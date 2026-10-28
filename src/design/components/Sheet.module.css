@@ -21,7 +21,7 @@
 }
 .header > :first-child { justify-self: start; }
 .header > :last-child { justify-self: end; }
-.title { font: var(--p-weight-heavy) var(--p-size-headline)/1.2 var(--font-display); letter-spacing: var(--p-tracking-headline); text-align: center; }
+.title { font: var(--p-weight-semibold) var(--p-size-headline)/1.2 var(--font-display); letter-spacing: var(--p-tracking-headline); text-align: center; }
 .body { overflow-y: auto; padding: var(--space-xs) var(--space-lg) var(--space-2xl); display: flex; flex-direction: column; gap: var(--space-lg); }
 
 @media (min-width: 744px) {

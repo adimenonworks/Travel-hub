@@ -1,8 +1,8 @@
-/* Text styles — use these classes (or the matching --p-size-* tokens) instead of raw sizes. */
-.t-display { font: var(--p-weight-heavy) var(--p-size-display)/var(--p-leading-display) var(--font-display); letter-spacing: var(--p-tracking-display); }
-.t-title1 { font: var(--p-weight-heavy) var(--p-size-title1)/var(--p-leading-title1) var(--font-display); letter-spacing: var(--p-tracking-title1); }
-.t-title2 { font: var(--p-weight-heavy) var(--p-size-title2)/var(--p-leading-title2) var(--font-display); letter-spacing: var(--p-tracking-title2); }
-.t-title3 { font: var(--p-weight-bold) var(--p-size-title3)/var(--p-leading-title3) var(--font-display); letter-spacing: var(--p-tracking-title3); }
+/* Text styles (weight 900 for the display style only, semibold for titles, per DESIGN.md) — use these classes (or the matching --p-size-* tokens) instead of raw sizes. */
+.t-display { font: var(--p-weight-black) var(--p-size-display)/var(--p-leading-display) var(--font-display); letter-spacing: var(--p-tracking-display); }
+.t-title1 { font: var(--p-weight-semibold) var(--p-size-title1)/var(--p-leading-title1) var(--font-display); letter-spacing: var(--p-tracking-title1); }
+.t-title2 { font: var(--p-weight-semibold) var(--p-size-title2)/var(--p-leading-title2) var(--font-display); letter-spacing: var(--p-tracking-title2); }
+.t-title3 { font: var(--p-weight-semibold) var(--p-size-title3)/var(--p-leading-title3) var(--font-display); letter-spacing: var(--p-tracking-title3); }
 .t-headline { font: var(--p-weight-semibold) var(--p-size-headline)/var(--p-leading-headline) var(--font-text); letter-spacing: var(--p-tracking-headline); }
 .t-body { font: var(--p-weight-regular) var(--p-size-body)/var(--p-leading-body) var(--font-text); letter-spacing: var(--p-tracking-body); }
 .t-callout { font: var(--p-weight-regular) var(--p-size-callout)/var(--p-leading-callout) var(--font-text); letter-spacing: var(--p-tracking-callout); }

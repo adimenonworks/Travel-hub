@@ -36,7 +36,7 @@
   color: var(--color-label-secondary);
 }
 .emptyIconWrap { display: grid; place-items: center; width: 80px; height: 80px; border-radius: var(--radius-icon); background: var(--color-accent); color: var(--color-on-accent); margin-bottom: var(--space-xs); }
-.emptyTitle { font: var(--p-weight-heavy) var(--p-size-title3)/var(--p-leading-title3) var(--font-display); letter-spacing: var(--p-tracking-title3); color: var(--color-label); }
+.emptyTitle { font: var(--p-weight-semibold) var(--p-size-title3)/var(--p-leading-title3) var(--font-display); letter-spacing: var(--p-tracking-title3); color: var(--color-label); }
 .emptyAction { margin-top: var(--space-sm); }
 
 /* Spinner */

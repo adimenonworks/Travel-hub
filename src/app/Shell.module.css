@@ -28,7 +28,7 @@
 
 .brand { display: inline-flex; align-items: center; gap: var(--space-sm); color: var(--color-label); flex: none; border-radius: var(--radius-pill); }
 .brandMark { width: 44px; height: 44px; border-radius: var(--radius-icon); background: var(--color-accent); color: var(--color-on-accent); display: grid; place-items: center; }
-.brandName { display: none; font: var(--p-weight-heavy) var(--p-size-title3)/1 var(--font-display); letter-spacing: var(--p-tracking-title3); }
+.brandName { display: none; font: var(--p-weight-black) var(--p-size-title3)/1 var(--font-display); letter-spacing: var(--p-tracking-title3); }
 
 .tabs { flex: 1; min-width: 0; }
 

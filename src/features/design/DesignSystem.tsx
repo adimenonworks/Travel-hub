@@ -16,10 +16,10 @@ const colorGroups: { title: string; tokens: string[] }[] = [
 ];
 
 const typeStyles = [
-  ['t-display', 'Display', '36–64 / 1.02 Heavy'],
-  ['t-title1', 'Title 1', '32 / 36 Heavy'],
-  ['t-title2', 'Title 2', '26 / 30 Heavy'],
-  ['t-title3', 'Title 3', '21 / 26 Bold'],
+  ['t-display', 'Display', '40–72 / 0.92 Black (900)'],
+  ['t-title1', 'Title 1', '32 / 38 Semibold'],
+  ['t-title2', 'Title 2', '24 / 31 Semibold'],
+  ['t-title3', 'Title 3', '20 / 26 Semibold'],
   ['t-headline', 'Headline', '17 / 24 Semibold'],
   ['t-body', 'Body', '16 / 24 Regular'],
   ['t-callout', 'Callout', '15 / 22 Regular'],
@@ -59,7 +59,7 @@ export function DesignSystem() {
           ))}
         </Section>
 
-        <Section title="Typography" footer="Inter (bundled with the app). Headings are heavy and tightly spaced. Classes in tokens/typography.css.">
+        <Section title="Typography" footer="Inter (bundled with the app). Weight 900 for page titles and big numbers only; everything else is semibold, as in DESIGN.md. Classes in tokens/typography.css.">
           <Card className={s.stack}>
             {typeStyles.map(([cls, name, spec]) => (
               <div key={cls} className={s.typeRow}>
@@ -70,7 +70,7 @@ export function DesignSystem() {
           </Card>
         </Section>
 
-        <Section title="Spacing & shape" footer="4px base unit, 8px rhythm. Controls are pills; surfaces have soft 32px corners. Minimum tap target 44×44.">
+        <Section title="Spacing & shape" footer="4px base unit, 8px rhythm. Controls are pills; cards have soft 24px corners and sit white on the sage canvas. Minimum tap target 44×44.">
           <Card className={s.stack}>
             {spaces.map((t) => (
               <div key={t} className={s.spaceRow}>
@@ -118,7 +118,7 @@ export function DesignSystem() {
 
         <Section title="Cards">
           <div className={s.cards}>
-            <Card><div className="t-title3">Default card</div><p className="t-subhead t-secondary">Flat surface, no shadow.</p></Card>
+            <Card><div className="t-title3">Default card</div><p className="t-subhead t-secondary">White on the sage canvas, no shadow.</p></Card>
             <Card tone="accent"><div className="t-title3">Accent card</div><p className="t-subhead t-secondary">For the one thing that matters most on a page.</p></Card>
           </div>
         </Section>

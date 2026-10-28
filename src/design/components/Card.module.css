@@ -25,5 +25,5 @@
   min-height: var(--size-tap);
   flex-wrap: wrap;
 }
-.sectionTitle { font: var(--p-weight-heavy) var(--p-size-title2)/var(--p-leading-title2) var(--font-display); letter-spacing: var(--p-tracking-title2); }
+.sectionTitle { font: var(--p-weight-semibold) var(--p-size-title2)/var(--p-leading-title2) var(--font-display); letter-spacing: var(--p-tracking-title2); }
 .sectionFooter { font-size: var(--p-size-footnote); line-height: var(--p-leading-footnote); color: var(--color-label-secondary); padding: 0 var(--space-xs); }

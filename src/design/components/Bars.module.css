@@ -15,7 +15,7 @@
 .back:hover { background: var(--color-fill-tertiary); }
 .titleRow { display: flex; align-items: flex-end; justify-content: space-between; gap: var(--space-md); flex-wrap: wrap; }
 .titleText { display: flex; flex-direction: column; gap: var(--space-xs); min-width: 0; }
-.title { font: var(--p-weight-heavy) var(--p-size-display)/var(--p-leading-display) var(--font-display); letter-spacing: var(--p-tracking-display); overflow-wrap: anywhere; }
+.title { font: var(--p-weight-black) var(--p-size-display)/var(--p-leading-display) var(--font-display); letter-spacing: var(--p-tracking-display); overflow-wrap: anywhere; }
 .subtitle { color: var(--color-label-secondary); font-size: var(--p-size-callout); line-height: var(--p-leading-callout); }
 .actions { display: flex; align-items: center; gap: var(--space-xs); }
 

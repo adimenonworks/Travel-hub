@@ -1,8 +1,9 @@
 /*
  * Primitives — raw values only. Nothing in the app should reference these
  * directly; components consume the semantic tokens in semantic.css.
- * Inspired by Wise: bright fills always carry a dark partner colour for text,
- * neutrals have a faint green cast, and type is heavy and tight.
+ * Inspired by Wise (see DESIGN.md at the repo root): bright fills always carry
+ * a dark partner colour for text, a sage canvas holds white cards, and hero
+ * type is weight 900 while everything else is semibold.
  * Every text pairing here meets WCAG 2.2 AA (most meet AAA).
  */
 :root {
@@ -29,8 +30,9 @@
   --p-white: #ffffff;
   --p-ink: #0e0f0c;
   --p-ink-2: #454745;
-  --p-ink-3: #6a6c6a;
+  --p-ink-3: #5f615e;
   --p-ink-4: #868685;
+  --p-sage: #e8ebe6;
   --p-mist: #f1f3ee;
   --p-mist-2: #e4e7e0;
 
@@ -54,10 +56,10 @@
   --p-font-mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
 
   /* Type scale (size / line-height / tracking) */
-  --p-size-display: clamp(36px, 3.2vw + 24px, 64px); --p-leading-display: 1.02; --p-tracking-display: -0.035em;
-  --p-size-title1: 32px;   --p-leading-title1: 36px;   --p-tracking-title1: -0.03em;
-  --p-size-title2: 26px;   --p-leading-title2: 30px;   --p-tracking-title2: -0.025em;
-  --p-size-title3: 21px;   --p-leading-title3: 26px;   --p-tracking-title3: -0.02em;
+  --p-size-display: clamp(40px, 3.2vw + 28px, 72px); --p-leading-display: 0.92; --p-tracking-display: -0.02em;
+  --p-size-title1: 32px;   --p-leading-title1: 38px;   --p-tracking-title1: -0.03em;
+  --p-size-title2: 24px;   --p-leading-title2: 31px;   --p-tracking-title2: -0.02em;
+  --p-size-title3: 20px;   --p-leading-title3: 26px;   --p-tracking-title3: -0.015em;
   --p-size-headline: 17px; --p-leading-headline: 24px; --p-tracking-headline: -0.012em;
   --p-size-body: 16px;     --p-leading-body: 24px;     --p-tracking-body: -0.011em;
   --p-size-callout: 15px;  --p-leading-callout: 22px;  --p-tracking-callout: -0.009em;
@@ -70,7 +72,7 @@
   --p-weight-medium: 500;
   --p-weight-semibold: 600;
   --p-weight-bold: 700;
-  --p-weight-heavy: 800;
+  --p-weight-black: 900;  /* hero headings and big numbers only */
 
   /* Spacing — 4px base, 8px rhythm */
   --p-space-1: 4px;
@@ -86,7 +88,6 @@
   /* Corner radii — generous; pills wherever a shape allows */
   --p-radius-md: 16px;
   --p-radius-lg: 24px;
-  --p-radius-xl: 32px;
   --p-radius-full: 999px;
 
   /* Elevation — surfaces are flat; only floating things get shadows */

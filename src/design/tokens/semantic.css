@@ -28,7 +28,7 @@
   --color-success: var(--p-green);
   --color-warning: var(--p-amber);
   --color-danger: var(--p-red);
-  --color-success-subtle: color-mix(in srgb, var(--p-lime) 40%, transparent);
+  --color-success-subtle: color-mix(in srgb, var(--p-lime) 35%, var(--p-white));
   --color-warning-subtle: color-mix(in srgb, var(--p-lemon) 55%, transparent);
   --color-danger-subtle: color-mix(in srgb, var(--p-red) 10%, transparent);
 
@@ -50,21 +50,21 @@
   --color-link: var(--color-tint);
 
   /* Surfaces */
-  --color-bg: var(--p-white);              /* page */
-  --color-surface: var(--p-mist);          /* cards, lists, tiles */
-  --color-bg-elevated: var(--p-white);     /* sheets, menus */
+  --color-bg: var(--p-sage);               /* page: Wise's sage canvas */
+  --color-surface: var(--p-white);         /* cards, lists, tiles */
+  --color-bg-elevated: var(--p-white);     /* sheets, menus, text fields */
 
   /* Fills (controls on top of surfaces) */
   --color-fill: var(--p-mist-2);
-  --color-fill-tertiary: rgba(14, 15, 12, 0.06);
+  --color-fill-tertiary: rgba(14, 15, 12, 0.07);
   --color-fill-quaternary: rgba(14, 15, 12, 0.04);
 
   /* Lines */
   --color-separator: rgba(14, 15, 12, 0.12);
-  --color-border-control: var(--p-ink-4); /* input and switch outlines, ≥ 3:1 */
+  --color-border-control: var(--p-ink-3); /* input outlines, ≥ 3:1 on every light surface */
 
   /* Materials */
-  --material-bar: rgba(255, 255, 255, 0.86);
+  --material-bar: rgba(255, 255, 255, 0.9);
   --material-blur: saturate(180%) blur(20px);
   --color-scrim: rgba(14, 15, 12, 0.5);
 
@@ -91,8 +91,8 @@
   --radius-control: var(--p-radius-full);  /* single-line fields, chips, tabs */
   --radius-field: var(--p-radius-lg);      /* multi-line fields, dropdown menus */
   --radius-inner: var(--p-radius-md);      /* thumbnails, bubbles, things inside cards */
-  --radius-card: var(--p-radius-xl);
-  --radius-sheet: var(--p-radius-xl);
+  --radius-card: var(--p-radius-lg);
+  --radius-sheet: var(--p-radius-lg);
   --radius-icon: var(--p-radius-full);
   --radius-pill: var(--p-radius-full);
 
@@ -124,7 +124,7 @@
   :root {
     --space-gutter: var(--p-space-8);
     --space-inset: var(--p-space-6);
-    --space-stack: var(--p-space-10);
+    --space-stack: var(--p-space-12);
     --size-topbar: 72px;
   }
 }

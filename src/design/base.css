@@ -17,7 +17,6 @@ body {
   color: var(--color-label);
   font: var(--p-weight-regular) var(--p-size-body)/var(--p-leading-body) var(--font-text);
   letter-spacing: var(--p-tracking-body);
-  font-feature-settings: "cv11", "ss01"; /* Inter's single-storey a and open digits, closer to Wise's type */
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
