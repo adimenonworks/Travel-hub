@@ -1,4 +1,5 @@
 import type { ButtonHTMLAttributes, ReactNode } from 'react';
+import { Link } from 'react-router-dom';
 import { Icon, type IconName } from './Icon';
 import s from './Button.module.css';
 
@@ -19,6 +20,17 @@ export function Button({ variant = 'filled', size = 'regular', block, icon, chil
       {icon && <Icon name={icon} size={size === 'small' ? 18 : 20} />}
       {children}
     </button>
+  );
+}
+
+/** A link that looks like a button (never wrap a Button in a Link: nested controls confuse screen readers). */
+export function LinkButton({ to, variant = 'filled', size = 'regular', icon, children }: { to: string; variant?: ButtonVariant; size?: 'small' | 'regular' | 'large'; icon?: IconName; children: ReactNode }) {
+  const cls = [s.button, s[variant], size !== 'regular' && s[size]].filter(Boolean).join(' ');
+  return (
+    <Link to={to} className={cls}>
+      {icon && <Icon name={icon} size={size === 'small' ? 18 : 20} />}
+      {children}
+    </Link>
   );
 }
 

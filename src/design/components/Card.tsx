@@ -2,10 +2,10 @@ import type { HTMLAttributes, ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import s from './Card.module.css';
 
-type CardProps = HTMLAttributes<HTMLDivElement> & { flush?: boolean };
+type CardProps = HTMLAttributes<HTMLDivElement> & { flush?: boolean; tone?: 'default' | 'accent' };
 
-export function Card({ flush, className, ...rest }: CardProps) {
-  return <div className={[s.card, flush && s.flush, 'on-secondary', className].filter(Boolean).join(' ')} {...rest} />;
+export function Card({ flush, tone = 'default', className, ...rest }: CardProps) {
+  return <div className={[s.card, flush && s.flush, tone === 'accent' && s.accent, className].filter(Boolean).join(' ')} {...rest} />;
 }
 
 export function CardLink({ to, flush, className, children }: { to: string; flush?: boolean; className?: string; children: ReactNode }) {

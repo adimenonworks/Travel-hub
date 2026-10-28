@@ -30,8 +30,8 @@ export function SignIn({ message }: { message?: string }) {
     <div className={s.page}>
       <div className={s.hero}>
         <span className={s.mark}><Icon name="plane" size={40} /></span>
-        <h1 className="t-large-title">Trip Hub</h1>
-        <p className="t-body t-secondary">Plan trips together: a day-by-day itinerary, an ideas board, a shared budget and local weather.</p>
+        <h1 className="t-display">Plan trips together.</h1>
+        <p className="t-body t-secondary">Trip Hub gives your crew a day-by-day itinerary, an ideas board, a shared budget and local weather.</p>
       </div>
       <Card className={s.card}>
         {message && <p className="t-subhead">{message}</p>}

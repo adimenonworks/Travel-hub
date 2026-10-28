@@ -21,7 +21,7 @@ export function Info({ trip, activities }: TripCtx) {
   }
   const pins = activities
     .filter((a) => a.location)
-    .map((a) => ({ lat: a.location!.lat, lng: a.location!.lng, label: a.title, color: cssVarHex(categoryInfo(a.category).color) }));
+    .map((a) => ({ lat: a.location!.lat, lng: a.location!.lng, label: a.title, color: categoryInfo(a.category).color }));
 
   return (
     <div className={s.infoGrid}>
@@ -32,12 +32,6 @@ export function Info({ trip, activities }: TripCtx) {
       <News place={dest.name} />
     </div>
   );
-}
-
-// Leaflet needs real colors, not CSS variables.
-function cssVarHex(v: string) {
-  const name = v.match(/var\((--[^)]+)\)/)?.[1];
-  return name ? getComputedStyle(document.documentElement).getPropertyValue(name).trim() || '#007aff' : v;
 }
 
 function Weather({ trip }: { trip: TripCtx['trip'] }) {
@@ -88,7 +82,7 @@ function News({ place }: { place: string }) {
     return () => { live = false; };
   }, [place]);
 
-  const more = <a href={newsSearchUrl(place)} target="_blank" rel="noreferrer" className="t-subhead">More news</a>;
+  const more = <a href={newsSearchUrl(place)} target="_blank" rel="noreferrer" >More news</a>;
   return (
     <Section title="Local news" action={more} footer="Headlines from the past week, via GDELT.">
       {state.status === 'loading' && <Card><Spinner center /></Card>}

@@ -3,9 +3,9 @@ import { Link } from 'react-router-dom';
 import { Icon, type IconName } from './Icon';
 import s from './List.module.css';
 
-/** Inset-grouped list (HIG "insetGrouped" table style). */
+/** Rounded list of rows on a surface. */
 export function List({ children, className }: { children: ReactNode; className?: string }) {
-  return <div role="list" className={[s.list, 'on-secondary', className].filter(Boolean).join(' ')}>{children}</div>;
+  return <div role="list" className={[s.list, className].filter(Boolean).join(' ')}>{children}</div>;
 }
 
 type RowProps = {
@@ -26,7 +26,7 @@ export function ListRow({ title, subtitle, icon, iconColor, leading, trailing, c
     <>
       {icon && (
         <span className={s.leading} style={{ '--leading-bg': iconColor } as CSSProperties}>
-          <Icon name={icon} size={18} />
+          <Icon name={icon} size={20} />
         </span>
       )}
       {leading}
@@ -42,7 +42,7 @@ export function ListRow({ title, subtitle, icon, iconColor, leading, trailing, c
       )}
     </>
   );
-  const inset = { '--row-inset': icon ? '58px' : undefined } as CSSProperties;
+  const inset = { '--row-inset': icon ? 'calc(var(--space-inset) + 52px)' : undefined } as CSSProperties;
   if (to) return <Link role="listitem" to={to} className={`${s.row} ${s.interactive}`} style={inset}>{body}</Link>;
   if (href) return <a role="listitem" href={href} target="_blank" rel="noreferrer" className={`${s.row} ${s.interactive}`} style={inset}>{body}</a>;
   if (onClick) return <button role="listitem" type="button" onClick={onClick} className={`${s.row} ${s.interactive}`} style={inset}>{body}</button>;

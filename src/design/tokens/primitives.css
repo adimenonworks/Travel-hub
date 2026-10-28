@@ -1,80 +1,78 @@
 /*
  * Primitives — raw values only. Nothing in the app should reference these
  * directly; components consume the semantic tokens in semantic.css.
- * Values follow Apple's Human Interface Guidelines (iOS system palette,
- * Dynamic Type "Large" sizes, 4/8pt grid).
+ * Inspired by Wise: bright fills always carry a dark partner colour for text,
+ * neutrals have a faint green cast, and type is heavy and tight.
+ * Every text pairing here meets WCAG 2.2 AA (most meet AAA).
  */
 :root {
-  /* System colors — light */
-  --p-blue-light: #007aff;
-  --p-green-light: #34c759;
-  --p-indigo-light: #5856d6;
-  --p-orange-light: #ff9500;
-  --p-pink-light: #ff2d55;
-  --p-purple-light: #af52de;
-  --p-red-light: #ff3b30;
-  --p-teal-light: #30b0c7;
-  --p-yellow-light: #ffcc00;
-  --p-mint-light: #00c7be;
-  --p-cyan-light: #32ade6;
-  --p-brown-light: #a2845e;
+  /* Brights: fills, always with dark text on top (≥ 10:1 with --p-ink) */
+  --p-lime: #9fe870;
+  --p-lemon: #ffeb69;
+  --p-tangerine: #ffa770;
+  --p-bubblegum: #ffa3da;
+  --p-lavender: #c2b0ff;
+  --p-aqua: #7ee0d6;
+  --p-sky: #8fcbff;
+  --p-sand: #e9cc9e;
+  --p-stone: #d3d6ce;
 
-  /* System colors — dark */
-  --p-blue-dark: #0a84ff;
-  --p-green-dark: #30d158;
-  --p-indigo-dark: #5e5ce6;
-  --p-orange-dark: #ff9f0a;
-  --p-pink-dark: #ff375f;
-  --p-purple-dark: #bf5af2;
-  --p-red-dark: #ff453a;
-  --p-teal-dark: #40c8e0;
-  --p-yellow-dark: #ffd60a;
-  --p-mint-dark: #63e6e2;
-  --p-cyan-dark: #64d2ff;
-  --p-brown-dark: #ac8e68;
+  /* Deeps: the dark partner of each bright, for text and icons on light surfaces */
+  --p-lime-deep: #163300;
+  --p-lemon-deep: #3a341c;
+  --p-tangerine-deep: #4a1a00;
+  --p-bubblegum-deep: #4a0d33;
+  --p-lavender-deep: #2a1260;
+  --p-sky-deep: #0b2e4f;
 
-  /* System grays */
-  --p-gray: #8e8e93;
-  --p-gray2-light: #aeaeb2;
-  --p-gray3-light: #c7c7cc;
-  --p-gray4-light: #d1d1d6;
-  --p-gray5-light: #e5e5ea;
-  --p-gray6-light: #f2f2f7;
-  --p-gray2-dark: #636366;
-  --p-gray3-dark: #48484a;
-  --p-gray4-dark: #3a3a3c;
-  --p-gray5-dark: #2c2c2e;
-  --p-gray6-dark: #1c1c1e;
-
+  /* Neutrals — light */
   --p-white: #ffffff;
-  --p-black: #000000;
+  --p-ink: #0e0f0c;
+  --p-ink-2: #454745;
+  --p-ink-3: #6a6c6a;
+  --p-ink-4: #868685;
+  --p-mist: #f1f3ee;
+  --p-mist-2: #e4e7e0;
 
-  /* Type families */
-  --p-font-text: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  --p-font-display: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  --p-font-rounded: ui-rounded, "SF Pro Rounded", -apple-system, BlinkMacSystemFont, sans-serif;
+  /* Neutrals — dark */
+  --p-night: #0e0f0c;
+  --p-night-2: #1c1f1a;
+  --p-night-3: #262923;
+  --p-fog: #c8cac4;
+  --p-fog-2: #9c9f98;
+  --p-fog-3: #7c7f78;
+
+  /* Status */
+  --p-red: #a8200d;
+  --p-red-bright: #ff8a7a;
+  --p-green: #2f5711;
+  --p-amber: #7a5200;
+  --p-amber-bright: #ffd166;
+
+  /* Type families (Inter is bundled; see main.tsx) */
+  --p-font-sans: "Inter Variable", Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   --p-font-mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
 
-  /* Type scale (size / line-height / tracking), HIG Dynamic Type "Large" */
-  --p-size-large-title: 34px; --p-leading-large-title: 41px; --p-tracking-large-title: 0.4px;
-  --p-size-title1: 28px;      --p-leading-title1: 34px;      --p-tracking-title1: 0.38px;
-  --p-size-title2: 22px;      --p-leading-title2: 28px;      --p-tracking-title2: -0.26px;
-  --p-size-title3: 20px;      --p-leading-title3: 25px;      --p-tracking-title3: -0.45px;
-  --p-size-headline: 17px;    --p-leading-headline: 22px;    --p-tracking-headline: -0.43px;
-  --p-size-body: 17px;        --p-leading-body: 22px;        --p-tracking-body: -0.43px;
-  --p-size-callout: 16px;     --p-leading-callout: 21px;     --p-tracking-callout: -0.31px;
-  --p-size-subhead: 15px;     --p-leading-subhead: 20px;     --p-tracking-subhead: -0.23px;
-  --p-size-footnote: 13px;    --p-leading-footnote: 18px;    --p-tracking-footnote: -0.08px;
-  --p-size-caption1: 12px;    --p-leading-caption1: 16px;    --p-tracking-caption1: 0px;
-  --p-size-caption2: 11px;    --p-leading-caption2: 13px;    --p-tracking-caption2: 0.06px;
+  /* Type scale (size / line-height / tracking) */
+  --p-size-display: clamp(36px, 3.2vw + 24px, 64px); --p-leading-display: 1.02; --p-tracking-display: -0.035em;
+  --p-size-title1: 32px;   --p-leading-title1: 36px;   --p-tracking-title1: -0.03em;
+  --p-size-title2: 26px;   --p-leading-title2: 30px;   --p-tracking-title2: -0.025em;
+  --p-size-title3: 21px;   --p-leading-title3: 26px;   --p-tracking-title3: -0.02em;
+  --p-size-headline: 17px; --p-leading-headline: 24px; --p-tracking-headline: -0.012em;
+  --p-size-body: 16px;     --p-leading-body: 24px;     --p-tracking-body: -0.011em;
+  --p-size-callout: 15px;  --p-leading-callout: 22px;  --p-tracking-callout: -0.009em;
+  --p-size-subhead: 14px;  --p-leading-subhead: 20px;  --p-tracking-subhead: -0.006em;
+  --p-size-footnote: 13px; --p-leading-footnote: 18px; --p-tracking-footnote: 0;
+  --p-size-caption1: 12px; --p-leading-caption1: 16px; --p-tracking-caption1: 0;
+  --p-size-caption2: 11px; --p-leading-caption2: 14px; --p-tracking-caption2: 0.01em;
 
   --p-weight-regular: 400;
   --p-weight-medium: 500;
   --p-weight-semibold: 600;
   --p-weight-bold: 700;
+  --p-weight-heavy: 800;
 
-  /* Spacing — 4pt base, 8pt rhythm */
-  --p-space-0: 0;
+  /* Spacing — 4px base, 8px rhythm */
   --p-space-1: 4px;
   --p-space-2: 8px;
   --p-space-3: 12px;
@@ -84,22 +82,16 @@
   --p-space-8: 32px;
   --p-space-10: 40px;
   --p-space-12: 48px;
-  --p-space-16: 64px;
 
-  /* Corner radii */
-  --p-radius-xs: 6px;
-  --p-radius-sm: 8px;
-  --p-radius-md: 10px;
-  --p-radius-lg: 12px;
-  --p-radius-xl: 16px;
-  --p-radius-2xl: 22px;
-  --p-radius-3xl: 28px;
+  /* Corner radii — generous; pills wherever a shape allows */
+  --p-radius-md: 16px;
+  --p-radius-lg: 24px;
+  --p-radius-xl: 32px;
   --p-radius-full: 999px;
 
-  /* Elevation */
-  --p-shadow-1: 0 1px 2px rgba(0, 0, 0, 0.06), 0 1px 1px rgba(0, 0, 0, 0.04);
-  --p-shadow-2: 0 4px 16px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.06);
-  --p-shadow-3: 0 12px 40px rgba(0, 0, 0, 0.18), 0 2px 8px rgba(0, 0, 0, 0.08);
+  /* Elevation — surfaces are flat; only floating things get shadows */
+  --p-shadow-2: 0 8px 24px rgba(14, 15, 12, 0.12), 0 2px 6px rgba(14, 15, 12, 0.06);
+  --p-shadow-3: 0 24px 64px rgba(14, 15, 12, 0.24), 0 4px 12px rgba(14, 15, 12, 0.1);
 
   /* Motion */
   --p-duration-fast: 150ms;

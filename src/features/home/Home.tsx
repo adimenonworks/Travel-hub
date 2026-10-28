@@ -1,19 +1,14 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Avatar, AvatarStack, Button, Card, CardLink, EmptyState, IconButton, PageHeader, Section, Spinner, TabBar } from '../../design/components';
+import { Avatar, AvatarStack, Button, Card, CardLink, EmptyState, PageHeader, Section, Spinner } from '../../design/components';
 import { personName, useMe, useMyTrips, useProfile, useProfiles } from '../../data/hooks';
 import type { Trip } from '../../data/types';
+import { coverColor } from '../../lib/colors';
 import { daysBetween, formatRange, today, tripPhase } from '../../lib/dates';
 import { Content } from '../../app/Shell';
 import { MapView } from '../shared/MapView';
 import { TripForm } from '../trip/TripForm';
 import s from './Home.module.css';
-
-export const globalTabs = [
-  { to: '/', label: 'Trips', icon: 'home' as const, end: true },
-  { to: '/profile', label: 'Profile', icon: 'person' as const },
-  { to: '/design', label: 'Design', icon: 'swatch' as const },
-];
 
 export function Home() {
   const me = useMe();
@@ -36,17 +31,13 @@ export function Home() {
 
   return (
     <>
-      <PageHeader
-        title="Trips"
-        leading={<Link to="/profile" aria-label="Profile" className={s.compactOnly}><Avatar name={me.name} photo={me.photo} seed={me.uid} size={32} /></Link>}
-        actions={<IconButton icon="plus" label="New trip" variant="tinted" onClick={() => setCreating(true)} />}
-      />
       <Content>
-        <Card className={s.profile}>
-          <Avatar name={me.name} photo={me.photo} seed={me.uid} size={56} />
+        <PageHeader title="Trips" actions={<Button icon="plus" onClick={() => setCreating(true)}>New trip</Button>} />
+        <Card tone="accent" className={s.profile}>
+          <Avatar name={me.name} photo={me.photo} seed={me.uid} size={64} />
           <div className={s.profileText}>
-            <div className="t-title3">Hi, {me.name.split(' ')[0]}</div>
-            <div className="t-subhead t-secondary">
+            <h2 className="t-title1">Hi, {me.name.split(' ')[0]}</h2>
+            <div className="t-callout">
               {next ? `${next.name} starts in ${daysBetween(today(), next.startDate)} days` : current.length ? `You're on ${current[0].name} right now` : 'No trips planned yet'}
             </div>
           </div>
@@ -70,7 +61,7 @@ export function Home() {
           </>
         )}
 
-        <Section title="Where you've been" action={<Link to="/profile" className="t-subhead">Add places</Link>}
+        <Section title="Where you've been" action={<Link to="/profile">Add places</Link>}
           footer="Past trips appear here automatically. Add your home and other places from your profile.">
           <MapView pins={[
             ...(profile?.home ? [{ lat: profile.home.lat, lng: profile.home.lng, label: `Home · ${profile.home.name}`, kind: 'home' as const }] : []),
@@ -78,7 +69,6 @@ export function Home() {
           ]} height={260} />
         </Section>
       </Content>
-      <TabBar items={globalTabs} />
       <TripForm open={creating} onClose={() => setCreating(false)} onSaved={(id) => navigate(`/trip/${id}`)} />
     </>
   );
@@ -88,7 +78,7 @@ function Stat({ value, label }: { value: number; label: string }) {
   return (
     <div className={s.stat}>
       <div className={s.statValue}>{value}</div>
-      <div className="t-caption1 t-secondary">{label}</div>
+      <div className="t-footnote">{label}</div>
     </div>
   );
 }
@@ -104,11 +94,11 @@ function TripGroup({ title, trips }: { title: string; trips: Trip[] }) {
           const until = daysBetween(today(), t.startDate);
           return (
             <CardLink key={t.id} to={`/trip/${t.id}`} flush>
-              <div className={s.cover} style={{ background: t.coverColor ?? 'var(--color-tint)' }}>
+              <div className={s.cover} style={{ background: coverColor(t.coverColor) }}>
                 <span className={s.coverBadge}>{until > 0 ? `in ${until} day${until === 1 ? '' : 's'}` : until === 0 ? 'Today' : `${n} day${n === 1 ? '' : 's'}`}</span>
               </div>
               <div className={s.tripBody}>
-                <div className="t-headline">{t.name}</div>
+                <div className="t-title3">{t.name}</div>
                 <div className="t-subhead t-secondary">{t.destination?.name.split(',').slice(0, 2).join(',') ?? 'No destination yet'}</div>
                 <div className={s.tripFoot}>
                   <span className="t-footnote t-secondary">{formatRange(t.startDate, t.endDate)}</span>

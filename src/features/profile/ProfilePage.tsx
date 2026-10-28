@@ -1,19 +1,19 @@
 import { useState } from 'react';
-import { Avatar, Button, Card, IconButton, List, ListRow, PageHeader, SegmentedControl, Section, TabBar } from '../../design/components';
+import { Avatar, Button, Card, ColorPicker, IconButton, List, ListRow, PageHeader, SegmentedControl, Section } from '../../design/components';
 import { store } from '../../data';
 import { useMe, useProfile } from '../../data/hooks';
 import type { Place } from '../../data/types';
-import { applyTheme, getTheme, type ThemePref } from '../../lib/theme';
+import { ACCENTS, applyAccent, applyTheme, getAccent, getTheme, type Accent, type ThemePref } from '../../lib/theme';
 import { Content } from '../../app/Shell';
 import { CityPicker } from '../shared/CityPicker';
 import { MapView } from '../shared/MapView';
-import { globalTabs } from '../home/Home';
 import s from './Profile.module.css';
 
 export function ProfilePage() {
   const me = useMe();
   const profile = useProfile(me.uid);
   const [theme, setTheme] = useState<ThemePref>(getTheme);
+  const [accent, setAccent] = useState<Accent>(getAccent);
   const [adding, setAdding] = useState<Place | null>(null);
   const [pickerKey, setPickerKey] = useState(0);
   const visited = profile?.visited ?? [];
@@ -27,12 +27,12 @@ export function ProfilePage() {
 
   return (
     <>
-      <PageHeader title="Profile" />
       <Content>
+        <PageHeader title="Profile" />
         <Card className={s.head}>
           <Avatar name={me.name} photo={me.photo} seed={me.uid} size={72} />
           <div>
-            <div className="t-title2">{me.name}</div>
+            <h2 className="t-title2">{me.name}</h2>
             {me.email && <div className="t-subhead t-secondary">{me.email}</div>}
             <div className="t-subhead t-secondary">{store.mode === 'demo' ? 'Demo account' : 'Signed in with Google'}</div>
           </div>
@@ -60,23 +60,26 @@ export function ProfilePage() {
           {visited.length > 0 && (
             <List>
               {visited.map((v) => (
-                <ListRow key={v.name} icon="pin" iconColor="var(--color-success)" title={v.name}
+                <ListRow key={v.name} icon="pin" title={v.name}
                   trailing={<IconButton icon="trash" size="small" label={`Remove ${v.name}`} onClick={() => store.saveProfile(me.uid, { visited: visited.filter((x) => x.name !== v.name) })} />} />
               ))}
             </List>
           )}
         </Section>
 
-        <Section title="Appearance">
-          <Card>
-            <SegmentedControl block label="Appearance" value={theme} onChange={(t) => { setTheme(t); applyTheme(t); }}
-              options={[{ value: 'auto', label: 'Automatic' }, { value: 'light', label: 'Light' }, { value: 'dark', label: 'Dark' }]} />
+        <Section title="Appearance" footer="Saved on this device. Every accent keeps text readable in light and dark mode.">
+          <Card className={s.appearance}>
+            <div className={s.appearanceRow}>
+              <div className="t-subhead t-bold">Mode</div>
+              <SegmentedControl block label="Mode" value={theme} onChange={(t) => { setTheme(t); applyTheme(t); }}
+                options={[{ value: 'auto', label: 'Automatic' }, { value: 'light', label: 'Light' }, { value: 'dark', label: 'Dark' }]} />
+            </div>
+            <ColorPicker label="Accent colour" options={ACCENTS} value={accent} onChange={(a) => { setAccent(a); applyAccent(a); }} />
           </Card>
         </Section>
 
-        <Button variant="destructive" icon="signout" onClick={() => store.signOut()}>Sign out</Button>
+        <div><Button variant="destructive" icon="signout" onClick={() => store.signOut()}>Sign out</Button></div>
       </Content>
-      <TabBar items={globalTabs} />
     </>
   );
 }

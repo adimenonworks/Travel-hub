@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { Link, useNavigate, useParams } from 'react-router-dom';
-import { Button, Card, EmptyState, Spinner } from '../../design/components';
+import { useNavigate, useParams } from 'react-router-dom';
+import { Button, Card, EmptyState, LinkButton, Spinner } from '../../design/components';
 import { store } from '../../data';
 import { useMyTrips } from '../../data/hooks';
 import type { Invite } from '../../data/types';
@@ -31,7 +31,7 @@ export function Join() {
       <Content>
         <Card>
           <EmptyState icon="link" title={expired ? 'This invite has expired' : 'Invite not found'} message="Ask the trip organizer for a new link."
-            action={<Link to="/"><Button variant="tinted">Go to my trips</Button></Link>} />
+            action={<LinkButton to="/" variant="tinted">Go to my trips</LinkButton>} />
         </Card>
       </Content>
     );
@@ -50,7 +50,7 @@ export function Join() {
 
   return (
     <Content>
-      <div style={{ height: 'var(--space-3xl)' }} />
+      <div />
       <Card>
         <EmptyState icon="plane" title={`Join “${invite.tripName}”`} message="You've been invited to plan this trip together."
           action={<Button size="large" onClick={join} disabled={busy}>Join trip</Button>} />

@@ -1,15 +1,15 @@
-.page { max-width: var(--size-content-max); margin: 0 auto; padding: var(--space-xs) var(--space-gutter) var(--space-3xl); display: flex; flex-direction: column; gap: var(--space-stack); }
+.page { max-width: calc(var(--size-content-max) + 2 * var(--space-gutter)); margin: 0 auto; padding: 0 var(--space-gutter) var(--space-3xl); display: flex; flex-direction: column; gap: var(--space-stack); }
 .swatches { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: var(--space-sm); }
 .swatch { display: flex; flex-direction: column; gap: 6px; }
-.chip { height: 56px; border-radius: var(--radius-control); box-shadow: inset 0 0 0 0.5px var(--color-separator); background-image: linear-gradient(45deg, transparent 0); }
+.chip { height: 56px; border-radius: var(--radius-pill); box-shadow: inset 0 0 0 1px var(--color-separator); }
 .code { font-family: var(--font-mono); font-size: var(--p-size-caption1); color: var(--color-label-secondary); overflow-wrap: anywhere; }
 .stack { display: flex; flex-direction: column; gap: var(--space-md); }
 .typeRow { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: var(--space-xs) var(--space-md); }
 .spaceRow { display: grid; grid-template-columns: 110px 1fr; align-items: center; gap: var(--space-sm); }
-.spaceBar { height: 16px; background: var(--color-tint); border-radius: 3px; }
+.spaceBar { height: 16px; background: var(--color-tint); border-radius: var(--radius-pill); }
 .radii { display: flex; flex-wrap: wrap; gap: var(--space-sm); }
 .radius { width: 96px; height: 64px; background: var(--color-fill-tertiary); display: grid; place-items: center; }
 .icons { display: grid; grid-template-columns: repeat(auto-fill, minmax(84px, 1fr)); gap: var(--space-sm); }
 .icon { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: var(--space-xs); color: var(--color-tint); text-align: center; }
 .row { display: flex; flex-wrap: wrap; gap: var(--space-sm); align-items: center; }
-.switchRow { display: flex; align-items: center; justify-content: space-between; }
+.cards { display: grid; gap: var(--space-md); grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
