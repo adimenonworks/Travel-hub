@@ -74,6 +74,7 @@ function TripLoaded({ trip }: { trip: Trip }) {
           actions={canManage && <Button variant="gray" icon="pencil" onClick={() => setEditing(true)}>Edit trip</Button>}
         />
         <div className={s.hero} style={{ '--trip-color': coverColor(trip.coverColor) } as CSSProperties}>
+          {trip.coverPhoto && <img src={trip.coverPhoto} alt="" className={s.heroPhoto} />}
           <span><Icon name="pin" size={20} />{trip.destination?.name ?? 'No destination'}</span>
           <span><Icon name="calendar" size={20} />{formatRange(trip.startDate, trip.endDate)} · {nDays} day{nDays === 1 ? '' : 's'}</span>
           <span><Icon name="people" size={20} />{trip.memberIds.length} traveler{trip.memberIds.length === 1 ? '' : 's'}</span>

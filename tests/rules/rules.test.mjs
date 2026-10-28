@@ -13,6 +13,8 @@ const trip = { name: 'Lisbon', ownerId: 'alice', memberIds: ['alice'], roles: { 
 
 await t('owner creates trip', assertSucceeds(setDoc(doc(A, 'trips/t1'), trip)));
 await t('cannot create trip owned by someone else', assertFails(setDoc(doc(B, 'trips/t2'), trip)));
+await t('owner creates trip with a cover photo', assertSucceeds(setDoc(doc(A, 'trips/t4'), { ...trip, coverPhoto: 'data:image/jpeg;base64,AAAA' })));
+await t('cannot create with a non-image cover', assertFails(setDoc(doc(A, 'trips/t5'), { ...trip, coverPhoto: 'hello' })));
 await t('cannot create with extra members', assertFails(setDoc(doc(B, 'trips/t3'), { ...trip, ownerId: 'bob', memberIds: ['bob', 'carol'], roles: { bob: 'owner' } })));
 await t('non-member cannot read trip', assertFails(getDoc(doc(B, 'trips/t1'))));
 await t('anon cannot read trip', assertFails(getDoc(doc(anon, 'trips/t1'))));
@@ -44,6 +46,12 @@ await env.withSecurityRulesDisabled(async (c) => setDoc(doc(c.firestore(), 'invi
 await t('expired invite rejected', assertFails(updateDoc(doc(C, 'trips/t1'), { memberIds: arrayUnion('carol'), 'roles.carol': 'member', joinedVia: 'old' })));
 
 await t('owner promotes bob', assertSucceeds(updateDoc(doc(A, 'trips/t1'), { 'roles.bob': 'editor' })));
+const jpeg = 'data:image/jpeg;base64,' + 'A'.repeat(1000);
+await t('editor sets a cover photo', assertSucceeds(updateDoc(doc(B, 'trips/t1'), { coverPhoto: jpeg })));
+await t('a full-size (300 KB) cover photo is accepted', assertSucceeds(updateDoc(doc(B, 'trips/t1'), { coverPhoto: 'data:image/jpeg;base64,' + 'A'.repeat(299000) })));
+await t('editor removes the cover photo', assertSucceeds(updateDoc(doc(B, 'trips/t1'), { coverPhoto: null })));
+await t('cover photo must be an image', assertFails(updateDoc(doc(B, 'trips/t1'), { coverPhoto: 'https://evil.example/x.js' })));
+await t('cover photo cannot be huge', assertFails(updateDoc(doc(B, 'trips/t1'), { coverPhoto: 'data:image/jpeg;base64,' + 'A'.repeat(600000) })));
 await t('editor renames trip', assertSucceeds(updateDoc(doc(B, 'trips/t1'), { name: 'Lisbon 2026' })));
 await t('editor cannot remove owner', assertFails(updateDoc(doc(B, 'trips/t1'), { memberIds: arrayRemove('alice'), 'roles.alice': deleteField() })));
 await t('editor cannot take ownership', assertFails(updateDoc(doc(B, 'trips/t1'), { ownerId: 'bob' })));

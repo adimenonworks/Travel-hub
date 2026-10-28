@@ -6,6 +6,7 @@ A shared vacation planner. Create trips, invite friends, and plan together:
 - **Ideas board**: anyone can drop ideas and vote; organizers approve an idea and schedule it into a day.
 - **Budget**: daily budget against planned spend for each day and the whole trip, either your share or the whole group's, plus flights, stays and other expenses.
 - **Info**: weather for your dates (a live forecast within 16 days, otherwise last year's weather on the same dates), local headlines, and a map of your plans.
+- **Cover photos**: pick a photo for each trip; it's shrunk on your device and saved with the trip (free, no Firebase Storage needed).
 - **Photos**: links to shared Google Photos or iCloud albums for the trip (those services don't allow embedding, so each album opens in its own app or tab).
 - **People**: invite links, roles (owner / organizer / member), leave or remove people.
 - **Home**: trips grouped into happening now / upcoming / past, travel stats, and a map of places you've been.

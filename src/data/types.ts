@@ -22,6 +22,8 @@ export type Trip = {
   currency: string;
   dailyBudget: number;
   coverColor?: string;
+  /** Small JPEG as a data URL (see lib/image.ts), or null for none. */
+  coverPhoto?: string | null;
   ownerId: string;
   memberIds: string[];
   roles: Record<string, Role>;
