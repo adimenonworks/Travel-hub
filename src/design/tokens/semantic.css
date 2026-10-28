@@ -82,9 +82,11 @@
   --space-stack: var(--p-space-6);         /* gap between sections */
 
   /* Shape */
-  --radius-control: var(--p-radius-md);
-  --radius-card: var(--p-radius-lg);
-  --radius-sheet: var(--p-radius-xl);
+  --radius-button: var(--p-radius-full);   /* capsule buttons */
+  --radius-control: var(--p-radius-xl);    /* text fields, menus, small panels */
+  --radius-card: var(--p-radius-2xl);
+  --radius-sheet: var(--p-radius-3xl);
+  --radius-icon: 9px;                      /* rounded-square icon tiles */
   --radius-pill: var(--p-radius-full);
 
   --shadow-card: var(--p-shadow-1);

@@ -29,7 +29,7 @@
 .interactive:active { background: var(--color-fill-tertiary); }
 .leading {
   flex: none; display: grid; place-items: center;
-  width: 30px; height: 30px; border-radius: 7px;
+  width: 30px; height: 30px; border-radius: var(--radius-icon);
   color: #fff; background: var(--leading-bg, var(--color-tint));
 }
 .leading.plain { background: transparent; color: var(--color-tint); width: auto; height: auto; }

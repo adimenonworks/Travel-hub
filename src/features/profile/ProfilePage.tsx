@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Avatar, Button, Card, IconButton, List, ListRow, PageHeader, SegmentedControl, Section, TabBar, TextField } from '../../design/components';
+import { Avatar, Button, Card, IconButton, List, ListRow, PageHeader, SegmentedControl, Section, TabBar } from '../../design/components';
 import { store } from '../../data';
 import { useMe, useProfile } from '../../data/hooks';
 import type { Place } from '../../data/types';
@@ -38,15 +38,21 @@ export function ProfilePage() {
           </div>
         </Card>
 
-        <Section title="Home">
-          <Card>
-            <TextField label="Home city" placeholder="Where you usually start from" defaultValue={profile?.homeCity ?? ''} key={profile?.homeCity}
-              onBlur={(e) => e.target.value !== (profile?.homeCity ?? '') && store.saveProfile(me.uid, { homeCity: e.target.value.trim() })} />
+        <Section title="Home" footer="Start typing and pick your city from the list. It appears on your maps with a home pin.">
+          <Card className={s.add}>
+            <div className={s.addField}>
+              <CityPicker key={profile?.home?.name ?? 'none'} label="Home city" placeholder="Melbourne" value={profile?.home ?? null}
+                onChange={(p) => p && store.saveProfile(me.uid, { home: p, homeCity: p.name })} />
+            </div>
+            {profile?.home && <IconButton icon="trash" label="Remove home city" onClick={() => store.saveProfile(me.uid, { home: null, homeCity: '' })} />}
           </Card>
         </Section>
 
         <Section title="Places I've been" footer="These show on your Trips map, along with the destinations of past trips.">
-          <MapView pins={visited.map((v) => ({ lat: v.lat, lng: v.lng, label: v.name }))} height={240} />
+          <MapView pins={[
+            ...(profile?.home ? [{ lat: profile.home.lat, lng: profile.home.lng, label: `Home · ${profile.home.name}`, kind: 'home' as const }] : []),
+            ...visited.map((v) => ({ lat: v.lat, lng: v.lng, label: v.name })),
+          ]} height={240} />
           <Card className={s.add}>
             <div className={s.addField}><CityPicker key={pickerKey} label="Add a place" placeholder="Tokyo" value={adding} onChange={setAdding} /></div>
             <Button icon="plus" onClick={addPlace} disabled={!adding}>Add</Button>

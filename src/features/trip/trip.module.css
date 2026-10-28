@@ -66,8 +66,8 @@
 .statValue { font: var(--p-weight-bold) var(--p-size-title2)/var(--p-leading-title2) var(--font-rounded); font-variant-numeric: tabular-nums; }
 .bars { display: flex; flex-direction: column; gap: var(--space-sm); }
 .barRow { display: grid; grid-template-columns: 84px minmax(0, 1fr) auto; gap: var(--space-sm); align-items: center; font-size: var(--p-size-subhead); }
-.barTrack { position: relative; height: 22px; border-radius: 6px; background: var(--color-fill-quaternary); overflow: hidden; }
-.barFill { position: absolute; inset: 0 auto 0 0; border-radius: 6px; background: var(--bar-color, var(--color-tint)); }
+.barTrack { position: relative; height: 22px; border-radius: var(--radius-pill); background: var(--color-fill-quaternary); overflow: hidden; }
+.barFill { position: absolute; inset: 0 auto 0 0; border-radius: var(--radius-pill); background: var(--bar-color, var(--color-tint)); }
 .barLimit { position: absolute; top: -2px; bottom: -2px; width: 2px; background: var(--color-label); opacity: .5; }
 .barValue { font-variant-numeric: tabular-nums; text-align: right; min-width: 72px; }
 .over { color: var(--color-danger); font-weight: var(--p-weight-semibold); }
@@ -90,7 +90,7 @@
 /* People */
 .invite { display: flex; flex-direction: column; gap: var(--space-sm); }
 .inviteRow { display: flex; gap: var(--space-xs); align-items: center; }
-.inviteUrl { flex: 1; min-width: 0; font-family: var(--font-mono); font-size: var(--p-size-footnote); padding: var(--space-sm); background: var(--color-fill-tertiary); border-radius: var(--radius-control); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.inviteUrl { flex: 1; min-width: 0; font-family: var(--font-mono); font-size: var(--p-size-footnote); padding: var(--space-sm) var(--space-md); background: var(--color-fill-tertiary); border-radius: var(--radius-control); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .dangerZone { display: flex; gap: var(--space-sm); flex-wrap: wrap; }
 
 .attending { display: inline-flex; align-items: center; gap: var(--space-xs); }

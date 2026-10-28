@@ -1,5 +1,5 @@
 import { initializeApp, type FirebaseOptions } from 'firebase/app';
-import { GoogleAuthProvider, getAuth, onAuthStateChanged, signInWithPopup, signOut } from 'firebase/auth';
+import { GoogleAuthProvider, getAuth, getRedirectResult, onAuthStateChanged, signInWithPopup, signInWithRedirect, signOut } from 'firebase/auth';
 import {
   Timestamp, addDoc, arrayRemove, arrayUnion, collection, deleteDoc, deleteField, doc, getDoc, getDocs,
   getFirestore, onSnapshot, query, setDoc, updateDoc, where, writeBatch, type DocumentData,
@@ -11,9 +11,20 @@ import { randomCode } from './util';
 const SUBS: SubName[] = ['activities', 'ideas', 'expenses', 'comments'];
 const INVITE_DAYS = 14;
 
+// Errors from the sign-in flow that mean "try a full-page redirect instead of a popup".
+const USE_REDIRECT = ['auth/popup-blocked', 'auth/operation-not-supported-in-this-environment', 'auth/cancelled-popup-request'];
+
 export function createFirebaseStore(config: FirebaseOptions): Store {
-  const app = initializeApp(config);
+  // When served from Firebase Hosting, sign in through the same domain. That
+  // avoids browsers (notably Safari on iPhone) blocking the cross-site storage
+  // the sign-in flow needs.
+  const host = location.hostname;
+  const sameSiteAuth = host.endsWith('.web.app') || host.endsWith('.firebaseapp.com');
+  const app = initializeApp(sameSiteAuth ? { ...config, authDomain: host } : config);
   const auth = getAuth(app);
+  // Surfaces errors from a redirect sign-in that just completed.
+  let lastAuthError: unknown = null;
+  const redirectResult = getRedirectResult(auth).catch((e) => { lastAuthError = e; return null; });
   const db = getFirestore(app);
 
   const withId = <T,>(id: string, data: DocumentData) => ({ ...data, id }) as T;
@@ -31,7 +42,21 @@ export function createFirebaseStore(config: FirebaseOptions): Store {
       });
     },
     async signIn() {
-      await signInWithPopup(auth, new GoogleAuthProvider());
+      await redirectResult;
+      const provider = new GoogleAuthProvider();
+      try {
+        await signInWithPopup(auth, provider);
+      } catch (e) {
+        const code = (e as { code?: string }).code ?? '';
+        if (USE_REDIRECT.includes(code)) await signInWithRedirect(auth, provider);
+        else throw e;
+      }
+    },
+    async takeAuthError() {
+      await redirectResult;
+      const e = lastAuthError;
+      lastAuthError = null;
+      return e;
     },
     async signOut() {
       await signOut(auth);

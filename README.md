@@ -40,6 +40,14 @@ Copy `.env.example` to `.env.local` and fill it in to use your real Firebase pro
 9. Push to the repository's default branch. The workflow in `.github/workflows/deploy.yml` builds and publishes to
    `https://<your-github-username>.github.io/<repo-name>/`.
 
+## Optional: also host on Firebase (fixes sign-in on iPhone Safari)
+
+Some browsers (notably Safari on iPhone) block the cross-site storage that Google sign-in needs when the site lives on `github.io`. Hosting the same site on Firebase (`https://travel-hub-a1aa2.web.app`) keeps sign-in on one domain, so it works everywhere.
+
+1. Firebase console → Project settings → **Service accounts** → **Generate new private key**. This downloads a `.json` file.
+2. GitHub repo → Settings → Secrets and variables → Actions → **New repository secret**. Name it `FIREBASE_SERVICE_ACCOUNT` and paste the whole contents of the file.
+3. Re-run the "Deploy site" workflow. Every deploy then publishes to both addresses.
+
 ## Design system
 
 `src/design/` has three layers, and you can swap pieces at any of them:

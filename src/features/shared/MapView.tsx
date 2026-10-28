@@ -3,7 +3,15 @@ import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import s from './shared.module.css';
 
-export type MapPin = { lat: number; lng: number; label: string; color?: string };
+export type MapPin = { lat: number; lng: number; label: string; color?: string; kind?: 'home' };
+
+const homeIcon = L.divIcon({
+  className: '',
+  iconSize: [32, 32],
+  iconAnchor: [16, 16],
+  html: `<span style="display:grid;place-items:center;width:32px;height:32px;border-radius:50%;background:#34c759;border:3px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.3)">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8M5 9.5V20h5v-6h4v6h5V9.5"/></svg></span>`,
+});
 
 /** OpenStreetMap via Leaflet. Fits all pins, or centers on `center`. */
 export function MapView({ pins, center, zoom = 12, height = 280 }: { pins: MapPin[]; center?: { lat: number; lng: number }; zoom?: number; height?: number }) {
@@ -30,12 +38,13 @@ export function MapView({ pins, center, zoom = 12, height = 280 }: { pins: MapPi
     if (!m || !g) return;
     g.clearLayers();
     pins.forEach((p) => {
-      L.circleMarker([p.lat, p.lng], {
-        radius: 8, weight: 3, color: '#fff', fillColor: p.color ?? '#007aff', fillOpacity: 1,
-      }).bindTooltip(p.label).addTo(g);
+      const marker = p.kind === 'home'
+        ? L.marker([p.lat, p.lng], { icon: homeIcon, zIndexOffset: 1000 })
+        : L.circleMarker([p.lat, p.lng], { radius: 8, weight: 3, color: '#fff', fillColor: p.color ?? '#007aff', fillOpacity: 1 });
+      marker.bindTooltip(p.label).addTo(g);
     });
     if (pins.length > 1) m.fitBounds(L.latLngBounds(pins.map((p) => [p.lat, p.lng])), { padding: [32, 32], maxZoom: 14 });
-    else if (pins.length === 1) m.setView([pins[0].lat, pins[0].lng], center ? zoom : 13);
+    else if (pins.length === 1) m.setView([pins[0].lat, pins[0].lng], center ? zoom : pins[0].kind === 'home' ? 5 : 13);
     else if (center) m.setView([center.lat, center.lng], zoom);
     else m.setView([20, 0], 1);
     // Leaflet measures its container once; re-measure after layout settles.

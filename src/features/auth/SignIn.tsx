@@ -1,12 +1,18 @@
-import { useState } from 'react';
-import { Button, Card, Icon, TextField } from '../../design/components';
+import { useEffect, useState } from 'react';
+import { Banner, Button, Card, Icon, TextField } from '../../design/components';
 import { store } from '../../data';
+import { describeAuthError, isInAppBrowser } from '../../lib/authErrors';
 import s from './SignIn.module.css';
 
 export function SignIn({ message }: { message?: string }) {
   const [name, setName] = useState('');
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
+  const inApp = isInAppBrowser();
+
+  useEffect(() => {
+    store.takeAuthError?.().then((e) => e && setError(describeAuthError(e) ?? ''));
+  }, []);
 
   const go = async () => {
     setBusy(true);
@@ -14,7 +20,7 @@ export function SignIn({ message }: { message?: string }) {
     try {
       await store.signIn(name);
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Sign-in failed');
+      setError(describeAuthError(e) ?? '');
     } finally {
       setBusy(false);
     }
@@ -29,6 +35,9 @@ export function SignIn({ message }: { message?: string }) {
       </div>
       <Card className={s.card}>
         {message && <p className="t-subhead">{message}</p>}
+        {store.mode === 'firebase' && inApp && (
+          <Banner>You're in an app's built-in browser, where Google sign-in is blocked. Tap the menu (⋯ or ↗) and choose <b>Open in Safari</b> or <b>Open in Chrome</b>.</Banner>
+        )}
         {store.mode === 'firebase' ? (
           <Button size="large" block onClick={go} disabled={busy}>Continue with Google</Button>
         ) : (

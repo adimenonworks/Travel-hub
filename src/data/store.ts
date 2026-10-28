@@ -12,6 +12,8 @@ export interface Store {
   onAuth(cb: (user: User | null) => void): Unsubscribe;
   signIn(demoName?: string): Promise<void>;
   signOut(): Promise<void>;
+  /** An error left over from a redirect sign-in, if any (shown once). */
+  takeAuthError?(): Promise<unknown>;
 
   watchProfile(uid: string, cb: (p: Profile | null) => void): Unsubscribe;
   getProfiles(uids: string[]): Promise<Record<string, Profile>>;

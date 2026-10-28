@@ -7,7 +7,7 @@
   min-width: var(--size-tap);
   padding: 0 var(--space-md);
   border: 0;
-  border-radius: var(--radius-control);
+  border-radius: var(--radius-button);
   font: var(--p-weight-semibold) var(--p-size-body)/1 var(--font-text);
   letter-spacing: var(--p-tracking-body);
   white-space: nowrap;
@@ -26,9 +26,9 @@
 .plain:hover:not(:disabled) { background: var(--color-fill-quaternary); }
 .destructive { background: var(--color-danger-subtle); color: var(--color-danger); }
 
-.small { min-height: var(--size-control-sm); padding: 0 var(--space-sm); font-size: var(--p-size-subhead); border-radius: var(--radius-pill); }
-.large { min-height: 50px; padding: 0 var(--space-xl); border-radius: var(--radius-card); }
+.small { min-height: var(--size-control-sm); padding: 0 var(--space-sm); font-size: var(--p-size-subhead); }
+.large { min-height: 52px; padding: 0 var(--space-xl); }
 .block { width: 100%; }
 
-.icon { padding: 0; width: var(--size-tap); border-radius: var(--radius-pill); }
+.icon { padding: 0; width: var(--size-tap); }
 .icon.small { width: var(--size-control-sm); min-width: var(--size-control-sm); }

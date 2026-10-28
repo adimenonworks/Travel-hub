@@ -71,8 +71,11 @@ export function Home() {
         )}
 
         <Section title="Where you've been" action={<Link to="/profile" className="t-subhead">Add places</Link>}
-          footer="Past trips appear here automatically. Add other places from your profile.">
-          <MapView pins={visited.map((v) => ({ lat: v.lat, lng: v.lng, label: v.label }))} height={260} />
+          footer="Past trips appear here automatically. Add your home and other places from your profile.">
+          <MapView pins={[
+            ...(profile?.home ? [{ lat: profile.home.lat, lng: profile.home.lng, label: `Home · ${profile.home.name}`, kind: 'home' as const }] : []),
+            ...visited.map((v) => ({ lat: v.lat, lng: v.lng, label: v.label })),
+          ]} height={260} />
         </Section>
       </Content>
       <TabBar items={globalTabs} />

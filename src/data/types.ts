@@ -9,6 +9,7 @@ export type Profile = {
   name: string;
   photo: string | null;
   homeCity?: string;
+  home?: Place | null;
   visited?: Place[];
 };
 

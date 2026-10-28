@@ -24,13 +24,13 @@
 }
 
 .brand { display: flex; align-items: center; gap: var(--space-xs); padding: 0 var(--space-xs); font: var(--p-weight-bold) var(--p-size-title3)/1 var(--font-display); }
-.brandMark { width: 28px; height: 28px; border-radius: 7px; background: var(--color-tint); color: #fff; display: grid; place-items: center; }
+.brandMark { width: 28px; height: 28px; border-radius: var(--radius-icon); background: var(--color-tint); color: #fff; display: grid; place-items: center; }
 .group { display: flex; flex-direction: column; gap: 2px; }
 .groupLabel { font: var(--p-weight-semibold) var(--p-size-footnote)/1 var(--font-text); color: var(--color-label-secondary); padding: var(--space-xs) var(--space-xs) var(--space-xxs); }
 .item {
   display: flex; align-items: center; gap: var(--space-sm);
   min-height: 36px; padding: 0 var(--space-xs);
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-pill);
   color: var(--color-label);
   font-size: var(--p-size-callout);
   text-decoration: none !important;

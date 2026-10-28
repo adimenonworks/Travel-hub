@@ -5,15 +5,15 @@
   padding: 2px;
   gap: 2px;
   background: var(--color-fill-tertiary);
-  border-radius: 9px;
+  border-radius: var(--radius-pill);
   max-width: 100%;
 }
 .block { display: grid; width: 100%; }
 .option {
   min-height: 32px;
-  padding: 0 var(--space-sm);
+  padding: 0 var(--space-md);
   border: 0;
-  border-radius: 7px;
+  border-radius: var(--radius-pill);
   background: transparent;
   font: var(--p-weight-medium) var(--p-size-footnote)/1 var(--font-text);
   color: var(--color-label);
