@@ -34,12 +34,10 @@ Copy `.env.example` to `.env.local` and fill it in to use your real Firebase pro
 4. **Create a Firestore database**: Build → Firestore Database → Create database (production mode, pick a nearby region).
 5. **Publish the security rules**: Firestore → Rules → paste the contents of [`firestore.rules`](firestore.rules) → Publish.
 6. **Authorize your domain**: Authentication → Settings → Authorized domains → add `<your-github-username>.github.io`.
-7. **Add the config to GitHub**: repo Settings → Secrets and variables → Actions → **Variables** tab → add
-   `VITE_FIREBASE_API_KEY`, `VITE_FIREBASE_AUTH_DOMAIN`, `VITE_FIREBASE_PROJECT_ID`,
-   `VITE_FIREBASE_STORAGE_BUCKET`, `VITE_FIREBASE_MESSAGING_SENDER_ID`, `VITE_FIREBASE_APP_ID`.
+7. **Add the config**: put the six values in [`.env.production`](.env.production) (already filled in for this project).
    These web keys are designed to be public; access is enforced by `firestore.rules`.
 8. **Turn on Pages**: repo Settings → Pages → Source: **GitHub Actions**.
-9. Push or merge to `main`. The workflow in `.github/workflows/deploy.yml` builds and publishes to
+9. Push to the repository's default branch. The workflow in `.github/workflows/deploy.yml` builds and publishes to
    `https://<your-github-username>.github.io/<repo-name>/`.
 
 ## Design system
