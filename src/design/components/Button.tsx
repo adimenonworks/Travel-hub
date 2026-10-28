@@ -23,15 +23,20 @@ export function Button({ variant = 'filled', size = 'regular', block, icon, chil
   );
 }
 
-/** A link that looks like a button (never wrap a Button in a Link: nested controls confuse screen readers). */
-export function LinkButton({ to, variant = 'filled', size = 'regular', icon, children }: { to: string; variant?: ButtonVariant; size?: 'small' | 'regular' | 'large'; icon?: IconName; children: ReactNode }) {
+/**
+ * A link that looks like a button (never wrap a Button in a Link: nested controls confuse screen readers).
+ * `to` is an in-app route; `href` is an external site, opened in a new tab.
+ */
+export function LinkButton({ to, href, variant = 'filled', size = 'regular', icon, children }: { variant?: ButtonVariant; size?: 'small' | 'regular' | 'large'; icon?: IconName; children: ReactNode } & ({ to: string; href?: never } | { href: string; to?: never })) {
   const cls = [s.button, s[variant], size !== 'regular' && s[size]].filter(Boolean).join(' ');
-  return (
-    <Link to={to} className={cls}>
+  const body = (
+    <>
       {icon && <Icon name={icon} size={size === 'small' ? 18 : 20} />}
       {children}
-    </Link>
+    </>
   );
+  if (href) return <a href={href} target="_blank" rel="noreferrer" className={cls}>{body}<span className="visually-hidden"> (opens in a new tab)</span></a>;
+  return <Link to={to!} className={cls}>{body}</Link>;
 }
 
 type IconButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {

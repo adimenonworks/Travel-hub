@@ -2,7 +2,7 @@ import { useState, type CSSProperties } from 'react';
 import { Route, Routes, useParams } from 'react-router-dom';
 import { Button, EmptyState, Icon, LinkButton, PageHeader, Spinner, Tabs, type TabItem } from '../../design/components';
 import { useProfiles, useRole, useSub, useTrip } from '../../data/hooks';
-import type { Activity, Comment, Expense, Idea, Profile, Trip } from '../../data/types';
+import type { Activity, Album, Comment, Expense, Idea, Profile, Trip } from '../../data/types';
 import { coverColor } from '../../lib/colors';
 import { daysBetween, formatRange } from '../../lib/dates';
 import { Content } from '../../app/Shell';
@@ -11,6 +11,7 @@ import { Ideas } from './Ideas';
 import { Info } from './Info';
 import { Itinerary } from './Itinerary';
 import { People } from './People';
+import { Photos } from './Photos';
 import { TripForm } from './TripForm';
 import s from './trip.module.css';
 
@@ -20,6 +21,7 @@ export type TripCtx = {
   ideas: Idea[];
   expenses: Expense[];
   comments: Comment[];
+  albums: Album[];
   profiles: Record<string, Profile>;
   canManage: boolean;
   isOwner: boolean;
@@ -44,12 +46,13 @@ function TripLoaded({ trip }: { trip: Trip }) {
   const ideas = useSub(trip.id, 'ideas');
   const expenses = useSub(trip.id, 'expenses');
   const comments = useSub(trip.id, 'comments');
+  const albums = useSub(trip.id, 'albums');
   const profiles = useProfiles(trip.memberIds);
   const { canManage, isOwner } = useRole(trip);
   const [editing, setEditing] = useState(false);
 
-  if (!activities || !ideas || !expenses || !comments) return <Spinner center />;
-  const ctx: TripCtx = { trip, activities, ideas, expenses, comments, profiles, canManage, isOwner };
+  if (!activities || !ideas || !expenses || !comments || !albums) return <Spinner center />;
+  const ctx: TripCtx = { trip, activities, ideas, expenses, comments, albums, profiles, canManage, isOwner };
   const nDays = daysBetween(trip.startDate, trip.endDate) + 1;
 
   const base = `/trip/${trip.id}`;
@@ -57,6 +60,7 @@ function TripLoaded({ trip }: { trip: Trip }) {
     { to: base, label: 'Itinerary', end: true },
     { to: `${base}/ideas`, label: 'Ideas', count: ideas.filter((i) => i.status === 'open').length },
     { to: `${base}/budget`, label: 'Budget' },
+    { to: `${base}/photos`, label: 'Photos', count: albums.length },
     { to: `${base}/info`, label: 'Info' },
     { to: `${base}/people`, label: 'People' },
   ];
@@ -81,6 +85,7 @@ function TripLoaded({ trip }: { trip: Trip }) {
           <Route index element={<Itinerary {...ctx} />} />
           <Route path="ideas" element={<Ideas {...ctx} />} />
           <Route path="budget" element={<Budget {...ctx} />} />
+          <Route path="photos" element={<Photos {...ctx} />} />
           <Route path="info" element={<Info {...ctx} />} />
           <Route path="people" element={<People {...ctx} />} />
         </Routes>

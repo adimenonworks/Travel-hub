@@ -102,3 +102,12 @@
 .dangerZone { display: flex; gap: var(--space-sm); flex-wrap: wrap; }
 
 .attending { display: inline-flex; align-items: center; gap: var(--space-xs); }
+
+/* Photos */
+.albumGrid { display: grid; gap: var(--space-md); grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); }
+.album { display: flex; flex-direction: column; }
+.albumCover { height: 120px; display: grid; place-items: center; background: var(--album-color); color: var(--color-on-bright); }
+.albumBody { padding: var(--space-md) var(--space-inset) var(--space-inset); display: flex; flex-direction: column; gap: var(--space-xxs); flex: 1; }
+.albumActions { display: flex; align-items: center; gap: var(--space-xs); margin-top: auto; padding-top: var(--space-md); }
+.albumHelp { display: flex; flex-direction: column; gap: var(--space-xs); padding: var(--space-md) var(--space-lg); border-radius: var(--radius-field); background: var(--color-fill-tertiary); font-size: var(--p-size-subhead); line-height: var(--p-leading-subhead); color: var(--color-label-secondary); }
+.albumHelp b { color: var(--color-label); font-weight: var(--p-weight-semibold); }

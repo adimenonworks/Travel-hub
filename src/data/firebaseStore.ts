@@ -8,7 +8,7 @@ import type { Store } from './store';
 import type { Invite, Profile, SubName, Trip } from './types';
 import { randomCode } from './util';
 
-const SUBS: SubName[] = ['activities', 'ideas', 'expenses', 'comments'];
+const SUBS: SubName[] = ['activities', 'ideas', 'expenses', 'comments', 'albums'];
 const INVITE_DAYS = 14;
 
 // Errors from the sign-in flow that mean "try a full-page redirect instead of a popup".

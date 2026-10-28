@@ -33,6 +33,9 @@ await t('join cannot add a friend too', assertFails(updateDoc(doc(B, 'trips/t1')
 await t('bob joins with invite', assertSucceeds(updateDoc(doc(B, 'trips/t1'), { memberIds: arrayUnion('bob'), 'roles.bob': 'member', joinedVia: 'good' })));
 await t('member reads trip', assertSucceeds(getDoc(doc(B, 'trips/t1'))));
 await t('member writes activity', assertSucceeds(updateDoc(doc(B, 'trips/t1/activities/a1'), { attendeeIds: arrayUnion('bob') })));
+await t('member adds photo album', assertSucceeds(setDoc(doc(B, 'trips/t1/albums/p1'), { title: 'Lisbon', url: 'https://photos.app.goo.gl/x', createdBy: 'bob' })));
+await t('non-member cannot add photo album', assertFails(setDoc(doc(C, 'trips/t1/albums/p2'), { title: 'x', url: 'https://x', createdBy: 'carol' })));
+await t('non-member cannot read photo albums', assertFails(getDocs(collection(C, 'trips/t1/albums'))));
 await t('member cannot rename trip', assertFails(updateDoc(doc(B, 'trips/t1'), { name: 'x' })));
 await t('member cannot promote self', assertFails(updateDoc(doc(B, 'trips/t1'), { 'roles.bob': 'editor' })));
 await t('member cannot delete trip', assertFails(deleteDoc(doc(B, 'trips/t1'))));
