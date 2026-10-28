@@ -11,7 +11,7 @@ A shared vacation planner. Create trips, invite friends, and plan together:
 - **People**: invite links, roles (owner / organizer / member), leave or remove people.
 - **Home**: trips grouped into happening now / upcoming / past, travel stats, and a map of places you've been.
 
-Edits sync live to everyone on the trip. It works on phone, tablet and desktop, has a bold, rounded look inspired by Wise with a choice of six accent colours, supports light and dark mode, and meets WCAG 2.2 AA.
+Edits sync live to everyone on the trip. It works on phone, tablet and desktop, has a bold, rounded look inspired by Wise with a choice of seven accent colours (Emerald by default), supports light and dark mode, and meets WCAG 2.2 AA.
 
 ## Stack
 
