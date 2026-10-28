@@ -9,9 +9,9 @@ import s from './Shell.module.css';
 export function Shell({ children }: { children: ReactNode }) {
   const me = useMe();
   const { pathname } = useLocation();
+  // The design system page (/#/design) is a reference for whoever builds the app, so it isn't linked here.
   const tabs = [
     { to: '/', label: 'Trips', active: pathname === '/' || pathname.startsWith('/trip/') },
-    { to: '/design', label: 'Design' },
   ];
 
   return (
