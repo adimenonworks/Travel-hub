@@ -11,8 +11,8 @@
   color-scheme: light;
 
   /* User-selectable accent (Profile → Appearance sets data-accent on <html>) */
-  --accent: var(--p-lime);
-  --accent-deep: var(--p-lime-deep);
+  --accent: var(--p-emerald);
+  --accent-deep: var(--p-emerald-deep);
 
   --color-accent: var(--accent);
   --color-accent-hover: color-mix(in srgb, var(--accent) 86%, var(--p-ink));
@@ -112,7 +112,8 @@
   --motion-sheet: var(--p-duration-slow) var(--p-ease-spring);
 }
 
-/* Accent choices */
+/* Accent choices (Emerald is the default above) */
+:root[data-accent='lime'] { --accent: var(--p-lime); --accent-deep: var(--p-lime-deep); }
 :root[data-accent='lemon'] { --accent: var(--p-lemon); --accent-deep: var(--p-lemon-deep); }
 :root[data-accent='tangerine'] { --accent: var(--p-tangerine); --accent-deep: var(--p-tangerine-deep); }
 :root[data-accent='bubblegum'] { --accent: var(--p-bubblegum); --accent-deep: var(--p-bubblegum-deep); }

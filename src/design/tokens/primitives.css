@@ -8,6 +8,7 @@
  */
 :root {
   /* Brights: fills, always with dark text on top (≥ 10:1 with --p-ink) */
+  --p-emerald: #2ee6b6;
   --p-lime: #9fe870;
   --p-lemon: #ffeb69;
   --p-tangerine: #ffa770;
@@ -19,6 +20,7 @@
   --p-stone: #d3d6ce;
 
   /* Deeps: the dark partner of each bright, for text and icons on light surfaces */
+  --p-emerald-deep: #00382b;
   --p-lime-deep: #163300;
   --p-lemon-deep: #3a341c;
   --p-tangerine-deep: #4a1a00;

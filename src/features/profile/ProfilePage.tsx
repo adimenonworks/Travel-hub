@@ -74,7 +74,7 @@ export function ProfilePage() {
               <SegmentedControl block label="Mode" value={theme} onChange={(t) => { setTheme(t); applyTheme(t); }}
                 options={[{ value: 'auto', label: 'Automatic' }, { value: 'light', label: 'Light' }, { value: 'dark', label: 'Dark' }]} />
             </div>
-            <ColorPicker label="Accent colour" options={ACCENTS} value={accent} onChange={(a) => { setAccent(a); applyAccent(a); }} />
+            <ColorPicker label="Accent colour" options={ACCENTS} value={accent} onChange={(a) => { setAccent(a); applyAccent(a, true); }} />
           </Card>
         </Section>
 
