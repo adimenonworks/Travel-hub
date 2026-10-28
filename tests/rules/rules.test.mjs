@@ -50,8 +50,18 @@ await t('editor cannot take ownership', assertFails(updateDoc(doc(B, 'trips/t1')
 await t('bob leaves', assertSucceeds(updateDoc(doc(B, 'trips/t1'), { memberIds: arrayRemove('bob'), 'roles.bob': deleteField() })));
 await t('ex-member cannot read', assertFails(getDoc(doc(B, 'trips/t1'))));
 await t('owner cannot leave (must delete)', assertFails(updateDoc(doc(A, 'trips/t1'), { memberIds: arrayRemove('alice'), 'roles.alice': deleteField() })));
-await t('user writes own profile', assertSucceeds(setDoc(doc(A, 'users/alice'), { name: 'Alice' })));
+await t('user writes own profile', assertSucceeds(setDoc(doc(A, 'users/alice'), { name: 'Alice', photo: null })));
 await t('user cannot write others profile', assertFails(setDoc(doc(B, 'users/alice'), { name: 'x' })));
+await t('signed-in user reads a public profile by id', assertSucceeds(getDoc(doc(B, 'users/alice'))));
+await t('anon cannot read profiles', assertFails(getDoc(doc(anon, 'users/alice'))));
+await t('nobody can list all users', assertFails(getDocs(collection(B, 'users'))));
+await t('home city cannot go in the public profile', assertFails(setDoc(doc(A, 'users/alice'), { home: { name: 'Melbourne', lat: -37.8, lng: 145 } }, { merge: true })));
+await t('owner writes private places', assertSucceeds(setDoc(doc(A, 'users/alice/private/places'), { homeCity: 'Melbourne', visited: [] })));
+await t('owner reads private places', assertSucceeds(getDoc(doc(A, 'users/alice/private/places'))));
+await t('others cannot read private places', assertFails(getDoc(doc(B, 'users/alice/private/places'))));
+await t('others cannot write private places', assertFails(setDoc(doc(B, 'users/alice/private/places'), { homeCity: 'x' })));
+await env.withSecurityRulesDisabled(async (c) => setDoc(doc(c.firestore(), 'users/dave'), { name: 'Dave', photo: null, homeCity: 'Paris', visited: [] }));
+await t('old profile can move its places out (migration)', assertSucceeds(updateDoc(doc(db('dave'), 'users/dave'), { homeCity: deleteField(), visited: deleteField() })));
 await t('owner deletes trip', assertSucceeds(deleteDoc(doc(A, 'trips/t1'))));
 
 console.log(`\n${pass} passed, ${fail} failed`);

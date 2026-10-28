@@ -9,10 +9,19 @@ service cloud.firestore {
     function isMember(tripId) { return signedIn() && uid() in tripData(tripId).memberIds; }
     function isManager(tripId) { return signedIn() && tripData(tripId).roles[uid()] in ['owner', 'editor']; }
 
-    // Public profile: name, photo, home city, visited places.
+    // Public profile: just name and photo, so trip-mates can see who's who.
+    // It can be fetched by id but never listed, so nobody can browse all users.
     match /users/{userId} {
-      allow read: if signedIn();
-      allow write: if signedIn() && uid() == userId;
+      allow get: if signedIn();
+      allow list: if false;
+      allow create, update: if signedIn() && uid() == userId
+        && request.resource.data.keys().hasOnly(['name', 'photo']);
+      allow delete: if signedIn() && uid() == userId;
+
+      // Private profile: home city and visited places. Only the owner can see it.
+      match /private/{docId} {
+        allow read, write: if signedIn() && uid() == userId;
+      }
     }
 
     match /trips/{tripId} {
