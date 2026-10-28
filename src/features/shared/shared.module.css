@@ -1,0 +1,39 @@
+.map { width: 100%; border-radius: var(--radius-card); overflow: hidden; background: var(--color-fill-tertiary); z-index: 0; }
+:global([data-theme='dark']) .map :global(.leaflet-tile-pane) { filter: invert(1) hue-rotate(180deg) brightness(0.9) contrast(0.9); }
+@media (prefers-color-scheme: dark) {
+  :global(:root:not([data-theme='light'])) .map :global(.leaflet-tile-pane) { filter: invert(1) hue-rotate(180deg) brightness(0.9) contrast(0.9); }
+}
+
+.links { display: flex; flex-wrap: wrap; gap: var(--space-xs); }
+.chip {
+  display: inline-flex; align-items: center; gap: 6px;
+  min-height: 32px; padding: 0 var(--space-sm);
+  border-radius: var(--radius-pill);
+  background: var(--color-fill-tertiary);
+  color: var(--color-tint);
+  font-size: var(--p-size-subhead);
+  max-width: 100%;
+  text-decoration: none !important;
+}
+.chip span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.linkEditor { display: flex; flex-direction: column; gap: var(--space-xs); }
+.linkRow { display: grid; grid-template-columns: 1fr 1.6fr auto; gap: var(--space-xs); align-items: end; }
+@media (max-width: 480px) { .linkRow { grid-template-columns: 1fr auto; } .linkRow > :first-child { grid-column: 1 / -1; } }
+
+.suggest { position: relative; }
+.suggestList {
+  position: absolute; left: 0; right: 0; top: calc(100% + 4px); z-index: 10;
+  background: var(--color-bg-elevated); border-radius: var(--radius-control);
+  box-shadow: var(--shadow-raised); overflow: hidden;
+}
+.suggestItem { display: block; width: 100%; text-align: left; padding: var(--space-sm) var(--space-md); background: none; border: 0; min-height: var(--size-tap); }
+.suggestItem:hover, .suggestItem[aria-selected='true'] { background: var(--color-fill-quaternary); }
+
+.comments { display: flex; flex-direction: column; gap: var(--space-xs); }
+.comment { display: flex; gap: var(--space-xs); align-items: flex-start; }
+.bubble { background: var(--color-fill-tertiary); border-radius: 16px; padding: 6px 12px; font-size: var(--p-size-subhead); line-height: var(--p-leading-subhead); min-width: 0; overflow-wrap: anywhere; }
+.bubbleMeta { font-size: var(--p-size-caption1); color: var(--color-label-secondary); }
+.commentForm { display: flex; gap: var(--space-xs); align-items: center; }
+.commentInput { flex: 1; min-height: 36px; border-radius: 18px; border: 1px solid var(--color-separator); background: transparent; padding: 0 var(--space-sm); font-size: var(--p-size-subhead); outline: none; min-width: 0; }
+.commentInput:focus { border-color: var(--color-tint); }

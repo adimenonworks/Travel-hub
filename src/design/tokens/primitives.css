@@ -1,0 +1,109 @@
+/*
+ * Primitives — raw values only. Nothing in the app should reference these
+ * directly; components consume the semantic tokens in semantic.css.
+ * Values follow Apple's Human Interface Guidelines (iOS system palette,
+ * Dynamic Type "Large" sizes, 4/8pt grid).
+ */
+:root {
+  /* System colors — light */
+  --p-blue-light: #007aff;
+  --p-green-light: #34c759;
+  --p-indigo-light: #5856d6;
+  --p-orange-light: #ff9500;
+  --p-pink-light: #ff2d55;
+  --p-purple-light: #af52de;
+  --p-red-light: #ff3b30;
+  --p-teal-light: #30b0c7;
+  --p-yellow-light: #ffcc00;
+  --p-mint-light: #00c7be;
+  --p-cyan-light: #32ade6;
+  --p-brown-light: #a2845e;
+
+  /* System colors — dark */
+  --p-blue-dark: #0a84ff;
+  --p-green-dark: #30d158;
+  --p-indigo-dark: #5e5ce6;
+  --p-orange-dark: #ff9f0a;
+  --p-pink-dark: #ff375f;
+  --p-purple-dark: #bf5af2;
+  --p-red-dark: #ff453a;
+  --p-teal-dark: #40c8e0;
+  --p-yellow-dark: #ffd60a;
+  --p-mint-dark: #63e6e2;
+  --p-cyan-dark: #64d2ff;
+  --p-brown-dark: #ac8e68;
+
+  /* System grays */
+  --p-gray: #8e8e93;
+  --p-gray2-light: #aeaeb2;
+  --p-gray3-light: #c7c7cc;
+  --p-gray4-light: #d1d1d6;
+  --p-gray5-light: #e5e5ea;
+  --p-gray6-light: #f2f2f7;
+  --p-gray2-dark: #636366;
+  --p-gray3-dark: #48484a;
+  --p-gray4-dark: #3a3a3c;
+  --p-gray5-dark: #2c2c2e;
+  --p-gray6-dark: #1c1c1e;
+
+  --p-white: #ffffff;
+  --p-black: #000000;
+
+  /* Type families */
+  --p-font-text: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --p-font-display: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --p-font-rounded: ui-rounded, "SF Pro Rounded", -apple-system, BlinkMacSystemFont, sans-serif;
+  --p-font-mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+
+  /* Type scale (size / line-height / tracking), HIG Dynamic Type "Large" */
+  --p-size-large-title: 34px; --p-leading-large-title: 41px; --p-tracking-large-title: 0.4px;
+  --p-size-title1: 28px;      --p-leading-title1: 34px;      --p-tracking-title1: 0.38px;
+  --p-size-title2: 22px;      --p-leading-title2: 28px;      --p-tracking-title2: -0.26px;
+  --p-size-title3: 20px;      --p-leading-title3: 25px;      --p-tracking-title3: -0.45px;
+  --p-size-headline: 17px;    --p-leading-headline: 22px;    --p-tracking-headline: -0.43px;
+  --p-size-body: 17px;        --p-leading-body: 22px;        --p-tracking-body: -0.43px;
+  --p-size-callout: 16px;     --p-leading-callout: 21px;     --p-tracking-callout: -0.31px;
+  --p-size-subhead: 15px;     --p-leading-subhead: 20px;     --p-tracking-subhead: -0.23px;
+  --p-size-footnote: 13px;    --p-leading-footnote: 18px;    --p-tracking-footnote: -0.08px;
+  --p-size-caption1: 12px;    --p-leading-caption1: 16px;    --p-tracking-caption1: 0px;
+  --p-size-caption2: 11px;    --p-leading-caption2: 13px;    --p-tracking-caption2: 0.06px;
+
+  --p-weight-regular: 400;
+  --p-weight-medium: 500;
+  --p-weight-semibold: 600;
+  --p-weight-bold: 700;
+
+  /* Spacing — 4pt base, 8pt rhythm */
+  --p-space-0: 0;
+  --p-space-1: 4px;
+  --p-space-2: 8px;
+  --p-space-3: 12px;
+  --p-space-4: 16px;
+  --p-space-5: 20px;
+  --p-space-6: 24px;
+  --p-space-8: 32px;
+  --p-space-10: 40px;
+  --p-space-12: 48px;
+  --p-space-16: 64px;
+
+  /* Corner radii */
+  --p-radius-xs: 6px;
+  --p-radius-sm: 8px;
+  --p-radius-md: 10px;
+  --p-radius-lg: 12px;
+  --p-radius-xl: 16px;
+  --p-radius-2xl: 22px;
+  --p-radius-full: 999px;
+
+  /* Elevation */
+  --p-shadow-1: 0 1px 2px rgba(0, 0, 0, 0.06), 0 1px 1px rgba(0, 0, 0, 0.04);
+  --p-shadow-2: 0 4px 16px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.06);
+  --p-shadow-3: 0 12px 40px rgba(0, 0, 0, 0.18), 0 2px 8px rgba(0, 0, 0, 0.08);
+
+  /* Motion */
+  --p-duration-fast: 150ms;
+  --p-duration-base: 250ms;
+  --p-duration-slow: 400ms;
+  --p-ease-standard: cubic-bezier(0.25, 0.1, 0.25, 1);
+  --p-ease-spring: cubic-bezier(0.32, 0.72, 0, 1);
+}

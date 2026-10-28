@@ -1,0 +1,3 @@
+.head { display: flex; gap: var(--space-md); align-items: center; }
+.add { display: flex; gap: var(--space-sm); align-items: flex-end; }
+.addField { flex: 1; min-width: 0; }

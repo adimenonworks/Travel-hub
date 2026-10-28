@@ -1,0 +1,18 @@
+.card {
+  background: var(--color-bg-grouped-secondary);
+  border-radius: var(--radius-card);
+  padding: var(--space-inset);
+  box-shadow: var(--shadow-card);
+}
+.flush { padding: 0; overflow: hidden; }
+.interactive { cursor: pointer; transition: transform var(--motion-fast), box-shadow var(--motion-fast); text-align: left; border: 0; width: 100%; color: inherit; display: block; }
+.interactive:hover { box-shadow: var(--shadow-raised); text-decoration: none; }
+.interactive:active { transform: scale(0.99); }
+
+.section { display: flex; flex-direction: column; gap: var(--space-xs); }
+.sectionHeader {
+  display: flex; align-items: baseline; justify-content: space-between; gap: var(--space-sm);
+  padding: 0 var(--space-xxs);
+}
+.sectionTitle { font: var(--p-weight-bold) var(--p-size-title3)/var(--p-leading-title3) var(--font-display); letter-spacing: var(--p-tracking-title3); }
+.sectionFooter { font-size: var(--p-size-footnote); line-height: var(--p-leading-footnote); color: var(--color-label-secondary); padding: 0 var(--space-sm); }

@@ -1,0 +1,61 @@
+import { useEffect, useState } from 'react';
+import { Link, useNavigate, useParams } from 'react-router-dom';
+import { Button, Card, EmptyState, Spinner } from '../../design/components';
+import { store } from '../../data';
+import { useMyTrips } from '../../data/hooks';
+import type { Invite } from '../../data/types';
+import { Content } from '../../app/Shell';
+
+export function Join() {
+  const { code = '' } = useParams();
+  const navigate = useNavigate();
+  const trips = useMyTrips();
+  const [invite, setInvite] = useState<Invite | null | undefined>(undefined);
+  const [error, setError] = useState('');
+  const [busy, setBusy] = useState(false);
+
+  useEffect(() => {
+    store.getInvite(code).then(setInvite).catch(() => setInvite(null));
+  }, [code]);
+
+  const alreadyIn = invite && trips?.some((t) => t.id === invite.tripId);
+  useEffect(() => {
+    if (alreadyIn && invite) navigate(`/trip/${invite.tripId}`, { replace: true });
+  }, [alreadyIn, invite, navigate]);
+
+  if (invite === undefined || trips === null) return <Spinner center />;
+
+  const expired = invite && invite.expiresAt < Date.now();
+  if (!invite || expired)
+    return (
+      <Content>
+        <Card>
+          <EmptyState icon="link" title={expired ? 'This invite has expired' : 'Invite not found'} message="Ask the trip organizer for a new link."
+            action={<Link to="/"><Button variant="tinted">Go to my trips</Button></Link>} />
+        </Card>
+      </Content>
+    );
+
+  const join = async () => {
+    setBusy(true);
+    setError('');
+    try {
+      await store.redeemInvite(invite);
+      navigate(`/trip/${invite.tripId}`, { replace: true });
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Could not join this trip');
+      setBusy(false);
+    }
+  };
+
+  return (
+    <Content>
+      <div style={{ height: 'var(--space-3xl)' }} />
+      <Card>
+        <EmptyState icon="plane" title={`Join “${invite.tripName}”`} message="You've been invited to plan this trip together."
+          action={<Button size="large" onClick={join} disabled={busy}>Join trip</Button>} />
+        {error && <p className="t-footnote t-danger" style={{ textAlign: 'center' }}>{error}</p>}
+      </Card>
+    </Content>
+  );
+}

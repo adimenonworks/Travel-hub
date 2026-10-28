@@ -1,0 +1,47 @@
+.shell { min-height: 100dvh; }
+.sidebar { display: none; }
+.main { min-width: 0; }
+.content {
+  max-width: var(--size-content-max);
+  margin: 0 auto;
+  padding: var(--space-xs) var(--space-gutter) var(--space-3xl);
+  display: flex; flex-direction: column; gap: var(--space-stack);
+}
+
+@media (min-width: 744px) {
+  .shell { display: grid; grid-template-columns: var(--size-sidebar) minmax(0, 1fr); }
+  .sidebar {
+    position: sticky; top: 0; height: 100dvh;
+    display: flex; flex-direction: column; gap: var(--space-md);
+    padding: calc(var(--space-md) + env(safe-area-inset-top)) var(--space-sm) var(--space-md);
+    background: var(--color-bg-secondary);
+    border-right: 0.5px solid var(--color-separator);
+    overflow-y: auto;
+  }
+}
+@media (min-width: 744px) and (max-width: 1067px) {
+  .shell { grid-template-columns: 240px minmax(0, 1fr); }
+}
+
+.brand { display: flex; align-items: center; gap: var(--space-xs); padding: 0 var(--space-xs); font: var(--p-weight-bold) var(--p-size-title3)/1 var(--font-display); }
+.brandMark { width: 28px; height: 28px; border-radius: 7px; background: var(--color-tint); color: #fff; display: grid; place-items: center; }
+.group { display: flex; flex-direction: column; gap: 2px; }
+.groupLabel { font: var(--p-weight-semibold) var(--p-size-footnote)/1 var(--font-text); color: var(--color-label-secondary); padding: var(--space-xs) var(--space-xs) var(--space-xxs); }
+.item {
+  display: flex; align-items: center; gap: var(--space-sm);
+  min-height: 36px; padding: 0 var(--space-xs);
+  border-radius: var(--radius-sm);
+  color: var(--color-label);
+  font-size: var(--p-size-callout);
+  text-decoration: none !important;
+}
+.item svg { color: var(--color-tint); flex: none; }
+.item span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.item:hover { background: var(--color-fill-quaternary); }
+.item[aria-current='page'], .item.active { background: var(--color-fill-tertiary); font-weight: var(--p-weight-semibold); }
+.dot { width: 10px; height: 10px; border-radius: 50%; flex: none; margin: 0 6px; }
+.footer { margin-top: auto; display: flex; align-items: center; gap: var(--space-xs); padding: var(--space-xs); border-radius: var(--radius-control); }
+.footerName { flex: 1; min-width: 0; font-size: var(--p-size-subhead); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.demo { margin: 0 var(--space-gutter); }
+@media (min-width: 744px) { .demo { margin: var(--space-sm) var(--space-gutter) 0; } }

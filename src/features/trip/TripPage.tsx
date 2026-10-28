@@ -1,0 +1,101 @@
+import { useState, type CSSProperties } from 'react';
+import { Link, NavLink, Route, Routes, useParams } from 'react-router-dom';
+import { Button, EmptyState, Icon, IconButton, PageHeader, Spinner, TabBar, type TabItem } from '../../design/components';
+import { useProfiles, useRole, useSub, useTrip } from '../../data/hooks';
+import type { Activity, Comment, Expense, Idea, Profile, Trip } from '../../data/types';
+import { daysBetween, formatRange } from '../../lib/dates';
+import { Content } from '../../app/Shell';
+import { Budget } from './Budget';
+import { Ideas } from './Ideas';
+import { Info } from './Info';
+import { Itinerary } from './Itinerary';
+import { People } from './People';
+import { TripForm } from './TripForm';
+import s from './trip.module.css';
+import sc from '../../design/components/SegmentedControl.module.css';
+
+export type TripCtx = {
+  trip: Trip;
+  activities: Activity[];
+  ideas: Idea[];
+  expenses: Expense[];
+  comments: Comment[];
+  profiles: Record<string, Profile>;
+  canManage: boolean;
+  isOwner: boolean;
+};
+
+export function TripPage() {
+  const { tripId = '' } = useParams();
+  const trip = useTrip(tripId);
+  if (trip === undefined) return <Spinner center />;
+  if (trip === null)
+    return (
+      <Content>
+        <EmptyState icon="info" title="Trip not found" message="It may have been deleted, or you're not a member yet. Ask the organizer for an invite link."
+          action={<Link to="/"><Button variant="tinted">Back to trips</Button></Link>} />
+      </Content>
+    );
+  return <TripLoaded trip={trip} />;
+}
+
+function TripLoaded({ trip }: { trip: Trip }) {
+  const activities = useSub(trip.id, 'activities');
+  const ideas = useSub(trip.id, 'ideas');
+  const expenses = useSub(trip.id, 'expenses');
+  const comments = useSub(trip.id, 'comments');
+  const profiles = useProfiles(trip.memberIds);
+  const { canManage, isOwner } = useRole(trip);
+  const [editing, setEditing] = useState(false);
+
+  const base = `/trip/${trip.id}`;
+  const tabs: TabItem[] = [
+    { to: base, label: 'Itinerary', icon: 'calendar', end: true },
+    { to: `${base}/ideas`, label: 'Ideas', icon: 'lightbulb' },
+    { to: `${base}/budget`, label: 'Budget', icon: 'wallet' },
+    { to: `${base}/info`, label: 'Info', icon: 'cloud' },
+    { to: `${base}/people`, label: 'People', icon: 'people' },
+  ];
+
+  if (!activities || !ideas || !expenses || !comments) return <Spinner center />;
+  const ctx: TripCtx = { trip, activities, ideas, expenses, comments, profiles, canManage, isOwner };
+  const nDays = daysBetween(trip.startDate, trip.endDate) + 1;
+  const openIdeas = ideas.filter((i) => i.status === 'open').length;
+
+  return (
+    <>
+      <PageHeader
+        title={trip.name}
+        back={{ to: '/', label: 'Trips' }}
+        actions={canManage && <IconButton icon="pencil" label="Edit trip" onClick={() => setEditing(true)} />}
+      />
+      <Content>
+        <div className={s.hero} style={{ '--trip-color': trip.coverColor } as CSSProperties}>
+          <div className={s.heroMeta}>
+            <span><Icon name="pin" size={16} />{trip.destination?.name ?? 'No destination'}</span>
+            <span><Icon name="calendar" size={16} />{formatRange(trip.startDate, trip.endDate)} · {nDays} day{nDays === 1 ? '' : 's'}</span>
+            <span><Icon name="people" size={16} />{trip.memberIds.length} traveler{trip.memberIds.length === 1 ? '' : 's'}</span>
+          </div>
+        </div>
+        <nav className={s.sectionNav} aria-label="Trip sections">
+          <div className={sc.control}>
+            {tabs.map((t) => (
+              <NavLink key={t.to} to={t.to} end={t.end} className={`${sc.option} ${sc.link}`}>
+                {t.label}{t.label === 'Ideas' && openIdeas > 0 ? ` (${openIdeas})` : ''}
+              </NavLink>
+            ))}
+          </div>
+        </nav>
+        <Routes>
+          <Route index element={<Itinerary {...ctx} />} />
+          <Route path="ideas" element={<Ideas {...ctx} />} />
+          <Route path="budget" element={<Budget {...ctx} />} />
+          <Route path="info" element={<Info {...ctx} />} />
+          <Route path="people" element={<People {...ctx} />} />
+        </Routes>
+      </Content>
+      <TabBar items={tabs} />
+      <TripForm open={editing} trip={trip} onClose={() => setEditing(false)} />
+    </>
+  );
+}
