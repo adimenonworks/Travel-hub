@@ -85,6 +85,15 @@ export type Comment = {
   createdAt: number;
 };
 
+/** A shared photo album (Google Photos, iCloud…). Only the link is stored; the photos stay with that service. */
+export type Album = {
+  id: string;
+  title: string;
+  url: string;
+  createdBy: string;
+  createdAt: number;
+};
+
 export type Invite = { code: string; tripId: string; tripName: string; createdBy: string; expiresAt: number };
 
 export type SubCollections = {
@@ -92,6 +101,7 @@ export type SubCollections = {
   ideas: Idea;
   expenses: Expense;
   comments: Comment;
+  albums: Album;
 };
 export type SubName = keyof SubCollections;
 
