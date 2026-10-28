@@ -9,6 +9,8 @@ import type { Invite, Profile, SubName, Trip } from './types';
 import { randomCode } from './util';
 
 const SUBS: SubName[] = ['activities', 'ideas', 'expenses', 'comments', 'albums'];
+// Profile fields only their owner may read; they live in users/{uid}/private/places.
+const PRIVATE_FIELDS = ['home', 'homeCity', 'visited'] as const;
 const INVITE_DAYS = 14;
 
 // Errors from the sign-in flow that mean "try a full-page redirect instead of a popup".
@@ -62,8 +64,34 @@ export function createFirebaseStore(config: FirebaseOptions): Store {
       await signOut(auth);
     },
 
+    // A profile is two documents: the public one (name, photo) and the owner's
+    // private one (home, visited). Older profiles kept everything in the public
+    // one; those fields move to the private one on first load. If the published
+    // rules don't allow the private document yet, everything stays public as before.
     watchProfile(uid, cb) {
-      return onSnapshot(doc(db, 'users', uid), (s) => cb(s.exists() ? withId<Profile>(s.id, s.data()) : null));
+      const publicRef = doc(db, 'users', uid);
+      const privateRef = doc(db, 'users', uid, 'private', 'places');
+      let pub: DocumentData | null | undefined;
+      let priv: DocumentData | undefined;
+      let privateAllowed = false;
+      let migrated = false;
+      const emit = () => {
+        if (pub === undefined || priv === undefined) return;
+        cb(pub === null && !Object.keys(priv).length ? null : withId<Profile>(uid, { ...pub, ...priv }));
+        const legacy = PRIVATE_FIELDS.filter((k) => pub && k in pub);
+        if (privateAllowed && !migrated && legacy.length && auth.currentUser?.uid === uid) {
+          migrated = true;
+          const moved = Object.fromEntries(legacy.filter((k) => !(k in priv!)).map((k) => [k, pub![k]]));
+          setDoc(privateRef, moved, { merge: true })
+            .then(() => updateDoc(publicRef, Object.fromEntries(legacy.map((k) => [k, deleteField()]))))
+            .catch(() => { migrated = false; });
+        }
+      };
+      const offPublic = onSnapshot(publicRef, (s) => { pub = s.exists() ? s.data() : null; emit(); }, () => { pub = null; emit(); });
+      const offPrivate = onSnapshot(privateRef,
+        (s) => { privateAllowed = true; priv = s.exists() ? s.data() : {}; emit(); },
+        () => { priv = {}; emit(); });
+      return () => { offPublic(); offPrivate(); };
     },
     async getProfiles(uids) {
       const out: Record<string, Profile> = {};
@@ -74,7 +102,19 @@ export function createFirebaseStore(config: FirebaseOptions): Store {
       return out;
     },
     async saveProfile(uid, patch) {
-      await setDoc(doc(db, 'users', uid), patch, { merge: true });
+      const rest: DocumentData = patch;
+      const isPrivate = (k: string) => (PRIVATE_FIELDS as readonly string[]).includes(k);
+      const pub = Object.fromEntries(Object.entries(rest).filter(([k]) => !isPrivate(k)));
+      const priv = Object.fromEntries(Object.entries(rest).filter(([k]) => isPrivate(k)));
+      if (Object.keys(priv).length) {
+        try {
+          await setDoc(doc(db, 'users', uid, 'private', 'places'), priv, { merge: true });
+        } catch {
+          // Rules not updated yet: keep the old behaviour so saving still works.
+          Object.assign(pub, priv);
+        }
+      }
+      if (Object.keys(pub).length) await setDoc(doc(db, 'users', uid), pub, { merge: true });
     },
 
     watchMyTrips(uid, cb) {
