@@ -1,16 +1,17 @@
 import { useEffect, useRef } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+import { resolveColor } from '../../lib/colors';
 import s from './shared.module.css';
 
 export type MapPin = { lat: number; lng: number; label: string; color?: string; kind?: 'home' };
 
-const homeIcon = L.divIcon({
-  className: '',
-  iconSize: [32, 32],
-  iconAnchor: [16, 16],
-  html: `<span style="display:grid;place-items:center;width:32px;height:32px;border-radius:50%;background:#34c759;border:3px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.3)">
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8M5 9.5V20h5v-6h4v6h5V9.5"/></svg></span>`,
+// Pins are bright fills with a dark ring so they stand out on light and dark map tiles alike.
+const homeIcon = () => L.divIcon({
+  className: s.homePin,
+  iconSize: [36, 36],
+  iconAnchor: [18, 18],
+  html: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8M5 9.5V20h5v-6h4v6h5V9.5"/></svg>`,
 });
 
 /** OpenStreetMap via Leaflet. Fits all pins, or centers on `center`. */
@@ -37,10 +38,13 @@ export function MapView({ pins, center, zoom = 12, height = 280 }: { pins: MapPi
     const g = layer.current;
     if (!m || !g) return;
     g.clearLayers();
+    // Leaflet draws with real colours, not CSS variables.
+    const ring = resolveColor('var(--color-on-bright)');
+    const accent = resolveColor('var(--color-accent)');
     pins.forEach((p) => {
       const marker = p.kind === 'home'
-        ? L.marker([p.lat, p.lng], { icon: homeIcon, zIndexOffset: 1000 })
-        : L.circleMarker([p.lat, p.lng], { radius: 8, weight: 3, color: '#fff', fillColor: p.color ?? '#007aff', fillOpacity: 1 });
+        ? L.marker([p.lat, p.lng], { icon: homeIcon(), zIndexOffset: 1000 })
+        : L.circleMarker([p.lat, p.lng], { radius: 9, weight: 3, color: ring, fillColor: p.color ? resolveColor(p.color) : accent, fillOpacity: 1 });
       marker.bindTooltip(p.label).addTo(g);
     });
     if (pins.length > 1) m.fitBounds(L.latLngBounds(pins.map((p) => [p.lat, p.lng])), { padding: [32, 32], maxZoom: 14 });
@@ -51,5 +55,5 @@ export function MapView({ pins, center, zoom = 12, height = 280 }: { pins: MapPi
     setTimeout(() => m.invalidateSize(), 0);
   }, [key]);
 
-  return <div ref={el} className={s.map} style={{ height }} role="img" aria-label="Map" />;
+  return <div ref={el} className={s.map} style={{ height }} role="region" aria-label="Map" />;
 }

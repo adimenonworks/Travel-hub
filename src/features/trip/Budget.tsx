@@ -46,12 +46,12 @@ export function Budget({ trip, activities, expenses, profiles, canManage }: Trip
   return (
     <>
       <div className={s.dayHead}>
-        <h2 className="t-title2">Budget</h2>
+        <h2 className="t-title1">Budget</h2>
         <SegmentedControl label="Budget view" value={view} onChange={setView} options={[{ value: 'me', label: 'My share' }, { value: 'group', label: 'Whole group' }]} />
       </div>
 
       <div className={s.stats}>
-        <Card className={s.stat}><span className={s.statLabel}>Planned spend</span><span className={s.statValue}>{fmt(total)}</span></Card>
+        <Card tone="accent" className={s.stat}><span className={s.statLabel}>Planned spend</span><span className={s.statValue}>{fmt(total)}</span></Card>
         <Card className={s.stat}><span className={s.statLabel}>Budget</span><span className={s.statValue}>{budgetTotal ? fmt(budgetTotal) : '—'}</span></Card>
         <Card className={s.stat}>
           <span className={s.statLabel}>{budgetTotal && total > budgetTotal ? 'Over by' : 'Left'}</span>
@@ -67,7 +67,7 @@ export function Budget({ trip, activities, expenses, profiles, canManage }: Trip
             return (
               <div key={d.date} className={s.barRow}>
                 <span className="t-secondary">Day {i + 1}<br /><span className="t-caption1">{formatDay(d.date, { month: 'short', day: 'numeric' })}</span></span>
-                <div className={s.barTrack} aria-label={`Day ${i + 1}: ${fmt(d.total)}`}>
+                <div className={s.barTrack} role="img" aria-label={`Day ${i + 1}: ${fmt(d.total)}`}>
                   <div className={s.barFill} style={{ width: `${(d.total / scaleMax) * 100}%`, '--bar-color': over ? 'var(--color-danger)' : 'var(--color-tint)' } as CSSProperties} />
                   {dayLimit > 0 && <div className={s.barLimit} style={{ left: `calc(${(dayLimit / scaleMax) * 100}% - 1px)` }} />}
                 </div>

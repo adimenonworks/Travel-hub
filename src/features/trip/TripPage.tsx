@@ -1,8 +1,9 @@
 import { useState, type CSSProperties } from 'react';
-import { Link, NavLink, Route, Routes, useParams } from 'react-router-dom';
-import { Button, EmptyState, Icon, IconButton, PageHeader, Spinner, TabBar, type TabItem } from '../../design/components';
+import { Route, Routes, useParams } from 'react-router-dom';
+import { Button, EmptyState, Icon, LinkButton, PageHeader, Spinner, Tabs, type TabItem } from '../../design/components';
 import { useProfiles, useRole, useSub, useTrip } from '../../data/hooks';
 import type { Activity, Comment, Expense, Idea, Profile, Trip } from '../../data/types';
+import { coverColor } from '../../lib/colors';
 import { daysBetween, formatRange } from '../../lib/dates';
 import { Content } from '../../app/Shell';
 import { Budget } from './Budget';
@@ -12,7 +13,6 @@ import { Itinerary } from './Itinerary';
 import { People } from './People';
 import { TripForm } from './TripForm';
 import s from './trip.module.css';
-import sc from '../../design/components/SegmentedControl.module.css';
 
 export type TripCtx = {
   trip: Trip;
@@ -33,7 +33,7 @@ export function TripPage() {
     return (
       <Content>
         <EmptyState icon="info" title="Trip not found" message="It may have been deleted, or you're not a member yet. Ask the organizer for an invite link."
-          action={<Link to="/"><Button variant="tinted">Back to trips</Button></Link>} />
+          action={<LinkButton to="/" variant="tinted">Back to trips</LinkButton>} />
       </Content>
     );
   return <TripLoaded trip={trip} />;
@@ -48,44 +48,35 @@ function TripLoaded({ trip }: { trip: Trip }) {
   const { canManage, isOwner } = useRole(trip);
   const [editing, setEditing] = useState(false);
 
-  const base = `/trip/${trip.id}`;
-  const tabs: TabItem[] = [
-    { to: base, label: 'Itinerary', icon: 'calendar', end: true },
-    { to: `${base}/ideas`, label: 'Ideas', icon: 'lightbulb' },
-    { to: `${base}/budget`, label: 'Budget', icon: 'wallet' },
-    { to: `${base}/info`, label: 'Info', icon: 'cloud' },
-    { to: `${base}/people`, label: 'People', icon: 'people' },
-  ];
-
   if (!activities || !ideas || !expenses || !comments) return <Spinner center />;
   const ctx: TripCtx = { trip, activities, ideas, expenses, comments, profiles, canManage, isOwner };
   const nDays = daysBetween(trip.startDate, trip.endDate) + 1;
-  const openIdeas = ideas.filter((i) => i.status === 'open').length;
+
+  const base = `/trip/${trip.id}`;
+  const tabs: TabItem[] = [
+    { to: base, label: 'Itinerary', end: true },
+    { to: `${base}/ideas`, label: 'Ideas', count: ideas.filter((i) => i.status === 'open').length },
+    { to: `${base}/budget`, label: 'Budget' },
+    { to: `${base}/info`, label: 'Info' },
+    { to: `${base}/people`, label: 'People' },
+  ];
 
   return (
     <>
-      <PageHeader
-        title={trip.name}
-        back={{ to: '/', label: 'Trips' }}
-        actions={canManage && <IconButton icon="pencil" label="Edit trip" onClick={() => setEditing(true)} />}
-      />
       <Content>
-        <div className={s.hero} style={{ '--trip-color': trip.coverColor } as CSSProperties}>
-          <div className={s.heroMeta}>
-            <span><Icon name="pin" size={16} />{trip.destination?.name ?? 'No destination'}</span>
-            <span><Icon name="calendar" size={16} />{formatRange(trip.startDate, trip.endDate)} · {nDays} day{nDays === 1 ? '' : 's'}</span>
-            <span><Icon name="people" size={16} />{trip.memberIds.length} traveler{trip.memberIds.length === 1 ? '' : 's'}</span>
-          </div>
+        <PageHeader
+          title={trip.name}
+          back={{ to: '/', label: 'Trips' }}
+          actions={canManage && <Button variant="gray" icon="pencil" onClick={() => setEditing(true)}>Edit trip</Button>}
+        />
+        <div className={s.hero} style={{ '--trip-color': coverColor(trip.coverColor) } as CSSProperties}>
+          <span><Icon name="pin" size={20} />{trip.destination?.name ?? 'No destination'}</span>
+          <span><Icon name="calendar" size={20} />{formatRange(trip.startDate, trip.endDate)} · {nDays} day{nDays === 1 ? '' : 's'}</span>
+          <span><Icon name="people" size={20} />{trip.memberIds.length} traveler{trip.memberIds.length === 1 ? '' : 's'}</span>
         </div>
-        <nav className={s.sectionNav} aria-label="Trip sections">
-          <div className={sc.control}>
-            {tabs.map((t) => (
-              <NavLink key={t.to} to={t.to} end={t.end} className={`${sc.option} ${sc.link}`}>
-                {t.label}{t.label === 'Ideas' && openIdeas > 0 ? ` (${openIdeas})` : ''}
-              </NavLink>
-            ))}
-          </div>
-        </nav>
+        <div className={s.sectionNav}>
+          <Tabs items={tabs} label="Trip sections" />
+        </div>
         <Routes>
           <Route index element={<Itinerary {...ctx} />} />
           <Route path="ideas" element={<Ideas {...ctx} />} />
@@ -94,7 +85,6 @@ function TripLoaded({ trip }: { trip: Trip }) {
           <Route path="people" element={<People {...ctx} />} />
         </Routes>
       </Content>
-      <TabBar items={tabs} />
       <TripForm open={editing} trip={trip} onClose={() => setEditing(false)} />
     </>
   );

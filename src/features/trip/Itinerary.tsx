@@ -1,4 +1,4 @@
-import { useMemo, useState, type CSSProperties } from 'react';
+import { useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { AvatarStack, Badge, Button, Card, EmptyState, Icon, IconButton } from '../../design/components';
 import { store } from '../../data';
@@ -52,13 +52,13 @@ export function Itinerary(ctx: TripCtx) {
       <div className={s.timeline}>
         <div className={s.dayHead}>
           <div>
-            <h2 className="t-title2">Day {index + 1}</h2>
+            <h2 className="t-title1">Day {index + 1}</h2>
             <div className={s.dayBudget}>
               {formatDay(day, { weekday: 'long', month: 'long', day: 'numeric' })}
               {trip.dailyBudget > 0 && <> · {money(spend, trip.currency)} of {money(trip.dailyBudget * trip.memberIds.length, trip.currency)} group budget</>}
             </div>
           </div>
-          <Button icon="plus" size="small" onClick={() => setAdding(true)}>Add plan</Button>
+          <Button icon="plus" onClick={() => setAdding(true)}>Add plan</Button>
         </div>
 
         {list.length === 0 ? (
@@ -89,10 +89,10 @@ function ActivityCard({ a, ctx, onEdit }: { a: Activity; ctx: TripCtx; onEdit: (
       <div className={s.time}>
         {a.startTime ? <>{formatTime(a.startTime)}{a.endTime && <><br /><span className="t-tertiary">{formatTime(a.endTime)}</span></>}</> : <span className="t-tertiary">Any time</span>}
       </div>
-      <Card className={s.actCard} style={{ '--cat-color': cat.color } as CSSProperties}>
+      <Card className={s.actCard}>
         <div className={s.actTop}>
           <div>
-            <div className="t-headline">{a.title}</div>
+            <h3 className="t-title3">{a.title}</h3>
             <div className={s.actMeta}>
               <Badge color={cat.color}>{cat.label}</Badge>
               {a.cost > 0 && <Badge>{money(a.cost, ctx.trip.currency)} pp</Badge>}
@@ -102,7 +102,7 @@ function ActivityCard({ a, ctx, onEdit }: { a: Activity; ctx: TripCtx; onEdit: (
         </div>
         {a.locationText && (
           <a className={s.locLink} href={mapsUrl(a.locationText, a.location)} target="_blank" rel="noreferrer">
-            <Icon name="pin" size={16} />{a.locationText}
+            <Icon name="pin" size={18} />{a.locationText}
           </a>
         )}
         {a.notes && <div className={s.actNotes}>{a.notes}</div>}
@@ -113,7 +113,7 @@ function ActivityCard({ a, ctx, onEdit }: { a: Activity; ctx: TripCtx; onEdit: (
             <span className="t-footnote t-secondary">{a.attendeeIds.length ? `${a.attendeeIds.length} going` : 'No one yet'}</span>
           </span>
           <span className={s.attending}>
-            <Button size="small" variant="plain" icon="chat" onClick={() => setShowComments((v) => !v)} aria-expanded={showComments}>
+            <Button size="small" variant="plain" icon="chat" onClick={() => setShowComments((v) => !v)} aria-expanded={showComments} aria-label={`Comments (${nComments})`}>
               {nComments || ''}
             </Button>
             <Button size="small" variant={going ? 'filled' : 'gray'} icon={going ? 'check' : 'plus'}

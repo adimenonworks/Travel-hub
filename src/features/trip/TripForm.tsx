@@ -1,13 +1,11 @@
 import { useEffect, useState } from 'react';
-import { FieldRow, Select, Sheet, TextField } from '../../design/components';
+import { ColorPicker, FieldRow, Select, Sheet, TextField } from '../../design/components';
 import { store } from '../../data';
 import type { Place, Trip } from '../../data/types';
+import { COVER_COLORS, coverName } from '../../lib/colors';
 import { addDays, today } from '../../lib/dates';
 import { CURRENCIES } from '../../lib/format';
 import { CityPicker } from '../shared/CityPicker';
-import s from './trip.module.css';
-
-export const COVER_COLORS = ['#007aff', '#34c759', '#ff9500', '#af52de', '#ff2d55', '#30b0c7', '#5856d6', '#a2845e'];
 
 type Draft = { name: string; destination: Place | null; startDate: string; endDate: string; currency: string; dailyBudget: string; coverColor: string };
 
@@ -18,7 +16,7 @@ const fromTrip = (t?: Trip): Draft => ({
   endDate: t?.endDate ?? addDays(today(), 34),
   currency: t?.currency ?? (Intl.NumberFormat().resolvedOptions().locale.startsWith('en-GB') ? 'GBP' : 'USD'),
   dailyBudget: t ? String(t.dailyBudget || '') : '',
-  coverColor: t?.coverColor ?? COVER_COLORS[Math.floor(Math.random() * COVER_COLORS.length)],
+  coverColor: t ? coverName(t.coverColor) : COVER_COLORS[Math.floor(Math.random() * COVER_COLORS.length)].value,
 });
 
 /** Create a trip (no `trip`) or edit one. Calls onSaved with the trip id. */
@@ -68,11 +66,7 @@ export function TripForm({ open, trip, onClose, onSaved }: { open: boolean; trip
           {CURRENCIES.map((c) => <option key={c}>{c}</option>)}
         </Select>
       </FieldRow>
-      <div className={s.colors} role="radiogroup" aria-label="Trip color">
-        {COVER_COLORS.map((c) => (
-          <button key={c} type="button" role="radio" aria-checked={d.coverColor === c} aria-label={c} className={s.swatch} style={{ background: c }} onClick={() => set({ coverColor: c })} />
-        ))}
-      </div>
+      <ColorPicker label="Trip colour" options={COVER_COLORS} value={d.coverColor} onChange={(coverColor) => set({ coverColor })} />
       {error && <p className="t-footnote t-danger">{error}</p>}
     </Sheet>
   );

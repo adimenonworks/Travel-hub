@@ -1,71 +1,76 @@
 /*
  * Semantic tokens — what components use. Each name describes a role, not a
- * value, so light/dark (and future brand themes) only swap this file's values.
+ * value, so light/dark and the user's accent colour only swap values here.
+ *
+ * Accent model (like Wise): every accent is a pair.
+ *   --color-accent / --color-on-accent  bright fill with its deep partner as text (primary buttons, highlights)
+ *   --color-tint / --color-on-tint      the accent as ink: deep in light mode, bright in dark mode
+ *                                       (links, icons, selected states, focus rings — always high contrast)
  */
 :root {
   color-scheme: light;
 
-  /* Accent */
-  --color-tint: var(--p-blue-light);
-  --color-tint-pressed: #0062cc;
-  --color-on-tint: var(--p-white);
-  --color-tint-subtle: rgba(0, 122, 255, 0.12);
+  /* User-selectable accent (Profile → Appearance sets data-accent on <html>) */
+  --accent: var(--p-lime);
+  --accent-deep: var(--p-lime-deep);
+
+  --color-accent: var(--accent);
+  --color-accent-hover: color-mix(in srgb, var(--accent) 86%, var(--p-ink));
+  --color-on-accent: var(--accent-deep);
+  --color-tint: var(--accent-deep);
+  --color-on-tint: var(--accent);
+  --color-tint-subtle: color-mix(in srgb, var(--color-tint) 10%, transparent);
+
+  /* Text on any bright fill (categories, trip covers, avatars) */
+  --color-on-bright: var(--p-ink);
 
   /* Status */
-  --color-success: var(--p-green-light);
-  --color-warning: var(--p-orange-light);
-  --color-danger: var(--p-red-light);
-  --color-success-subtle: rgba(52, 199, 89, 0.14);
-  --color-warning-subtle: rgba(255, 149, 0, 0.14);
-  --color-danger-subtle: rgba(255, 59, 48, 0.12);
+  --color-success: var(--p-green);
+  --color-warning: var(--p-amber);
+  --color-danger: var(--p-red);
+  --color-success-subtle: color-mix(in srgb, var(--p-lime) 35%, var(--p-white));
+  --color-warning-subtle: color-mix(in srgb, var(--p-lemon) 55%, transparent);
+  --color-danger-subtle: color-mix(in srgb, var(--p-red) 10%, transparent);
 
-  /* Category accents (activities, ideas, budget) */
-  --color-cat-activity: var(--p-blue-light);
-  --color-cat-food: var(--p-orange-light);
-  --color-cat-drinks: var(--p-purple-light);
-  --color-cat-cafe: var(--p-brown-light);
-  --color-cat-sight: var(--p-teal-light);
-  --color-cat-transport: var(--p-indigo-light);
-  --color-cat-stay: var(--p-pink-light);
-  --color-cat-other: var(--p-gray);
+  /* Category fills (activities, ideas, budget) — brights, so text on them is --color-on-bright */
+  --color-cat-activity: var(--p-lime);
+  --color-cat-food: var(--p-tangerine);
+  --color-cat-drinks: var(--p-lavender);
+  --color-cat-cafe: var(--p-sand);
+  --color-cat-sight: var(--p-aqua);
+  --color-cat-transport: var(--p-sky);
+  --color-cat-stay: var(--p-bubblegum);
+  --color-cat-other: var(--p-stone);
 
-  /* Labels (text) */
-  --color-label: var(--p-black);
-  --color-label-secondary: rgba(60, 60, 67, 0.6);
-  --color-label-tertiary: rgba(60, 60, 67, 0.3);
-  --color-label-quaternary: rgba(60, 60, 67, 0.18);
-  --color-placeholder: rgba(60, 60, 67, 0.3);
-  --color-link: var(--p-blue-light);
+  /* Labels (text) — secondary and tertiary still pass 4.5:1 on cards */
+  --color-label: var(--p-ink);
+  --color-label-secondary: var(--p-ink-2);
+  --color-label-tertiary: var(--p-ink-3);
+  --color-placeholder: var(--p-ink-3);
+  --color-link: var(--color-tint);
 
-  /* Backgrounds */
-  --color-bg: var(--p-white);
-  --color-bg-secondary: var(--p-gray6-light);
-  --color-bg-tertiary: var(--p-white);
-  --color-bg-grouped: var(--p-gray6-light);
-  --color-bg-grouped-secondary: var(--p-white);
-  --color-bg-grouped-tertiary: var(--p-gray6-light);
-  --color-bg-elevated: var(--p-white);
+  /* Surfaces */
+  --color-bg: var(--p-sage);               /* page: Wise's sage canvas */
+  --color-surface: var(--p-white);         /* cards, lists, tiles */
+  --color-bg-elevated: var(--p-white);     /* sheets, menus, text fields */
 
-  /* Fills (controls on top of backgrounds) */
-  --color-fill: rgba(120, 120, 128, 0.2);
-  --color-fill-secondary: rgba(120, 120, 128, 0.16);
-  --color-fill-tertiary: rgba(118, 118, 128, 0.12);
-  --color-fill-quaternary: rgba(116, 116, 128, 0.08);
+  /* Fills (controls on top of surfaces) */
+  --color-fill: var(--p-mist-2);
+  --color-fill-tertiary: rgba(14, 15, 12, 0.07);
+  --color-fill-quaternary: rgba(14, 15, 12, 0.04);
 
-  /* Separators */
-  --color-separator: rgba(60, 60, 67, 0.29);
-  --color-separator-opaque: #c6c6c8;
+  /* Lines */
+  --color-separator: rgba(14, 15, 12, 0.12);
+  --color-border-control: var(--p-ink-3); /* input outlines, ≥ 3:1 on every light surface */
 
-  /* Materials (translucent bars) */
-  --material-bar: rgba(249, 249, 249, 0.8);
-  --material-thick: rgba(255, 255, 255, 0.85);
+  /* Materials */
+  --material-bar: rgba(255, 255, 255, 0.9);
   --material-blur: saturate(180%) blur(20px);
-  --color-scrim: rgba(0, 0, 0, 0.4);
+  --color-scrim: rgba(14, 15, 12, 0.5);
 
   /* Typography */
-  --font-text: var(--p-font-text);
-  --font-display: var(--p-font-display);
-  --font-rounded: var(--p-font-rounded);
+  --font-text: var(--p-font-sans);
+  --font-display: var(--p-font-sans);
   --font-mono: var(--p-font-mono);
 
   /* Spacing roles */
@@ -77,30 +82,29 @@
   --space-xl: var(--p-space-6);
   --space-2xl: var(--p-space-8);
   --space-3xl: var(--p-space-12);
-  --space-gutter: var(--p-space-4);        /* page side margin, compact */
-  --space-inset: var(--p-space-4);         /* list row / card padding */
-  --space-stack: var(--p-space-6);         /* gap between sections */
+  --space-gutter: var(--p-space-5);        /* page side margin, compact */
+  --space-inset: var(--p-space-5);         /* list row / card padding */
+  --space-stack: var(--p-space-8);         /* gap between sections */
 
-  /* Shape */
-  --radius-button: var(--p-radius-full);   /* capsule buttons */
-  --radius-control: var(--p-radius-xl);    /* text fields, menus, small panels */
-  --radius-card: var(--p-radius-2xl);
-  --radius-sheet: var(--p-radius-3xl);
-  --radius-icon: 9px;                      /* rounded-square icon tiles */
+  /* Shape — everything is a pill or a soft rounded rectangle */
+  --radius-button: var(--p-radius-full);
+  --radius-control: var(--p-radius-full);  /* single-line fields, chips, tabs */
+  --radius-field: var(--p-radius-lg);      /* multi-line fields, dropdown menus */
+  --radius-inner: var(--p-radius-md);      /* thumbnails, bubbles, things inside cards */
+  --radius-card: var(--p-radius-lg);
+  --radius-sheet: var(--p-radius-lg);
+  --radius-icon: var(--p-radius-full);
   --radius-pill: var(--p-radius-full);
 
-  --shadow-card: var(--p-shadow-1);
   --shadow-raised: var(--p-shadow-2);
   --shadow-overlay: var(--p-shadow-3);
 
   /* Sizing */
-  --size-tap: 44px;               /* HIG minimum hit target */
-  --size-control: 44px;
-  --size-control-sm: 32px;
-  --size-tabbar: 49px;
-  --size-navbar: 44px;
-  --size-sidebar: 280px;
-  --size-content-max: 1080px;
+  --size-tap: 44px;               /* minimum hit target */
+  --size-control: 48px;
+  --size-control-sm: 36px;
+  --size-topbar: 64px;
+  --size-content-max: 1200px;
 
   /* Motion */
   --motion-fast: var(--p-duration-fast) var(--p-ease-standard);
@@ -108,101 +112,81 @@
   --motion-sheet: var(--p-duration-slow) var(--p-ease-spring);
 }
 
-/* Regular width (iPad / desktop) */
+/* Accent choices */
+:root[data-accent='lemon'] { --accent: var(--p-lemon); --accent-deep: var(--p-lemon-deep); }
+:root[data-accent='tangerine'] { --accent: var(--p-tangerine); --accent-deep: var(--p-tangerine-deep); }
+:root[data-accent='bubblegum'] { --accent: var(--p-bubblegum); --accent-deep: var(--p-bubblegum-deep); }
+:root[data-accent='lavender'] { --accent: var(--p-lavender); --accent-deep: var(--p-lavender-deep); }
+:root[data-accent='sky'] { --accent: var(--p-sky); --accent-deep: var(--p-sky-deep); }
+
+/* Regular width (tablet / desktop) */
 @media (min-width: 744px) {
   :root {
-    --space-gutter: var(--p-space-6);
+    --space-gutter: var(--p-space-8);
+    --space-inset: var(--p-space-6);
+    --space-stack: var(--p-space-12);
+    --size-topbar: 72px;
   }
 }
 @media (min-width: 1068px) {
   :root {
-    --space-gutter: var(--p-space-8);
+    --space-gutter: var(--p-space-12);
   }
 }
 
 /* Dark appearance — follows the OS unless the user forces light */
 @media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
+  :root:not([data-theme='light']) {
     color-scheme: dark;
-    --color-tint: var(--p-blue-dark);
-    --color-tint-pressed: #409cff;
-    --color-tint-subtle: rgba(10, 132, 255, 0.2);
-    --color-success: var(--p-green-dark);
-    --color-warning: var(--p-orange-dark);
-    --color-danger: var(--p-red-dark);
-    --color-success-subtle: rgba(48, 209, 88, 0.2);
-    --color-warning-subtle: rgba(255, 159, 10, 0.2);
-    --color-danger-subtle: rgba(255, 69, 58, 0.2);
-    --color-cat-activity: var(--p-blue-dark);
-    --color-cat-food: var(--p-orange-dark);
-    --color-cat-drinks: var(--p-purple-dark);
-    --color-cat-cafe: var(--p-brown-dark);
-    --color-cat-sight: var(--p-teal-dark);
-    --color-cat-transport: var(--p-indigo-dark);
-    --color-cat-stay: var(--p-pink-dark);
+    --color-tint: var(--accent);
+    --color-on-tint: var(--accent-deep);
+    --color-tint-subtle: color-mix(in srgb, var(--color-tint) 16%, transparent);
+    --color-success: var(--p-lime);
+    --color-warning: var(--p-amber-bright);
+    --color-danger: var(--p-red-bright);
+    --color-success-subtle: color-mix(in srgb, var(--p-lime) 16%, transparent);
+    --color-warning-subtle: color-mix(in srgb, var(--p-amber-bright) 16%, transparent);
+    --color-danger-subtle: color-mix(in srgb, var(--p-red-bright) 16%, transparent);
     --color-label: var(--p-white);
-    --color-label-secondary: rgba(235, 235, 245, 0.6);
-    --color-label-tertiary: rgba(235, 235, 245, 0.3);
-    --color-label-quaternary: rgba(235, 235, 245, 0.16);
-    --color-placeholder: rgba(235, 235, 245, 0.3);
-    --color-link: var(--p-blue-dark);
-    --color-bg: var(--p-black);
-    --color-bg-secondary: var(--p-gray6-dark);
-    --color-bg-tertiary: var(--p-gray5-dark);
-    --color-bg-grouped: var(--p-black);
-    --color-bg-grouped-secondary: var(--p-gray6-dark);
-    --color-bg-grouped-tertiary: var(--p-gray5-dark);
-    --color-bg-elevated: var(--p-gray6-dark);
-    --color-fill: rgba(120, 120, 128, 0.36);
-    --color-fill-secondary: rgba(120, 120, 128, 0.32);
-    --color-fill-tertiary: rgba(118, 118, 128, 0.24);
-    --color-fill-quaternary: rgba(116, 116, 128, 0.18);
-    --color-separator: rgba(84, 84, 88, 0.6);
-    --color-separator-opaque: #38383a;
-    --material-bar: rgba(29, 29, 31, 0.8);
-    --material-thick: rgba(37, 37, 39, 0.85);
-    --color-scrim: rgba(0, 0, 0, 0.6);
+    --color-label-secondary: var(--p-fog);
+    --color-label-tertiary: var(--p-fog-2);
+    --color-placeholder: var(--p-fog-2);
+    --color-bg: var(--p-night);
+    --color-surface: var(--p-night-2);
+    --color-bg-elevated: var(--p-night-3);
+    --color-fill: var(--p-night-3);
+    --color-fill-tertiary: rgba(255, 255, 255, 0.08);
+    --color-fill-quaternary: rgba(255, 255, 255, 0.05);
+    --color-separator: rgba(255, 255, 255, 0.12);
+    --color-border-control: var(--p-fog-3);
+    --material-bar: rgba(14, 15, 12, 0.86);
+    --color-scrim: rgba(0, 0, 0, 0.66);
   }
 }
 
-:root[data-theme="dark"] {
+:root[data-theme='dark'] {
   color-scheme: dark;
-  --color-tint: var(--p-blue-dark);
-  --color-tint-pressed: #409cff;
-  --color-tint-subtle: rgba(10, 132, 255, 0.2);
-  --color-success: var(--p-green-dark);
-  --color-warning: var(--p-orange-dark);
-  --color-danger: var(--p-red-dark);
-  --color-success-subtle: rgba(48, 209, 88, 0.2);
-  --color-warning-subtle: rgba(255, 159, 10, 0.2);
-  --color-danger-subtle: rgba(255, 69, 58, 0.2);
-  --color-cat-activity: var(--p-blue-dark);
-  --color-cat-food: var(--p-orange-dark);
-  --color-cat-drinks: var(--p-purple-dark);
-  --color-cat-cafe: var(--p-brown-dark);
-  --color-cat-sight: var(--p-teal-dark);
-  --color-cat-transport: var(--p-indigo-dark);
-  --color-cat-stay: var(--p-pink-dark);
+  --color-tint: var(--accent);
+  --color-on-tint: var(--accent-deep);
+  --color-tint-subtle: color-mix(in srgb, var(--color-tint) 16%, transparent);
+  --color-success: var(--p-lime);
+  --color-warning: var(--p-amber-bright);
+  --color-danger: var(--p-red-bright);
+  --color-success-subtle: color-mix(in srgb, var(--p-lime) 16%, transparent);
+  --color-warning-subtle: color-mix(in srgb, var(--p-amber-bright) 16%, transparent);
+  --color-danger-subtle: color-mix(in srgb, var(--p-red-bright) 16%, transparent);
   --color-label: var(--p-white);
-  --color-label-secondary: rgba(235, 235, 245, 0.6);
-  --color-label-tertiary: rgba(235, 235, 245, 0.3);
-  --color-label-quaternary: rgba(235, 235, 245, 0.16);
-  --color-placeholder: rgba(235, 235, 245, 0.3);
-  --color-link: var(--p-blue-dark);
-  --color-bg: var(--p-black);
-  --color-bg-secondary: var(--p-gray6-dark);
-  --color-bg-tertiary: var(--p-gray5-dark);
-  --color-bg-grouped: var(--p-black);
-  --color-bg-grouped-secondary: var(--p-gray6-dark);
-  --color-bg-grouped-tertiary: var(--p-gray5-dark);
-  --color-bg-elevated: var(--p-gray6-dark);
-  --color-fill: rgba(120, 120, 128, 0.36);
-  --color-fill-secondary: rgba(120, 120, 128, 0.32);
-  --color-fill-tertiary: rgba(118, 118, 128, 0.24);
-  --color-fill-quaternary: rgba(116, 116, 128, 0.18);
-  --color-separator: rgba(84, 84, 88, 0.6);
-  --color-separator-opaque: #38383a;
-  --material-bar: rgba(29, 29, 31, 0.8);
-  --material-thick: rgba(37, 37, 39, 0.85);
-  --color-scrim: rgba(0, 0, 0, 0.6);
+  --color-label-secondary: var(--p-fog);
+  --color-label-tertiary: var(--p-fog-2);
+  --color-placeholder: var(--p-fog-2);
+  --color-bg: var(--p-night);
+  --color-surface: var(--p-night-2);
+  --color-bg-elevated: var(--p-night-3);
+  --color-fill: var(--p-night-3);
+  --color-fill-tertiary: rgba(255, 255, 255, 0.08);
+  --color-fill-quaternary: rgba(255, 255, 255, 0.05);
+  --color-separator: rgba(255, 255, 255, 0.12);
+  --color-border-control: var(--p-fog-3);
+  --material-bar: rgba(14, 15, 12, 0.86);
+  --color-scrim: rgba(0, 0, 0, 0.66);
 }

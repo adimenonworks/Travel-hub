@@ -28,10 +28,10 @@ export function Ideas(ctx: TripCtx) {
     <>
       <div className={s.dayHead}>
         <div>
-          <h2 className="t-title2">Ideas board</h2>
+          <h2 className="t-title1">Ideas board</h2>
           <div className={s.dayBudget}>Drop ideas, vote, and {ctx.canManage ? 'approve the winners into the itinerary' : 'organizers will schedule the winners'}.</div>
         </div>
-        <Button icon="plus" size="small" onClick={() => setEditing('new')}>Add idea</Button>
+        <Button icon="plus" onClick={() => setEditing('new')}>Add idea</Button>
       </div>
       <SegmentedControl label="Filter ideas" value={filter} onChange={setFilter} options={[
         { value: 'open', label: `Open (${count('open')})` },
@@ -82,7 +82,7 @@ function IdeaCard({ idea, ctx, onEdit, onApprove }: { idea: Idea; ctx: TripCtx; 
         </div>
         {canEdit && <IconButton icon="pencil" size="small" label={`Edit ${idea.title}`} onClick={onEdit} />}
       </div>
-      <div className="t-headline">{idea.title}</div>
+      <h3 className="t-title3">{idea.title}</h3>
       {idea.notes && <div className={s.actNotes}>{idea.notes}</div>}
       <LinkChips links={idea.links} />
       <div className={s.ideaFoot}>
@@ -90,7 +90,7 @@ function IdeaCard({ idea, ctx, onEdit, onApprove }: { idea: Idea; ctx: TripCtx; 
           aria-label={voted ? 'Remove your vote' : 'Vote for this idea'}>
           <Icon name="thumbs-up" size={16} />{votes}
         </button>
-        <Button size="small" variant="plain" icon="chat" onClick={() => setShowComments((v) => !v)} aria-expanded={showComments}>{nComments || ''}</Button>
+        <Button size="small" variant="plain" icon="chat" onClick={() => setShowComments((v) => !v)} aria-expanded={showComments} aria-label={`Comments (${nComments})`}>{nComments || ''}</Button>
         <span className={s.spacer} />
         <Avatar name={author} photo={ctx.profiles[idea.createdBy]?.photo} seed={idea.createdBy} size={22} />
         {ctx.canManage && idea.status === 'open' && (

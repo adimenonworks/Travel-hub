@@ -1,18 +1,29 @@
 .card {
-  background: var(--color-bg-grouped-secondary);
+  background: var(--color-surface);
   border-radius: var(--radius-card);
   padding: var(--space-inset);
-  box-shadow: var(--shadow-card);
 }
 .flush { padding: 0; overflow: hidden; }
-.interactive { cursor: pointer; transition: transform var(--motion-fast), box-shadow var(--motion-fast); text-align: left; border: 0; width: 100%; color: inherit; display: block; }
-.interactive:hover { box-shadow: var(--shadow-raised); text-decoration: none; }
+.interactive { cursor: pointer; transition: transform var(--motion-fast), background var(--motion-fast); text-align: left; border: 0; width: 100%; color: inherit; display: block; }
+.interactive:hover { background: color-mix(in srgb, var(--color-surface) 92%, var(--color-label)); }
 .interactive:active { transform: scale(0.99); }
 
-.section { display: flex; flex-direction: column; gap: var(--space-xs); }
-.sectionHeader {
-  display: flex; align-items: baseline; justify-content: space-between; gap: var(--space-sm);
-  padding: 0 var(--space-xxs);
+/* Bold accent card: the bright accent fill, with every text role remapped to its deep partner. */
+.accent {
+  background: var(--color-accent);
+  color: var(--color-on-accent);
+  --color-label: var(--color-on-accent);
+  --color-label-secondary: var(--color-on-accent);
+  --color-label-tertiary: var(--color-on-accent);
+  --color-separator: color-mix(in srgb, var(--color-on-accent) 20%, transparent);
+  --color-tint: var(--color-on-accent);
 }
-.sectionTitle { font: var(--p-weight-bold) var(--p-size-title3)/var(--p-leading-title3) var(--font-display); letter-spacing: var(--p-tracking-title3); }
-.sectionFooter { font-size: var(--p-size-footnote); line-height: var(--p-leading-footnote); color: var(--color-label-secondary); padding: 0 var(--space-sm); }
+
+.section { display: flex; flex-direction: column; gap: var(--space-sm); }
+.sectionHeader {
+  display: flex; align-items: center; justify-content: space-between; gap: var(--space-sm);
+  min-height: var(--size-tap);
+  flex-wrap: wrap;
+}
+.sectionTitle { font: var(--p-weight-semibold) var(--p-size-title2)/var(--p-leading-title2) var(--font-display); letter-spacing: var(--p-tracking-title2); }
+.sectionFooter { font-size: var(--p-size-footnote); line-height: var(--p-leading-footnote); color: var(--color-label-secondary); padding: 0 var(--space-xs); }

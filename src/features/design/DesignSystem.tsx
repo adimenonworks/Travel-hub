@@ -1,47 +1,49 @@
 import { useState, type CSSProperties } from 'react';
 import {
-  Avatar, AvatarStack, Badge, Banner, Button, Card, EmptyState, FieldRow, Icon, IconButton, List, ListRow, PageHeader,
-  ProgressBar, SegmentedControl, Section, Select, Sheet, Spinner, Switch, TextArea, TextField, type IconName,
+  Avatar, AvatarStack, Badge, Banner, Button, Card, ColorPicker, EmptyState, FieldRow, Icon, IconButton, LinkButton, List, ListRow, PageHeader,
+  SegmentedControl, Section, Select, Sheet, Spinner, Tabs, TextArea, TextField, type IconName,
 } from '../../design/components';
+import { COVER_COLORS } from '../../lib/colors';
 import s from './DesignSystem.module.css';
 
 const colorGroups: { title: string; tokens: string[] }[] = [
-  { title: 'Accent & status', tokens: ['--color-tint', '--color-tint-subtle', '--color-success', '--color-warning', '--color-danger'] },
-  { title: 'Categories', tokens: ['--color-cat-activity', '--color-cat-food', '--color-cat-cafe', '--color-cat-drinks', '--color-cat-sight', '--color-cat-transport', '--color-cat-stay', '--color-cat-other'] },
-  { title: 'Labels', tokens: ['--color-label', '--color-label-secondary', '--color-label-tertiary', '--color-label-quaternary'] },
-  { title: 'Backgrounds', tokens: ['--color-bg', '--color-bg-secondary', '--color-bg-grouped', '--color-bg-grouped-secondary', '--color-bg-elevated'] },
-  { title: 'Fills & separators', tokens: ['--color-fill', '--color-fill-secondary', '--color-fill-tertiary', '--color-fill-quaternary', '--color-separator'] },
+  { title: 'Accent (changes with Profile → Appearance)', tokens: ['--color-accent', '--color-on-accent', '--color-tint', '--color-on-tint', '--color-tint-subtle'] },
+  { title: 'Status', tokens: ['--color-success', '--color-warning', '--color-danger', '--color-success-subtle', '--color-warning-subtle', '--color-danger-subtle'] },
+  { title: 'Categories (brights, text is --color-on-bright)', tokens: ['--color-cat-activity', '--color-cat-food', '--color-cat-cafe', '--color-cat-drinks', '--color-cat-sight', '--color-cat-transport', '--color-cat-stay', '--color-cat-other'] },
+  { title: 'Labels', tokens: ['--color-label', '--color-label-secondary', '--color-label-tertiary', '--color-on-bright'] },
+  { title: 'Surfaces', tokens: ['--color-bg', '--color-surface', '--color-bg-elevated'] },
+  { title: 'Fills & lines', tokens: ['--color-fill', '--color-fill-tertiary', '--color-fill-quaternary', '--color-separator', '--color-border-control'] },
 ];
 
 const typeStyles = [
-  ['t-large-title', 'Large Title', '34 / 41 Bold'],
-  ['t-title1', 'Title 1', '28 / 34 Bold'],
-  ['t-title2', 'Title 2', '22 / 28 Bold'],
-  ['t-title3', 'Title 3', '20 / 25 Semibold'],
-  ['t-headline', 'Headline', '17 / 22 Semibold'],
-  ['t-body', 'Body', '17 / 22 Regular'],
-  ['t-callout', 'Callout', '16 / 21 Regular'],
-  ['t-subhead', 'Subheadline', '15 / 20 Regular'],
+  ['t-display', 'Display', '40–72 / 0.92 Black (900)'],
+  ['t-title1', 'Title 1', '32 / 38 Semibold'],
+  ['t-title2', 'Title 2', '24 / 31 Semibold'],
+  ['t-title3', 'Title 3', '20 / 26 Semibold'],
+  ['t-headline', 'Headline', '17 / 24 Semibold'],
+  ['t-body', 'Body', '16 / 24 Regular'],
+  ['t-callout', 'Callout', '15 / 22 Regular'],
+  ['t-subhead', 'Subheadline', '14 / 20 Regular'],
   ['t-footnote', 'Footnote', '13 / 18 Regular'],
-  ['t-caption1', 'Caption 1', '12 / 16 Regular'],
-  ['t-caption2', 'Caption 2', '11 / 13 Regular'],
+  ['t-caption1', 'Caption 1', '12 / 16 Medium'],
+  ['t-caption2', 'Caption 2', '11 / 14 Medium'],
 ];
 
 const spaces = ['--space-xxs', '--space-xs', '--space-sm', '--space-md', '--space-lg', '--space-xl', '--space-2xl', '--space-3xl'];
-const radii = ['--radius-icon', '--radius-control', '--radius-card', '--radius-sheet', '--radius-button'];
+const radii = ['--radius-inner', '--radius-field', '--radius-card', '--radius-pill'];
 const icons: IconName[] = ['plus', 'calendar', 'lightbulb', 'wallet', 'cloud', 'people', 'person', 'home', 'pin', 'link', 'doc', 'pencil', 'trash', 'check', 'thumbs-up', 'chat', 'clock', 'globe', 'sun', 'rain', 'map', 'share', 'plane', 'news'];
 
 /** Living reference for tokens and components, at /#/design. */
 export function DesignSystem() {
   const [seg, setSeg] = useState<'a' | 'b' | 'c'>('a');
-  const [on, setOn] = useState(true);
+  const [color, setColor] = useState('lime');
   const [sheet, setSheet] = useState(false);
 
   return (
     <>
-      <PageHeader title="Design system" subtitle="Primitives → semantic tokens → components. Based on Apple's Human Interface Guidelines." back={{ to: '/', label: 'Trips' }} />
       <div className={s.page}>
-        <Section title="Color" footer="Semantic tokens from src/design/tokens/semantic.css. Switch your OS to dark mode (or use Profile → Appearance) to see the dark values.">
+        <PageHeader title="Design system" subtitle="Primitives → semantic tokens → components. Bold, bright and rounded, inspired by Wise. Every text pairing meets WCAG 2.2 AA." />
+        <Section title="Colour" footer="Semantic tokens from src/design/tokens/semantic.css. Use Profile → Appearance to change the accent or switch to dark mode.">
           {colorGroups.map((g) => (
             <Card key={g.title}>
               <div className="t-headline" style={{ marginBottom: 'var(--space-sm)' }}>{g.title}</div>
@@ -57,7 +59,7 @@ export function DesignSystem() {
           ))}
         </Section>
 
-        <Section title="Typography" footer="System font stack (SF Pro on Apple devices). Classes in tokens/typography.css.">
+        <Section title="Typography" footer="Inter (bundled with the app). Weight 900 for page titles and big numbers only; everything else is semibold, as in DESIGN.md. Classes in tokens/typography.css.">
           <Card className={s.stack}>
             {typeStyles.map(([cls, name, spec]) => (
               <div key={cls} className={s.typeRow}>
@@ -68,7 +70,7 @@ export function DesignSystem() {
           </Card>
         </Section>
 
-        <Section title="Spacing & shape" footer="4pt base unit, 8pt rhythm. Minimum tap target 44×44.">
+        <Section title="Spacing & shape" footer="4px base unit, 8px rhythm. Controls are pills; cards have soft 24px corners and sit white on the sage canvas. Minimum tap target 44×44.">
           <Card className={s.stack}>
             {spaces.map((t) => (
               <div key={t} className={s.spaceRow}>
@@ -98,9 +100,27 @@ export function DesignSystem() {
             <Button icon="plus" size="small">Small</Button>
             <Button size="large">Large</Button>
             <Button disabled>Disabled</Button>
+            <LinkButton to="/" variant="tinted">Link button</LinkButton>
             <IconButton icon="pencil" label="Edit" />
             <IconButton icon="plus" label="Add" variant="tinted" />
           </Card>
+        </Section>
+
+        <Section title="Navigation" footer="Tabs are pill links. The top bar and each trip's sections use them.">
+          <Card>
+            <Tabs label="Demo tabs" items={[
+              { to: '/design', label: 'Current', active: true },
+              { to: '/', label: 'Trips', active: false },
+              { to: '/profile', label: 'With count', count: 3, active: false },
+            ]} />
+          </Card>
+        </Section>
+
+        <Section title="Cards">
+          <div className={s.cards}>
+            <Card><div className="t-title3">Default card</div><p className="t-subhead t-secondary">White on the sage canvas, no shadow.</p></Card>
+            <Card tone="accent"><div className="t-title3">Accent card</div><p className="t-subhead t-secondary">For the one thing that matters most on a page.</p></Card>
+          </div>
         </Section>
 
         <Section title="Inputs">
@@ -115,7 +135,7 @@ export function DesignSystem() {
             </FieldRow>
             <TextArea label="Text area" placeholder="Notes" />
             <SegmentedControl label="Demo" value={seg} onChange={setSeg} options={[{ value: 'a', label: 'First' }, { value: 'b', label: 'Second' }, { value: 'c', label: 'Third' }]} />
-            <label className={s.switchRow}><span>Switch</span><Switch checked={on} onChange={setOn} label="Demo switch" /></label>
+            <ColorPicker label="Colour picker" options={COVER_COLORS} value={color} onChange={setColor} />
           </Card>
         </Section>
 
@@ -137,8 +157,6 @@ export function DesignSystem() {
               <AvatarStack people={['Ana', 'Ben', 'Cy', 'Dee', 'Eli', 'Fay'].map((n) => ({ id: n, name: n }))} />
               <Spinner />
             </div>
-            <ProgressBar value={64} max={100} label="Demo progress" />
-            <ProgressBar value={92} max={100} color="var(--color-danger)" label="Demo progress over" />
             <Banner>Banners call out important context.</Banner>
           </Card>
           <Card><EmptyState icon="lightbulb" title="Empty state" message="Explains what goes here and how to start." action={<Button variant="tinted" onClick={() => setSheet(true)}>Open a sheet</Button>} /></Card>

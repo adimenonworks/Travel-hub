@@ -9,7 +9,7 @@ A shared vacation planner. Create trips, invite friends, and plan together:
 - **People**: invite links, roles (owner / organizer / member), leave or remove people.
 - **Home**: trips grouped into happening now / upcoming / past, travel stats, and a map of places you've been.
 
-Edits sync live to everyone on the trip. It works on phone, tablet and desktop, follows Apple's Human Interface Guidelines, and supports light and dark mode.
+Edits sync live to everyone on the trip. It works on phone, tablet and desktop, has a bold, rounded look inspired by Wise with a choice of six accent colours, supports light and dark mode, and meets WCAG 2.2 AA.
 
 ## Stack
 
@@ -54,11 +54,11 @@ Some browsers (notably Safari on iPhone) block the cross-site storage that Googl
 
 | Layer | File | What's in it |
 | --- | --- | --- |
-| Primitives | `tokens/primitives.css` | Raw HIG values: system colors (light and dark), type scale, 4/8pt spacing, radii, shadows, motion |
-| Semantic tokens | `tokens/semantic.css` | Role-based names components use (`--color-label`, `--color-bg-grouped`, `--color-tint`, `--space-gutter`, `--size-tap`…), including dark mode |
-| Components | `components/` | Button, IconButton, TextField/TextArea/Select, Card, Section, List/ListRow, SegmentedControl, Sheet, PageHeader, TabBar, Avatar(Stack), Badge, EmptyState, ProgressBar, Switch, Spinner, Banner, Icon |
+| Primitives | `tokens/primitives.css` | Raw values: bright/deep colour pairs, neutrals (light and dark), Inter type scale, 4/8px spacing, radii, shadows, motion |
+| Semantic tokens | `tokens/semantic.css` | Role-based names components use (`--color-label`, `--color-surface`, `--color-accent`, `--color-tint`, `--space-gutter`, `--size-tap`…), including dark mode and the six accent choices |
+| Components | `components/` | Button, IconButton, LinkButton, TextField/TextArea/Select, Card (default or accent), Section, List/ListRow, SegmentedControl, ColorPicker, Sheet, PageHeader, Tabs, Avatar(Stack), Badge, EmptyState, Spinner, Banner, Icon |
 
-Breakpoints: **compact** < 744px (bottom tab bar, bottom sheets), **regular** 744–1067px (sidebar, modal sheets), **wide** ≥ 1068px (sidebar plus a day list beside the timeline). Every tappable element is at least 44×44pt.
+Navigation is a sticky top bar with pill tabs at every width. Breakpoints: **compact** < 744px (bottom sheets), **regular** 744–1067px (modal sheets), **wide** ≥ 1068px (a day list beside the timeline). Every tappable element is at least 44×44px.
 
 The live reference is at `/#/design` in the app.
 
@@ -66,7 +66,7 @@ The live reference is at `/#/design` in the app.
 
 ```
 src/
-  app/         router + shell (sidebar)
+  app/         router + shell (top bar)
   data/        types, Store interface, Firebase + demo implementations, React hooks
   design/      tokens + components
   features/    home, trip (itinerary, ideas, budget, info, people), profile, auth, design page

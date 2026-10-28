@@ -1,34 +1,45 @@
 .button {
+  position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: var(--space-xs);
   min-height: var(--size-control);
   min-width: var(--size-tap);
-  padding: 0 var(--space-md);
+  padding: 0 var(--space-xl);
   border: 0;
   border-radius: var(--radius-button);
   font: var(--p-weight-semibold) var(--p-size-body)/1 var(--font-text);
   letter-spacing: var(--p-tracking-body);
   white-space: nowrap;
-  text-decoration: none !important;
-  transition: background var(--motion-fast), opacity var(--motion-fast), transform var(--motion-fast);
+  text-decoration: none;
+  transition: background var(--motion-fast), transform var(--motion-fast);
   user-select: none;
 }
-.button:active:not(:disabled) { transform: scale(0.98); opacity: 0.85; }
-.button:disabled { opacity: 0.4; cursor: default; }
+.button:active:not(:disabled) { transform: scale(0.97); }
+.button:disabled { opacity: 0.45; cursor: default; }
 
-.filled { background: var(--color-tint); color: var(--color-on-tint); }
-.filled:hover:not(:disabled) { background: var(--color-tint-pressed); }
+/* Primary: the bright accent with its deep partner as text */
+.filled { background: var(--color-accent); color: var(--color-on-accent); }
+.filled:hover:not(:disabled) { background: var(--color-accent-hover); }
+/* Secondary: a soft wash of the accent */
 .tinted { background: var(--color-tint-subtle); color: var(--color-tint); }
-.gray { background: var(--color-fill-tertiary); color: var(--color-tint); }
-.plain { background: transparent; color: var(--color-tint); padding: 0 var(--space-xs); }
+.tinted:hover:not(:disabled) { background: color-mix(in srgb, var(--color-tint) 18%, transparent); }
+/* Neutral: grey pill */
+.gray { background: var(--color-fill-tertiary); color: var(--color-label); }
+.gray:hover:not(:disabled) { background: var(--color-fill); }
+/* Tertiary: text only, underlined so it reads as an action without a fill */
+.plain { background: transparent; color: var(--color-tint); padding: 0 var(--space-sm); text-decoration: underline; text-underline-offset: 3px; }
 .plain:hover:not(:disabled) { background: var(--color-fill-quaternary); }
 .destructive { background: var(--color-danger-subtle); color: var(--color-danger); }
+.destructive:hover:not(:disabled) { background: color-mix(in srgb, var(--color-danger) 18%, transparent); }
 
-.small { min-height: var(--size-control-sm); padding: 0 var(--space-sm); font-size: var(--p-size-subhead); }
-.large { min-height: 52px; padding: 0 var(--space-xl); }
+.small { min-height: var(--size-control-sm); padding: 0 var(--space-md); font-size: var(--p-size-subhead); }
+/* Small controls keep a full 44px hit area */
+.small::after { content: ''; position: absolute; inset: calc((var(--size-control-sm) - var(--size-tap)) / 2) 0; }
+.large { min-height: 56px; padding: 0 var(--space-2xl); font-size: var(--p-size-headline); }
 .block { width: 100%; }
 
-.icon { padding: 0; width: var(--size-tap); }
-.icon.small { width: var(--size-control-sm); min-width: var(--size-control-sm); }
+.icon { padding: 0; width: var(--size-tap); min-height: var(--size-tap); text-decoration: none; }
+.icon.small { width: var(--size-control-sm); min-width: var(--size-control-sm); min-height: var(--size-control-sm); }
+.icon.small::after { inset: calc((var(--size-control-sm) - var(--size-tap)) / 2); }

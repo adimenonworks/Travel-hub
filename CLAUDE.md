@@ -21,7 +21,7 @@ A collaborative vacation planner. People create trips, invite others with a link
 ## Code layout
 
 ```
-src/app/        router (App.tsx) + responsive shell/sidebar
+src/app/        router (App.tsx) + shell (sticky top bar with tabs)
 src/data/       types.ts, Store interface (store.ts), firebaseStore.ts, localStore.ts, hooks.tsx
 src/design/     tokens/ (primitives → semantic → typography) + components/
 src/features/   home, trip (Itinerary, Ideas, Budget, Info, People, forms), profile, auth, design page, shared
@@ -31,8 +31,9 @@ firestore.rules + tests/rules/   security rules and their emulator tests
 
 ## Rules for changes
 
-- **Design system:** follow Apple's Human Interface Guidelines with a rounded look (capsule buttons, soft corners). Use semantic tokens from `src/design/tokens/semantic.css` and components from `src/design/components/`. Never hard-code colors, sizes or radii. Add new tokens or components there and show them on the `/#/design` page.
-- **Responsive:** compact < 744px (bottom tab bar, bottom sheets), regular 744–1067px (sidebar), wide ≥ 1068px. Tap targets ≥ 44px, no horizontal scroll at 390px, light and dark mode.
+- **Design system:** bold, bright and rounded, inspired by Wise. `DESIGN.md` (repo root) is the Wise reference spec; follow it except where this file says otherwise. In short: sage canvas with white cards, Inter at weight 900 for page titles and big numbers only (semibold elsewhere), bright accent fills with their deep partner colour as text, pill-shaped controls and 24px card corners. Deliberate departures from DESIGN.md: a user-chosen accent (not only Wise green), a dark mode, pill (not 24px) buttons and inputs, and WCAG AA contrast wins over any value in the spec (e.g. its `mute` grey is too light for text). The user picks the accent in Profile → Appearance (`data-accent` on `<html>`), so use `--color-accent`/`--color-on-accent` for bright fills and `--color-tint`/`--color-on-tint` for text, icons and selected states; never put text in a bright colour on a light background. Use semantic tokens from `src/design/tokens/semantic.css` and components from `src/design/components/`. Never hard-code colors, sizes or radii. Add new tokens or components there and show them on the `/#/design` page.
+- **Responsive:** top tab bar at every width; compact < 744px (bottom sheets), regular 744–1067px, wide ≥ 1068px. Tap targets ≥ 44px, no horizontal scroll at 390px, light and dark mode.
+- **Accessibility:** WCAG 2.2 AA. Text ≥ 4.5:1 contrast, control outlines and focus rings ≥ 3:1, never colour alone for state, every control has an accessible name. Check new colour pairs with every accent in light and dark mode.
 - **Data:** UI code talks only to the `Store` interface. Any new data operation must be added to **both** `firebaseStore.ts` and `localStore.ts`. Dates are `YYYY-MM-DD` strings and times are `HH:mm`.
 - **Security:** a new Firestore collection or field rule needs a matching change in `firestore.rules`, plus tests in `tests/rules/rules.test.mjs`. If the rules changed, tell the owner to re-paste them in the Firebase console (Firestore → Rules → Publish).
 - Watch for `fn?.(await x())`: if `fn` is undefined, `x()` never runs. Await into a variable first.

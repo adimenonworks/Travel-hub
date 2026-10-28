@@ -2,7 +2,7 @@ import type { CSSProperties, ReactNode } from 'react';
 import { Icon, type IconName } from './Icon';
 import s from './Misc.module.css';
 
-const avatarColors = ['#007aff', '#34c759', '#ff9500', '#af52de', '#ff2d55', '#5856d6', '#30b0c7', '#a2845e'];
+const avatarColors = ['--p-lime', '--p-sky', '--p-tangerine', '--p-lavender', '--p-bubblegum', '--p-lemon', '--p-aqua', '--p-sand'].map((v) => `var(${v})`);
 
 function colorFor(seed: string) {
   let h = 0;
@@ -35,7 +35,8 @@ export function AvatarStack({ people, max = 4, size = 28 }: { people: { id: stri
 export type BadgeTone = 'neutral' | 'tint' | 'success' | 'warning' | 'danger';
 
 export function Badge({ tone = 'neutral', icon, children, color }: { tone?: BadgeTone; icon?: IconName; children: ReactNode; color?: string }) {
-  const style = color ? ({ '--badge-fg': color, '--badge-bg': `color-mix(in srgb, ${color} 14%, transparent)` } as CSSProperties) : undefined;
+  // A custom colour is a bright fill (category colours), so its text is the dark on-bright ink.
+  const style = color ? ({ '--badge-fg': 'var(--color-on-bright)', '--badge-bg': color } as CSSProperties) : undefined;
   return (
     <span className={[s.badge, tone !== 'neutral' && s[`badge-${tone}`]].filter(Boolean).join(' ')} style={style}>
       {icon && <Icon name={icon} size={13} />}
@@ -47,29 +48,11 @@ export function Badge({ tone = 'neutral', icon, children, color }: { tone?: Badg
 export function EmptyState({ icon, title, message, action }: { icon: IconName; title: string; message?: ReactNode; action?: ReactNode }) {
   return (
     <div className={s.empty}>
-      <Icon name={icon} size={48} className={s.emptyIcon} />
+      <span className={s.emptyIconWrap}><Icon name={icon} size={36} /></span>
       <div className={s.emptyTitle}>{title}</div>
       {message && <div>{message}</div>}
       {action && <div className={s.emptyAction}>{action}</div>}
     </div>
-  );
-}
-
-export function ProgressBar({ value, max, color, label }: { value: number; max: number; color?: string; label: string }) {
-  const pct = max > 0 ? Math.min(100, (value / max) * 100) : 0;
-  return (
-    <div className={s.progress} role="progressbar" aria-label={label} aria-valuemin={0} aria-valuemax={max} aria-valuenow={value}>
-      <div className={s.progressBar} style={{ width: `${pct}%`, '--progress-color': color } as CSSProperties} />
-    </div>
-  );
-}
-
-export function Switch({ checked, onChange, label }: { checked: boolean; onChange: (v: boolean) => void; label: string }) {
-  return (
-    <span className={s.switch}>
-      <input type="checkbox" role="switch" aria-label={label} checked={checked} onChange={(e) => onChange(e.target.checked)} />
-      <span className={s.track}><span className={s.thumb} /></span>
-    </span>
   );
 }
 
