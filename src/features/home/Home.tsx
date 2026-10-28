@@ -94,7 +94,7 @@ function TripGroup({ title, trips }: { title: string; trips: Trip[] }) {
           const until = daysBetween(today(), t.startDate);
           return (
             <CardLink key={t.id} to={`/trip/${t.id}`} flush>
-              <div className={s.cover} style={{ background: coverColor(t.coverColor) }}>
+              <div className={s.cover} style={{ backgroundColor: coverColor(t.coverColor), backgroundImage: t.coverPhoto ? `url(${t.coverPhoto})` : undefined }}>
                 <span className={s.coverBadge}>{until > 0 ? `in ${until} day${until === 1 ? '' : 's'}` : until === 0 ? 'Today' : `${n} day${n === 1 ? '' : 's'}`}</span>
               </div>
               <div className={s.tripBody}>

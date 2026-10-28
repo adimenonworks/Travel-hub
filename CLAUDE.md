@@ -35,7 +35,7 @@ firestore.rules + tests/rules/   security rules and their emulator tests
 - **Responsive:** top tab bar at every width; compact < 744px (bottom sheets), regular 744–1067px, wide ≥ 1068px. Tap targets ≥ 44px, no horizontal scroll at 390px, light and dark mode.
 - **Accessibility:** WCAG 2.2 AA. Text ≥ 4.5:1 contrast, control outlines and focus rings ≥ 3:1, never colour alone for state, every control has an accessible name. Check new colour pairs with every accent in light and dark mode.
 - **Data:** UI code talks only to the `Store` interface. Any new data operation must be added to **both** `firebaseStore.ts` and `localStore.ts`. Dates are `YYYY-MM-DD` strings and times are `HH:mm`.
-- **Security:** a new Firestore collection or field rule needs a matching change in `firestore.rules`, plus tests in `tests/rules/rules.test.mjs`. If the rules changed, tell the owner to re-paste them in the Firebase console (Firestore → Rules → Publish).
+- **Security:** a new Firestore collection or field rule needs a matching change in `firestore.rules`, plus tests in `tests/rules/rules.test.mjs`. If the rules changed, the owner must re-publish them in the Firebase console. The owner isn't technical: never ask them to edit or add to anything. Paste the **entire** `firestore.rules` file in your reply as one code block, with numbered click-by-click steps (console.firebase.google.com → project travel-hub-a1aa2 → Firestore Database → Rules tab → select all and delete → paste → Publish). Make app code work with both the old and new rules, since they may publish later.
 - Watch for `fn?.(await x())`: if `fn` is undefined, `x()` never runs. Await into a variable first.
 
 ## Before pushing
@@ -47,6 +47,6 @@ firestore.rules + tests/rules/   security rules and their emulator tests
 ## Roadmap / open ideas
 
 - Gmail import of reservations (restricted read-only Gmail permission; capped at 100 test users unless Google verifies the app)
-- PDF/file uploads (needs Firebase Blaze plan for Storage; today links are used instead)
+- PDF/file uploads (needs Firebase Blaze plan for Storage; today links are used instead). Trip cover photos avoid this by shrinking to ≤ 300 KB JPEG and storing the data URL in the trip doc (`src/lib/image.ts`).
 - AI recommendations for nearby cafés, bars and activities
 - More home-dashboard widgets

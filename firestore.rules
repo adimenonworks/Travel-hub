@@ -27,17 +27,26 @@ service cloud.firestore {
     match /trips/{tripId} {
       allow read: if signedIn() && uid() in resource.data.memberIds;
 
+      // Optional cover photo: a small JPEG/WebP stored as text, under 500 KB.
+      function validCover(d) {
+        return !('coverPhoto' in d) || d.coverPhoto == null
+          || (d.coverPhoto is string && d.coverPhoto.size() < 500000
+              && d.coverPhoto.matches('^data:image/(jpeg|webp);base64,[A-Za-z0-9+/=]+$'));
+      }
+
       allow create: if signedIn()
         && request.resource.data.ownerId == uid()
         && request.resource.data.memberIds == [uid()]
-        && request.resource.data.roles == { (uid()): 'owner' };
+        && request.resource.data.roles == { (uid()): 'owner' }
+        && validCover(request.resource.data);
 
       // Owner/organizers edit anything except ownership, and can't drop the owner.
       function managerUpdate() {
         return resource.data.roles[uid()] in ['owner', 'editor']
           && request.resource.data.ownerId == resource.data.ownerId
           && resource.data.ownerId in request.resource.data.memberIds
-          && request.resource.data.roles[resource.data.ownerId] == 'owner';
+          && request.resource.data.roles[resource.data.ownerId] == 'owner'
+          && validCover(request.resource.data);
       }
 
       // A non-member joins with a valid, unexpired invite for this trip.

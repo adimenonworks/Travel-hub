@@ -3,11 +3,25 @@
   display: flex; flex-wrap: wrap; gap: var(--space-sm) var(--space-xl); align-items: center;
   padding: var(--space-xl) var(--space-inset);
   border-radius: var(--radius-card);
+  overflow: hidden;
   background: var(--trip-color, var(--color-accent));
   color: var(--color-on-bright);
   font: var(--p-weight-semibold) var(--p-size-callout)/var(--p-leading-callout) var(--font-text);
 }
 .hero span { display: inline-flex; align-items: center; gap: var(--space-xs); }
+/* Cover photo sits above the colour band, so the text never has to sit on a busy photo. */
+.heroPhoto {
+  flex: 0 0 calc(100% + 2 * var(--space-inset));
+  width: calc(100% + 2 * var(--space-inset)); max-width: none;
+  margin: calc(-1 * var(--space-xl)) calc(-1 * var(--space-inset)) var(--space-xs);
+  aspect-ratio: 5 / 2; max-height: 360px; object-fit: cover;
+}
+@media (max-width: 743px) { .heroPhoto { aspect-ratio: 16 / 9; } }
+
+/* Cover photo picker (trip form) */
+.coverField { display: flex; flex-direction: column; gap: var(--space-sm); }
+.coverPreview { width: 100%; aspect-ratio: 5 / 2; object-fit: cover; border-radius: var(--radius-inner); }
+.coverButtons { display: flex; gap: var(--space-xs); flex-wrap: wrap; }
 
 /* Section tabs stay reachable while scrolling */
 .sectionNav {
