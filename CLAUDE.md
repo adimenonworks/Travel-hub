@@ -13,21 +13,10 @@ A collaborative vacation planner. People create trips, invite others with a link
 
 ## Stack
 
-- React 19 + TypeScript + Vite. Hash routing (`/#/trip/:id`) because GitHub Pages can't route paths.
+- Hash routing (`/#/trip/:id`) because GitHub Pages can't route paths.
 - Firebase Auth (Google sign-in) + Firestore, project `travel-hub-a1aa2`. The web config is in `.env.production`; it's public by design, and security comes from `firestore.rules`.
 - With no Firebase config (e.g. `npm run dev` without `.env.local`), the app runs in **demo mode** using localStorage. This is how to test locally.
 - External APIs (free, no keys): Open-Meteo (weather + city search), OpenStreetMap/Leaflet (maps), Nominatim (address lookup). Fonts: Manrope is bundled (`@fontsource-variable/manrope`); Clash Display Bold loads from Fontshare's CDN (`index.html`), so the sandbox falls back to Manrope.
-
-## Code layout
-
-```
-src/app/        router (App.tsx) + shell (sticky top bar with tabs)
-src/data/       types.ts, Store interface (store.ts), firebaseStore.ts, localStore.ts, hooks.tsx
-src/design/     tokens/ (primitives → semantic → typography) + components/
-src/features/   home, trip (Itinerary, plan page, Ideas, Budget, Photos, People, forms), profile (incl. Your travels), auth, design page, shared
-src/lib/        dates, format, weather, geocode, categories, theme, prefs, image, authErrors
-firestore.rules + tests/rules/   security rules and their emulator tests
-```
 
 ## Rules for changes
 
