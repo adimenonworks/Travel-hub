@@ -52,7 +52,7 @@
 .day[aria-pressed='true']:hover { background: var(--interactive-selected-hover); }
 .day[aria-pressed='true']:active { background: var(--interactive-selected-pressed); }
 .dayDow { font-size: var(--p-size-caption1); font-weight: var(--p-weight-semibold); }
-.dayNum { font: var(--p-weight-display) var(--p-size-title2)/1 var(--font-display); letter-spacing: var(--p-tracking-title2); }
+.dayNum { font: var(--p-weight-display) var(--p-size-title2)/1 var(--font-display); font-stretch: var(--p-stretch-display); letter-spacing: var(--p-tracking-title2); }
 .dayDot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
 /* The selected day opens up: date and month, plus small labels for plans and budget left. */
 .day[aria-pressed='true'] { min-width: 132px; padding: var(--space-sm) var(--space-md); border-radius: var(--radius-card); gap: var(--space-xxs); }
@@ -134,7 +134,7 @@ a.docLink:hover { text-decoration-thickness: 2px; color: var(--text-link-hover);
 .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: var(--space-md); }
 .stat { display: flex; flex-direction: column; gap: var(--space-xxs); }
 .statLabel { font-size: var(--p-size-subhead); font-weight: var(--p-weight-semibold); color: var(--text-subtle); }
-.statValue { font: var(--p-weight-display) var(--p-size-title1)/var(--p-leading-title1) var(--font-display); letter-spacing: var(--p-tracking-title1); font-variant-numeric: tabular-nums; }
+.statValue { font: var(--p-weight-display) var(--p-size-title1)/var(--p-leading-title1) var(--font-display); font-stretch: var(--p-stretch-display); letter-spacing: var(--p-tracking-title1); font-variant-numeric: tabular-nums; }
 .bars { display: flex; flex-direction: column; gap: var(--space-md); }
 .barRow { display: grid; grid-template-columns: 72px minmax(0, 1fr) auto; gap: var(--space-sm); align-items: center; font-size: var(--p-size-subhead); }
 .barTrack { position: relative; height: 24px; border-radius: var(--radius-pill); background: var(--surface-sunken); overflow: hidden; }
