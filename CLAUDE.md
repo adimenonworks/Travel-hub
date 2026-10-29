@@ -8,7 +8,7 @@ A collaborative vacation planner. People create trips, invite others with a link
 ## Publishing
 
 - Any push to the repo's **default branch** builds and deploys automatically (`.github/workflows/deploy.yml`, about 1 minute). Other branches build nothing.
-- A change is only live once it's on the default branch. When the owner says "publish it", get the change there: open a PR and merge it, or push to it directly if they say so. Then confirm the workflow run is green.
+- A change is only live once it's on the default branch. **Publish every change by default**: once the build and checks pass and nothing needs the owner's attention (a rules re-publish, a decision, a known problem), open a PR, merge it and confirm the workflow run is green, without asking first. If something does need their attention, ask before publishing.
 - Optional second host: Firebase Hosting at https://travel-hub-a1aa2.web.app runs only if the `FIREBASE_SERVICE_ACCOUNT` repo secret exists (see README).
 
 ## Stack
