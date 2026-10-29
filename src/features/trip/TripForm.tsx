@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { Button, ColorPicker, FieldRow, Select, Sheet, TextField } from '../../design/components';
+import { Button, FieldRow, Select, Sheet, TextField } from '../../design/components';
 import { store } from '../../data';
 import type { Place, Trip } from '../../data/types';
 import { COVER_COLORS, coverName } from '../../lib/colors';
@@ -22,8 +22,11 @@ const fromTrip = (t?: Trip): Draft => ({
   coverPhoto: t?.coverPhoto ?? null,
 });
 
-/** Create a trip (no `trip`) or edit one. Calls onSaved with the trip id. */
-export function TripForm({ open, trip, onClose, onSaved }: { open: boolean; trip?: Trip; onClose: () => void; onSaved?: (id: string) => void }) {
+/**
+ * Create a trip (no `trip`) or edit one. Calls onSaved with the trip id.
+ * Pass onDeleted to show a Delete trip button (only the owner can delete; the security rules enforce it too).
+ */
+export function TripForm({ open, trip, onClose, onSaved, onDeleted }: { open: boolean; trip?: Trip; onClose: () => void; onSaved?: (id: string) => void; onDeleted?: () => void }) {
   const [d, setD] = useState<Draft>(() => fromTrip(trip));
   const [error, setError] = useState('');
   useEffect(() => { if (open) { setD(fromTrip(trip)); setError(''); } }, [open, trip]);
@@ -56,6 +59,17 @@ export function TripForm({ open, trip, onClose, onSaved }: { open: boolean; trip
     }
   };
 
+  const remove = async () => {
+    if (!trip || !confirm(`Delete "${trip.name}" for everyone? This can't be undone.`)) return;
+    try {
+      await store.deleteTrip(trip.id);
+      onClose();
+      onDeleted?.();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Could not delete the trip');
+    }
+  };
+
   return (
     <Sheet open={open} title={trip ? 'Edit trip' : 'New trip'} onClose={onClose} onSubmit={submit} submitLabel={trip ? 'Save' : 'Create'} submitDisabled={!valid}>
       <TextField label="Trip name" placeholder="Summer in Lisbon" value={d.name} onChange={(e) => set({ name: e.target.value })} required />
@@ -70,9 +84,9 @@ export function TripForm({ open, trip, onClose, onSaved }: { open: boolean; trip
           {CURRENCIES.map((c) => <option key={c}>{c}</option>)}
         </Select>
       </FieldRow>
-      <ColorPicker label="Trip colour" options={COVER_COLORS} value={d.coverColor} onChange={(coverColor) => set({ coverColor })} />
       <CoverPhotoField value={d.coverPhoto} onChange={(coverPhoto) => set({ coverPhoto })} />
       {error && <p className="t-footnote t-danger">{error}</p>}
+      {trip && onDeleted && <Button variant="destructive" icon="trash" block onClick={remove}>Delete trip</Button>}
     </Sheet>
   );
 }
@@ -110,7 +124,7 @@ function CoverPhotoField({ value, onChange }: { value: string | null; onChange: 
       <input ref={input} type="file" accept="image/*" className="visually-hidden" tabIndex={-1} aria-hidden="true"
         onChange={(e) => pick(e.target.files?.[0])} />
       {error ? <p className="t-footnote t-danger" role="alert">{error}</p>
-        : !value && <p className="t-footnote t-secondary">Optional. Shown on the trip card and at the top of the trip. Without one, the colour is used.</p>}
+        : !value && <p className="t-footnote t-secondary">Optional. Fills the trip card and shows at the top of the trip.</p>}
     </div>
   );
 }

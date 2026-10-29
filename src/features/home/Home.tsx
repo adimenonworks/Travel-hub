@@ -1,9 +1,8 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Avatar, AvatarStack, Button, Card, CardLink, EmptyState, PageHeader, Section, Spinner } from '../../design/components';
+import { Avatar, AvatarStack, Badge, Button, Card, CardLink, EmptyState, Icon, PageHeader, Section, Spinner } from '../../design/components';
 import { personName, useMe, useMyTrips, useProfile, useProfiles } from '../../data/hooks';
 import type { Trip } from '../../data/types';
-import { coverColor } from '../../lib/colors';
 import { daysBetween, formatRange, today, tripPhase } from '../../lib/dates';
 import { Content } from '../../app/Shell';
 import { MapView } from '../shared/MapView';
@@ -33,20 +32,24 @@ export function Home() {
     <>
       <Content>
         <PageHeader title="Trips" actions={<Button icon="plus" onClick={() => setCreating(true)}>New trip</Button>} />
-        <Card tone="accent" className={s.profile}>
-          <Avatar name={me.name} photo={me.photo} seed={me.uid} size={64} />
-          <div className={s.profileText}>
-            <h2 className="t-title1">Hi, {me.name.split(' ')[0]}</h2>
-            <div className="t-callout">
-              {next ? `${next.name} starts in ${daysBetween(today(), next.startDate)} days` : current.length ? `You're on ${current[0].name} right now` : 'No trips planned yet'}
-            </div>
-          </div>
+        <section className={s.profile} aria-label="You">
+          {/* With no top bar, this is the way into your profile and settings. */}
+          <Link to="/profile" className={s.me} aria-label={`Profile and settings: ${me.name}`}>
+            <Avatar name={me.name} photo={me.photo} seed={me.uid} size={64} />
+            <span className={s.profileText}>
+              <span className="t-title1">Hi, {me.name.split(' ')[0]}</span>
+              <span className="t-callout t-secondary">
+                {next ? `${next.name} starts in ${daysBetween(today(), next.startDate)} days` : current.length ? `You're on ${current[0].name} right now` : 'No trips planned yet'}
+              </span>
+            </span>
+            <Icon name="chevron-right" size={20} className={s.meChevron} />
+          </Link>
           <div className={s.stats}>
             <Stat value={all.length} label="Trips" />
             <Stat value={daysTraveled} label="Days away" />
             <Stat value={new Set(visited.map((v) => v.country ?? v.name)).size} label="Places" />
           </div>
-        </Card>
+        </section>
 
         {trips === null ? <Spinner center /> : all.length === 0 ? (
           <Card>
@@ -83,6 +86,8 @@ function Stat({ value, label }: { value: number; label: string }) {
   );
 }
 
+const whenLabel = (until: number, n: number) => (until > 0 ? `in ${until} day${until === 1 ? '' : 's'}` : until === 0 ? 'Today' : `${n} day${n === 1 ? '' : 's'}`);
+
 function TripGroup({ title, trips }: { title: string; trips: Trip[] }) {
   const ids = Array.from(new Set(trips.flatMap((t) => t.memberIds)));
   const profiles = useProfiles(ids);
@@ -93,11 +98,16 @@ function TripGroup({ title, trips }: { title: string; trips: Trip[] }) {
           const n = daysBetween(t.startDate, t.endDate) + 1;
           const until = daysBetween(today(), t.startDate);
           return (
-            <CardLink key={t.id} to={`/trip/${t.id}`} flush>
-              <div className={s.cover} style={{ backgroundColor: coverColor(t.coverColor), backgroundImage: t.coverPhoto ? `url(${t.coverPhoto})` : undefined }}>
-                <span className={s.coverBadge}>{until > 0 ? `in ${until} day${until === 1 ? '' : 's'}` : until === 0 ? 'Today' : `${n} day${n === 1 ? '' : 's'}`}</span>
-              </div>
+            <CardLink key={t.id} to={`/trip/${t.id}`} flush className={[s.trip, t.coverPhoto && s.withPhoto].filter(Boolean).join(' ')}>
+              {/* A cover photo fills the whole card, darkened at the bottom so the text stays readable. */}
+              {t.coverPhoto && <div className={s.photo} style={{ backgroundImage: `url(${t.coverPhoto})` }} />}
               <div className={s.tripBody}>
+                <span className={s.when}>
+                  {t.coverPhoto
+                    ? <span className={s.photoBadge}>{whenLabel(until, n)}</span>
+                    : <Badge>{whenLabel(until, n)}</Badge>}
+                </span>
+                <span className={s.spacer} />
                 <div className="t-title3">{t.name}</div>
                 <div className="t-subhead t-secondary">{t.destination?.name.split(',').slice(0, 2).join(',') ?? 'No destination yet'}</div>
                 <div className={s.tripFoot}>

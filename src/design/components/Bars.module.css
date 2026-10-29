@@ -1,7 +1,6 @@
 /* Page header: back link, big heavy title, actions */
 .header {
   display: flex; flex-direction: column; gap: var(--space-sm);
-  padding-top: var(--space-xl);
 }
 .back {
   align-self: flex-start;

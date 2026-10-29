@@ -22,6 +22,7 @@
   --text-on-destructive: var(--p-red-700);
   --text-field-label: var(--p-neutral-800);
   --text-field-placeholder: var(--p-neutral-700);
+  --text-on-image: var(--p-neutral-0);           /* over photos (with --overlay-image behind), both modes */
 
   /* Icons — mirror text so they can change independently */
   --icon-primary: var(--p-neutral-800);
@@ -33,6 +34,7 @@
   --icon-on-secondary: var(--p-emerald-800);
   --icon-on-selected: var(--p-emerald-100);
   --icon-on-destructive: var(--p-red-700);
+  --icon-on-image: var(--p-neutral-0);
 
   /* Status */
   --status-success: var(--p-green-700);
@@ -82,6 +84,7 @@
   /* Overlays */
   --overlay-bar: var(--p-alpha-white-85);               /* top bar, with --blur-overlay behind it */
   --overlay-scrim: var(--p-alpha-black-50);
+  --overlay-image: var(--p-alpha-black-70);             /* bottom of a photo gradient, so text on it stays readable */
   --blur-overlay: saturate(180%) blur(20px);
 
   /* Typography */
@@ -101,6 +104,7 @@
   --space-gutter: var(--p-space-5);        /* page side margin, compact */
   --space-inset: var(--p-space-5);         /* list row / card padding */
   --space-stack: var(--p-space-8);         /* gap between sections */
+  --space-page-top: var(--p-space-12);     /* space above the page title */
 
   /* Shape — everything is a pill or a soft rounded rectangle */
   --radius-button: var(--p-radius-full);
@@ -120,7 +124,6 @@
   --size-tap: 44px;               /* minimum hit target */
   --size-control: 48px;
   --size-control-sm: 36px;
-  --size-topbar: 64px;
   --size-content-max: 1200px;
 
   /* Motion */
@@ -135,7 +138,7 @@
     --space-gutter: var(--p-space-8);
     --space-inset: var(--p-space-6);
     --space-stack: var(--p-space-12);
-    --size-topbar: 72px;
+    --space-page-top: var(--p-space-24);
   }
 }
 @media (min-width: 1068px) {
