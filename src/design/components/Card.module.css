@@ -20,6 +20,7 @@
   --text-link: var(--text-on-brand);
   --icon-primary: var(--icon-on-brand);
   --icon-brand: var(--icon-on-brand);
+  --border-focus: var(--text-on-brand);
   --border-subtle: color-mix(in srgb, var(--text-on-brand) 20%, transparent);
 }
 

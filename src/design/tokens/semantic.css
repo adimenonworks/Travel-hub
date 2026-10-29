@@ -20,6 +20,7 @@
   --text-on-secondary: var(--p-emerald-800);
   --text-on-selected: var(--p-emerald-100);
   --text-on-destructive: var(--p-red-700);
+  --text-on-inverse: var(--p-emerald-300);        /* on the dark inverse button, both modes */
   --text-field-label: var(--p-neutral-800);
   --text-field-placeholder: var(--p-neutral-700);
   --text-on-image: var(--p-neutral-0);           /* over photos (with --overlay-image behind), both modes */
@@ -45,7 +46,7 @@
   --status-error-subtle: var(--p-red-100);
 
   /* Surfaces, back to front, plus the brand surfaces */
-  --surface-background-primary: var(--p-neutral-200);   /* page canvas */
+  --surface-background-primary: var(--p-neutral-100);   /* page canvas */
   --surface-background-secondary: var(--p-neutral-0);   /* cards, lists, inputs */
   --surface-background-tertiary: var(--p-neutral-0);    /* sheets, menus, popovers — with --shadow-subtle */
   --surface-brand: var(--p-emerald-300);                /* accent card, trip hero, covers, brand mark */
@@ -68,6 +69,9 @@
   --interactive-destructive: var(--p-red-100);
   --interactive-destructive-hover: var(--p-alpha-red-100-50);
   --interactive-destructive-pressed: var(--p-red-200);
+  --interactive-inverse: var(--p-emerald-900);         /* dark button for brand surfaces, both modes */
+  --interactive-inverse-hover: var(--p-emerald-800);
+  --interactive-inverse-pressed: var(--p-neutral-1000);
   --interactive-ghost-hover: var(--p-alpha-black-5);    /* transparent controls: plain buttons, rows, unselected tabs */
   --interactive-ghost-pressed: var(--p-alpha-black-8);
 

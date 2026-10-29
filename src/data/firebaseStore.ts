@@ -37,10 +37,16 @@ export function createFirebaseStore(config: FirebaseOptions): Store {
     onAuth(cb) {
       return onAuthStateChanged(auth, async (u) => {
         if (!u) return cb(null);
-        const user = { uid: u.uid, name: u.displayName ?? 'Traveler', photo: u.photoURL, email: u.email };
-        // Keep the public profile's name/photo in sync with the Google account.
-        await setDoc(doc(db, 'users', u.uid), { name: user.name, photo: user.photo }, { merge: true }).catch(() => {});
-        cb(user);
+        const google = { uid: u.uid, name: u.displayName ?? 'Traveler', photo: u.photoURL, email: u.email };
+        // The saved profile wins once it exists, so a nickname or photo chosen in Profile
+        // isn't replaced by the Google account's on the next sign-in. Google's fill the gaps.
+        const ref = doc(db, 'users', u.uid);
+        const snap = await getDoc(ref).catch(() => null);
+        const saved = snap?.exists() ? snap.data() : null;
+        const name = (typeof saved?.name === 'string' && saved.name) || google.name;
+        const photo = saved && 'photo' in saved ? (saved.photo as string | null) : google.photo;
+        if (!saved || saved.name !== name || !('photo' in saved)) await setDoc(ref, { name, photo }, { merge: true }).catch(() => {});
+        cb({ ...google, name, photo });
       });
     },
     async signIn() {

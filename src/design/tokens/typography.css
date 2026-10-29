@@ -12,7 +12,8 @@
 .t-caption2 { font: var(--p-weight-medium) var(--p-size-caption2)/var(--p-leading-caption2) var(--font-text); letter-spacing: var(--p-tracking-caption2); }
 
 /* Headings use the softer --text-primary; body copy inherits --text-body from <body>. */
-.t-display, .t-title1, .t-title2, .t-title3, .t-headline { color: var(--text-primary); }
+.t-display { color: var(--text-brand); }
+.t-title1, .t-title2, .t-title3, .t-headline { color: var(--text-primary); }
 
 .t-secondary { color: var(--text-subtle); }
 .t-tertiary { color: var(--text-subtle); }
