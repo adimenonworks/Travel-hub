@@ -1,9 +1,9 @@
 import { useState } from 'react';
-import { Avatar, Button, Card, ColorPicker, IconButton, List, ListRow, PageHeader, SegmentedControl, Section } from '../../design/components';
+import { Avatar, Button, Card, IconButton, List, ListRow, PageHeader, SegmentedControl, Section } from '../../design/components';
 import { store } from '../../data';
 import { useMe, useProfile } from '../../data/hooks';
 import type { Place } from '../../data/types';
-import { ACCENTS, applyAccent, applyTheme, getAccent, getTheme, type Accent, type ThemePref } from '../../lib/theme';
+import { applyTheme, getTheme, type ThemePref } from '../../lib/theme';
 import { Content } from '../../app/Shell';
 import { CityPicker } from '../shared/CityPicker';
 import { MapView } from '../shared/MapView';
@@ -13,7 +13,6 @@ export function ProfilePage() {
   const me = useMe();
   const profile = useProfile(me.uid);
   const [theme, setTheme] = useState<ThemePref>(getTheme);
-  const [accent, setAccent] = useState<Accent>(getAccent);
   const [adding, setAdding] = useState<Place | null>(null);
   const [pickerKey, setPickerKey] = useState(0);
   const visited = profile?.visited ?? [];
@@ -67,14 +66,13 @@ export function ProfilePage() {
           )}
         </Section>
 
-        <Section title="Appearance" footer="Saved on this device. Every accent keeps text readable in light and dark mode.">
+        <Section title="Appearance" footer="Saved on this device.">
           <Card className={s.appearance}>
             <div className={s.appearanceRow}>
               <div className="t-subhead t-bold">Mode</div>
               <SegmentedControl block label="Mode" value={theme} onChange={(t) => { setTheme(t); applyTheme(t); }}
                 options={[{ value: 'auto', label: 'Automatic' }, { value: 'light', label: 'Light' }, { value: 'dark', label: 'Dark' }]} />
             </div>
-            <ColorPicker label="Accent colour" options={ACCENTS} value={accent} onChange={(a) => { setAccent(a); applyAccent(a, true); }} />
           </Card>
         </Section>
 

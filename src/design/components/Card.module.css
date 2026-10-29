@@ -1,22 +1,25 @@
 .card {
-  background: var(--color-surface);
+  background: var(--surface-background-secondary);
   border-radius: var(--radius-card);
   padding: var(--space-inset);
 }
 .flush { padding: 0; overflow: hidden; }
 .interactive { cursor: pointer; transition: transform var(--motion-fast), background var(--motion-fast); text-align: left; border: 0; width: 100%; color: inherit; display: block; }
-.interactive:hover { background: color-mix(in srgb, var(--color-surface) 92%, var(--color-label)); }
+.interactive:hover { background-image: linear-gradient(var(--interactive-ghost-hover), var(--interactive-ghost-hover)); }
+.interactive:active { background-image: linear-gradient(var(--interactive-ghost-pressed), var(--interactive-ghost-pressed)); }
 .interactive:active { transform: scale(0.99); }
 
-/* Bold accent card: the bright accent fill, with every text role remapped to its deep partner. */
+/* Bold brand card: bright emerald, with every text and icon role remapped to its deep partner. */
 .accent {
-  background: var(--color-accent);
-  color: var(--color-on-accent);
-  --color-label: var(--color-on-accent);
-  --color-label-secondary: var(--color-on-accent);
-  --color-label-tertiary: var(--color-on-accent);
-  --color-separator: color-mix(in srgb, var(--color-on-accent) 20%, transparent);
-  --color-tint: var(--color-on-accent);
+  background: var(--surface-brand);
+  color: var(--text-on-brand);
+  --text-primary: var(--text-on-brand);
+  --text-body: var(--text-on-brand);
+  --text-subtle: var(--text-on-brand);
+  --text-link: var(--text-on-brand);
+  --icon-primary: var(--icon-on-brand);
+  --icon-brand: var(--icon-on-brand);
+  --border-subtle: color-mix(in srgb, var(--text-on-brand) 20%, transparent);
 }
 
 .section { display: flex; flex-direction: column; gap: var(--space-sm); }
@@ -25,5 +28,5 @@
   min-height: var(--size-tap);
   flex-wrap: wrap;
 }
-.sectionTitle { font: var(--p-weight-semibold) var(--p-size-title2)/var(--p-leading-title2) var(--font-display); letter-spacing: var(--p-tracking-title2); }
-.sectionFooter { font-size: var(--p-size-footnote); line-height: var(--p-leading-footnote); color: var(--color-label-secondary); padding: 0 var(--space-xs); }
+.sectionTitle { font: var(--p-weight-semibold) var(--p-size-title2)/var(--p-leading-title2) var(--font-display); letter-spacing: var(--p-tracking-title2); color: var(--text-primary); }
+.sectionFooter { font-size: var(--p-size-footnote); line-height: var(--p-leading-footnote); color: var(--text-subtle); padding: 0 var(--space-xs); }

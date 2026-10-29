@@ -1,4 +1,4 @@
-import { useEffect, useState, type CSSProperties } from 'react';
+import { useEffect, useState } from 'react';
 import { Button, Card, EmptyState, Icon, IconButton, LinkButton, Sheet, TextField } from '../../design/components';
 import { store } from '../../data';
 import { personName, useMe } from '../../data/hooks';
@@ -8,7 +8,6 @@ import { albumProvider, providerName } from '../../lib/photos';
 import type { TripCtx } from './TripPage';
 import s from './trip.module.css';
 
-const coverFor = { google: 'var(--p-sky)', apple: 'var(--p-lavender)', other: 'var(--p-aqua)' };
 
 /**
  * Shared photo albums. Google Photos and iCloud don't allow their albums to be
@@ -52,7 +51,7 @@ function AlbumCard({ album, ctx, onEdit }: { album: Album; ctx: TripCtx; onEdit:
   const canEdit = ctx.canManage || album.createdBy === me.uid;
   return (
     <Card flush className={s.album}>
-      <div className={s.albumCover} style={{ '--album-color': coverFor[provider] } as CSSProperties}>
+      <div className={s.albumCover} >
         <Icon name="photo" size={40} />
       </div>
       <div className={s.albumBody}>

@@ -76,7 +76,7 @@ function IdeaCard({ idea, ctx, onEdit, onApprove }: { idea: Idea; ctx: TripCtx; 
     <Card className={s.idea}>
       <div className={s.actTop}>
         <div className={s.actMeta}>
-          <Badge color={cat.color}>{cat.label}</Badge>
+          <Badge tone="category" icon={cat.icon}>{cat.label}</Badge>
           {idea.cost > 0 && <Badge>~{money(idea.cost, ctx.trip.currency)}</Badge>}
           {idea.status === 'approved' && <Badge tone="success" icon="check">Scheduled</Badge>}
         </div>

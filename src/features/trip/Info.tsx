@@ -3,7 +3,6 @@ import { Card, EmptyState, Icon, List, ListRow, SegmentedControl, Section, Spinn
 import { formatDay } from '../../lib/dates';
 import { localNews, newsSearchUrl, type Article } from '../../lib/news';
 import { defaultUnit, describeWeather, tripWeather, type WeatherResult } from '../../lib/weather';
-import { categoryInfo } from '../../lib/categories';
 import { MapView } from '../shared/MapView';
 import type { TripCtx } from './TripPage';
 import s from './trip.module.css';
@@ -21,7 +20,7 @@ export function Info({ trip, activities }: TripCtx) {
   }
   const pins = activities
     .filter((a) => a.location)
-    .map((a) => ({ lat: a.location!.lat, lng: a.location!.lng, label: a.title, color: categoryInfo(a.category).color }));
+    .map((a) => ({ lat: a.location!.lat, lng: a.location!.lng, label: a.title }));
 
   return (
     <div className={s.infoGrid}>

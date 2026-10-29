@@ -17,22 +17,29 @@
   user-select: none;
 }
 .button:active:not(:disabled) { transform: scale(0.97); }
-.button:disabled { opacity: 0.45; cursor: default; }
+.button:disabled { background: var(--disabled-background); color: var(--disabled-foreground); cursor: default; }
+.plain:disabled { background: transparent; }
 
-/* Primary: the bright accent with its deep partner as text */
-.filled { background: var(--color-accent); color: var(--color-on-accent); }
-.filled:hover:not(:disabled) { background: var(--color-accent-hover); }
-/* Secondary: a soft wash of the accent */
-.tinted { background: var(--color-tint-subtle); color: var(--color-tint); }
-.tinted:hover:not(:disabled) { background: color-mix(in srgb, var(--color-tint) 18%, transparent); }
+/* Hover is lighter, pressed is darker (interactive-*-hover / -pressed). */
+/* Primary: bright emerald with its deep partner as text */
+.filled { background: var(--interactive-primary); color: var(--text-on-brand); }
+.filled:hover:not(:disabled) { background: var(--interactive-primary-hover); }
+.filled:active:not(:disabled) { background: var(--interactive-primary-pressed); }
+/* Secondary: a light emerald wash */
+.tinted { background: var(--interactive-secondary); color: var(--text-on-secondary); }
+.tinted:hover:not(:disabled) { background: var(--interactive-secondary-hover); }
+.tinted:active:not(:disabled) { background: var(--interactive-secondary-pressed); }
 /* Neutral: grey pill */
-.gray { background: var(--color-fill-tertiary); color: var(--color-label); }
-.gray:hover:not(:disabled) { background: var(--color-fill); }
+.gray { background: var(--interactive-neutral); color: var(--text-body); }
+.gray:hover:not(:disabled) { background: var(--interactive-neutral-hover); }
+.gray:active:not(:disabled) { background: var(--interactive-neutral-pressed); }
 /* Tertiary: text only, underlined so it reads as an action without a fill */
-.plain { background: transparent; color: var(--color-tint); padding: 0 var(--space-sm); text-decoration: underline; text-underline-offset: 3px; }
-.plain:hover:not(:disabled) { background: var(--color-fill-quaternary); }
-.destructive { background: var(--color-danger-subtle); color: var(--color-danger); }
-.destructive:hover:not(:disabled) { background: color-mix(in srgb, var(--color-danger) 18%, transparent); }
+.plain { background: transparent; color: var(--text-link); padding: 0 var(--space-sm); text-decoration: underline; text-underline-offset: 3px; }
+.plain:hover:not(:disabled) { background: var(--interactive-ghost-hover); color: var(--text-link-hover); }
+.plain:active:not(:disabled) { background: var(--interactive-ghost-pressed); color: var(--text-link-pressed); }
+.destructive { background: var(--interactive-destructive); color: var(--text-on-destructive); }
+.destructive:hover:not(:disabled) { background: var(--interactive-destructive-hover); }
+.destructive:active:not(:disabled) { background: var(--interactive-destructive-pressed); }
 
 .small { min-height: var(--size-control-sm); padding: 0 var(--space-md); font-size: var(--p-size-subhead); }
 /* Small controls keep a full 44px hit area */

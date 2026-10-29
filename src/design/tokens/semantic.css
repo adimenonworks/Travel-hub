@@ -1,72 +1,88 @@
 /*
- * Semantic tokens — what components use. Each name describes a role, not a
- * value, so light/dark and the user's accent colour only swap values here.
- *
- * Accent model (like Wise): every accent is a pair.
- *   --color-accent / --color-on-accent  bright fill with its deep partner as text (primary buttons, highlights)
- *   --color-tint / --color-on-tint      the accent as ink: deep in light mode, bright in dark mode
- *                                       (links, icons, selected states, focus rings — always high contrast)
+ * Semantic tokens — what components use. Each name says the job, not the colour,
+ * so light and dark mode only swap values here. Groups: text, icon, status,
+ * surface, interactive, border, disabled, overlay (mirrors the Figma "Color" collection).
+ * Every colour points at a primitive in primitives.css. Hover is lighter, pressed is darker.
  */
 :root {
   color-scheme: light;
 
-  /* User-selectable accent (Profile → Appearance sets data-accent on <html>) */
-  --accent: var(--p-emerald);
-  --accent-deep: var(--p-emerald-deep);
+  /* Text — greys only for headings, body and form text; emerald only for links and brand text */
+  --text-primary: var(--p-neutral-800);          /* display and headings: a softer dark */
+  --text-body: var(--p-neutral-900);             /* body copy and UI labels */
+  --text-subtle: var(--p-neutral-700);           /* secondary copy, captions, hints */
+  --text-inverse: var(--p-neutral-0);            /* on dark fills */
+  --text-brand: var(--p-emerald-800);            /* emerald text that is not a link */
+  --text-link: var(--p-emerald-800);
+  --text-link-hover: var(--p-emerald-700);
+  --text-link-pressed: var(--p-emerald-900);
+  --text-on-brand: var(--p-emerald-900);         /* on bright emerald, both modes */
+  --text-on-secondary: var(--p-emerald-800);
+  --text-on-selected: var(--p-emerald-100);
+  --text-on-destructive: var(--p-red-700);
+  --text-field-label: var(--p-neutral-800);
+  --text-field-placeholder: var(--p-neutral-700);
 
-  --color-accent: var(--accent);
-  --color-accent-hover: color-mix(in srgb, var(--accent) 86%, var(--p-ink));
-  --color-on-accent: var(--accent-deep);
-  --color-tint: var(--accent-deep);
-  --color-on-tint: var(--accent);
-  --color-tint-subtle: color-mix(in srgb, var(--color-tint) 10%, transparent);
-
-  /* Text on any bright fill (categories, trip covers, avatars) */
-  --color-on-bright: var(--p-ink);
+  /* Icons — mirror text so they can change independently */
+  --icon-primary: var(--p-neutral-800);
+  --icon-subtle: var(--p-neutral-700);
+  --icon-inverse: var(--p-neutral-0);
+  --icon-brand: var(--p-emerald-800);
+  --icon-brand-hover: var(--p-emerald-700);
+  --icon-on-brand: var(--p-emerald-900);
+  --icon-on-secondary: var(--p-emerald-800);
+  --icon-on-selected: var(--p-emerald-100);
+  --icon-on-destructive: var(--p-red-700);
 
   /* Status */
-  --color-success: var(--p-green);
-  --color-warning: var(--p-amber);
-  --color-danger: var(--p-red);
-  --color-success-subtle: color-mix(in srgb, var(--p-lime) 35%, var(--p-white));
-  --color-warning-subtle: color-mix(in srgb, var(--p-lemon) 55%, transparent);
-  --color-danger-subtle: color-mix(in srgb, var(--p-red) 10%, transparent);
+  --status-success: var(--p-green-700);
+  --status-warning: var(--p-orange-700);
+  --status-error: var(--p-red-700);
+  --status-success-subtle: var(--p-green-100);
+  --status-warning-subtle: var(--p-orange-100);
+  --status-error-subtle: var(--p-red-100);
 
-  /* Category fills (activities, ideas, budget) — brights, so text on them is --color-on-bright */
-  --color-cat-activity: var(--p-lime);
-  --color-cat-food: var(--p-tangerine);
-  --color-cat-drinks: var(--p-lavender);
-  --color-cat-cafe: var(--p-sand);
-  --color-cat-sight: var(--p-aqua);
-  --color-cat-transport: var(--p-sky);
-  --color-cat-stay: var(--p-bubblegum);
-  --color-cat-other: var(--p-stone);
+  /* Surfaces, back to front, plus the brand surfaces */
+  --surface-background-primary: var(--p-neutral-200);   /* page canvas */
+  --surface-background-secondary: var(--p-neutral-0);   /* cards, lists, inputs */
+  --surface-background-tertiary: var(--p-neutral-0);    /* sheets, menus, popovers — with --shadow-subtle */
+  --surface-brand: var(--p-emerald-300);                /* accent card, trip hero, covers, brand mark */
+  --surface-brand-subtle: var(--p-emerald-100);         /* category badges, avatars, list icons */
+  --surface-sunken: var(--p-alpha-black-8);             /* progress tracks, segmented-control track */
 
-  /* Labels (text) — secondary and tertiary still pass 4.5:1 on cards */
-  --color-label: var(--p-ink);
-  --color-label-secondary: var(--p-ink-2);
-  --color-label-tertiary: var(--p-ink-3);
-  --color-placeholder: var(--p-ink-3);
-  --color-link: var(--color-tint);
+  /* Interactive fills — hover is lighter, pressed is darker */
+  --interactive-primary: var(--p-emerald-300);
+  --interactive-primary-hover: var(--p-emerald-200);
+  --interactive-primary-pressed: var(--p-emerald-400);
+  --interactive-secondary: var(--p-emerald-100);
+  --interactive-secondary-hover: var(--p-alpha-emerald-100-50);
+  --interactive-secondary-pressed: var(--p-emerald-200);
+  --interactive-neutral: var(--p-alpha-black-8);
+  --interactive-neutral-hover: var(--p-alpha-black-5);
+  --interactive-neutral-pressed: var(--p-alpha-black-15);
+  --interactive-selected: var(--p-emerald-800);
+  --interactive-selected-hover: var(--p-emerald-700);
+  --interactive-selected-pressed: var(--p-emerald-900);
+  --interactive-destructive: var(--p-red-100);
+  --interactive-destructive-hover: var(--p-alpha-red-100-50);
+  --interactive-destructive-pressed: var(--p-red-200);
+  --interactive-ghost-hover: var(--p-alpha-black-5);    /* transparent controls: plain buttons, rows, unselected tabs */
+  --interactive-ghost-pressed: var(--p-alpha-black-8);
 
-  /* Surfaces */
-  --color-bg: var(--p-sage);               /* page: Wise's sage canvas */
-  --color-surface: var(--p-white);         /* cards, lists, tiles */
-  --color-bg-elevated: var(--p-white);     /* sheets, menus, text fields */
+  /* Borders — see-through so they work on any surface */
+  --border-subtle: var(--p-alpha-black-15);             /* dividers, hairlines */
+  --border-bold: var(--p-alpha-black-50);               /* input outlines, ≥ 3:1 */
+  --border-bold-hover: var(--p-alpha-black-70);
+  --border-focus: var(--p-emerald-800);
 
-  /* Fills (controls on top of surfaces) */
-  --color-fill: var(--p-mist-2);
-  --color-fill-tertiary: rgba(14, 15, 12, 0.07);
-  --color-fill-quaternary: rgba(14, 15, 12, 0.04);
+  /* Disabled (exempt from contrast rules) */
+  --disabled-background: var(--p-alpha-black-5);
+  --disabled-foreground: var(--p-alpha-black-30);
 
-  /* Lines */
-  --color-separator: rgba(14, 15, 12, 0.12);
-  --color-border-control: var(--p-ink-3); /* input outlines, ≥ 3:1 on every light surface */
-
-  /* Materials */
-  --material-bar: rgba(255, 255, 255, 0.9);
-  --material-blur: saturate(180%) blur(20px);
-  --color-scrim: rgba(14, 15, 12, 0.5);
+  /* Overlays */
+  --overlay-bar: var(--p-alpha-white-85);               /* top bar, with --blur-overlay behind it */
+  --overlay-scrim: var(--p-alpha-black-50);
+  --blur-overlay: saturate(180%) blur(20px);
 
   /* Typography */
   --font-text: var(--p-font-sans);
@@ -96,6 +112,7 @@
   --radius-icon: var(--p-radius-full);
   --radius-pill: var(--p-radius-full);
 
+  --shadow-subtle: var(--p-shadow-1);   /* third surface level */
   --shadow-raised: var(--p-shadow-2);
   --shadow-overlay: var(--p-shadow-3);
 
@@ -111,14 +128,6 @@
   --motion-base: var(--p-duration-base) var(--p-ease-standard);
   --motion-sheet: var(--p-duration-slow) var(--p-ease-spring);
 }
-
-/* Accent choices (Emerald is the default above) */
-:root[data-accent='lime'] { --accent: var(--p-lime); --accent-deep: var(--p-lime-deep); }
-:root[data-accent='lemon'] { --accent: var(--p-lemon); --accent-deep: var(--p-lemon-deep); }
-:root[data-accent='tangerine'] { --accent: var(--p-tangerine); --accent-deep: var(--p-tangerine-deep); }
-:root[data-accent='bubblegum'] { --accent: var(--p-bubblegum); --accent-deep: var(--p-bubblegum-deep); }
-:root[data-accent='lavender'] { --accent: var(--p-lavender); --accent-deep: var(--p-lavender-deep); }
-:root[data-accent='sky'] { --accent: var(--p-sky); --accent-deep: var(--p-sky-deep); }
 
 /* Regular width (tablet / desktop) */
 @media (min-width: 744px) {
@@ -139,55 +148,117 @@
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme='light']) {
     color-scheme: dark;
-    --color-tint: var(--accent);
-    --color-on-tint: var(--accent-deep);
-    --color-tint-subtle: color-mix(in srgb, var(--color-tint) 16%, transparent);
-    --color-success: var(--p-lime);
-    --color-warning: var(--p-amber-bright);
-    --color-danger: var(--p-red-bright);
-    --color-success-subtle: color-mix(in srgb, var(--p-lime) 16%, transparent);
-    --color-warning-subtle: color-mix(in srgb, var(--p-amber-bright) 16%, transparent);
-    --color-danger-subtle: color-mix(in srgb, var(--p-red-bright) 16%, transparent);
-    --color-label: var(--p-white);
-    --color-label-secondary: var(--p-fog);
-    --color-label-tertiary: var(--p-fog-2);
-    --color-placeholder: var(--p-fog-2);
-    --color-bg: var(--p-night);
-    --color-surface: var(--p-night-2);
-    --color-bg-elevated: var(--p-night-3);
-    --color-fill: var(--p-night-3);
-    --color-fill-tertiary: rgba(255, 255, 255, 0.08);
-    --color-fill-quaternary: rgba(255, 255, 255, 0.05);
-    --color-separator: rgba(255, 255, 255, 0.12);
-    --color-border-control: var(--p-fog-3);
-    --material-bar: rgba(14, 15, 12, 0.86);
-    --color-scrim: rgba(0, 0, 0, 0.66);
+    --text-primary: var(--p-neutral-200);
+    --text-body: var(--p-neutral-100);
+    --text-subtle: var(--p-neutral-400);
+    --text-inverse: var(--p-neutral-1000);
+    --text-brand: var(--p-emerald-300);
+    --text-link: var(--p-emerald-300);
+    --text-link-hover: var(--p-emerald-200);
+    --text-link-pressed: var(--p-emerald-400);
+    --text-on-secondary: var(--p-emerald-200);
+    --text-on-selected: var(--p-emerald-900);
+    --text-on-destructive: var(--p-red-200);
+    --text-field-label: var(--p-neutral-200);
+    --text-field-placeholder: var(--p-neutral-400);
+    --icon-primary: var(--p-neutral-200);
+    --icon-subtle: var(--p-neutral-400);
+    --icon-inverse: var(--p-neutral-1000);
+    --icon-brand: var(--p-emerald-300);
+    --icon-brand-hover: var(--p-emerald-200);
+    --icon-on-secondary: var(--p-emerald-200);
+    --icon-on-selected: var(--p-emerald-900);
+    --icon-on-destructive: var(--p-red-200);
+    --status-success: var(--p-green-300);
+    --status-warning: var(--p-orange-300);
+    --status-error: var(--p-red-300);
+    --status-success-subtle: var(--p-green-800);
+    --status-warning-subtle: var(--p-orange-800);
+    --status-error-subtle: var(--p-red-800);
+    --surface-background-primary: var(--p-neutral-1000);
+    --surface-background-secondary: var(--p-neutral-900);
+    --surface-background-tertiary: var(--p-neutral-800);
+    --surface-brand-subtle: var(--p-emerald-800);
+    --surface-sunken: var(--p-alpha-white-8);
+    --interactive-secondary: var(--p-emerald-800);
+    --interactive-secondary-hover: var(--p-emerald-700);
+    --interactive-secondary-pressed: var(--p-emerald-900);
+    --interactive-neutral: var(--p-alpha-white-8);
+    --interactive-neutral-hover: var(--p-alpha-white-12);
+    --interactive-neutral-pressed: var(--p-alpha-white-5);
+    --interactive-selected: var(--p-emerald-300);
+    --interactive-selected-hover: var(--p-emerald-200);
+    --interactive-selected-pressed: var(--p-emerald-400);
+    --interactive-destructive: var(--p-red-800);
+    --interactive-destructive-hover: var(--p-red-700);
+    --interactive-destructive-pressed: var(--p-red-900);
+    --interactive-ghost-hover: var(--p-alpha-white-5);
+    --interactive-ghost-pressed: var(--p-alpha-white-8);
+    --border-subtle: var(--p-alpha-white-15);
+    --border-bold: var(--p-alpha-white-40);
+    --border-bold-hover: var(--p-alpha-white-70);
+    --border-focus: var(--p-emerald-300);
+    --disabled-background: var(--p-alpha-white-5);
+    --disabled-foreground: var(--p-alpha-white-30);
+    --overlay-bar: var(--p-alpha-black-85);
+    --overlay-scrim: var(--p-alpha-black-70);
   }
 }
 
 :root[data-theme='dark'] {
   color-scheme: dark;
-  --color-tint: var(--accent);
-  --color-on-tint: var(--accent-deep);
-  --color-tint-subtle: color-mix(in srgb, var(--color-tint) 16%, transparent);
-  --color-success: var(--p-lime);
-  --color-warning: var(--p-amber-bright);
-  --color-danger: var(--p-red-bright);
-  --color-success-subtle: color-mix(in srgb, var(--p-lime) 16%, transparent);
-  --color-warning-subtle: color-mix(in srgb, var(--p-amber-bright) 16%, transparent);
-  --color-danger-subtle: color-mix(in srgb, var(--p-red-bright) 16%, transparent);
-  --color-label: var(--p-white);
-  --color-label-secondary: var(--p-fog);
-  --color-label-tertiary: var(--p-fog-2);
-  --color-placeholder: var(--p-fog-2);
-  --color-bg: var(--p-night);
-  --color-surface: var(--p-night-2);
-  --color-bg-elevated: var(--p-night-3);
-  --color-fill: var(--p-night-3);
-  --color-fill-tertiary: rgba(255, 255, 255, 0.08);
-  --color-fill-quaternary: rgba(255, 255, 255, 0.05);
-  --color-separator: rgba(255, 255, 255, 0.12);
-  --color-border-control: var(--p-fog-3);
-  --material-bar: rgba(14, 15, 12, 0.86);
-  --color-scrim: rgba(0, 0, 0, 0.66);
+  --text-primary: var(--p-neutral-200);
+  --text-body: var(--p-neutral-100);
+  --text-subtle: var(--p-neutral-400);
+  --text-inverse: var(--p-neutral-1000);
+  --text-brand: var(--p-emerald-300);
+  --text-link: var(--p-emerald-300);
+  --text-link-hover: var(--p-emerald-200);
+  --text-link-pressed: var(--p-emerald-400);
+  --text-on-secondary: var(--p-emerald-200);
+  --text-on-selected: var(--p-emerald-900);
+  --text-on-destructive: var(--p-red-200);
+  --text-field-label: var(--p-neutral-200);
+  --text-field-placeholder: var(--p-neutral-400);
+  --icon-primary: var(--p-neutral-200);
+  --icon-subtle: var(--p-neutral-400);
+  --icon-inverse: var(--p-neutral-1000);
+  --icon-brand: var(--p-emerald-300);
+  --icon-brand-hover: var(--p-emerald-200);
+  --icon-on-secondary: var(--p-emerald-200);
+  --icon-on-selected: var(--p-emerald-900);
+  --icon-on-destructive: var(--p-red-200);
+  --status-success: var(--p-green-300);
+  --status-warning: var(--p-orange-300);
+  --status-error: var(--p-red-300);
+  --status-success-subtle: var(--p-green-800);
+  --status-warning-subtle: var(--p-orange-800);
+  --status-error-subtle: var(--p-red-800);
+  --surface-background-primary: var(--p-neutral-1000);
+  --surface-background-secondary: var(--p-neutral-900);
+  --surface-background-tertiary: var(--p-neutral-800);
+  --surface-brand-subtle: var(--p-emerald-800);
+  --surface-sunken: var(--p-alpha-white-8);
+  --interactive-secondary: var(--p-emerald-800);
+  --interactive-secondary-hover: var(--p-emerald-700);
+  --interactive-secondary-pressed: var(--p-emerald-900);
+  --interactive-neutral: var(--p-alpha-white-8);
+  --interactive-neutral-hover: var(--p-alpha-white-12);
+  --interactive-neutral-pressed: var(--p-alpha-white-5);
+  --interactive-selected: var(--p-emerald-300);
+  --interactive-selected-hover: var(--p-emerald-200);
+  --interactive-selected-pressed: var(--p-emerald-400);
+  --interactive-destructive: var(--p-red-800);
+  --interactive-destructive-hover: var(--p-red-700);
+  --interactive-destructive-pressed: var(--p-red-900);
+  --interactive-ghost-hover: var(--p-alpha-white-5);
+  --interactive-ghost-pressed: var(--p-alpha-white-8);
+  --border-subtle: var(--p-alpha-white-15);
+  --border-bold: var(--p-alpha-white-40);
+  --border-bold-hover: var(--p-alpha-white-70);
+  --border-focus: var(--p-emerald-300);
+  --disabled-background: var(--p-alpha-white-5);
+  --disabled-foreground: var(--p-alpha-white-30);
+  --overlay-bar: var(--p-alpha-black-85);
+  --overlay-scrim: var(--p-alpha-black-70);
 }

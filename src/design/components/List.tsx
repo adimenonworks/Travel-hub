@@ -12,7 +12,6 @@ type RowProps = {
   title: ReactNode;
   subtitle?: ReactNode;
   icon?: IconName;
-  iconColor?: string;
   leading?: ReactNode;
   trailing?: ReactNode;
   chevron?: boolean;
@@ -21,11 +20,11 @@ type RowProps = {
   onClick?: () => void;
 };
 
-export function ListRow({ title, subtitle, icon, iconColor, leading, trailing, chevron, to, href, onClick }: RowProps) {
+export function ListRow({ title, subtitle, icon, leading, trailing, chevron, to, href, onClick }: RowProps) {
   const body = (
     <>
       {icon && (
-        <span className={s.leading} style={{ '--leading-bg': iconColor } as CSSProperties}>
+        <span className={s.leading}>
           <Icon name={icon} size={20} />
         </span>
       )}

@@ -3,16 +3,16 @@
   flex: none; display: inline-grid; place-items: center;
   width: var(--avatar-size, 32px); height: var(--avatar-size, 32px);
   border-radius: 50%;
-  background: var(--avatar-bg, var(--color-cat-other));
-  color: var(--color-on-bright);
+  background: var(--surface-brand-subtle);
+  color: var(--text-brand);
   font: var(--p-weight-bold) calc(var(--avatar-size, 32px) * 0.4)/1 var(--font-display);
   overflow: hidden;
   object-fit: cover;
 }
 .stack { display: inline-flex; align-items: center; }
 .stack > * + * { margin-left: -8px; }
-.stack > * { box-shadow: 0 0 0 2px var(--color-surface); }
-.more { --avatar-bg: var(--color-fill); color: var(--color-label); }
+.stack > * { box-shadow: 0 0 0 2px var(--surface-background-secondary); }
+.more { background: var(--surface-sunken); color: var(--text-body); }
 
 /* Badge */
 .badge {
@@ -20,30 +20,32 @@
   min-height: 26px; padding: 0 10px;
   border-radius: var(--radius-pill);
   font: var(--p-weight-semibold) var(--p-size-caption1)/1 var(--font-text);
-  background: var(--badge-bg, var(--color-fill-tertiary));
-  color: var(--badge-fg, var(--color-label-secondary));
+  background: var(--badge-bg, var(--surface-sunken));
+  color: var(--badge-fg, var(--text-subtle));
   white-space: nowrap;
 }
-.badge-tint { --badge-bg: var(--color-accent); --badge-fg: var(--color-on-accent); }
-.badge-success { --badge-bg: var(--color-success-subtle); --badge-fg: var(--color-success); }
-.badge-warning { --badge-bg: var(--color-warning-subtle); --badge-fg: var(--color-warning); }
-.badge-danger { --badge-bg: var(--color-danger-subtle); --badge-fg: var(--color-danger); }
+.badge-tint { --badge-bg: var(--surface-brand); --badge-fg: var(--text-on-brand); }
+/* Categories: told apart by icon, on the light emerald wash */
+.badge-category { --badge-bg: var(--surface-brand-subtle); --badge-fg: var(--text-brand); }
+.badge-success { --badge-bg: var(--status-success-subtle); --badge-fg: var(--status-success); }
+.badge-warning { --badge-bg: var(--status-warning-subtle); --badge-fg: var(--status-warning); }
+.badge-error { --badge-bg: var(--status-error-subtle); --badge-fg: var(--status-error); }
 
 /* Empty state */
 .empty {
   display: flex; flex-direction: column; align-items: center; text-align: center;
   gap: var(--space-xs); padding: var(--space-3xl) var(--space-xl);
-  color: var(--color-label-secondary);
+  color: var(--text-subtle);
 }
-.emptyIconWrap { display: grid; place-items: center; width: 80px; height: 80px; border-radius: var(--radius-icon); background: var(--color-accent); color: var(--color-on-accent); margin-bottom: var(--space-xs); }
-.emptyTitle { font: var(--p-weight-semibold) var(--p-size-title3)/var(--p-leading-title3) var(--font-display); letter-spacing: var(--p-tracking-title3); color: var(--color-label); }
+.emptyIconWrap { display: grid; place-items: center; width: 80px; height: 80px; border-radius: var(--radius-icon); background: var(--surface-brand); color: var(--icon-on-brand); margin-bottom: var(--space-xs); }
+.emptyTitle { font: var(--p-weight-semibold) var(--p-size-title3)/var(--p-leading-title3) var(--font-display); letter-spacing: var(--p-tracking-title3); color: var(--text-primary); }
 .emptyAction { margin-top: var(--space-sm); }
 
 /* Spinner */
-.spinner { width: 20px; height: 20px; border-radius: 50%; border: 2.5px solid var(--color-fill); border-top-color: var(--color-tint); animation: spin 0.8s linear infinite; }
+.spinner { width: 20px; height: 20px; border-radius: 50%; border: 2.5px solid var(--surface-sunken); border-top-color: var(--icon-brand); animation: spin 0.8s linear infinite; }
 .center { display: grid; place-items: center; padding: var(--space-3xl); }
 @keyframes spin { to { transform: rotate(360deg); } }
 
 /* Banner */
-.banner { display: flex; gap: var(--space-sm); align-items: flex-start; padding: var(--space-md) var(--space-lg); border-radius: var(--radius-field); background: var(--color-warning-subtle); font-size: var(--p-size-subhead); line-height: var(--p-leading-subhead); }
-.banner svg { flex: none; color: var(--color-warning); }
+.banner { display: flex; gap: var(--space-sm); align-items: flex-start; padding: var(--space-md) var(--space-lg); border-radius: var(--radius-field); background: var(--status-warning-subtle); font-size: var(--p-size-subhead); line-height: var(--p-leading-subhead); }
+.banner svg { flex: none; color: var(--status-warning); }

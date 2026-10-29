@@ -1,6 +1,6 @@
 .profile { display: grid; grid-template-columns: auto 1fr; gap: var(--space-md) var(--space-lg); align-items: center; }
 .profileText { display: flex; flex-direction: column; gap: var(--space-xxs); min-width: 0; }
-.stats { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-xs); border-top: 1px solid var(--color-separator); padding-top: var(--space-md); }
+.stats { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-xs); border-top: 1px solid var(--border-subtle); padding-top: var(--space-md); }
 @media (min-width: 744px) {
   .profile { grid-template-columns: auto 1fr auto; padding: var(--space-2xl); }
   .stats { grid-column: auto; border-top: 0; padding-top: 0; gap: var(--space-2xl); }
@@ -10,7 +10,7 @@
 
 .grid { display: grid; gap: var(--space-md); grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); }
 .cover { height: 140px; position: relative; background-size: cover; background-position: center; }
-.coverBadge { position: absolute; top: var(--space-md); left: var(--space-md); background: var(--color-bg-elevated); color: var(--color-label); font: var(--p-weight-semibold) var(--p-size-footnote)/1 var(--font-text); padding: 8px 12px; border-radius: var(--radius-pill); }
-.tripBody { padding: var(--space-md) var(--space-inset) var(--space-inset); display: flex; flex-direction: column; gap: var(--space-xxs); color: var(--color-label); }
+.coverBadge { position: absolute; top: var(--space-md); left: var(--space-md); background: var(--surface-background-tertiary); box-shadow: var(--shadow-subtle); color: var(--text-body); font: var(--p-weight-semibold) var(--p-size-footnote)/1 var(--font-text); padding: 8px 12px; border-radius: var(--radius-pill); }
+.tripBody { padding: var(--space-md) var(--space-inset) var(--space-inset); display: flex; flex-direction: column; gap: var(--space-xxs); color: var(--text-body); }
 .tripFoot { display: flex; align-items: center; justify-content: space-between; margin-top: var(--space-sm); }
-.profile > :first-child { box-shadow: 0 0 0 3px var(--color-bg-elevated); }
+.profile > :first-child { box-shadow: 0 0 0 3px var(--surface-background-secondary); }
