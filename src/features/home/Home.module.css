@@ -1,34 +1,36 @@
-/* Header: a quiet outlined area. Only the avatar is a button (emerald ring) and leads to Profile. */
+/* Header: a quiet outlined area with a greeting and three quick numbers.
+   Only the avatar is a button (emerald ring) and leads to Profile. */
 .profile {
-  display: flex; align-items: center; gap: var(--space-lg);
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-md) var(--space-2xl);
   padding: var(--space-inset);
   border: 1px solid var(--border-subtle); border-radius: var(--radius-card);
 }
+.who { display: flex; align-items: center; gap: var(--space-lg); min-width: 0; }
 .me { flex: none; display: grid; place-items: center; padding: 4px; border-radius: 50%; background: var(--interactive-primary); transition: background var(--motion-fast); }
 .me:hover { background: var(--interactive-primary-hover); }
 .me:active { background: var(--interactive-primary-pressed); }
-
-/* Plan card: the bright moment that replaces the New trip button */
-.plan { display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-sm); padding: var(--space-xl) var(--space-inset); }
-.planTitle { font: var(--p-weight-semibold) var(--p-size-title1)/var(--p-leading-title1) var(--font-display); letter-spacing: var(--p-tracking-title1); }
-.planPlace { display: inline-block; animation: planIn var(--motion-base); }
-@keyframes planIn { from { opacity: 0; transform: translateY(6px); } }
-@media (prefers-reduced-motion: reduce) { .planPlace { animation: none; } }
-.plan > div { margin-top: var(--space-sm); }
-@media (min-width: 744px) { .plan { padding: var(--space-2xl); } }
-
-.emptyPast {
-  padding: var(--space-2xl) var(--space-inset); text-align: center;
-  border: 1px solid var(--border-subtle); border-radius: var(--radius-card);
-  color: var(--text-subtle); font-size: var(--p-size-subhead); line-height: var(--p-leading-subhead);
+.headStats { display: grid; grid-template-columns: repeat(3, auto); gap: var(--space-2xl); margin: 0; }
+.headStats div { display: flex; flex-direction: column-reverse; align-items: center; }
+.headStats dt { font-size: var(--p-size-footnote); color: var(--text-subtle); }
+.headStats dd { margin: 0; font: var(--p-weight-display) var(--p-size-title1)/1.1 var(--font-display); letter-spacing: var(--p-tracking-title1); font-variant-numeric: tabular-nums; color: var(--text-primary); }
+@media (max-width: 743px) {
+  .headStats { width: 100%; grid-template-columns: repeat(3, 1fr); gap: var(--space-xs); padding-top: var(--space-md); border-top: 1px solid var(--border-subtle); }
 }
+@media (min-width: 744px) { .profile { padding: var(--space-lg) var(--space-xl); } }
 
-/* Your travels */
-.stats { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-sm); }
-@media (min-width: 744px) { .stats { grid-template-columns: repeat(5, 1fr); } }
-.stat { display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-xxs); padding: var(--space-md); border-radius: var(--radius-card); background: var(--surface-background-secondary); border: 1px solid var(--border-subtle); }
-.statIcon { display: grid; place-items: center; width: 32px; height: 32px; border-radius: 50%; background: var(--surface-brand-subtle); color: var(--icon-brand); margin-bottom: var(--space-xs); }
-.statValue { font: var(--p-weight-black) var(--p-size-title1)/1.1 var(--font-display); letter-spacing: var(--p-tracking-title1); font-variant-numeric: tabular-nums; color: var(--text-primary); }
+/* Plan card: a slim bright banner with the globe, a cycling destination and the button on the right */
+.plan { margin-top: var(--space-lg); padding: var(--space-lg) var(--space-inset); }
+@media (min-width: 744px) { .plan { padding: var(--space-lg) var(--space-xl); } }
+.planTitle { font: var(--p-weight-semibold) var(--p-size-title1)/var(--p-leading-title1) var(--font-heading); letter-spacing: var(--p-tracking-title1); }
+/* Each letter is its own box so it can slide up on its own; the word clips them as they enter and leave. */
+.planWord { display: inline-flex; overflow: hidden; padding: 2px 0; margin: -2px 0; vertical-align: bottom; }
+.letter { display: inline-block; animation-name: letterIn; animation-timing-function: cubic-bezier(0.2, 0.75, 0.25, 1); animation-fill-mode: both; }
+.leaving .letter { animation-name: letterOut; animation-timing-function: cubic-bezier(0.55, 0, 0.75, 0.25); }
+@keyframes letterIn { from { transform: translateY(110%); opacity: 0; } to { transform: none; opacity: 1; } }
+@keyframes letterOut { from { transform: none; opacity: 1; } to { transform: translateY(-110%); opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .letter { animation: none; } }
+
+.emptyPast { border: 1px solid var(--border-subtle); background: transparent; }
 
 .grid { display: grid; gap: var(--space-md); grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); }
 

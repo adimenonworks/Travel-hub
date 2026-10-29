@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Route, Routes, useLocation, useMatch, useNavigate, useParams } from 'react-router-dom';
+import { Navigate, Route, Routes, useLocation, useMatch, useNavigate, useParams } from 'react-router-dom';
 import { Button, EmptyState, Icon, LinkButton, PageHeader, Spinner, Tabs, type TabItem } from '../../design/components';
 import { useProfiles, useRole, useSub, useTrip } from '../../data/hooks';
 import type { Activity, Album, Comment, Expense, Idea, Profile, Trip } from '../../data/types';
@@ -9,7 +9,6 @@ import { Content } from '../../app/Shell';
 import { ActivityPage } from './ActivityPage';
 import { Budget } from './Budget';
 import { Ideas } from './Ideas';
-import { Info } from './Info';
 import { Itinerary } from './Itinerary';
 import { People } from './People';
 import { Photos } from './Photos';
@@ -66,7 +65,6 @@ function TripLoaded({ trip }: { trip: Trip }) {
     { to: `${base}/ideas`, label: 'Ideas', count: ideas.filter((i) => i.status === 'open').length, active: section === 'ideas' },
     { to: `${base}/budget`, label: 'Budget', active: section === 'budget' },
     { to: `${base}/photos`, label: 'Photos', count: albums.length, active: section === 'photos' },
-    { to: `${base}/info`, label: 'Info', active: section === 'info' },
     { to: `${base}/people`, label: 'People', active: section === 'people' },
   ];
 
@@ -100,7 +98,7 @@ function TripLoaded({ trip }: { trip: Trip }) {
           <Route path="ideas" element={<Ideas {...ctx} />} />
           <Route path="budget" element={<Budget {...ctx} />} />
           <Route path="photos" element={<Photos {...ctx} />} />
-          <Route path="info" element={<Info {...ctx} />} />
+          <Route path="info" element={<Navigate to={base} replace />} />
           <Route path="people" element={<People {...ctx} />} />
         </Routes>
       </Content>

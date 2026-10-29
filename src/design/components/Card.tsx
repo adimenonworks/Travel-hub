@@ -2,10 +2,25 @@ import type { HTMLAttributes, ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import s from './Card.module.css';
 
-type CardProps = HTMLAttributes<HTMLDivElement> & { flush?: boolean; tone?: 'default' | 'accent' };
+type CardProps = HTMLAttributes<HTMLDivElement> & {
+  flush?: boolean;
+  tone?: 'default' | 'accent';
+  /** A large icon or illustration on the left (e.g. <Icon name="globe" size={56} /> or <Illustration />). */
+  media?: ReactNode;
+  /** A call to action on the right; it drops below the text on narrow screens. */
+  action?: ReactNode;
+};
 
-export function Card({ flush, tone = 'default', className, ...rest }: CardProps) {
-  return <div className={[s.card, flush && s.flush, tone === 'accent' && s.accent, className].filter(Boolean).join(' ')} {...rest} />;
+export function Card({ flush, tone = 'default', media, action, className, children, ...rest }: CardProps) {
+  const cls = [s.card, flush && s.flush, tone === 'accent' && s.accent, (media || action) && s.split, className].filter(Boolean).join(' ');
+  if (!media && !action) return <div className={cls} {...rest}>{children}</div>;
+  return (
+    <div className={cls} {...rest}>
+      {media && <div className={s.media} aria-hidden="true">{media}</div>}
+      <div className={s.body}>{children}</div>
+      {action && <div className={s.action}>{action}</div>}
+    </div>
+  );
 }
 
 export function CardLink({ to, flush, className, children }: { to: string; flush?: boolean; className?: string; children: ReactNode }) {

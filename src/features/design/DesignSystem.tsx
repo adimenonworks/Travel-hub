@@ -1,7 +1,7 @@
 import { useState, type CSSProperties } from 'react';
 import {
   Avatar, AvatarStack, Badge, Banner, Button, Card, ColorPicker, EmptyState, FieldRow, Icon, IconButton, LinkButton, List, ListRow, PageHeader,
-  SegmentedControl, Section, Select, Sheet, Spinner, Tabs, TextArea, TextField, type IconName,
+  SegmentedControl, Section, Select, Sheet, Spinner, Tabs, TextArea, TextField, type IconName, Illustration,
 } from '../../design/components';
 import { COVER_COLORS } from '../../lib/colors';
 import s from './DesignSystem.module.css';
@@ -13,22 +13,22 @@ const colorGroups: { title: string; tokens: string[] }[] = [
   { title: 'Status', tokens: ['--status-success', '--status-warning', '--status-error', '--status-success-subtle', '--status-warning-subtle', '--status-error-subtle'] },
   { title: 'Surface', tokens: ['--surface-background-primary', '--surface-background-secondary', '--surface-background-tertiary', '--surface-brand', '--surface-brand-subtle', '--surface-sunken'] },
   { title: 'Interactive (hover lighter, pressed darker)', tokens: ['--interactive-primary', '--interactive-primary-hover', '--interactive-primary-pressed', '--interactive-secondary', '--interactive-secondary-hover', '--interactive-secondary-pressed', '--interactive-neutral', '--interactive-neutral-hover', '--interactive-neutral-pressed', '--interactive-selected', '--interactive-selected-hover', '--interactive-selected-pressed', '--interactive-destructive', '--interactive-destructive-hover', '--interactive-destructive-pressed', '--interactive-ghost-hover', '--interactive-ghost-pressed'] },
-  { title: 'Border', tokens: ['--border-subtle', '--border-bold', '--border-bold-hover', '--border-focus'] },
+  { title: 'Border', tokens: ['--border-subtle', '--border-bold', '--border-bold-hover', '--border-focus', '--border-selected'] },
   { title: 'Disabled & overlay', tokens: ['--disabled-background', '--disabled-foreground', '--overlay-bar', '--overlay-scrim'] },
 ];
 
 const typeStyles = [
-  ['t-display', 'Display', '40–72 / 0.92 Black (900)'],
-  ['t-title1', 'Title 1', '32 / 38 Semibold'],
+  ['t-display', 'Display', '40–72 / 1.0 Clash Display Bold'],
+  ['t-title1', 'Title 1', '32 / 38 Manrope Semibold'],
   ['t-title2', 'Title 2', '24 / 31 Semibold'],
   ['t-title3', 'Title 3', '20 / 26 Semibold'],
   ['t-headline', 'Headline', '17 / 24 Semibold'],
   ['t-body', 'Body', '16 / 24 Regular'],
   ['t-callout', 'Callout', '15 / 22 Regular'],
   ['t-subhead', 'Subheadline', '14 / 20 Regular'],
-  ['t-footnote', 'Footnote', '13 / 18 Regular'],
-  ['t-caption1', 'Caption 1', '12 / 16 Medium'],
-  ['t-caption2', 'Caption 2', '11 / 14 Medium'],
+  ['t-footnote', 'Footnote', '13 / 18 Regular (14 from 744px)'],
+  ['t-caption1', 'Caption 1', '12 / 16 Medium (14 from 744px)'],
+  ['t-caption2', 'Caption 2', '11 / 14 Medium (14 from 744px)'],
 ];
 
 const spaces = ['--space-xxs', '--space-xs', '--space-sm', '--space-md', '--space-lg', '--space-xl', '--space-2xl', '--space-3xl'];
@@ -123,6 +123,10 @@ export function DesignSystem() {
           <div className={s.cards}>
             <Card><div className="t-title3">Default card</div><p className="t-subhead t-secondary">White on the pale canvas, no shadow.</p></Card>
             <Card tone="accent"><div className="t-title3">Brand card</div><p className="t-subhead t-secondary">For the one thing that matters most on a page.</p><div><Button variant="inverse" icon="plus">Inverse button</Button></div></Card>
+            <Card tone="accent" media={<Icon name="globe" size={56} strokeWidth={1.4} />} action={<Button variant="inverse">Action</Button>}>
+              <div className="t-title3">Card with media and action</div><p className="t-subhead">The media sits on the left, the action on the right (below on phones).</p>
+            </Card>
+            <Card media={<Illustration name="memories" />}><div className="t-headline">Card with an illustration</div><p className="t-subhead t-secondary">Illustrations are for empty states.</p></Card>
           </div>
         </Section>
 

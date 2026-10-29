@@ -1,0 +1,7 @@
+/* Your travels */
+.stats { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-sm); }
+@media (min-width: 744px) { .stats { grid-template-columns: repeat(5, 1fr); } }
+.stat { display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-xxs); padding: var(--space-md); border-radius: var(--radius-card); background: var(--surface-background-secondary); border: 1px solid var(--border-subtle); }
+.statIcon { display: grid; place-items: center; width: 32px; height: 32px; border-radius: 50%; background: var(--surface-brand-subtle); color: var(--icon-brand); margin-bottom: var(--space-xs); }
+.statValue { font: var(--p-weight-display) var(--p-size-title1)/1.1 var(--font-display); letter-spacing: var(--p-tracking-title1); font-variant-numeric: tabular-nums; color: var(--text-primary); }
+

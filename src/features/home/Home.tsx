@@ -1,9 +1,8 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Avatar, AvatarStack, Badge, Button, Card, CardLink, Icon, PageHeader, Section, Spinner, type IconName } from '../../design/components';
-import { personName, useActivitiesFor, useMe, useMyTrips, useProfile, useProfiles } from '../../data/hooks';
-import type { Activity, Category, Place, Trip } from '../../data/types';
-import { categoryInfo } from '../../lib/categories';
+import { Avatar, AvatarStack, Badge, Button, Card, CardLink, Icon, Illustration, PageHeader, Section, Spinner } from '../../design/components';
+import { personName, useMe, useMyTrips, useProfile, useProfiles } from '../../data/hooks';
+import type { Trip } from '../../data/types';
 import { coverPosition } from '../../lib/image';
 import { daysBetween, formatRange, today, tripPhase } from '../../lib/dates';
 import { Content } from '../../app/Shell';
@@ -24,6 +23,9 @@ export function Home() {
   const current = all.filter((t) => tripPhase(t.startDate, t.endDate) === 'current');
   const upcoming = all.filter((t) => tripPhase(t.startDate, t.endDate) === 'upcoming');
   const past = all.filter((t) => tripPhase(t.startDate, t.endDate) === 'past').reverse();
+  const daysAway = past.reduce((n, t) => n + daysBetween(t.startDate, t.endDate) + 1, 0);
+  const places = new Set([...past.flatMap((t) => (t.destination ? [t.destination] : [])), ...(profile?.visited ?? [])]
+    .map((p) => p.name.split(',')[0].trim().toLowerCase())).size;
   const plan = <PlanCard onPlan={() => setCreating(true)} />;
 
   return (
@@ -31,21 +33,32 @@ export function Home() {
       <Content>
         <PageHeader title="Where to next?" />
         <section className={s.profile} aria-label="You">
-          {/* With no top bar, the avatar is the way into your profile and settings; the emerald ring marks it as a button. */}
-          <Link to="/profile" className={s.me} aria-label="Your profile and settings">
-            <Avatar name={name} photo={photo} seed={me.uid} size={64} />
-          </Link>
-          <h2 className="t-title1">Hi, {name.split(' ')[0]}</h2>
+          <div className={s.who}>
+            {/* With no top bar, the avatar is the way into your profile and settings; the emerald ring marks it as a button. */}
+            <Link to="/profile" className={s.me} aria-label="Your profile, travel stats and settings">
+              <Avatar name={name} photo={photo} seed={me.uid} size={64} />
+            </Link>
+            <h2 className="t-title1">{greeting()}, {name.split(' ')[0]}</h2>
+          </div>
+          <dl className={s.headStats}>
+            <div><dt>Trips</dt><dd>{all.length}</dd></div>
+            <div><dt>Days away</dt><dd>{daysAway}</dd></div>
+            <div><dt>Places</dt><dd>{places}</dd></div>
+          </dl>
         </section>
 
         {trips === null ? <Spinner center /> : (
           <>
             {current.length > 0 && <TripGroup title="Happening now" trips={current} />}
-            {upcoming.length > 0 ? <TripGroup title="Upcoming" trips={upcoming}>{plan}</TripGroup> : plan}
+            {upcoming.length > 0 ? <TripGroup title="Upcoming trips" trips={upcoming}>{plan}</TripGroup> : plan}
             <TripGroup title="Past trips" trips={past}>
-              {past.length === 0 && <div className={s.emptyPast}>Looks a little empty… let’s make some memories.</div>}
+              {past.length === 0 && (
+                <Card className={s.emptyPast} media={<Illustration name="memories" />}>
+                  <p className="t-headline">Looks a little empty…</p>
+                  <p className="t-subhead t-secondary">Let’s make some memories. Trips you’ve finished will show up here.</p>
+                </Card>
+              )}
             </TripGroup>
-            <TravelStats trips={[...past, ...current]} home={profile?.home ?? null} visited={profile?.visited ?? []} meId={me.uid} />
           </>
         )}
       </Content>
@@ -54,26 +67,49 @@ export function Home() {
   );
 }
 
+/** "Good morning" before noon, "Good afternoon" until 6pm, then "Good evening". */
+function greeting(h = new Date().getHours()) {
+  return h < 12 ? 'Good morning' : h < 18 ? 'Good afternoon' : 'Good evening';
+}
+
 // Cities and countries the plan card cycles through.
 const DESTINATIONS = ['Tokyo', 'Lisbon', 'Mexico City', 'Iceland', 'Marrakech', 'Kyoto', 'Cape Town', 'Peru', 'Seoul', 'Istanbul', 'New Zealand', 'Hanoi', 'Buenos Aires', 'Greece', 'Bali', 'Copenhagen'];
+const LETTER_DELAY = 0.1; // seconds between letters in the wave
+const LETTER_MOVE = 0.5;  // how long one letter takes to slide
+const HOLD = 3.2;         // how long a name stays before the next one
 
-/** A bright "moment" that invites you to plan a trip: the destination in the title changes every few seconds. */
+/**
+ * A bright "moment" that invites you to plan a trip. The destination changes
+ * letter by letter: each letter slides up 0.1s after the one before, like a wave.
+ */
 function PlanCard({ onPlan }: { onPlan: () => void }) {
   const [i, setI] = useState(() => Math.floor(Math.random() * DESTINATIONS.length));
+  const [leaving, setLeaving] = useState(false);
+  const word = `${DESTINATIONS[i]}?`;
   useEffect(() => {
     // Respect "reduce motion": keep one destination instead of cycling.
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-    const t = setInterval(() => setI((n) => (n + 1) % DESTINATIONS.length), 2800);
-    return () => clearInterval(t);
-  }, []);
+    const wave = (word.length - 1) * LETTER_DELAY + LETTER_MOVE;
+    const t = leaving
+      ? setTimeout(() => { setLeaving(false); setI((n) => (n + 1) % DESTINATIONS.length); }, wave * 1000)
+      : setTimeout(() => setLeaving(true), (wave + HOLD) * 1000);
+    return () => clearTimeout(t);
+  }, [leaving, word]);
+
   return (
-    <Card tone="accent" className={s.plan}>
+    <Card tone="accent" className={s.plan} media={<Icon name="globe" size={56} strokeWidth={1.4} />}
+      action={<Button variant="inverse" size="large" icon="plus" onClick={onPlan}>Plan your next journey</Button>}>
       <h2 className={s.planTitle}>
         <span className="visually-hidden">Plan a new trip</span>
-        <span key={i} className={s.planPlace} aria-hidden="true">{DESTINATIONS[i]}?</span>
+        <span key={`${i}-${leaving}`} className={[s.planWord, leaving && s.leaving].filter(Boolean).join(' ')} aria-hidden="true">
+          {[...word].map((ch, n) => (
+            <span key={n} className={s.letter} style={{ animationDelay: `${n * LETTER_DELAY}s`, animationDuration: `${LETTER_MOVE}s` }}>
+              {ch === ' ' ? '\u00A0' : ch}
+            </span>
+          ))}
+        </span>
       </h2>
       <p className="t-body">There’s so much to see and do. Let’s plan it right.</p>
-      <div><Button variant="inverse" size="large" icon="plus" onClick={onPlan}>Plan your next journey</Button></div>
     </Card>
   );
 }
@@ -115,54 +151,3 @@ function TripGroup({ title, trips, children }: { title: string; trips: Trip[]; c
     </Section>
   );
 }
-
-/** Great-circle distance in miles. */
-function miles(a: Place, b: Place) {
-  const r = Math.PI / 180, R = 3958.8;
-  const dLat = (b.lat - a.lat) * r, dLng = (b.lng - a.lng) * r;
-  const h = Math.sin(dLat / 2) ** 2 + Math.cos(a.lat * r) * Math.cos(b.lat * r) * Math.sin(dLng / 2) ** 2;
-  return 2 * R * Math.asin(Math.sqrt(h));
-}
-
-const fmt = (n: number) => new Intl.NumberFormat(undefined, { notation: n >= 100000 ? 'compact' : 'standard', maximumFractionDigits: n >= 100000 ? 1 : 0 }).format(n);
-
-/**
- * Your travels in numbers, from past and current trips. Places count itinerary
- * plans that have happened and that you went to (or that nobody marked attendance for).
- */
-function TravelStats({ trips, home, visited, meId }: { trips: Trip[]; home: Place | null; visited: Place[]; meId: string }) {
-  const byTrip = useActivitiesFor(trips.map((t) => t.id));
-  const t0 = today();
-  const seen: Activity[] = Object.values(byTrip).flat().filter((a) => a.date <= t0 && (a.attendeeIds.length === 0 || a.attendeeIds.includes(meId)));
-  const count = (c: Category) => seen.filter((a) => a.category === c).length;
-  const places = [...trips.flatMap((t) => (t.destination ? [t.destination] : [])), ...visited];
-  const countries = new Set(places.map((p) => p.country ?? p.name.split(',').pop()!.trim())).size;
-  const cities = new Set(places.map((p) => p.name.split(',')[0].trim().toLowerCase())).size;
-  const pastOnly = trips.filter((t) => t.endDate < t0);
-  const days = pastOnly.reduce((n, t) => n + daysBetween(t.startDate, t.endDate) + 1, 0);
-  const travelled = home ? Math.round(pastOnly.reduce((n, t) => n + (t.destination ? 2 * miles(home, t.destination) : 0), 0)) : null;
-
-  const stats: { icon: IconName; value: string; label: string }[] = [
-    { icon: 'plane', value: fmt(pastOnly.length), label: pastOnly.length === 1 ? 'Trip taken' : 'Trips taken' },
-    { icon: 'globe', value: fmt(countries), label: countries === 1 ? 'Country' : 'Countries' },
-    { icon: 'pin', value: fmt(cities), label: cities === 1 ? 'City' : 'Cities' },
-    { icon: 'calendar', value: fmt(days), label: days === 1 ? 'Day away' : 'Days away' },
-    { icon: 'map', value: travelled === null ? '—' : fmt(travelled), label: 'Miles travelled' },
-    ...(['sight', 'food', 'cafe', 'drinks', 'activity'] as const).map((c) => ({ icon: categoryInfo(c).icon, value: fmt(count(c)), label: STAT_LABEL[c] })),
-  ];
-  return (
-    <Section title="Your travels" footer={travelled === null ? <>Add your home city in <Link to="/profile">Profile</Link> to count miles travelled.</> : 'Miles are there and back from your home city.'}>
-      <div className={s.stats}>
-        {stats.map((st) => (
-          <div key={st.label} className={s.stat}>
-            <span className={s.statIcon}><Icon name={st.icon} size={18} /></span>
-            <span className={s.statValue}>{st.value}</span>
-            <span className="t-footnote t-secondary">{st.label}</span>
-          </div>
-        ))}
-      </div>
-    </Section>
-  );
-}
-
-const STAT_LABEL: Record<'sight' | 'food' | 'cafe' | 'drinks' | 'activity', string> = { sight: 'Sights seen', food: 'Restaurants', cafe: 'Cafés', drinks: 'Bars', activity: 'Activities' };

@@ -72,7 +72,7 @@ export function ActivityForm({ open, trip, date, activity, draft, onClose, onCre
   };
 
   return (
-    <Sheet open={open} title={activity ? 'Edit plan' : 'Add to itinerary'} onClose={onClose} onSubmit={submit} submitLabel={activity ? 'Save' : 'Add'} submitDisabled={!f.title.trim() || busy}>
+    <Sheet open={open} title={activity ? 'Edit event' : 'Add to itinerary'} onClose={onClose} onSubmit={submit} submitLabel={activity ? 'Save' : 'Add'} submitDisabled={!f.title.trim() || busy}>
       <TextField label="What" placeholder="Sunset at Miradouro da Graça" value={f.title} onChange={(e) => set({ title: e.target.value })} />
       <FieldRow>
         <Select label="Day" value={f.date} onChange={(e) => set({ date: e.target.value })}>

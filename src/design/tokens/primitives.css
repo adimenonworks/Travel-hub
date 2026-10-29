@@ -31,12 +31,14 @@
   --p-alpha-white-40: rgba(255, 255, 255, 0.4); --p-alpha-white-70: rgba(255, 255, 255, 0.7); --p-alpha-white-85: rgba(255, 255, 255, 0.85);
   --p-alpha-emerald-100-50: rgba(212, 253, 237, 0.5); --p-alpha-red-100-50: rgba(253, 241, 241, 0.5);
 
-  /* Type families (Inter is bundled; see main.tsx) */
-  --p-font-sans: "Inter Variable", Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  /* Type families. Manrope is bundled (main.tsx); Clash Display Bold loads from Fontshare (index.html).
+     Both are free for commercial use (SIL Open Font License / ITF Free Font License). */
+  --p-font-sans: "Manrope Variable", Manrope, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --p-font-display: "Clash Display", "Manrope Variable", Manrope, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   --p-font-mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
 
   /* Type scale (size / line-height / tracking) */
-  --p-size-display: clamp(40px, 3.2vw + 28px, 72px); --p-leading-display: 0.92; --p-tracking-display: -0.02em;
+  --p-size-display: clamp(40px, 3.2vw + 28px, 72px); --p-leading-display: 1; --p-tracking-display: -0.01em;
   --p-size-title1: 32px;   --p-leading-title1: 38px;   --p-tracking-title1: -0.03em;
   --p-size-title2: 24px;   --p-leading-title2: 31px;   --p-tracking-title2: -0.02em;
   --p-size-title3: 20px;   --p-leading-title3: 26px;   --p-tracking-title3: -0.015em;
@@ -52,7 +54,8 @@
   --p-weight-medium: 500;
   --p-weight-semibold: 600;
   --p-weight-bold: 700;
-  --p-weight-black: 900;  /* hero headings and big numbers only */
+  --p-weight-black: 900;
+  --p-weight-display: 700;  /* Clash Display Bold: page titles and big numbers only */
 
   /* Spacing — 4px base, 8px rhythm */
   --p-space-1: 4px;
@@ -82,4 +85,13 @@
   --p-duration-slow: 400ms;
   --p-ease-standard: cubic-bezier(0.25, 0.1, 0.25, 1);
   --p-ease-spring: cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+/* From 744px up nothing is smaller than 14px: the small styles (footnote, captions, tags) step up. Phones keep 12–13px. */
+@media (min-width: 744px) {
+  :root {
+    --p-size-footnote: 14px; --p-leading-footnote: 20px;
+    --p-size-caption1: 14px; --p-leading-caption1: 18px;
+    --p-size-caption2: 14px; --p-leading-caption2: 18px;
+  }
 }

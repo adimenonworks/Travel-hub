@@ -5,7 +5,7 @@
   border-radius: 50%;
   background: var(--surface-brand-subtle);
   color: var(--text-brand);
-  font: var(--p-weight-bold) calc(var(--avatar-size, 32px) * 0.4)/1 var(--font-display);
+  font: var(--p-weight-bold) calc(var(--avatar-size, 32px) * 0.4)/1 var(--font-heading);
   overflow: hidden;
   object-fit: cover;
 }
@@ -38,7 +38,7 @@
   color: var(--text-subtle);
 }
 .emptyIconWrap { display: grid; place-items: center; width: 80px; height: 80px; border-radius: var(--radius-icon); background: var(--surface-brand); color: var(--icon-on-brand); margin-bottom: var(--space-xs); }
-.emptyTitle { font: var(--p-weight-semibold) var(--p-size-title3)/var(--p-leading-title3) var(--font-display); letter-spacing: var(--p-tracking-title3); color: var(--text-primary); }
+.emptyTitle { font: var(--p-weight-semibold) var(--p-size-title3)/var(--p-leading-title3) var(--font-heading); letter-spacing: var(--p-tracking-title3); color: var(--text-primary); }
 .emptyAction { margin-top: var(--space-sm); }
 
 /* Spinner */
