@@ -1,9 +1,8 @@
-import { useState, type CSSProperties } from 'react';
+import { useState } from 'react';
 import { Route, Routes, useNavigate, useParams } from 'react-router-dom';
 import { Button, EmptyState, Icon, LinkButton, PageHeader, Spinner, Tabs, type TabItem } from '../../design/components';
 import { useProfiles, useRole, useSub, useTrip } from '../../data/hooks';
 import type { Activity, Album, Comment, Expense, Idea, Profile, Trip } from '../../data/types';
-import { coverColor } from '../../lib/colors';
 import { daysBetween, formatRange } from '../../lib/dates';
 import { Content } from '../../app/Shell';
 import { Budget } from './Budget';
@@ -74,7 +73,7 @@ function TripLoaded({ trip }: { trip: Trip }) {
           back={{ to: '/', label: 'Trips' }}
           actions={canManage && <Button variant="gray" icon="pencil" onClick={() => setEditing(true)}>Edit trip</Button>}
         />
-        <div className={s.hero} style={{ '--trip-color': coverColor(trip.coverColor) } as CSSProperties}>
+        <div className={s.hero}>
           {trip.coverPhoto && <img src={trip.coverPhoto} alt="" className={s.heroPhoto} />}
           <span><Icon name="pin" size={20} />{trip.destination?.name ?? 'No destination'}</span>
           <span><Icon name="calendar" size={20} />{formatRange(trip.startDate, trip.endDate)} · {nDays} day{nDays === 1 ? '' : 's'}</span>

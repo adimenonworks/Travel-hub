@@ -4,9 +4,10 @@
   padding: var(--space-inset);
 }
 .flush { padding: 0; overflow: hidden; }
-.interactive { cursor: pointer; transition: transform var(--motion-fast), background var(--motion-fast); text-align: left; border: 0; width: 100%; color: inherit; display: block; }
-.interactive:hover { background-image: linear-gradient(var(--interactive-ghost-hover), var(--interactive-ghost-hover)); }
-.interactive:active { background-image: linear-gradient(var(--interactive-ghost-pressed), var(--interactive-ghost-pressed)); }
+.interactive { position: relative; isolation: isolate; cursor: pointer; transition: transform var(--motion-fast), background var(--motion-fast); text-align: left; border: 0; width: 100%; color: inherit; display: block; }
+.interactive::after { content: ''; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; transition: background var(--motion-fast); }
+.interactive:hover::after { background: var(--interactive-ghost-hover); }
+.interactive:active::after { background: var(--interactive-ghost-pressed); }
 .interactive:active { transform: scale(0.99); }
 
 /* Bold brand card: bright emerald, with every text and icon role remapped to its deep partner. */

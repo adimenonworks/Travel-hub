@@ -64,6 +64,7 @@
   --p-space-8: 32px;
   --p-space-10: 40px;
   --p-space-12: 48px;
+  --p-space-24: 96px;
 
   /* Corner radii — generous; pills wherever a shape allows */
   --p-radius-md: 16px;

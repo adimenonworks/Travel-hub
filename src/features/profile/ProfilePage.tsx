@@ -27,7 +27,7 @@ export function ProfilePage() {
   return (
     <>
       <Content>
-        <PageHeader title="Profile" />
+        <PageHeader title="Profile" back={{ to: '/', label: 'Trips' }} />
         <Card className={s.head}>
           <Avatar name={me.name} photo={me.photo} seed={me.uid} size={72} />
           <div>

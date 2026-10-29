@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { Button, ColorPicker, FieldRow, Select, Sheet, TextField } from '../../design/components';
+import { Button, FieldRow, Select, Sheet, TextField } from '../../design/components';
 import { store } from '../../data';
 import type { Place, Trip } from '../../data/types';
 import { COVER_COLORS, coverName } from '../../lib/colors';
@@ -84,7 +84,6 @@ export function TripForm({ open, trip, onClose, onSaved, onDeleted }: { open: bo
           {CURRENCIES.map((c) => <option key={c}>{c}</option>)}
         </Select>
       </FieldRow>
-      <ColorPicker label="Trip colour" options={COVER_COLORS} value={d.coverColor} onChange={(coverColor) => set({ coverColor })} />
       <CoverPhotoField value={d.coverPhoto} onChange={(coverPhoto) => set({ coverPhoto })} />
       {error && <p className="t-footnote t-danger">{error}</p>}
       {trip && onDeleted && <Button variant="destructive" icon="trash" block onClick={remove}>Delete trip</Button>}
@@ -125,7 +124,7 @@ function CoverPhotoField({ value, onChange }: { value: string | null; onChange: 
       <input ref={input} type="file" accept="image/*" className="visually-hidden" tabIndex={-1} aria-hidden="true"
         onChange={(e) => pick(e.target.files?.[0])} />
       {error ? <p className="t-footnote t-danger" role="alert">{error}</p>
-        : !value && <p className="t-footnote t-secondary">Optional. Shown on the trip card and at the top of the trip. Without one, the colour is used.</p>}
+        : !value && <p className="t-footnote t-secondary">Optional. Fills the trip card and shows at the top of the trip.</p>}
     </div>
   );
 }
