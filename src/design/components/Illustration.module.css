@@ -1,0 +1,7 @@
+.art { display: block; overflow: visible; }
+.frame { fill: var(--surface-background-secondary); stroke: var(--border-bold); stroke-width: 1.5; }
+.photo { fill: var(--surface-brand-subtle); }
+.hill { fill: var(--interactive-primary); }
+.sun { fill: var(--status-warning); }
+.line { fill: var(--surface-sunken); }
+.spark { fill: none; stroke: var(--icon-brand); stroke-width: 2; stroke-linecap: round; }

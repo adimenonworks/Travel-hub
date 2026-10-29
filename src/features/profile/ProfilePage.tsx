@@ -10,6 +10,7 @@ import { applyTheme, getTheme, type ThemePref } from '../../lib/theme';
 import { Content } from '../../app/Shell';
 import { CityPicker } from '../shared/CityPicker';
 import { MapView } from '../shared/MapView';
+import { TravelStats } from './TravelStats';
 import s from './Profile.module.css';
 
 export function ProfilePage() {
@@ -35,6 +36,8 @@ export function ProfilePage() {
       <Content>
         <PageHeader title="Profile" back={{ to: '/', label: 'Trips' }} />
         <ProfileCard uid={me.uid} name={profile?.name || me.name} photo={profile ? profile.photo : me.photo} email={me.email} />
+
+        {trips && <TravelStats trips={trips.filter((t) => tripPhase(t.startDate, t.endDate) !== 'upcoming')} home={profile?.home ?? null} visited={visited} meId={me.uid} />}
 
         <Section title="Home" footer="Start typing and pick your city from the list. It appears on your maps with a home pin.">
           <Card className={s.add}>

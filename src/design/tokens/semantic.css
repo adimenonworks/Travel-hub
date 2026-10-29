@@ -94,7 +94,8 @@
 
   /* Typography */
   --font-text: var(--p-font-sans);
-  --font-display: var(--p-font-sans);
+  --font-display: var(--p-font-display);  /* page titles and big numbers */
+  --font-heading: var(--p-font-sans);    /* titles 1–3 */
   --font-mono: var(--p-font-mono);
 
   /* Spacing roles */

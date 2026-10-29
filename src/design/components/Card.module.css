@@ -4,6 +4,12 @@
   padding: var(--space-inset);
 }
 .flush { padding: 0; overflow: hidden; }
+/* Card with media on the left and/or an action on the right */
+.split { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-md) var(--space-lg); }
+.media { flex: none; display: grid; place-items: center; color: var(--icon-brand); }
+.body { flex: 1 1 220px; min-width: 0; display: flex; flex-direction: column; gap: var(--space-xxs); }
+.action { flex: none; }
+@media (max-width: 743px) { .action { flex-basis: 100%; } }
 .interactive { position: relative; isolation: isolate; cursor: pointer; transition: transform var(--motion-fast), background var(--motion-fast); text-align: left; border: 0; width: 100%; color: inherit; display: block; }
 .interactive::after { content: ''; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; transition: background var(--motion-fast); }
 .interactive:hover::after { background: var(--interactive-ghost-hover); }
@@ -30,5 +36,5 @@
   min-height: var(--size-tap);
   flex-wrap: wrap;
 }
-.sectionTitle { font: var(--p-weight-semibold) var(--p-size-title2)/var(--p-leading-title2) var(--font-display); letter-spacing: var(--p-tracking-title2); color: var(--text-primary); }
+.sectionTitle { font: var(--p-weight-semibold) var(--p-size-title2)/var(--p-leading-title2) var(--font-heading); letter-spacing: var(--p-tracking-title2); color: var(--text-primary); }
 .sectionFooter { font-size: var(--p-size-footnote); line-height: var(--p-leading-footnote); color: var(--text-subtle); padding: 0 var(--space-xs); }
