@@ -1,4 +1,4 @@
-import type { CSSProperties } from 'react';
+import { useLayoutEffect, useRef, useState, type CSSProperties } from 'react';
 import s from './SegmentedControl.module.css';
 
 type Option<T extends string> = { value: T; label: string };
@@ -10,12 +10,27 @@ export function SegmentedControl<T extends string>({ options, value, onChange, b
   block?: boolean;
   label: string;
 }) {
-  const index = options.findIndex((o) => o.value === value);
+  // The selected look is one pill that slides between options: measure where the chosen option sits
+  // (labels can make options different widths), then move the pill there.
+  const group = useRef<HTMLDivElement>(null);
+  const [pill, setPill] = useState<{ x: number; w: number; ready: boolean } | null>(null);
+  useLayoutEffect(() => {
+    const el = group.current;
+    if (!el) return;
+    const measure = () => {
+      const cur = el.querySelector<HTMLElement>('[aria-checked="true"]');
+      setPill((prev) => (cur ? { x: cur.offsetLeft, w: cur.offsetWidth, ready: prev !== null } : null));
+    };
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [value, options]);
+
   return (
-    <div role="radiogroup" aria-label={label} className={[s.control, block && s.block].filter(Boolean).join(' ')}
-      style={{ '--count': options.length, '--index': index } as CSSProperties}>
-      {/* The selected look is one pill that slides between options. */}
-      {index >= 0 && <span className={s.thumb} aria-hidden="true" />}
+    <div ref={group} role="radiogroup" aria-label={label} className={[s.control, block && s.block].filter(Boolean).join(' ')}>
+      {pill && <span className={[s.thumb, pill.ready && s.animate].filter(Boolean).join(' ')} aria-hidden="true"
+        style={{ '--x': `${pill.x}px`, '--w': `${pill.w}px` } as CSSProperties} />}
       {options.map((o) => (
         <button key={o.value} type="button" role="radio" aria-checked={o.value === value} className={s.option} onClick={() => onChange(o.value)}>
           {o.label}

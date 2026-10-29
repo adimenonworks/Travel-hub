@@ -27,14 +27,14 @@
 .option:active { background: var(--interactive-ghost-pressed); }
 .option[aria-checked='true'], .option[aria-checked='true']:hover, .option[aria-checked='true']:active { background: transparent; color: var(--text-on-selected); }
 
-/* The sliding pill: one option wide, moved along by its index (each step is its own width plus the gap). */
+/* The sliding pill: placed on the chosen option (position and width measured in SegmentedControl.tsx). */
 .thumb {
-  position: absolute; top: var(--space-xxs); bottom: var(--space-xxs); left: var(--space-xxs);
-  width: calc((100% - 2 * var(--space-xxs) - (var(--count) - 1) * var(--space-xxs)) / var(--count));
-  transform: translateX(calc(var(--index) * (100% + var(--space-xxs))));
+  position: absolute; top: var(--space-xxs); bottom: var(--space-xxs); left: 0;
+  width: var(--w); transform: translateX(var(--x));
   border-radius: var(--radius-pill);
   background: var(--interactive-selected);
-  transition: transform var(--motion-fluid), background var(--motion-fast);
+  transition: background var(--motion-fast);
 }
+.animate { transition: transform var(--motion-fluid), width var(--motion-fluid), background var(--motion-fast); }
 .control:has(.option[aria-checked='true']:hover) .thumb { background: var(--interactive-selected-hover); }
 .control:has(.option[aria-checked='true']:active) .thumb { background: var(--interactive-selected-pressed); }
