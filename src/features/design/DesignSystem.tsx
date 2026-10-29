@@ -101,7 +101,9 @@ export function DesignSystem() {
             <Button variant="ghost" icon="pencil">Ghost</Button>
             <Button variant="destructive">Delete</Button>
             <Button icon="plus" size="small">Small</Button>
+            <Button size="medium">Medium</Button>
             <Button size="large">Large</Button>
+            <Select compact aria-label="Compact select (matches a medium button)"><option>Organizer</option><option>Member</option></Select>
             <Button disabled>Disabled</Button>
             <LinkButton to="/" variant="tinted">Link button</LinkButton>
             <IconButton icon="pencil" label="Edit" />

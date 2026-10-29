@@ -25,10 +25,11 @@ export function TextArea({ label, hint, id, ...rest }: Wrap & TextareaHTMLAttrib
   return <Wrapper id={fid} label={label} hint={hint}><textarea id={fid} className={s.input} {...rest} /></Wrapper>;
 }
 
-export function Select({ label, hint, id, children, ...rest }: Wrap & SelectHTMLAttributes<HTMLSelectElement>) {
+/** `compact` is 44px tall with smaller text, to match a medium button beside it (e.g. in a list row). */
+export function Select({ label, hint, id, compact, children, ...rest }: Wrap & SelectHTMLAttributes<HTMLSelectElement> & { compact?: boolean }) {
   const auto = useId();
   const fid = id ?? auto;
-  return <Wrapper id={fid} label={label} hint={hint}><select id={fid} className={s.input} {...rest}>{children}</select></Wrapper>;
+  return <Wrapper id={fid} label={label} hint={hint}><select id={fid} className={[s.input, compact && s.compact].filter(Boolean).join(' ')} {...rest}>{children}</select></Wrapper>;
 }
 
 /** Lays fields out side by side, wrapping on narrow screens. */

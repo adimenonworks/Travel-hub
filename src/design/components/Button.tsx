@@ -11,7 +11,7 @@ export type ButtonVariant = 'filled' | 'tinted' | 'gray' | 'plain' | 'ghost' | '
 
 type Props = ButtonHTMLAttributes<HTMLButtonElement> & {
   variant?: ButtonVariant;
-  size?: 'small' | 'regular' | 'large';
+  size?: 'small' | 'medium' | 'regular' | 'large';
   block?: boolean;
   icon?: IconName;
   children?: ReactNode;
