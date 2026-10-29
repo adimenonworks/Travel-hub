@@ -74,13 +74,13 @@ function greeting(h = new Date().getHours()) {
 
 // Cities and countries the plan card cycles through.
 const DESTINATIONS = ['Tokyo', 'Lisbon', 'Mexico City', 'Iceland', 'Marrakech', 'Kyoto', 'Cape Town', 'Peru', 'Seoul', 'Istanbul', 'New Zealand', 'Hanoi', 'Buenos Aires', 'Greece', 'Bali', 'Copenhagen'];
-const LETTER_DELAY = 0.1; // seconds between letters in the wave
-const LETTER_MOVE = 0.5;  // how long one letter takes to slide
-const HOLD = 3.2;         // how long a name stays before the next one
+const LETTER_DELAY = 0.035; // seconds between letters in the wave
+const LETTER_MOVE = 0.35;   // how long one letter takes to slide
+const CYCLE = 5.6;          // seconds from one place appearing to the next (in, hold, out)
 
 /**
  * A bright "moment" that invites you to plan a trip. The destination changes
- * letter by letter: each letter slides up 0.1s after the one before, like a wave.
+ * letter by letter: each letter slides up just after the one before, like a quick wave.
  */
 function PlanCard({ onPlan }: { onPlan: () => void }) {
   const [i, setI] = useState(() => Math.floor(Math.random() * DESTINATIONS.length));
@@ -92,7 +92,7 @@ function PlanCard({ onPlan }: { onPlan: () => void }) {
     const wave = (word.length - 1) * LETTER_DELAY + LETTER_MOVE;
     const t = leaving
       ? setTimeout(() => { setLeaving(false); setI((n) => (n + 1) % DESTINATIONS.length); }, wave * 1000)
-      : setTimeout(() => setLeaving(true), (wave + HOLD) * 1000);
+      : setTimeout(() => setLeaving(true), (CYCLE - wave) * 1000);
     return () => clearTimeout(t);
   }, [leaving, word]);
 
