@@ -27,7 +27,7 @@ export function PageHeader({ title, subtitle, back, actions }: {
 /** `active` overrides route matching, e.g. to keep "Trips" lit on a trip's own pages. */
 export type TabItem = { to: string; label: string; icon?: IconName; end?: boolean; count?: number; active?: boolean };
 
-/** Pill tabs for navigation. The current page's tab is filled. */
+/** Tabs for switching sections of a page. The current tab is darker and underlined in emerald. */
 export function Tabs({ items, label, className }: { items: TabItem[]; label: string; className?: string }) {
   return (
     <nav aria-label={label} className={[s.tabs, className].filter(Boolean).join(' ')}>

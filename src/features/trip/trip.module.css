@@ -8,8 +8,10 @@
   color: var(--text-body);
   font: var(--p-weight-semibold) var(--p-size-callout)/var(--p-leading-callout) var(--font-text);
 }
-.hero span { display: inline-flex; align-items: center; gap: var(--space-xs); }
-.hero svg { color: var(--icon-subtle); }
+.hero > span { display: inline-flex; align-items: center; gap: var(--space-xs); }
+/* Edit trip sits in the empty space on the right; on narrow screens it wraps under the details. */
+.heroEdit { margin-left: auto; margin-right: calc(-1 * var(--space-sm)); }
+.hero > span svg { color: var(--icon-subtle); }
 /* Cover photo sits above the colour band, so the text never has to sit on a busy photo. */
 .heroPhoto {
   flex: 0 0 calc(100% + 2 * var(--space-inset));
@@ -21,7 +23,8 @@
 
 /* Cover photo picker (trip form) */
 .coverField { display: flex; flex-direction: column; gap: var(--space-sm); }
-.coverPreview { width: 100%; aspect-ratio: 5 / 2; object-fit: cover; border-radius: var(--radius-inner); }
+.coverPreview { width: 100%; aspect-ratio: 5 / 2; object-fit: cover; border-radius: var(--radius-inner); cursor: grab; touch-action: none; user-select: none; }
+.coverPreview:active { cursor: grabbing; }
 .coverButtons { display: flex; gap: var(--space-xs); flex-wrap: wrap; }
 
 /* Section tabs stay reachable while scrolling */
@@ -74,6 +77,10 @@
 .actMeta { display: flex; flex-wrap: wrap; gap: var(--space-xs); align-items: center; margin-top: var(--space-xs); }
 .actFoot { display: flex; align-items: center; justify-content: space-between; gap: var(--space-sm); flex-wrap: wrap; padding-top: var(--space-xxs); }
 .actNotes { white-space: pre-wrap; color: var(--text-subtle); font-size: var(--p-size-subhead); line-height: var(--p-leading-subhead); }
+.actChevron { flex: none; color: var(--icon-subtle); margin-top: 2px; }
+.actPlace { display: flex; align-items: center; gap: var(--space-xxs); font-size: var(--p-size-subhead); font-weight: var(--p-weight-semibold); color: var(--text-body); }
+.actPlace svg { flex: none; color: var(--icon-subtle); }
+.clamp { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 .locLink { align-self: flex-start; display: inline-flex; align-items: center; gap: var(--space-xxs); min-height: var(--size-tap); font-size: var(--p-size-subhead); font-weight: var(--p-weight-semibold); text-decoration: underline !important; text-underline-offset: 3px; }
 
 /* Ideas */
@@ -87,7 +94,21 @@
 .vote[aria-pressed='true'] { background: var(--interactive-selected); color: var(--text-on-selected); }
 .vote[aria-pressed='true']:hover { background: var(--interactive-selected-hover); }
 .vote[aria-pressed='true']:active { background: var(--interactive-selected-pressed); }
+.votes { display: inline-flex; gap: var(--space-xxs); }
 .spacer { flex: 1; }
+
+/* A plan's own page */
+.planMeta { display: flex; flex-wrap: wrap; gap: var(--space-xs); }
+.planGrid { display: grid; gap: var(--space-stack); }
+.planCol { display: flex; flex-direction: column; gap: var(--space-stack); min-width: 0; }
+@media (min-width: 1068px) { .planGrid { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: start; } }
+.planLocation { display: flex; flex-direction: column; gap: var(--space-md); }
+.planAddress { font-weight: var(--p-weight-semibold); color: var(--text-body); }
+.planButtons { display: flex; flex-wrap: wrap; gap: var(--space-xs); }
+a.docLink { color: var(--text-link); text-decoration: underline; text-underline-offset: 3px; overflow-wrap: anywhere; }
+a.docLink:hover { text-decoration-thickness: 2px; color: var(--text-link-hover); }
+.docActions { display: inline-flex; align-items: center; gap: var(--space-xxs); }
+.emptyNote { padding: var(--space-lg) var(--space-inset); border-radius: var(--radius-card); border: 1px solid var(--border-subtle); color: var(--text-subtle); font-size: var(--p-size-subhead); }
 
 /* Budget */
 .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: var(--space-md); }

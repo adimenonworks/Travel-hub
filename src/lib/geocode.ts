@@ -1,3 +1,4 @@
+import { getMapsApp, type MapsApp } from './prefs';
 import type { Place } from '../data/types';
 
 /** City / region search (Open-Meteo geocoding — free, no key). */
@@ -36,5 +37,24 @@ export async function geocodePlace(q: string, near?: Place | null): Promise<Plac
   }
 }
 
-export const mapsUrl = (q: string, p?: Place | null) =>
-  p ? `https://www.google.com/maps/search/?api=1&query=${p.lat},${p.lng}` : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(q)}`;
+/** A link that opens the place in the person's chosen maps app (Profile → Maps). */
+export function mapsUrl(q: string, p?: Place | null, app: MapsApp = getMapsApp()) {
+  const text = encodeURIComponent(q);
+  const ll = p ? `${p.lat},${p.lng}` : '';
+  if (app === 'apple') return p ? `https://maps.apple.com/?ll=${ll}&q=${text || ll}` : `https://maps.apple.com/?q=${text}`;
+  if (app === 'waze') return p ? `https://waze.com/ul?ll=${ll}&navigate=yes` : `https://waze.com/ul?q=${text}&navigate=yes`;
+  return `https://www.google.com/maps/search/?api=1&query=${p ? ll : text}`;
+}
+
+/** Opens Uber (app or website) with the place as the drop-off and the rider's current location as pickup. */
+export function uberUrl(q: string, p?: Place | null) {
+  const u = new URLSearchParams({ action: 'setPickup', pickup: 'my_location' });
+  if (p) {
+    u.set('dropoff[latitude]', String(p.lat));
+    u.set('dropoff[longitude]', String(p.lng));
+    u.set('dropoff[nickname]', q || p.name);
+  } else {
+    u.set('dropoff[formatted_address]', q);
+  }
+  return `https://m.uber.com/ul/?${u}`;
+}

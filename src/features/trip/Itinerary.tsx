@@ -1,15 +1,11 @@
 import { useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { AvatarStack, Badge, Button, Card, EmptyState, Icon, IconButton } from '../../design/components';
-import { store } from '../../data';
+import { AvatarStack, Badge, Button, Card, CardLink, EmptyState, Icon } from '../../design/components';
 import { personName, useMe } from '../../data/hooks';
 import type { Activity } from '../../data/types';
 import { formatDay, formatTime, parseDay, today, tripDays } from '../../lib/dates';
 import { money } from '../../lib/format';
-import { mapsUrl } from '../../lib/geocode';
 import { categoryInfo } from '../../lib/categories';
-import { Comments } from '../shared/Comments';
-import { LinkChips } from '../shared/Links';
 import { ActivityForm } from './ActivityForm';
 import type { TripCtx } from './TripPage';
 import s from './trip.module.css';
@@ -25,7 +21,6 @@ export function Itinerary(ctx: TripCtx) {
   const day = days.includes(params.get('day') ?? '') ? params.get('day')! : fallback;
   const setDay = (d: string) => setParams({ day: d }, { replace: true });
 
-  const [editing, setEditing] = useState<Activity | null>(null);
   const [adding, setAdding] = useState(false);
 
   const counts = useMemo(() => {
@@ -67,63 +62,53 @@ export function Itinerary(ctx: TripCtx) {
               action={<Button variant="tinted" icon="plus" onClick={() => setAdding(true)}>Add plan</Button>} />
           </Card>
         ) : (
-          list.map((a) => <ActivityCard key={a.id} a={a} ctx={ctx} onEdit={() => setEditing(a)} />)
+          list.map((a) => <ActivityCard key={a.id} a={a} ctx={ctx} />)
         )}
       </div>
 
       <ActivityForm open={adding} trip={trip} date={day} onClose={() => setAdding(false)} />
-      <ActivityForm open={!!editing} trip={trip} date={day} activity={editing ?? undefined} onClose={() => setEditing(null)} />
     </div>
   );
 }
 
-function ActivityCard({ a, ctx, onEdit }: { a: Activity; ctx: TripCtx; onEdit: () => void }) {
+/** A plan in the timeline. The whole card opens the plan's own page (details, location, documents, comments). */
+function ActivityCard({ a, ctx }: { a: Activity; ctx: TripCtx }) {
   const me = useMe();
-  const [showComments, setShowComments] = useState(false);
   const cat = categoryInfo(a.category);
   const going = a.attendeeIds.includes(me.uid);
   const nComments = ctx.comments.filter((c) => c.targetId === a.id).length;
+  const nDocs = a.links.length;
 
   return (
     <div className={s.activity}>
       <div className={s.time}>
         {a.startTime ? <>{formatTime(a.startTime)}{a.endTime && <><br /><span className="t-tertiary">{formatTime(a.endTime)}</span></>}</> : <span className="t-tertiary">Any time</span>}
       </div>
-      <Card className={s.actCard}>
+      <CardLink to={`/trip/${ctx.trip.id}/plan/${a.id}`} className={s.actCard}>
         <div className={s.actTop}>
           <div>
             <h3 className="t-title3">{a.title}</h3>
             <div className={s.actMeta}>
               <Badge tone="category" icon={cat.icon}>{cat.label}</Badge>
               {a.cost > 0 && <Badge>{money(a.cost, ctx.trip.currency)} pp</Badge>}
+              {going && <Badge tone="success" icon="check">You're going</Badge>}
             </div>
           </div>
-          <IconButton icon="pencil" size="small" label={`Edit ${a.title}`} onClick={onEdit} />
+          <Icon name="chevron-right" size={20} className={s.actChevron} />
         </div>
-        {a.locationText && (
-          <a className={s.locLink} href={mapsUrl(a.locationText, a.location)} target="_blank" rel="noreferrer">
-            <Icon name="pin" size={18} />{a.locationText}
-          </a>
-        )}
-        {a.notes && <div className={s.actNotes}>{a.notes}</div>}
-        <LinkChips links={a.links} />
+        {a.locationText && <div className={s.actPlace}><Icon name="pin" size={18} />{a.locationText}</div>}
+        {a.notes && <div className={[s.actNotes, s.clamp].join(' ')}>{a.notes}</div>}
         <div className={s.actFoot}>
           <span className={s.attending}>
             <AvatarStack people={a.attendeeIds.map((id) => ({ id, name: personName(ctx.profiles, id), photo: ctx.profiles[id]?.photo }))} size={26} />
             <span className="t-footnote t-secondary">{a.attendeeIds.length ? `${a.attendeeIds.length} going` : 'No one yet'}</span>
           </span>
-          <span className={s.attending}>
-            <Button size="small" variant="plain" icon="chat" onClick={() => setShowComments((v) => !v)} aria-expanded={showComments} aria-label={`Comments (${nComments})`}>
-              {nComments || ''}
-            </Button>
-            <Button size="small" variant={going ? 'filled' : 'gray'} icon={going ? 'check' : 'plus'}
-              onClick={() => store.toggleInArray(ctx.trip.id, 'activities', a.id, 'attendeeIds', me.uid, !going)}>
-              {going ? "I'm in" : 'Join'}
-            </Button>
+          <span className={[s.attending, 't-footnote t-secondary'].join(' ')}>
+            {nDocs > 0 && <span className={s.attending}><Icon name="doc" size={16} />{nDocs}<span className="visually-hidden"> {nDocs === 1 ? 'document' : 'documents'}</span></span>}
+            {nComments > 0 && <span className={s.attending}><Icon name="chat" size={16} />{nComments}<span className="visually-hidden"> {nComments === 1 ? 'comment' : 'comments'}</span></span>}
           </span>
         </div>
-        {showComments && <Comments tripId={ctx.trip.id} targetId={a.id} comments={ctx.comments} profiles={ctx.profiles} />}
-      </Card>
+      </CardLink>
     </div>
   );
 }

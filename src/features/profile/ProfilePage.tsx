@@ -5,6 +5,7 @@ import { useMe, useMyTrips, useProfile } from '../../data/hooks';
 import type { Place } from '../../data/types';
 import { tripPhase } from '../../lib/dates';
 import { shrinkPhoto } from '../../lib/image';
+import { MAPS_APPS, getMapsApp, setMapsApp, type MapsApp } from '../../lib/prefs';
 import { applyTheme, getTheme, type ThemePref } from '../../lib/theme';
 import { Content } from '../../app/Shell';
 import { CityPicker } from '../shared/CityPicker';
@@ -15,6 +16,7 @@ export function ProfilePage() {
   const me = useMe();
   const profile = useProfile(me.uid);
   const [theme, setTheme] = useState<ThemePref>(getTheme);
+  const [maps, setMaps] = useState<MapsApp>(getMapsApp);
   const [adding, setAdding] = useState<Place | null>(null);
   const [pickerKey, setPickerKey] = useState(0);
   const trips = useMyTrips();
@@ -62,6 +64,15 @@ export function ProfilePage() {
               ))}
             </List>
           )}
+        </Section>
+
+        <Section title="Directions" footer="Plans open their location in this app. Saved on this device.">
+          <Card className={s.appearance}>
+            <div className={s.appearanceRow}>
+              <div className="t-subhead t-bold">Maps app</div>
+              <SegmentedControl block label="Maps app" value={maps} onChange={(m) => { setMaps(m); setMapsApp(m); }} options={MAPS_APPS} />
+            </div>
+          </Card>
         </Section>
 
         <Section title="Appearance" footer="Saved on this device.">

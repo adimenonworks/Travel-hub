@@ -80,6 +80,7 @@
   --border-bold: var(--p-alpha-black-50);               /* input outlines, ≥ 3:1 */
   --border-bold-hover: var(--p-alpha-black-70);
   --border-focus: var(--p-emerald-800);
+  --border-selected: var(--p-emerald-800);              /* current tab underline, ≥ 3:1 */
 
   /* Disabled (exempt from contrast rules) */
   --disabled-background: var(--p-alpha-black-5);
@@ -112,7 +113,7 @@
 
   /* Shape — everything is a pill or a soft rounded rectangle */
   --radius-button: var(--p-radius-full);
-  --radius-control: var(--p-radius-full);  /* single-line fields, chips, tabs */
+  --radius-control: var(--p-radius-full);  /* single-line fields, chips */
   --radius-field: var(--p-radius-lg);      /* multi-line fields, dropdown menus */
   --radius-inner: var(--p-radius-md);      /* thumbnails, bubbles, things inside cards */
   --radius-card: var(--p-radius-lg);
@@ -205,6 +206,7 @@
     --border-bold: var(--p-alpha-white-40);
     --border-bold-hover: var(--p-alpha-white-70);
     --border-focus: var(--p-emerald-300);
+    --border-selected: var(--p-emerald-300);
     --disabled-background: var(--p-alpha-white-5);
     --disabled-foreground: var(--p-alpha-white-30);
     --overlay-bar: var(--p-alpha-black-85);
@@ -264,6 +266,7 @@
   --border-bold: var(--p-alpha-white-40);
   --border-bold-hover: var(--p-alpha-white-70);
   --border-focus: var(--p-emerald-300);
+  --border-selected: var(--p-emerald-300);
   --disabled-background: var(--p-alpha-white-5);
   --disabled-foreground: var(--p-alpha-white-30);
   --overlay-bar: var(--p-alpha-black-85);

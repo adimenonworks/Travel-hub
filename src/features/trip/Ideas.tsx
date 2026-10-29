@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Avatar, Badge, Button, Card, EmptyState, FieldRow, Icon, IconButton, SegmentedControl, Select, Sheet, TextArea, TextField } from '../../design/components';
 import { store } from '../../data';
 import { personName, useMe } from '../../data/hooks';
-import type { Category, Idea, LinkItem } from '../../data/types';
+import type { Category, Idea, LinkItem, Vote } from '../../data/types';
 import { CATEGORIES, categoryInfo } from '../../lib/categories';
 import { money } from '../../lib/format';
 import { Comments } from '../shared/Comments';
@@ -13,6 +13,11 @@ import s from './trip.module.css';
 
 type Filter = 'open' | 'approved' | 'rejected';
 
+const ups = (i: Idea) => Object.keys(i.votes ?? {}).length;
+const downs = (i: Idea) => Object.keys(i.downvotes ?? {}).length;
+/** Ideas are ranked by thumbs up minus thumbs down. */
+const score = (i: Idea) => ups(i) - downs(i);
+
 export function Ideas(ctx: TripCtx) {
   const { trip, ideas } = ctx;
   const [filter, setFilter] = useState<Filter>('open');
@@ -21,7 +26,7 @@ export function Ideas(ctx: TripCtx) {
 
   const shown = ideas
     .filter((i) => i.status === filter)
-    .sort((a, b) => Object.keys(b.votes).length - Object.keys(a.votes).length || b.createdAt - a.createdAt);
+    .sort((a, b) => score(b) - score(a) || b.createdAt - a.createdAt);
   const count = (f: Filter) => ideas.filter((i) => i.status === f).length;
 
   return (
@@ -66,8 +71,8 @@ function IdeaCard({ idea, ctx, onEdit, onApprove }: { idea: Idea; ctx: TripCtx; 
   const me = useMe();
   const [showComments, setShowComments] = useState(false);
   const cat = categoryInfo(idea.category);
-  const voted = !!idea.votes[me.uid];
-  const votes = Object.keys(idea.votes).length;
+  const mine: Vote = idea.votes?.[me.uid] ? 1 : idea.downvotes?.[me.uid] ? -1 : 0;
+  const vote = (v: 1 | -1) => store.setVote(ctx.trip.id, idea.id, me.uid, mine === v ? 0 : v);
   const nComments = ctx.comments.filter((c) => c.targetId === idea.id).length;
   const canEdit = ctx.canManage || idea.createdBy === me.uid;
   const author = personName(ctx.profiles, idea.createdBy);
@@ -86,10 +91,16 @@ function IdeaCard({ idea, ctx, onEdit, onApprove }: { idea: Idea; ctx: TripCtx; 
       {idea.notes && <div className={s.actNotes}>{idea.notes}</div>}
       <LinkChips links={idea.links} />
       <div className={s.ideaFoot}>
-        <button type="button" className={s.vote} aria-pressed={voted} onClick={() => store.toggleVote(ctx.trip.id, idea.id, me.uid, !voted)}
-          aria-label={voted ? 'Remove your vote' : 'Vote for this idea'}>
-          <Icon name="thumbs-up" size={16} />{votes}
-        </button>
+        <div className={s.votes} role="group" aria-label="Votes">
+          <button type="button" className={s.vote} aria-pressed={mine === 1} onClick={() => vote(1)}
+            aria-label={`Thumbs up, ${ups(idea)} ${ups(idea) === 1 ? 'vote' : 'votes'}`}>
+            <Icon name="thumbs-up" size={16} />{ups(idea)}
+          </button>
+          <button type="button" className={s.vote} aria-pressed={mine === -1} onClick={() => vote(-1)}
+            aria-label={`Thumbs down, ${downs(idea)} ${downs(idea) === 1 ? 'vote' : 'votes'}`}>
+            <Icon name="thumbs-down" size={16} />{downs(idea)}
+          </button>
+        </div>
         <Button size="small" variant="plain" icon="chat" onClick={() => setShowComments((v) => !v)} aria-expanded={showComments} aria-label={`Comments (${nComments})`}>{nComments || ''}</Button>
         <span className={s.spacer} />
         <Avatar name={author} photo={ctx.profiles[idea.createdBy]?.photo} seed={idea.createdBy} size={22} />
