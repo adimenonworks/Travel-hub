@@ -37,5 +37,10 @@ export function LinkEditor({ links, onChange }: { links: LinkItem[]; onChange: (
   );
 }
 
-export const cleanLinks = (links: LinkItem[]) =>
-  links.map((l) => ({ label: l.label.trim(), url: normalizeUrl(l.url) })).filter((l) => l.url);
+export const cleanLinks = (links: LinkItem[]): LinkItem[] =>
+  links
+    .map((l) => {
+      const email = l.emailUrl ? normalizeUrl(l.emailUrl) : '';
+      return { label: l.label.trim(), url: normalizeUrl(l.url), ...(email ? { emailUrl: email } : {}) };
+    })
+    .filter((l) => l.url);

@@ -4,6 +4,7 @@ import { Avatar, AvatarStack, Badge, Button, Card, CardLink, Icon, PageHeader, S
 import { personName, useActivitiesFor, useMe, useMyTrips, useProfile, useProfiles } from '../../data/hooks';
 import type { Activity, Category, Place, Trip } from '../../data/types';
 import { categoryInfo } from '../../lib/categories';
+import { coverPosition } from '../../lib/image';
 import { daysBetween, formatRange, today, tripPhase } from '../../lib/dates';
 import { Content } from '../../app/Shell';
 import { TripForm } from '../trip/TripForm';
@@ -91,7 +92,7 @@ function TripGroup({ title, trips, children }: { title: string; trips: Trip[]; c
           return (
             <CardLink key={t.id} to={`/trip/${t.id}`} flush className={[s.trip, t.coverPhoto && s.withPhoto].filter(Boolean).join(' ')}>
               {/* A cover photo fills the whole card, darkened at the bottom so the text stays readable. */}
-              {t.coverPhoto && <div className={s.photo} style={{ backgroundImage: `url(${t.coverPhoto})` }} />}
+              {t.coverPhoto && <div className={s.photo} style={{ backgroundImage: `url(${t.coverPhoto})`, backgroundPosition: coverPosition(t) }} />}
               <div className={s.tripBody}>
                 <span className={s.when}>
                   {t.coverPhoto

@@ -158,11 +158,16 @@ export function createLocalStore(): Store {
       d[field] = on ? Array.from(new Set([...arr, uid])) : arr.filter((x) => x !== uid);
       save();
     },
-    async toggleVote(tripId, ideaId, uid, on) {
+    async setVote(tripId, ideaId, uid, vote) {
       const d = sub(tripId, 'ideas')[ideaId];
       const votes = { ...((d.votes as Record<string, true>) ?? {}) };
-      if (on) votes[uid] = true; else delete votes[uid];
+      const downvotes = { ...((d.downvotes as Record<string, true>) ?? {}) };
+      delete votes[uid];
+      delete downvotes[uid];
+      if (vote === 1) votes[uid] = true;
+      if (vote === -1) downvotes[uid] = true;
       d.votes = votes;
+      d.downvotes = downvotes;
       save();
     },
 

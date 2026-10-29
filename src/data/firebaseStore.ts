@@ -179,8 +179,11 @@ export function createFirebaseStore(config: FirebaseOptions): Store {
     async toggleInArray(tripId, name, id, field, uid, on) {
       await updateDoc(doc(db, 'trips', tripId, name, id), { [field]: on ? arrayUnion(uid) : arrayRemove(uid) });
     },
-    async toggleVote(tripId, ideaId, uid, on) {
-      await updateDoc(doc(db, 'trips', tripId, 'ideas', ideaId), { [`votes.${uid}`]: on ? true : deleteField() });
+    async setVote(tripId, ideaId, uid, vote) {
+      await updateDoc(doc(db, 'trips', tripId, 'ideas', ideaId), {
+        [`votes.${uid}`]: vote === 1 ? true : deleteField(),
+        [`downvotes.${uid}`]: vote === -1 ? true : deleteField(),
+      });
     },
 
     async createInvite(trip) {

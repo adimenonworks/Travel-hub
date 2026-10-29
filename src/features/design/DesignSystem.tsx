@@ -98,6 +98,7 @@ export function DesignSystem() {
             <Button variant="tinted">Tinted</Button>
             <Button variant="gray">Gray</Button>
             <Button variant="plain">Plain</Button>
+            <Button variant="ghost" icon="pencil">Ghost</Button>
             <Button variant="destructive">Delete</Button>
             <Button icon="plus" size="small">Small</Button>
             <Button size="large">Large</Button>
@@ -108,7 +109,7 @@ export function DesignSystem() {
           </Card>
         </Section>
 
-        <Section title="Navigation" footer="Tabs are pill links. The top bar and each trip's sections use them.">
+        <Section title="Navigation" footer="Tabs switch between sections of a page (each trip uses them). The current tab is darker and underlined in emerald (--border-selected).">
           <Card>
             <Tabs label="Demo tabs" items={[
               { to: '/design', label: 'Current', active: true },
@@ -121,7 +122,7 @@ export function DesignSystem() {
         <Section title="Cards">
           <div className={s.cards}>
             <Card><div className="t-title3">Default card</div><p className="t-subhead t-secondary">White on the pale canvas, no shadow.</p></Card>
-            <Card tone="accent"><div className="t-title3">Brand card</div><p className="t-subhead t-secondary">For the one thing that matters most on a page.</p></Card>
+            <Card tone="accent"><div className="t-title3">Brand card</div><p className="t-subhead t-secondary">For the one thing that matters most on a page.</p><div><Button variant="inverse" icon="plus">Inverse button</Button></div></Card>
           </div>
         </Section>
 

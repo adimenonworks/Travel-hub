@@ -1,4 +1,4 @@
-import type { Invite, NewDoc, Profile, SubCollections, SubName, Trip, User } from './types';
+import type { Vote, Invite, NewDoc, Profile, SubCollections, SubName, Trip, User } from './types';
 
 export type Unsubscribe = () => void;
 
@@ -34,7 +34,8 @@ export interface Store {
   deleteSub(tripId: string, name: SubName, id: string): Promise<void>;
   /** Atomically add or remove `uid` from an array field / map field on a sub-document. */
   toggleInArray(tripId: string, name: SubName, id: string, field: string, uid: string, on: boolean): Promise<void>;
-  toggleVote(tripId: string, ideaId: string, uid: string, on: boolean): Promise<void>;
+  /** Set one person's vote on an idea: up, down, or none. A person has at most one of the two. */
+  setVote(tripId: string, ideaId: string, uid: string, vote: Vote): Promise<void>;
 
   createInvite(trip: Trip): Promise<string>;
   getInvite(code: string): Promise<Invite | null>;

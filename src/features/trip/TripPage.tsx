@@ -1,10 +1,12 @@
 import { useState } from 'react';
-import { Route, Routes, useNavigate, useParams } from 'react-router-dom';
+import { Route, Routes, useLocation, useMatch, useNavigate, useParams } from 'react-router-dom';
 import { Button, EmptyState, Icon, LinkButton, PageHeader, Spinner, Tabs, type TabItem } from '../../design/components';
 import { useProfiles, useRole, useSub, useTrip } from '../../data/hooks';
 import type { Activity, Album, Comment, Expense, Idea, Profile, Trip } from '../../data/types';
 import { daysBetween, formatRange } from '../../lib/dates';
+import { coverPosition } from '../../lib/image';
 import { Content } from '../../app/Shell';
+import { ActivityPage } from './ActivityPage';
 import { Budget } from './Budget';
 import { Ideas } from './Ideas';
 import { Info } from './Info';
@@ -50,20 +52,31 @@ function TripLoaded({ trip }: { trip: Trip }) {
   const { canManage, isOwner } = useRole(trip);
   const [editing, setEditing] = useState(false);
   const navigate = useNavigate();
+  const { pathname } = useLocation();
+  const planPage = useMatch('/trip/:tripId/plan/:activityId');
 
   if (!activities || !ideas || !expenses || !comments || !albums) return <Spinner center />;
   const ctx: TripCtx = { trip, activities, ideas, expenses, comments, albums, profiles, canManage, isOwner };
   const nDays = daysBetween(trip.startDate, trip.endDate) + 1;
 
   const base = `/trip/${trip.id}`;
+  const section = pathname.slice(base.length + 1).split('/')[0];
   const tabs: TabItem[] = [
-    { to: base, label: 'Itinerary', end: true },
-    { to: `${base}/ideas`, label: 'Ideas', count: ideas.filter((i) => i.status === 'open').length },
-    { to: `${base}/budget`, label: 'Budget' },
-    { to: `${base}/photos`, label: 'Photos', count: albums.length },
-    { to: `${base}/info`, label: 'Info' },
-    { to: `${base}/people`, label: 'People' },
+    { to: base, label: 'Itinerary', active: section === '' },
+    { to: `${base}/ideas`, label: 'Ideas', count: ideas.filter((i) => i.status === 'open').length, active: section === 'ideas' },
+    { to: `${base}/budget`, label: 'Budget', active: section === 'budget' },
+    { to: `${base}/photos`, label: 'Photos', count: albums.length, active: section === 'photos' },
+    { to: `${base}/info`, label: 'Info', active: section === 'info' },
+    { to: `${base}/people`, label: 'People', active: section === 'people' },
   ];
+
+  // A plan's own page replaces the trip header and tabs.
+  if (planPage)
+    return (
+      <Content>
+        <Routes><Route path="plan/:activityId" element={<ActivityPage {...ctx} />} /></Routes>
+      </Content>
+    );
 
   return (
     <>
@@ -71,13 +84,13 @@ function TripLoaded({ trip }: { trip: Trip }) {
         <PageHeader
           title={trip.name}
           back={{ to: '/', label: 'Trips' }}
-          actions={canManage && <Button variant="gray" icon="pencil" onClick={() => setEditing(true)}>Edit trip</Button>}
         />
         <div className={s.hero}>
-          {trip.coverPhoto && <img src={trip.coverPhoto} alt="" className={s.heroPhoto} />}
+          {trip.coverPhoto && <img src={trip.coverPhoto} alt="" className={s.heroPhoto} style={{ objectPosition: coverPosition(trip) }} />}
           <span><Icon name="pin" size={20} />{trip.destination?.name ?? 'No destination'}</span>
           <span><Icon name="calendar" size={20} />{formatRange(trip.startDate, trip.endDate)} · {nDays} day{nDays === 1 ? '' : 's'}</span>
           <span><Icon name="people" size={20} />{trip.memberIds.length} traveler{trip.memberIds.length === 1 ? '' : 's'}</span>
+          {canManage && <Button variant="ghost" icon="pencil" className={s.heroEdit} onClick={() => setEditing(true)}>Edit trip</Button>}
         </div>
         <div className={s.sectionNav}>
           <Tabs items={tabs} label="Trip sections" />

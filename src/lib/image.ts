@@ -38,3 +38,7 @@ function load(file: File) {
     img.src = url;
   });
 }
+
+/** CSS object-position for a trip's cover photo: the part the owner dragged into view, or the centre. */
+export const coverPosition = (t: { coverPosition?: { x: number; y: number } | null }) =>
+  t.coverPosition ? `${t.coverPosition.x}% ${t.coverPosition.y}%` : '50% 50%';

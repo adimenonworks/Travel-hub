@@ -24,6 +24,8 @@ export type Trip = {
   coverColor?: string;
   /** Small JPEG as a data URL (see lib/image.ts), or null for none. */
   coverPhoto?: string | null;
+  /** Which part of the cover photo shows when it's cropped: CSS object-position in % (50/50 = centre). */
+  coverPosition?: { x: number; y: number } | null;
   ownerId: string;
   memberIds: string[];
   roles: Record<string, Role>;
@@ -31,7 +33,8 @@ export type Trip = {
   createdAt: number;
 };
 
-export type LinkItem = { label: string; url: string };
+/** A link, PDF or booking. `emailUrl` optionally points at the email it came from (e.g. a Gmail message link). */
+export type LinkItem = { label: string; url: string; emailUrl?: string };
 
 export type Category = 'activity' | 'food' | 'drinks' | 'cafe' | 'sight' | 'transport' | 'stay' | 'other';
 
@@ -52,6 +55,9 @@ export type Activity = {
   createdAt: number;
 };
 
+/** 1 = thumbs up, -1 = thumbs down, 0 = no vote. */
+export type Vote = 1 | -1 | 0;
+
 export type IdeaStatus = 'open' | 'approved' | 'rejected';
 
 export type Idea = {
@@ -62,6 +68,8 @@ export type Idea = {
   cost: number;
   links: LinkItem[];
   votes: Record<string, true>;
+  /** Thumbs-down votes. Older ideas don't have this field. */
+  downvotes?: Record<string, true>;
   status: IdeaStatus;
   activityId?: string;
   createdBy: string;

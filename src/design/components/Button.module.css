@@ -37,6 +37,11 @@
 .plain { background: transparent; color: var(--text-link); padding: 0 var(--space-sm); text-decoration: underline; text-underline-offset: 3px; }
 .plain:hover:not(:disabled) { background: var(--interactive-ghost-hover); color: var(--text-link-hover); }
 .plain:active:not(:disabled) { background: var(--interactive-ghost-pressed); color: var(--text-link-pressed); }
+/* Ghost: no fill, grey text and icon; the fill appears on hover */
+.ghost { background: transparent; color: var(--text-body); }
+.ghost:hover:not(:disabled) { background: var(--interactive-ghost-hover); }
+.ghost:active:not(:disabled) { background: var(--interactive-ghost-pressed); }
+.ghost:disabled { background: transparent; }
 /* Inverse: dark, for sitting on bright emerald */
 .inverse { background: var(--interactive-inverse); color: var(--text-on-inverse); }
 .inverse:hover:not(:disabled) { background: var(--interactive-inverse-hover); }
