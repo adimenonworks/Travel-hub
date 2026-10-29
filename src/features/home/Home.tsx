@@ -31,7 +31,7 @@ export function Home() {
   return (
     <>
       <Content>
-        <PageHeader title="Trips" actions={<Button icon="plus" onClick={() => setCreating(true)}>New trip</Button>} />
+        <PageHeader title="Where to next?" actions={<Button icon="plus" onClick={() => setCreating(true)}>New trip</Button>} />
         <section className={s.profile} aria-label="You">
           {/* With no top bar, this is the way into your profile and settings. */}
           <Link to="/profile" className={s.me} aria-label={`Profile and settings: ${me.name}`}>
