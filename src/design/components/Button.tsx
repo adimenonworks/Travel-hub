@@ -3,7 +3,8 @@ import { Link } from 'react-router-dom';
 import { Icon, type IconName } from './Icon';
 import s from './Button.module.css';
 
-export type ButtonVariant = 'filled' | 'tinted' | 'gray' | 'plain' | 'destructive';
+/** `inverse` is the dark button for bright brand surfaces (e.g. the accent card). */
+export type ButtonVariant = 'filled' | 'tinted' | 'gray' | 'plain' | 'destructive' | 'inverse';
 
 type Props = ButtonHTMLAttributes<HTMLButtonElement> & {
   variant?: ButtonVariant;

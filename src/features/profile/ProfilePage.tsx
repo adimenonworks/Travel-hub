@@ -1,8 +1,10 @@
-import { useState } from 'react';
-import { Avatar, Button, Card, IconButton, List, ListRow, PageHeader, SegmentedControl, Section } from '../../design/components';
+import { useEffect, useRef, useState, type FormEvent } from 'react';
+import { Avatar, Button, Card, IconButton, List, ListRow, PageHeader, SegmentedControl, Section, TextField } from '../../design/components';
 import { store } from '../../data';
-import { useMe, useProfile } from '../../data/hooks';
+import { useMe, useMyTrips, useProfile } from '../../data/hooks';
 import type { Place } from '../../data/types';
+import { tripPhase } from '../../lib/dates';
+import { shrinkPhoto } from '../../lib/image';
 import { applyTheme, getTheme, type ThemePref } from '../../lib/theme';
 import { Content } from '../../app/Shell';
 import { CityPicker } from '../shared/CityPicker';
@@ -15,7 +17,9 @@ export function ProfilePage() {
   const [theme, setTheme] = useState<ThemePref>(getTheme);
   const [adding, setAdding] = useState<Place | null>(null);
   const [pickerKey, setPickerKey] = useState(0);
+  const trips = useMyTrips();
   const visited = profile?.visited ?? [];
+  const pastPlaces = (trips ?? []).filter((t) => t.destination && tripPhase(t.startDate, t.endDate) === 'past').map((t) => t.destination!);
 
   const addPlace = async () => {
     if (!adding) return;
@@ -28,14 +32,7 @@ export function ProfilePage() {
     <>
       <Content>
         <PageHeader title="Profile" back={{ to: '/', label: 'Trips' }} />
-        <Card className={s.head}>
-          <Avatar name={me.name} photo={me.photo} seed={me.uid} size={72} />
-          <div>
-            <h2 className="t-title2">{me.name}</h2>
-            {me.email && <div className="t-subhead t-secondary">{me.email}</div>}
-            <div className="t-subhead t-secondary">{store.mode === 'demo' ? 'Demo account' : 'Signed in with Google'}</div>
-          </div>
-        </Card>
+        <ProfileCard uid={me.uid} name={profile?.name || me.name} photo={profile ? profile.photo : me.photo} email={me.email} />
 
         <Section title="Home" footer="Start typing and pick your city from the list. It appears on your maps with a home pin.">
           <Card className={s.add}>
@@ -47,10 +44,11 @@ export function ProfilePage() {
           </Card>
         </Section>
 
-        <Section title="Places I've been" footer="These show on your Trips map, along with the destinations of past trips.">
+        <Section title="Places I've been" footer="The map shows these, your home city and the destinations of past trips.">
           <MapView pins={[
             ...(profile?.home ? [{ lat: profile.home.lat, lng: profile.home.lng, label: `Home · ${profile.home.name}`, kind: 'home' as const }] : []),
             ...visited.map((v) => ({ lat: v.lat, lng: v.lng, label: v.name })),
+            ...pastPlaces.filter((p) => !visited.some((v) => v.name === p.name)).map((p) => ({ lat: p.lat, lng: p.lng, label: p.name })),
           ]} height={240} />
           <Card className={s.add}>
             <div className={s.addField}><CityPicker key={pickerKey} label="Add a place" placeholder="Tokyo" value={adding} onChange={setAdding} /></div>
@@ -79,5 +77,69 @@ export function ProfilePage() {
         <div><Button variant="destructive" icon="signout" onClick={() => store.signOut()}>Sign out</Button></div>
       </Content>
     </>
+  );
+}
+
+/** Your photo and nickname. They're what other people on your trips see. */
+function ProfileCard({ uid, name, photo, email }: { uid: string; name: string; photo: string | null; email?: string | null }) {
+  const input = useRef<HTMLInputElement>(null);
+  const [draft, setDraft] = useState(name);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState('');
+  const [saved, setSaved] = useState(false);
+  useEffect(() => setDraft(name), [name]);
+
+  const pick = async (file?: File) => {
+    if (!file) return;
+    setBusy(true);
+    setError('');
+    try {
+      const url = await shrinkPhoto(file, 256, 256);
+      await store.saveProfile(uid, { photo: url });
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "That photo couldn't be used.");
+    } finally {
+      setBusy(false);
+      if (input.current) input.current.value = '';
+    }
+  };
+
+  const saveName = async (e: FormEvent) => {
+    e.preventDefault();
+    const next = draft.trim();
+    if (!next || next === name) return;
+    await store.saveProfile(uid, { name: next });
+    setSaved(true);
+  };
+
+  const trimmed = draft.trim();
+  return (
+    <Card className={s.head}>
+      <div className={s.who}>
+        <Avatar name={name} photo={photo} seed={uid} size={72} />
+        <div className={s.whoText}>
+          <h2 className="t-title2">{name}</h2>
+          {email && <div className="t-subhead t-secondary">{email}</div>}
+          <div className="t-subhead t-secondary">{store.mode === 'demo' ? 'Demo account' : 'Signed in with Google'}</div>
+        </div>
+      </div>
+      <div className={s.photoButtons}>
+        <Button variant="tinted" size="small" icon="photo" onClick={() => input.current?.click()} disabled={busy}>
+          {busy ? 'Preparing photo…' : photo ? 'Change photo' : 'Add photo'}
+        </Button>
+        {photo && <Button variant="plain" size="small" onClick={() => store.saveProfile(uid, { photo: null })}>Remove photo</Button>}
+      </div>
+      <input ref={input} type="file" accept="image/*" className="visually-hidden" tabIndex={-1} aria-hidden="true"
+        onChange={(e) => pick(e.target.files?.[0])} />
+      {error && <p className="t-footnote t-danger" role="alert">{error}</p>}
+      <form className={s.nameRow} onSubmit={saveName}>
+        <div className={s.addField}>
+          <TextField label="Nickname" value={draft} maxLength={40} autoComplete="nickname" aria-describedby="nickname-hint"
+            onChange={(e) => { setDraft(e.target.value); setSaved(false); }} />
+        </div>
+        <Button type="submit" disabled={!trimmed || trimmed === name}>Save</Button>
+      </form>
+      <p id="nickname-hint" className="t-footnote t-secondary" role="status">{saved && draft === name ? 'Saved.' : 'What people on your trips see.'}</p>
+    </Card>
   );
 }

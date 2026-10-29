@@ -1,27 +1,34 @@
-/* Header: a quiet outlined area (no fill). The left side links to your profile and settings. */
+/* Header: a quiet outlined area. Only the avatar is a button (emerald ring) and leads to Profile. */
 .profile {
-  display: grid; grid-template-columns: 1fr; gap: var(--space-md);
+  display: flex; align-items: center; gap: var(--space-lg);
   padding: var(--space-inset);
   border: 1px solid var(--border-subtle); border-radius: var(--radius-card);
 }
-.me {
-  display: flex; align-items: center; gap: var(--space-lg); min-width: 0;
-  margin: calc(-1 * var(--space-xs)); padding: var(--space-xs);
-  border-radius: var(--radius-inner); color: var(--text-primary);
+.me { flex: none; display: grid; place-items: center; padding: 4px; border-radius: 50%; background: var(--interactive-primary); transition: background var(--motion-fast); }
+.me:hover { background: var(--interactive-primary-hover); }
+.me:active { background: var(--interactive-primary-pressed); }
+
+/* Plan card: the bright moment that replaces the New trip button */
+.plan { display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-sm); padding: var(--space-xl) var(--space-inset); }
+.planTitle { font: var(--p-weight-semibold) var(--p-size-title1)/var(--p-leading-title1) var(--font-display); letter-spacing: var(--p-tracking-title1); }
+.planPlace { display: inline-block; animation: planIn var(--motion-base); }
+@keyframes planIn { from { opacity: 0; transform: translateY(6px); } }
+@media (prefers-reduced-motion: reduce) { .planPlace { animation: none; } }
+.plan > div { margin-top: var(--space-sm); }
+@media (min-width: 744px) { .plan { padding: var(--space-2xl); } }
+
+.emptyPast {
+  padding: var(--space-2xl) var(--space-inset); text-align: center;
+  border: 1px solid var(--border-subtle); border-radius: var(--radius-card);
+  color: var(--text-subtle); font-size: var(--p-size-subhead); line-height: var(--p-leading-subhead);
 }
-.me:hover { background: var(--interactive-ghost-hover); }
-.me:active { background: var(--interactive-ghost-pressed); }
-.meChevron { flex: none; margin-left: auto; color: var(--icon-subtle); }
-.profileText { display: flex; flex-direction: column; gap: var(--space-xxs); min-width: 0; }
-.stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-xs); border-top: 1px solid var(--border-subtle); padding-top: var(--space-md); color: var(--text-primary); }
-@media (min-width: 744px) {
-  .profile { grid-template-columns: 1fr auto; align-items: center; gap: var(--space-2xl); padding: var(--space-xl); }
-  .me { margin-right: 0; }
-  .meChevron { margin-left: 0; }
-  .stats { border-top: 0; padding-top: 0; gap: var(--space-2xl); }
-}
-.stat { text-align: center; }
-.statValue { font: var(--p-weight-black) var(--p-size-title1)/1.1 var(--font-display); letter-spacing: var(--p-tracking-title1); font-variant-numeric: tabular-nums; }
+
+/* Your travels */
+.stats { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-sm); }
+@media (min-width: 744px) { .stats { grid-template-columns: repeat(5, 1fr); } }
+.stat { display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-xxs); padding: var(--space-md); border-radius: var(--radius-card); background: var(--surface-background-secondary); border: 1px solid var(--border-subtle); }
+.statIcon { display: grid; place-items: center; width: 32px; height: 32px; border-radius: 50%; background: var(--surface-brand-subtle); color: var(--icon-brand); margin-bottom: var(--space-xs); }
+.statValue { font: var(--p-weight-black) var(--p-size-title1)/1.1 var(--font-display); letter-spacing: var(--p-tracking-title1); font-variant-numeric: tabular-nums; color: var(--text-primary); }
 
 .grid { display: grid; gap: var(--space-md); grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); }
 

@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
 import { store } from './index';
-import type { Profile, Role, SubCollections, SubName, Trip, User } from './types';
+import type { Activity, Profile, Role, SubCollections, SubName, Trip, User } from './types';
 
 type AuthState = { user: User | null; loading: boolean };
 const AuthContext = createContext<AuthState>({ user: null, loading: true });
@@ -40,6 +40,18 @@ export function useSub<K extends SubName>(tripId: string, name: K) {
   const [items, setItems] = useState<SubCollections[K][] | null>(null);
   useEffect(() => store.watchSub(tripId, name, setItems), [tripId, name]);
   return items;
+}
+
+/** Activities for several trips, keyed by trip id (used for the travel metrics on Home). */
+export function useActivitiesFor(tripIds: string[]) {
+  const key = tripIds.join(',');
+  const [byTrip, setByTrip] = useState<Record<string, Activity[]>>({});
+  useEffect(() => {
+    const offs = tripIds.map((id) => store.watchSub(id, 'activities', (items) => setByTrip((m) => ({ ...m, [id]: items }))));
+    return () => offs.forEach((off) => off());
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [key]);
+  return byTrip;
 }
 
 export function useProfile(uid: string) {
