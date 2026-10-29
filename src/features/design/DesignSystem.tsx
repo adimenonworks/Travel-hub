@@ -18,7 +18,7 @@ const colorGroups: { title: string; tokens: string[] }[] = [
 ];
 
 const typeStyles = [
-  ['t-display', 'Display', '40–72 / 1.0 Clash Display Bold'],
+  ['t-display', 'Display', '40–72 / 0.95 Bricolage Grotesque ExtraBold, 80% width'],
   ['t-title1', 'Title 1', '32 / 38 Manrope Semibold'],
   ['t-title2', 'Title 2', '24 / 31 Semibold'],
   ['t-title3', 'Title 3', '20 / 26 Semibold'],
