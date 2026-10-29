@@ -1,5 +1,5 @@
 import { useState, type CSSProperties } from 'react';
-import { Route, Routes, useParams } from 'react-router-dom';
+import { Route, Routes, useNavigate, useParams } from 'react-router-dom';
 import { Button, EmptyState, Icon, LinkButton, PageHeader, Spinner, Tabs, type TabItem } from '../../design/components';
 import { useProfiles, useRole, useSub, useTrip } from '../../data/hooks';
 import type { Activity, Album, Comment, Expense, Idea, Profile, Trip } from '../../data/types';
@@ -50,6 +50,7 @@ function TripLoaded({ trip }: { trip: Trip }) {
   const profiles = useProfiles(trip.memberIds);
   const { canManage, isOwner } = useRole(trip);
   const [editing, setEditing] = useState(false);
+  const navigate = useNavigate();
 
   if (!activities || !ideas || !expenses || !comments || !albums) return <Spinner center />;
   const ctx: TripCtx = { trip, activities, ideas, expenses, comments, albums, profiles, canManage, isOwner };
@@ -91,7 +92,7 @@ function TripLoaded({ trip }: { trip: Trip }) {
           <Route path="people" element={<People {...ctx} />} />
         </Routes>
       </Content>
-      <TripForm open={editing} trip={trip} onClose={() => setEditing(false)} />
+      <TripForm open={editing} trip={trip} onClose={() => setEditing(false)} onDeleted={isOwner ? () => navigate('/') : undefined} />
     </>
   );
 }
