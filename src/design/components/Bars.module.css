@@ -9,14 +9,15 @@
   min-height: var(--size-tap); padding: 0 var(--space-md) 0 var(--space-sm);
   margin-left: calc(-1 * var(--space-sm));
   border-radius: var(--radius-pill);
-  color: var(--color-tint);
+  color: var(--text-link);
   font: var(--p-weight-semibold) var(--p-size-callout)/1 var(--font-text);
 }
-.back:hover { background: var(--color-fill-tertiary); }
+.back:hover { background: var(--interactive-ghost-hover); color: var(--text-link-hover); }
+.back:active { background: var(--interactive-ghost-pressed); color: var(--text-link-pressed); }
 .titleRow { display: flex; align-items: flex-end; justify-content: space-between; gap: var(--space-md); flex-wrap: wrap; }
 .titleText { display: flex; flex-direction: column; gap: var(--space-xs); min-width: 0; }
-.title { font: var(--p-weight-black) var(--p-size-display)/var(--p-leading-display) var(--font-display); letter-spacing: var(--p-tracking-display); overflow-wrap: anywhere; }
-.subtitle { color: var(--color-label-secondary); font-size: var(--p-size-callout); line-height: var(--p-leading-callout); }
+.title { font: var(--p-weight-black) var(--p-size-display)/var(--p-leading-display) var(--font-display); letter-spacing: var(--p-tracking-display); overflow-wrap: anywhere; color: var(--text-primary); }
+.subtitle { color: var(--text-subtle); font-size: var(--p-size-callout); line-height: var(--p-leading-callout); }
 .actions { display: flex; align-items: center; gap: var(--space-xs); }
 
 /* Tabs: a row of pills; scrolls sideways inside itself if it can't fit */
@@ -32,11 +33,14 @@
   display: inline-flex; align-items: center; justify-content: center; gap: var(--space-xs);
   min-height: var(--size-tap); padding: 0 var(--space-lg);
   border-radius: var(--radius-pill);
-  color: var(--color-label);
+  color: var(--text-body);
   font: var(--p-weight-semibold) var(--p-size-callout)/1 var(--font-text);
   white-space: nowrap;
   transition: background var(--motion-fast), color var(--motion-fast);
 }
-.tab:hover { background: var(--color-fill-tertiary); }
-.tab[aria-current='page'] { background: var(--color-tint); color: var(--color-on-tint); }
+.tab:hover { background: var(--interactive-ghost-hover); }
+.tab:active { background: var(--interactive-ghost-pressed); }
+.tab[aria-current='page'] { background: var(--interactive-selected); color: var(--text-on-selected); }
+.tab[aria-current='page']:hover { background: var(--interactive-selected-hover); }
+.tab[aria-current='page']:active { background: var(--interactive-selected-pressed); }
 .count { font-variant-numeric: tabular-nums; opacity: 0.8; }

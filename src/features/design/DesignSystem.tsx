@@ -6,13 +6,15 @@ import {
 import { COVER_COLORS } from '../../lib/colors';
 import s from './DesignSystem.module.css';
 
+// Same groups and names as the Figma "Color" collection.
 const colorGroups: { title: string; tokens: string[] }[] = [
-  { title: 'Accent (changes with Profile → Appearance)', tokens: ['--color-accent', '--color-on-accent', '--color-tint', '--color-on-tint', '--color-tint-subtle'] },
-  { title: 'Status', tokens: ['--color-success', '--color-warning', '--color-danger', '--color-success-subtle', '--color-warning-subtle', '--color-danger-subtle'] },
-  { title: 'Categories (brights, text is --color-on-bright)', tokens: ['--color-cat-activity', '--color-cat-food', '--color-cat-cafe', '--color-cat-drinks', '--color-cat-sight', '--color-cat-transport', '--color-cat-stay', '--color-cat-other'] },
-  { title: 'Labels', tokens: ['--color-label', '--color-label-secondary', '--color-label-tertiary', '--color-on-bright'] },
-  { title: 'Surfaces', tokens: ['--color-bg', '--color-surface', '--color-bg-elevated'] },
-  { title: 'Fills & lines', tokens: ['--color-fill', '--color-fill-tertiary', '--color-fill-quaternary', '--color-separator', '--color-border-control'] },
+  { title: 'Text', tokens: ['--text-primary', '--text-body', '--text-subtle', '--text-inverse', '--text-brand', '--text-link', '--text-link-hover', '--text-link-pressed', '--text-on-brand', '--text-on-secondary', '--text-on-selected', '--text-on-destructive', '--text-field-label', '--text-field-placeholder'] },
+  { title: 'Icon', tokens: ['--icon-primary', '--icon-subtle', '--icon-inverse', '--icon-brand', '--icon-brand-hover', '--icon-on-brand', '--icon-on-secondary', '--icon-on-selected', '--icon-on-destructive'] },
+  { title: 'Status', tokens: ['--status-success', '--status-warning', '--status-error', '--status-success-subtle', '--status-warning-subtle', '--status-error-subtle'] },
+  { title: 'Surface', tokens: ['--surface-background-primary', '--surface-background-secondary', '--surface-background-tertiary', '--surface-brand', '--surface-brand-subtle', '--surface-sunken'] },
+  { title: 'Interactive (hover lighter, pressed darker)', tokens: ['--interactive-primary', '--interactive-primary-hover', '--interactive-primary-pressed', '--interactive-secondary', '--interactive-secondary-hover', '--interactive-secondary-pressed', '--interactive-neutral', '--interactive-neutral-hover', '--interactive-neutral-pressed', '--interactive-selected', '--interactive-selected-hover', '--interactive-selected-pressed', '--interactive-destructive', '--interactive-destructive-hover', '--interactive-destructive-pressed', '--interactive-ghost-hover', '--interactive-ghost-pressed'] },
+  { title: 'Border', tokens: ['--border-subtle', '--border-bold', '--border-bold-hover', '--border-focus'] },
+  { title: 'Disabled & overlay', tokens: ['--disabled-background', '--disabled-foreground', '--overlay-bar', '--overlay-scrim'] },
 ];
 
 const typeStyles = [
@@ -36,14 +38,14 @@ const icons: IconName[] = ['plus', 'calendar', 'lightbulb', 'wallet', 'cloud', '
 /** Living reference for tokens and components, at /#/design. */
 export function DesignSystem() {
   const [seg, setSeg] = useState<'a' | 'b' | 'c'>('a');
-  const [color, setColor] = useState('lime');
+  const [color, setColor] = useState('emerald');
   const [sheet, setSheet] = useState(false);
 
   return (
     <>
       <div className={s.page}>
-        <PageHeader title="Design system" subtitle="Primitives → semantic tokens → components. Bold, bright and rounded, inspired by Wise. Every text pairing meets WCAG 2.2 AA." />
-        <Section title="Colour" footer="Semantic tokens from src/design/tokens/semantic.css. Use Profile → Appearance to change the accent or switch to dark mode.">
+        <PageHeader title="Design system" subtitle="Primitives → semantic tokens → components. One brand colour (emerald), light and dark mode. Every text pairing meets WCAG 2.2 AA." />
+        <Section title="Colour" footer="Semantic tokens from src/design/tokens/semantic.css. Switch light/dark mode in Profile → Appearance.">
           {colorGroups.map((g) => (
             <Card key={g.title}>
               <div className="t-headline" style={{ marginBottom: 'var(--space-sm)' }}>{g.title}</div>
@@ -51,7 +53,7 @@ export function DesignSystem() {
                 {g.tokens.map((t) => (
                   <div key={t} className={s.swatch}>
                     <div className={s.chip} style={{ background: `var(${t})` }} />
-                    <code className={s.code}>{t.replace('--color-', '')}</code>
+                    <code className={s.code}>{t.replace('--', '')}</code>
                   </div>
                 ))}
               </div>
@@ -118,8 +120,8 @@ export function DesignSystem() {
 
         <Section title="Cards">
           <div className={s.cards}>
-            <Card><div className="t-title3">Default card</div><p className="t-subhead t-secondary">White on the sage canvas, no shadow.</p></Card>
-            <Card tone="accent"><div className="t-title3">Accent card</div><p className="t-subhead t-secondary">For the one thing that matters most on a page.</p></Card>
+            <Card><div className="t-title3">Default card</div><p className="t-subhead t-secondary">White on the pale canvas, no shadow.</p></Card>
+            <Card tone="accent"><div className="t-title3">Brand card</div><p className="t-subhead t-secondary">For the one thing that matters most on a page.</p></Card>
           </div>
         </Section>
 
@@ -142,7 +144,7 @@ export function DesignSystem() {
         <Section title="Lists">
           <List>
             <ListRow icon="calendar" title="With icon" subtitle="And a subtitle" chevron onClick={() => {}} />
-            <ListRow icon="wallet" iconColor="var(--color-success)" title="Trailing value" trailing="$120" />
+            <ListRow icon="wallet" title="Trailing value" trailing="$120" />
             <ListRow leading={<Avatar name="Sam Rivera" size={32} />} title="With avatar" trailing={<Badge tone="tint">Owner</Badge>} />
           </List>
         </Section>
@@ -150,7 +152,7 @@ export function DesignSystem() {
         <Section title="Feedback & identity">
           <Card className={s.stack}>
             <div className={s.row}>
-              <Badge>Neutral</Badge><Badge tone="tint">Tint</Badge><Badge tone="success" icon="check">Success</Badge><Badge tone="warning">Warning</Badge><Badge tone="danger">Danger</Badge>
+              <Badge>Neutral</Badge><Badge tone="tint">Tint</Badge><Badge tone="success" icon="check">Success</Badge><Badge tone="warning">Warning</Badge><Badge tone="error">Error</Badge><Badge tone="category" icon="sun">Category</Badge>
             </div>
             <div className={s.row}>
               <Avatar name="Alex Kim" size={44} /><Avatar name="Jo" size={32} />

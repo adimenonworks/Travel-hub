@@ -15,6 +15,9 @@ type View = 'me' | 'group';
  * Activity costs are per person (counted for each attendee). Expenses are
  * group totals split evenly across members. The daily budget is per person.
  */
+/** Categories have no colours of their own, so the chart uses shades of the brand ink (largest category darkest). */
+const shade = (i: number) => Math.max(0.25, 1 - i * 0.18);
+
 export function Budget({ trip, activities, expenses, profiles, canManage }: TripCtx) {
   const me = useMe();
   const [view, setView] = useState<View>('me');
@@ -68,7 +71,7 @@ export function Budget({ trip, activities, expenses, profiles, canManage }: Trip
               <div key={d.date} className={s.barRow}>
                 <span className="t-secondary">Day {i + 1}<br /><span className="t-caption1">{formatDay(d.date, { month: 'short', day: 'numeric' })}</span></span>
                 <div className={s.barTrack} role="img" aria-label={`Day ${i + 1}: ${fmt(d.total)}`}>
-                  <div className={s.barFill} style={{ width: `${(d.total / scaleMax) * 100}%`, '--bar-color': over ? 'var(--color-danger)' : 'var(--color-tint)' } as CSSProperties} />
+                  <div className={s.barFill} style={{ width: `${(d.total / scaleMax) * 100}%`, '--bar-color': over ? 'var(--status-error)' : 'var(--icon-brand)' } as CSSProperties} />
                   {dayLimit > 0 && <div className={s.barLimit} style={{ left: `calc(${(dayLimit / scaleMax) * 100}% - 1px)` }} />}
                 </div>
                 <span className={[s.barValue, over && s.over].filter(Boolean).join(' ')}>{fmt(d.total)}</span>
@@ -89,10 +92,10 @@ export function Budget({ trip, activities, expenses, profiles, canManage }: Trip
         <Section title="By category">
           <Card className={s.bars}>
             <div className={s.cats}>
-              {cats.map(([c, v]) => <div key={c} style={{ flex: v, background: categoryInfo(c).color }} title={`${categoryInfo(c).label}: ${fmt(v)}`} />)}
+              {cats.map(([c, v], i) => <div key={c} style={{ flex: v, background: 'var(--icon-brand)', opacity: shade(i) }} title={`${categoryInfo(c).label}: ${fmt(v)}`} />)}
             </div>
             <div className={s.legend}>
-              {cats.map(([c, v]) => <span key={c}><i style={{ background: categoryInfo(c).color }} />{categoryInfo(c).label} {fmt(v)}</span>)}
+              {cats.map(([c, v], i) => <span key={c}><i style={{ background: 'var(--icon-brand)', opacity: shade(i) }} />{categoryInfo(c).label} {fmt(v)}</span>)}
             </div>
           </Card>
         </Section>
@@ -107,7 +110,7 @@ export function Budget({ trip, activities, expenses, profiles, canManage }: Trip
             {expenses.slice().sort((a, b) => (a.date || '0').localeCompare(b.date || '0')).map((e) => {
               const c = categoryInfo(e.category);
               return (
-                <ListRow key={e.id} icon={c.icon} iconColor={c.color} title={e.title}
+                <ListRow key={e.id} icon={c.icon} title={e.title}
                   subtitle={`${e.date ? formatDay(e.date) : 'Whole trip'} · paid by ${personName(profiles, e.paidBy)}`}
                   trailing={<span className="t-num">{fmt(e.amount)}</span>} chevron onClick={() => setEditing(e)} />
               );

@@ -94,7 +94,7 @@ function ActivityCard({ a, ctx, onEdit }: { a: Activity; ctx: TripCtx; onEdit: (
           <div>
             <h3 className="t-title3">{a.title}</h3>
             <div className={s.actMeta}>
-              <Badge color={cat.color}>{cat.label}</Badge>
+              <Badge tone="category" icon={cat.icon}>{cat.label}</Badge>
               {a.cost > 0 && <Badge>{money(a.cost, ctx.trip.currency)} pp</Badge>}
             </div>
           </div>

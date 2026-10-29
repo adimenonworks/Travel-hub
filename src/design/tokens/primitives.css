@@ -1,57 +1,35 @@
 /*
  * Primitives — raw values only. Nothing in the app should reference these
  * directly; components consume the semantic tokens in semantic.css.
- * Inspired by Wise (see DESIGN.md at the repo root): bright fills always carry
- * a dark partner colour for text, a sage canvas holds white cards, and hero
- * type is weight 900 while everything else is semibold.
- * Every text pairing here meets WCAG 2.2 AA (most meet AAA).
+ * Inspired by Wise (see DESIGN.md at the repo root): one bright brand colour (emerald)
+ * with its deep partner as text, a pale neutral canvas with white cards, and hero
+ * type at weight 900 while everything else is semibold.
  */
 :root {
-  /* Brights: fills, always with dark text on top (≥ 10:1 with --p-ink) */
-  --p-emerald: #2ee6b6;
-  --p-lime: #9fe870;
-  --p-lemon: #ffeb69;
-  --p-tangerine: #ffa770;
-  --p-bubblegum: #ffa3da;
-  --p-lavender: #c2b0ff;
-  --p-aqua: #7ee0d6;
-  --p-sky: #8fcbff;
-  --p-sand: #e9cc9e;
-  --p-stone: #d3d6ce;
+  /*
+   * Colour palettes: white (0) to our black #181D1B (1000) in 11 steps.
+   * Every palette has the same contrast against white at the same step:
+   * 100 1.1:1 · 200 1.25 · 300 1.6 · 400 2.2 · 500 3 · 600 4.5 · 700 7 · 800 10 · 900 13.5 · 1000 17.1
+   * Emerald #2EE6B6 is the brand colour, locked at 300. Status hues come from emerald on the colour wheel:
+   * green = analogous (−30°), orange = triadic (+240°), red = split-complementary (+210°). Neutral uses the black’s own hue.
+   */
+  --p-emerald-0: #ffffff; --p-emerald-100: #d4fded; --p-emerald-200: #74fed2; --p-emerald-300: #2ee6b6; --p-emerald-400: #00c69a; --p-emerald-500: #00a983;
+  --p-emerald-600: #168669; --p-emerald-700: #1f6450; --p-emerald-800: #214a3c; --p-emerald-900: #1e332b; --p-emerald-1000: #181d1b;
+  --p-green-0: #ffffff; --p-green-100: #ddfdd5; --p-green-200: #9dfd85; --p-green-300: #7ee465; --p-green-400: #60c545; --p-green-500: #44aa25;
+  --p-green-600: #318812; --p-green-700: #2b661b; --p-green-800: #264b1d; --p-green-900: #20331c; --p-green-1000: #181d1b;
+  --p-orange-0: #ffffff; --p-orange-100: #fdf2ec; --p-orange-200: #fee0d0; --p-orange-300: #ffbe9b; --p-orange-400: #ff9353; --p-orange-500: #ef7000;
+  --p-orange-600: #bd5b13; --p-orange-700: #8a471c; --p-orange-800: #63371e; --p-orange-900: #40291c; --p-orange-1000: #181d1b;
+  --p-red-0: #ffffff; --p-red-100: #fdf1f1; --p-red-200: #fedfde; --p-red-300: #ffbcbb; --p-red-400: #ff8e90; --p-red-500: #fc606a;
+  --p-red-600: #d3424f; --p-red-700: #a72837; --p-red-800: #76272d; --p-red-900: #4b2223; --p-red-1000: #181d1b;
+  --p-neutral-0: #ffffff; --p-neutral-100: #edf6f2; --p-neutral-200: #dfe8e4; --p-neutral-300: #c5cfcb; --p-neutral-400: #a7b1ad; --p-neutral-500: #8e9793;
+  --p-neutral-600: #707975; --p-neutral-700: #545b58; --p-neutral-800: #3e4441; --p-neutral-900: #2c2f2e; --p-neutral-1000: #181d1b;
 
-  /* Deeps: the dark partner of each bright, for text and icons on light surfaces */
-  --p-emerald-deep: #00382b;
-  --p-lime-deep: #163300;
-  --p-lemon-deep: #3a341c;
-  --p-tangerine-deep: #4a1a00;
-  --p-bubblegum-deep: #4a0d33;
-  --p-lavender-deep: #2a1260;
-  --p-sky-deep: #0b2e4f;
-
-  /* Neutrals — light */
-  --p-white: #ffffff;
-  --p-ink: #0e0f0c;
-  --p-ink-2: #454745;
-  --p-ink-3: #5f615e;
-  --p-ink-4: #868685;
-  --p-sage: #e8ebe6;
-  --p-mist: #f1f3ee;
-  --p-mist-2: #e4e7e0;
-
-  /* Neutrals — dark */
-  --p-night: #0e0f0c;
-  --p-night-2: #1c1f1a;
-  --p-night-3: #262923;
-  --p-fog: #c8cac4;
-  --p-fog-2: #9c9f98;
-  --p-fog-3: #7c7f78;
-
-  /* Status */
-  --p-red: #a8200d;
-  --p-red-bright: #ff8a7a;
-  --p-green: #2f5711;
-  --p-amber: #7a5200;
-  --p-amber-bright: #ffd166;
+  /* See-through black and white, for borders, overlays and neutral control fills that must work on any surface */
+  --p-alpha-black-5: rgba(24, 29, 27, 0.05); --p-alpha-black-8: rgba(24, 29, 27, 0.08); --p-alpha-black-15: rgba(24, 29, 27, 0.15); --p-alpha-black-30: rgba(24, 29, 27, 0.3);
+  --p-alpha-black-50: rgba(24, 29, 27, 0.5); --p-alpha-black-70: rgba(24, 29, 27, 0.7); --p-alpha-black-85: rgba(24, 29, 27, 0.85);
+  --p-alpha-white-5: rgba(255, 255, 255, 0.05); --p-alpha-white-8: rgba(255, 255, 255, 0.08); --p-alpha-white-12: rgba(255, 255, 255, 0.12); --p-alpha-white-15: rgba(255, 255, 255, 0.15); --p-alpha-white-30: rgba(255, 255, 255, 0.3);
+  --p-alpha-white-40: rgba(255, 255, 255, 0.4); --p-alpha-white-70: rgba(255, 255, 255, 0.7); --p-alpha-white-85: rgba(255, 255, 255, 0.85);
+  --p-alpha-emerald-100-50: rgba(212, 253, 237, 0.5); --p-alpha-red-100-50: rgba(253, 241, 241, 0.5);
 
   /* Type families (Inter is bundled; see main.tsx) */
   --p-font-sans: "Inter Variable", Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
@@ -93,8 +71,9 @@
   --p-radius-full: 999px;
 
   /* Elevation — surfaces are flat; only floating things get shadows */
-  --p-shadow-2: 0 8px 24px rgba(14, 15, 12, 0.12), 0 2px 6px rgba(14, 15, 12, 0.06);
-  --p-shadow-3: 0 24px 64px rgba(14, 15, 12, 0.24), 0 4px 12px rgba(14, 15, 12, 0.1);
+  --p-shadow-1: 0 4px 12px rgba(24, 29, 27, 0.08), 0 1px 2px rgba(24, 29, 27, 0.06);
+  --p-shadow-2: 0 8px 24px rgba(24, 29, 27, 0.12), 0 2px 6px rgba(24, 29, 27, 0.06);
+  --p-shadow-3: 0 24px 64px rgba(24, 29, 27, 0.24), 0 4px 12px rgba(24, 29, 27, 0.1);
 
   /* Motion */
   --p-duration-fast: 150ms;

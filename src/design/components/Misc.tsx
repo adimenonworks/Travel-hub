@@ -2,21 +2,14 @@ import type { CSSProperties, ReactNode } from 'react';
 import { Icon, type IconName } from './Icon';
 import s from './Misc.module.css';
 
-const avatarColors = ['--p-lime', '--p-sky', '--p-tangerine', '--p-lavender', '--p-bubblegum', '--p-lemon', '--p-aqua', '--p-sand'].map((v) => `var(${v})`);
-
-function colorFor(seed: string) {
-  let h = 0;
-  for (const c of seed) h = (h * 31 + c.charCodeAt(0)) | 0;
-  return avatarColors[Math.abs(h) % avatarColors.length];
-}
-
 function initials(name: string) {
   const parts = name.trim().split(/\s+/).filter(Boolean);
   return ((parts[0]?.[0] ?? '?') + (parts.length > 1 ? parts[parts.length - 1][0] : '')).toUpperCase();
 }
 
-export function Avatar({ name, photo, size = 32, seed }: { name: string; photo?: string | null; size?: number; seed?: string }) {
-  const style = { '--avatar-size': `${size}px`, '--avatar-bg': colorFor(seed ?? name) } as CSSProperties;
+/** Initials on the light emerald wash. `seed` is accepted for older callers; every avatar now shares one colour. */
+export function Avatar({ name, photo, size = 32 }: { name: string; photo?: string | null; size?: number; seed?: string }) {
+  const style = { '--avatar-size': `${size}px` } as CSSProperties;
   if (photo) return <img className={s.avatar} style={style} src={photo} alt={name} title={name} referrerPolicy="no-referrer" />;
   return <span className={s.avatar} style={style} title={name} role="img" aria-label={name}>{initials(name)}</span>;
 }
@@ -32,13 +25,11 @@ export function AvatarStack({ people, max = 4, size = 28 }: { people: { id: stri
   );
 }
 
-export type BadgeTone = 'neutral' | 'tint' | 'success' | 'warning' | 'danger';
+export type BadgeTone = 'neutral' | 'tint' | 'category' | 'success' | 'warning' | 'error';
 
-export function Badge({ tone = 'neutral', icon, children, color }: { tone?: BadgeTone; icon?: IconName; children: ReactNode; color?: string }) {
-  // A custom colour is a bright fill (category colours), so its text is the dark on-bright ink.
-  const style = color ? ({ '--badge-fg': 'var(--color-on-bright)', '--badge-bg': color } as CSSProperties) : undefined;
+export function Badge({ tone = 'neutral', icon, children }: { tone?: BadgeTone; icon?: IconName; children: ReactNode }) {
   return (
-    <span className={[s.badge, tone !== 'neutral' && s[`badge-${tone}`]].filter(Boolean).join(' ')} style={style}>
+    <span className={[s.badge, tone !== 'neutral' && s[`badge-${tone}`]].filter(Boolean).join(' ')}>
       {icon && <Icon name={icon} size={13} />}
       {children}
     </span>

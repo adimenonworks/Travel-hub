@@ -11,9 +11,12 @@
 .t-caption1 { font: var(--p-weight-medium) var(--p-size-caption1)/var(--p-leading-caption1) var(--font-text); letter-spacing: var(--p-tracking-caption1); }
 .t-caption2 { font: var(--p-weight-medium) var(--p-size-caption2)/var(--p-leading-caption2) var(--font-text); letter-spacing: var(--p-tracking-caption2); }
 
-.t-secondary { color: var(--color-label-secondary); }
-.t-tertiary { color: var(--color-label-tertiary); }
-.t-tint { color: var(--color-tint); }
-.t-danger { color: var(--color-danger); }
+/* Headings use the softer --text-primary; body copy inherits --text-body from <body>. */
+.t-display, .t-title1, .t-title2, .t-title3, .t-headline { color: var(--text-primary); }
+
+.t-secondary { color: var(--text-subtle); }
+.t-tertiary { color: var(--text-subtle); }
+.t-tint { color: var(--text-brand); }
+.t-danger { color: var(--status-error); }
 .t-bold { font-weight: var(--p-weight-semibold); }
 .t-num { font-variant-numeric: tabular-nums; }
