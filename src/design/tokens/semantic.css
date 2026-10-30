@@ -110,7 +110,7 @@
   --space-gutter: var(--p-space-5);        /* page side margin, compact */
   --space-inset: var(--p-space-5);         /* list row / card padding */
   --space-stack: var(--p-space-8);         /* gap between sections */
-  --space-page-top: var(--p-space-12);     /* space above the page title */
+  --space-page-top: var(--p-space-8);      /* space between the top bar and the page title */
 
   /* Shape — everything is a pill or a soft rounded rectangle */
   --radius-button: var(--p-radius-full);
@@ -131,6 +131,7 @@
   --size-control: 48px;
   --size-control-md: 44px;        /* a compact control beside a medium button, e.g. a role picker in a list row */
   --size-control-sm: 36px;
+  --size-topbar: 64px;           /* the app's top bar */
   --size-content-max: 1200px;
 
   /* Motion */
@@ -148,7 +149,7 @@
     --space-gutter: var(--p-space-8);
     --space-inset: var(--p-space-6);
     --space-stack: var(--p-space-12);
-    --space-page-top: var(--p-space-24);
+    --space-page-top: var(--p-space-12);
   }
 }
 @media (min-width: 1068px) {

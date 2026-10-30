@@ -29,7 +29,7 @@ export function ActivityPage(ctx: TripCtx) {
     return (
       <>
         <PageHeader title="Plan not found" back={{ to: itinerary, label: 'Itinerary' }} />
-        <Card><EmptyState icon="calendar" title="This plan was deleted" message="It may have been removed from the itinerary." action={<LinkButton to={itinerary} variant="tinted">Back to itinerary</LinkButton>} /></Card>
+        <Card><EmptyState illustration="calendar" title="This plan was deleted" message="It may have been removed from the itinerary." action={<LinkButton to={itinerary} variant="tinted">Back to itinerary</LinkButton>} /></Card>
       </>
     );
 
@@ -71,7 +71,7 @@ export function ActivityPage(ctx: TripCtx) {
                 </div>
               </Card>
             ) : (
-              <Card><EmptyState icon="pin" title="No location yet" message="Add an address to get directions and an Uber in one tap."
+              <Card><EmptyState illustration="map" title="No location yet" message="Add an address to get directions and an Uber in one tap."
                 action={<Button variant="tinted" icon="pencil" onClick={() => setEditing(true)}>Add location</Button>} /></Card>
             )}
           </Section>

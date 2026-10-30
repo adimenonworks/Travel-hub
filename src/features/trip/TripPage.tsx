@@ -34,7 +34,7 @@ export function TripPage() {
   if (trip === null)
     return (
       <Content>
-        <EmptyState icon="info" title="Trip not found" message="It may have been deleted, or you're not a member yet. Ask the organizer for an invite link."
+        <EmptyState illustration="compass" title="Trip not found" message="It may have been deleted, or you're not a member yet. Ask the organizer for an invite link."
           action={<LinkButton to="/" variant="tinted">Back to trips</LinkButton>} />
       </Content>
     );

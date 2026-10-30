@@ -30,7 +30,7 @@ export function Photos(ctx: TripCtx) {
       </div>
       {sorted.length === 0 ? (
         <Card>
-          <EmptyState icon="photo" title="No albums yet"
+          <EmptyState illustration="memories" title="No albums yet"
             message="Make a shared album in Google Photos or Apple Photos, then add its link here so everyone can find the pictures."
             action={<Button variant="tinted" icon="plus" onClick={() => setEditing('new')}>Add album</Button>} />
         </Card>

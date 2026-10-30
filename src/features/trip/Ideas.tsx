@@ -45,7 +45,7 @@ export function Ideas(ctx: TripCtx) {
       ]} />
       {shown.length === 0 ? (
         <Card>
-          <EmptyState icon="lightbulb" title={filter === 'open' ? 'No open ideas' : 'Nothing here yet'}
+          <EmptyState illustration="ideas" title={filter === 'open' ? 'No open ideas' : 'Nothing here yet'}
             message={filter === 'open' ? 'Saw a great restaurant or tour? Add it so everyone can vote.' : undefined}
             action={filter === 'open' && <Button variant="tinted" icon="plus" onClick={() => setEditing('new')}>Add idea</Button>} />
         </Card>

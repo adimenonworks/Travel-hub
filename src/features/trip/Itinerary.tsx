@@ -123,7 +123,7 @@ export function Itinerary(ctx: TripCtx) {
 
         {list.length === 0 ? (
           <Card>
-            <EmptyState icon="calendar" title="Nothing planned yet" message="Add something to do, or approve an idea from the Ideas board."
+            <EmptyState illustration="calendar" title="Nothing planned yet" message="Add something to do, or approve an idea from the Ideas board."
               action={<Button variant="tinted" icon="plus" onClick={() => setAdding(true)}>Add event</Button>} />
           </Card>
         ) : (

@@ -9,7 +9,11 @@
 .spaceBar { height: 16px; background: var(--icon-brand); border-radius: var(--radius-pill); }
 .radii { display: flex; flex-wrap: wrap; gap: var(--space-sm); }
 .radius { width: 96px; height: 64px; background: var(--surface-sunken); display: grid; place-items: center; }
-.icons { display: grid; grid-template-columns: repeat(auto-fill, minmax(84px, 1fr)); gap: var(--space-sm); }
+.icons { display: grid; grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); gap: var(--space-sm); }
 .icon { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: var(--space-xs); color: var(--icon-brand); text-align: center; }
 .row { display: flex; flex-wrap: wrap; gap: var(--space-sm); align-items: center; }
 .cards { display: grid; gap: var(--space-md); grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
+
+.covers { display: grid; gap: var(--space-md); grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); }
+.coverBox { display: flex; flex-direction: column; gap: var(--space-xs); }
+.coverBox > svg { height: 120px; border-radius: var(--radius-card); overflow: hidden; }

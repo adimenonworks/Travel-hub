@@ -8,4 +8,4 @@ export { Sheet } from './Sheet';
 export { Avatar, AvatarStack, Badge, EmptyState, Spinner, Banner, type BadgeTone } from './Misc';
 export { PageHeader, Tabs, type TabItem } from './Bars';
 export { ColorPicker, type ColorOption } from './ColorPicker';
-export { Illustration, type IllustrationName } from './Illustration';
+export { Illustration, COVER_ILLUSTRATIONS, type IllustrationName } from './Illustration';

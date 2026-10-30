@@ -1,7 +1,7 @@
 import { useState, type CSSProperties } from 'react';
 import {
   Avatar, AvatarStack, Badge, Banner, Button, Card, ColorPicker, EmptyState, FieldRow, Icon, IconButton, LinkButton, List, ListRow, PageHeader,
-  SegmentedControl, Section, Select, Sheet, Spinner, Tabs, TextArea, TextField, type IconName, Illustration,
+  SegmentedControl, Section, Select, Sheet, Spinner, Tabs, TextArea, TextField, type IconName, Illustration, type IllustrationName, COVER_ILLUSTRATIONS,
 } from '../../design/components';
 import { COVER_COLORS } from '../../lib/colors';
 import s from './DesignSystem.module.css';
@@ -33,7 +33,7 @@ const typeStyles = [
 
 const spaces = ['--space-xxs', '--space-xs', '--space-sm', '--space-md', '--space-lg', '--space-xl', '--space-2xl', '--space-3xl'];
 const radii = ['--radius-inner', '--radius-field', '--radius-card', '--radius-pill'];
-const controlSizes = ['--size-control-sm', '--size-control-md', '--size-tap', '--size-control'];
+const controlSizes = ['--size-control-sm', '--size-control-md', '--size-tap', '--size-control', '--size-topbar'];
 const motions: [string, string][] = [
   ['--motion-fast', 'Colour and background changes (hover, press colours)'],
   ['--motion-fluid', 'Things that move: the tab underline, the segmented pill, day cards morphing'],
@@ -41,6 +41,7 @@ const motions: [string, string][] = [
   ['--motion-release', 'Springing back out, with a small overshoot'],
   ['--motion-sheet', 'Sheets sliding up'],
 ];
+const spotNames: IllustrationName[] = ['memories', 'ideas', 'calendar', 'map', 'ticket', 'suitcase', 'compass', 'globe'];
 const icons: IconName[] = ['plus', 'calendar', 'lightbulb', 'wallet', 'cloud', 'people', 'person', 'home', 'pin', 'link', 'doc', 'pencil', 'trash', 'check', 'thumbs-up', 'chat', 'clock', 'globe', 'sun', 'rain', 'map', 'share', 'plane', 'news', 'photo'];
 
 /** Living reference for tokens and components, at /#/design. */
@@ -108,6 +109,15 @@ export function DesignSystem() {
           </Card>
         </Section>
 
+        <Section title="Illustrations" footer="One style everywhere: white frames with a bold outline and a slight tilt, emerald land, a warm sun, sparkles. Spots go in empty states; covers fill a trip card when it has no photo.">
+          <Card className={s.icons}>
+            {spotNames.map((n) => <span key={n} className={s.icon}><Illustration name={n} size={96} /><code className={s.code}>{n}</code></span>)}
+          </Card>
+          <div className={s.covers}>
+            {COVER_ILLUSTRATIONS.map((n) => <div key={n} className={s.coverBox}><Illustration name={n} /><code className={s.code}>{n}</code></div>)}
+          </div>
+        </Section>
+
         <Section title="Icons">
           <Card className={s.icons}>
             {icons.map((n) => <span key={n} className={s.icon} title={n}><Icon name={n} /><code className={s.code}>{n}</code></span>)}
@@ -150,7 +160,7 @@ export function DesignSystem() {
             <Card tone="accent" media={<Icon name="globe" size={56} strokeWidth={1.4} />} action={<Button variant="inverse">Action</Button>}>
               <div className="t-title3">Card with media and action</div><p className="t-subhead">The media sits on the left, the action on the right (below on phones).</p>
             </Card>
-            <Card media={<Illustration name="memories" />}><div className="t-headline">Card with an illustration</div><p className="t-subhead t-secondary">Illustrations are for empty states.</p></Card>
+            <Card media={<Illustration name="memories" />}><div className="t-headline">Card with an illustration</div><p className="t-subhead t-secondary">Illustrations are for empty states and invitations.</p></Card>
           </div>
         </Section>
 
@@ -190,7 +200,7 @@ export function DesignSystem() {
             </div>
             <Banner>Banners call out important context.</Banner>
           </Card>
-          <Card><EmptyState icon="lightbulb" title="Empty state" message="Explains what goes here and how to start." action={<Button variant="tinted" onClick={() => setSheet(true)}>Open a sheet</Button>} /></Card>
+          <Card><EmptyState illustration="ideas" title="Empty state" message="Explains what goes here and how to start." action={<Button variant="tinted" onClick={() => setSheet(true)}>Open a sheet</Button>} /></Card>
         </Section>
       </div>
       <Sheet open={sheet} title="Sheet" onClose={() => setSheet(false)} onSubmit={() => setSheet(false)}>

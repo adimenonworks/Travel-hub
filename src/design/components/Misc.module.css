@@ -37,7 +37,7 @@
   gap: var(--space-xs); padding: var(--space-3xl) var(--space-xl);
   color: var(--text-subtle);
 }
-.emptyIconWrap { display: grid; place-items: center; width: 80px; height: 80px; border-radius: var(--radius-icon); background: var(--surface-brand); color: var(--icon-on-brand); margin-bottom: var(--space-xs); }
+.emptyArt { display: grid; place-items: center; margin-bottom: var(--space-xs); }
 .emptyTitle { font: var(--p-weight-semibold) var(--p-size-title3)/var(--p-leading-title3) var(--font-heading); letter-spacing: var(--p-tracking-title3); color: var(--text-primary); }
 .emptyAction { margin-top: var(--space-sm); }
 
