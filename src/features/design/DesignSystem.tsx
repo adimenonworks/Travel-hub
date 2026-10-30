@@ -41,7 +41,7 @@ const motions: [string, string][] = [
   ['--motion-release', 'Springing back out, with a small overshoot'],
   ['--motion-sheet', 'Sheets sliding up'],
 ];
-const spotNames: IllustrationName[] = ['memories', 'ideas', 'calendar', 'map', 'ticket', 'suitcase', 'compass', 'globe'];
+const spotNames: IllustrationName[] = ['memories', 'ideas', 'calendar', 'map', 'ticket', 'suitcase', 'compass', 'globe', 'people'];
 const icons: IconName[] = ['plus', 'calendar', 'lightbulb', 'wallet', 'cloud', 'people', 'person', 'home', 'pin', 'link', 'doc', 'pencil', 'trash', 'check', 'thumbs-up', 'chat', 'clock', 'globe', 'sun', 'rain', 'map', 'share', 'plane', 'news', 'photo'];
 
 /** Living reference for tokens and components, at /#/design. */

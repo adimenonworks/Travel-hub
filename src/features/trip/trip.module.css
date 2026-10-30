@@ -30,7 +30,7 @@
 }
 
 /* The tab's content: never shorter than the screen, so the page height doesn't jump between tabs. */
-.tabPanel { min-height: 100dvh; }
+.tabPanel { min-height: 100dvh; display: flex; flex-direction: column; gap: var(--space-stack); }
 
 /* Day strip. Push-expand: each card has a fixed size, so the browser can animate between them. In the strip the
    tapped card widens (80 → 208px) as the old one narrows; in the side list (wide screens) it grows taller instead.
@@ -105,7 +105,10 @@
 .nowTime { text-align: right; font-size: var(--p-size-footnote); font-weight: var(--p-weight-bold); color: var(--text-brand); font-variant-numeric: tabular-nums; }
 .nowLine { position: relative; border-top: 2px dotted var(--icon-brand); }
 .nowLine::before { content: ''; position: absolute; left: -5px; top: -6px; width: 10px; height: 10px; border-radius: 50%; background: var(--icon-brand); }
-.dayHead { display: flex; align-items: center; justify-content: space-between; gap: var(--space-sm); flex-wrap: wrap; }
+/* A tab's title with its one action beside it; the text wraps rather than pushing the button underneath. */
+.dayHead { display: flex; align-items: center; justify-content: space-between; gap: var(--space-sm); }
+.dayHead > :first-child { flex: 1; min-width: 0; }
+.dayHead > :last-child { flex: none; }
 .dayBudget { font-size: var(--p-size-subhead); color: var(--text-subtle); }
 .activity { display: grid; grid-template-columns: 56px minmax(0, 1fr); gap: var(--space-sm); }
 @media (min-width: 744px) { .activity { grid-template-columns: 72px minmax(0, 1fr); gap: var(--space-md); } }
@@ -177,7 +180,7 @@ a.docLink:hover { text-decoration-thickness: 2px; color: var(--text-link-hover);
 .newsThumb { width: 72px; height: 54px; border-radius: var(--radius-inner); object-fit: cover; background: var(--surface-sunken); }
 
 /* People */
-.invite { display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-sm); }
+.inviteActions { display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-sm); margin-top: var(--space-sm); }
 .inviteRow { display: flex; gap: var(--space-xs); align-items: center; align-self: stretch; }
 .inviteUrl { flex: 1; min-width: 0; font-family: var(--font-mono); font-size: var(--p-size-footnote); min-height: var(--size-control); line-height: var(--size-control); padding: 0 var(--space-lg); background: var(--surface-background-secondary); border: 1px solid var(--border-bold); border-radius: var(--radius-control); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .dangerZone { display: flex; gap: var(--space-sm); flex-wrap: wrap; }

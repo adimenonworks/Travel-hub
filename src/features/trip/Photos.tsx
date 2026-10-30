@@ -26,13 +26,12 @@ export function Photos(ctx: TripCtx) {
           <h2 className="t-title1">Photos</h2>
           <div className={s.dayBudget}>Shared albums for this trip. Anyone on the trip can add one.</div>
         </div>
-        <Button icon="plus" onClick={() => setEditing('new')}>Add album</Button>
+        <Button size="small" icon="plus" onClick={() => setEditing('new')}>Add album</Button>
       </div>
       {sorted.length === 0 ? (
         <Card>
           <EmptyState illustration="memories" title="No albums yet"
-            message="Make a shared album in Google Photos or Apple Photos, then add its link here so everyone can find the pictures."
-            action={<Button variant="tinted" icon="plus" onClick={() => setEditing('new')}>Add album</Button>} />
+            message="Make a shared album in Google Photos or Apple Photos, then add its link here so everyone can find the pictures." />
         </Card>
       ) : (
         <div className={s.albumGrid}>
