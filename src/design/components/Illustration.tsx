@@ -172,10 +172,10 @@ const covers = {
     <>
       <rect className={s.photo} width="320" height="160" />
       <circle className={s.sun} cx="246" cy="52" r="20" />
-      <path className={s.cloud} d="M60 50a12 12 0 0124-2 10 10 0 0118 8H52a8 8 0 018-6z" />
+      <path className={s.cloud} d="M150 46a12 12 0 0124-2 10 10 0 0118 8h-50a8 8 0 018-6z" />
       <path className={s.hill} d="M0 118l52-42 40 30 36-26 60 52 46-34 86 54v8H0z" />
       <path className={s.hillDeep} d="M0 136l70-30 60 26 70-34 120 44v18H0z" />
-      <path className={s.spark} d="M150 26v10M145 31h10M290 96v8M286 100h8" />
+      <path className={s.spark} d="M110 34v10M105 39h10M212 84v8M208 88h8" />
     </>
   ),
   'cover-coast': (
@@ -189,14 +189,14 @@ const covers = {
         <path className={s.frame} d="M24 8l18 32H24z" />
         <path className={s.hillDeep} d="M-4 44h52l-8 10H4z" />
       </g>
-      <path className={s.spark} d="M160 24v10M155 29h10M300 36v8M296 40h8" />
+      <path className={s.spark} d="M150 30v10M145 35h10M250 40v8M246 44h8" />
     </>
   ),
   'cover-city': (
     <>
       <rect className={s.photo} width="320" height="160" />
       <circle className={s.sun} cx="268" cy="46" r="18" />
-      <path className={s.cloud} d="M104 40a12 12 0 0124-2 10 10 0 0118 8H96a8 8 0 018-6z" />
+      <path className={s.cloud} d="M196 36a12 12 0 0124-2 10 10 0 0118 8h-50a8 8 0 018-6z" />
       {[[30, 70, 34], [70, 52, 40], [116, 82, 30], [150, 40, 36], [192, 66, 34], [232, 58, 30]].map(([x, top, w]) => (
         <g key={x}>
           <rect className={s.frame} x={x} y={top} width={w} height={160 - top} rx="4" />
@@ -204,7 +204,7 @@ const covers = {
         </g>
       ))}
       <path className={s.hillDeep} d="M0 140c60-10 110-6 160 0s110 8 160-2v22H0z" />
-      <path className={s.spark} d="M20 30v10M15 35h10M300 96v8M296 100h8" />
+      <path className={s.spark} d="M120 30v10M115 35h10M276 96v8M272 100h8" />
     </>
   ),
 };

@@ -5,7 +5,7 @@
   position: sticky; top: 0; z-index: 40;
   padding-top: env(safe-area-inset-top);
   background: var(--surface-background-secondary);
-  border-bottom: 1px solid var(--border-subtle);
+  box-shadow: 0 1px 0 var(--border-subtle); /* a hairline that doesn't add to the bar's height */
 }
 .barInner {
   max-width: calc(var(--size-content-max) + 2 * var(--space-gutter));

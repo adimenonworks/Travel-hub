@@ -87,16 +87,16 @@ function Hero({ trip, now }: { trip: Trip; now: boolean }) {
   const until = daysBetween(today(), trip.startDate);
   const [big, small] = now
     ? [`Day ${daysBetween(trip.startDate, today()) + 1}`, `of ${total}`]
-    : [String(until), until === 1 ? 'day to go' : 'days to go'];
+    : until === 1 ? ['Tomorrow', ''] : [String(until), 'days to go'];
   const base = `/trip/${trip.id}`;
   return (
     <section className={s.hero} aria-labelledby="hero-title">
       <Cover trip={trip} className={s.heroCover} />
       <div className={s.heroBody}>
         <Badge tone={now ? 'tint' : 'neutral'}>{now ? 'Happening now' : 'Next up'}</Badge>
-        <h2 id="hero-title" className={s.heroTitle}><Link to={base} className={s.heroLink}>{trip.name}</Link></h2>
+        <h2 id="hero-title" className={`t-title1 ${s.heroTitle}`}><Link to={base} className={s.heroLink}>{trip.name}</Link></h2>
         <p className="t-callout t-secondary">{place(trip)} · {formatRange(trip.startDate, trip.endDate)}</p>
-        <p className={s.countdown}><span className={s.countBig}>{big}</span> <span className={s.countSmall}>{small}</span></p>
+        <p className={s.countdown}><span className={s.countBig}>{big}</span> {small && <span className={`t-title3 ${s.countSmall}`}>{small}</span>}</p>
         <div className={s.heroFoot}>
           <div className={s.heroLinks}>
             <LinkButton to={base} variant="tinted" icon="calendar">Itinerary</LinkButton>
@@ -177,7 +177,7 @@ function PlanTile({ wide }: { wide?: boolean }) {
     <div className={[s.plan, wide && s.planWide].filter(Boolean).join(' ')}>
       <Illustration name="globe" size={wide ? 120 : 96} />
       <div className={s.planText}>
-        <h2 className={s.planTitle}>
+        <h2 className="t-title2">
           <span className="visually-hidden">Plan a new trip</span>
           <span key={`${i}-${leaving}`} className={[s.planWord, leaving && s.leaving].filter(Boolean).join(' ')} aria-hidden="true">
             {[...word].map((ch, n) => (

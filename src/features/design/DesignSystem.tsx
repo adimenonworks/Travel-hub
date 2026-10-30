@@ -33,7 +33,7 @@ const typeStyles = [
 
 const spaces = ['--space-xxs', '--space-xs', '--space-sm', '--space-md', '--space-lg', '--space-xl', '--space-2xl', '--space-3xl'];
 const radii = ['--radius-inner', '--radius-field', '--radius-card', '--radius-pill'];
-const controlSizes = ['--size-control-sm', '--size-control-md', '--size-tap', '--size-control'];
+const controlSizes = ['--size-control-sm', '--size-control-md', '--size-tap', '--size-control', '--size-topbar'];
 const motions: [string, string][] = [
   ['--motion-fast', 'Colour and background changes (hover, press colours)'],
   ['--motion-fluid', 'Things that move: the tab underline, the segmented pill, day cards morphing'],
