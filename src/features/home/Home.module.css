@@ -1,4 +1,4 @@
-/* Hero: the trip that matters now, on the emerald brand card (Card tone="accent" remaps the text roles).
+/* Hero: the trip that matters now, on a white card with the countdown in the brand colour.
    From 744px it's compact: cover on the left, name and details beside it, the countdown at the top right.
    On phones the cover sits on top at 16:9. The travellers sit on the cover, as on the trip page. */
 .hero { display: grid; grid-template-columns: minmax(0, 4fr) minmax(0, 8fr); }
@@ -13,7 +13,7 @@
 .heroLink { color: var(--text-primary); }
 .heroLink:hover { text-decoration: underline; text-underline-offset: 4px; text-decoration-thickness: 2px; }
 .countdown { grid-area: count; display: flex; align-items: baseline; gap: var(--space-xs); margin: 0; }
-.countBig { font: var(--p-weight-display) var(--p-size-display)/var(--p-leading-display) var(--font-display); font-stretch: var(--p-stretch-display); letter-spacing: var(--p-tracking-display); color: var(--text-primary); font-variant-numeric: tabular-nums; }
+.countBig { font: var(--p-weight-display) var(--p-size-display)/var(--p-leading-display) var(--font-display); font-stretch: var(--p-stretch-display); letter-spacing: var(--p-tracking-display); color: var(--text-brand); font-variant-numeric: tabular-nums; }
 .countSmall { color: var(--text-subtle); }
 .heroLinks { grid-area: links; display: flex; gap: var(--space-xs); flex-wrap: wrap; }
 @media (max-width: 743px) {

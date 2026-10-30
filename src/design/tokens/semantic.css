@@ -130,7 +130,7 @@
   --size-control: 48px;
   --size-control-md: 44px;        /* a compact control beside a medium button, e.g. a role picker in a list row */
   --size-control-sm: 36px;
-  --size-topbar: 64px;           /* the app's top bar row (Add a trip + profile) */
+  --size-topbar: 64px;           /* the app's top bar row (profile) */
   --size-content-max: 1200px;
 
   /* Motion */
