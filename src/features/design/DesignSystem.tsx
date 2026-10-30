@@ -33,6 +33,14 @@ const typeStyles = [
 
 const spaces = ['--space-xxs', '--space-xs', '--space-sm', '--space-md', '--space-lg', '--space-xl', '--space-2xl', '--space-3xl'];
 const radii = ['--radius-inner', '--radius-field', '--radius-card', '--radius-pill'];
+const controlSizes = ['--size-control-sm', '--size-control-md', '--size-tap', '--size-control'];
+const motions: [string, string][] = [
+  ['--motion-fast', 'Colour and background changes (hover, press colours)'],
+  ['--motion-fluid', 'Things that move: the tab underline, the segmented pill, day cards morphing'],
+  ['--motion-press', 'A button or option pressing in (scales to 96%)'],
+  ['--motion-release', 'Springing back out, with a small overshoot'],
+  ['--motion-sheet', 'Sheets sliding up'],
+];
 const icons: IconName[] = ['plus', 'calendar', 'lightbulb', 'wallet', 'cloud', 'people', 'person', 'home', 'pin', 'link', 'doc', 'pencil', 'trash', 'check', 'thumbs-up', 'chat', 'clock', 'globe', 'sun', 'rain', 'map', 'share', 'plane', 'news', 'photo'];
 
 /** Living reference for tokens and components, at /#/design. */
@@ -83,6 +91,20 @@ export function DesignSystem() {
             <div className={s.radii}>
               {radii.map((r) => <div key={r} className={s.radius} style={{ borderRadius: `var(${r})` } as CSSProperties}><code className={s.code}>{r.replace('--radius-', '')}</code></div>)}
             </div>
+            {controlSizes.map((t) => (
+              <div key={t} className={s.spaceRow}>
+                <code className={s.code}>{t}</code>
+                <div className={s.spaceBar} style={{ width: `var(${t})`, height: `var(${t})` }} />
+              </div>
+            ))}
+          </Card>
+        </Section>
+
+        <Section title="Motion" footer="Tokens in semantic.css. Tap the tabs or the segmented control on this page to see --motion-fluid. With “reduce motion” on, changes are instant.">
+          <Card className={s.stack}>
+            {motions.map(([t, use]) => (
+              <div key={t} className={s.typeRow}><code className={s.code}>{t}</code><span className="t-subhead t-secondary">{use}</span></div>
+            ))}
           </Card>
         </Section>
 

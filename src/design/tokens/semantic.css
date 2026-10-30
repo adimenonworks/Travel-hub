@@ -138,7 +138,7 @@
   --motion-base: var(--p-duration-base) var(--p-ease-standard);
   --motion-sheet: var(--p-duration-slow) var(--p-ease-spring);
   --motion-fluid: var(--p-duration-fluid) var(--p-ease-fluid);      /* things that move: tab underline, segment pill, day cards */
-  --motion-press: 110ms var(--p-ease-standard);                       /* a control pressing in */
+  --motion-press: var(--p-duration-fast) var(--p-ease-standard);     /* a control pressing in */
   --motion-release: var(--p-duration-slow) var(--p-ease-bounce);      /* and springing back out */
 }
 

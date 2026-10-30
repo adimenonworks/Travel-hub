@@ -53,7 +53,7 @@
 .small { min-height: var(--size-control-sm); padding: 0 var(--space-md); font-size: var(--p-size-subhead); }
 /* Small controls keep a full 44px hit area */
 .small::after { content: ''; position: absolute; inset: calc((var(--size-control-sm) - var(--size-tap)) / 2) 0; }
-.medium { min-height: var(--size-control-md); padding: 0 var(--space-lg); font-size: var(--p-size-callout); }
+.medium { min-height: var(--size-control-md); padding: 0 var(--space-lg); }
 .large { min-height: 56px; padding: 0 var(--space-2xl); font-size: var(--p-size-headline); }
 .block { width: 100%; }
 

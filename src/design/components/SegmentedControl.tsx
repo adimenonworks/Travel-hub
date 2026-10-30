@@ -17,13 +17,18 @@ export function SegmentedControl<T extends string>({ options, value, onChange, b
   useLayoutEffect(() => {
     const el = group.current;
     if (!el) return;
+    // Measured to the fraction of a pixel, and again whenever the group or any option changes size
+    // (e.g. once the web font has loaded).
     const measure = () => {
       const cur = el.querySelector<HTMLElement>('[aria-checked="true"]');
-      setPill((prev) => (cur ? { x: cur.offsetLeft, w: cur.offsetWidth, ready: prev !== null } : null));
+      if (!cur) return setPill(null);
+      const box = el.getBoundingClientRect(), r = cur.getBoundingClientRect();
+      setPill((prev) => ({ x: r.left - box.left + el.scrollLeft, w: r.width, ready: prev !== null }));
     };
     measure();
     const ro = new ResizeObserver(measure);
     ro.observe(el);
+    Array.from(el.children).forEach((c) => ro.observe(c));
     return () => ro.disconnect();
   }, [value, options]);
 

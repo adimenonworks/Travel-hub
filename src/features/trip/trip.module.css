@@ -76,10 +76,10 @@
   .itinLayout { display: grid; grid-template-columns: 240px minmax(0, 1fr); gap: var(--space-2xl); align-items: start; }
   .days { flex-direction: column; overflow: visible; margin: 0; padding: 0; position: sticky; top: 92px; }
   .day { flex-direction: row; justify-content: flex-start; gap: var(--space-sm); min-height: 56px; padding: 0 var(--space-lg); }
-  .dayNum { font-size: var(--p-size-title2); }
+  .dayNum { font-size: var(--p-size-title2); letter-spacing: var(--p-tracking-title2); }
   .dayDot { margin-left: auto; }
   .day[aria-pressed='true'] { min-width: 0; min-height: 0; padding: var(--space-md) var(--space-lg); }
-  .day[aria-pressed='true'] .dayNum { font-size: var(--p-size-title1); }
+  .day[aria-pressed='true'] .dayNum { font-size: var(--p-size-title1); letter-spacing: var(--p-tracking-title1); }
 }
 
 /* Timeline */

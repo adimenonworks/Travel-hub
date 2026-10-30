@@ -49,10 +49,11 @@ export function Itinerary(ctx: TripCtx) {
   // "Today", "Tomorrow" and "Yesterday" near today; otherwise the day's number in the trip.
   const dayWord = (d: string) =>
     d === t ? 'Today' : d === addDays(t, 1) ? 'Tomorrow' : d === addDays(t, -1) ? 'Yesterday' : `Day ${days.indexOf(d) + 1}`;
-  // Events still to come: all of a future day's, none of a past day's, and today's that haven't finished
-  // (an event with no time counts until the day is over).
+  // Events still to come: all of a future day's, none of a past day's, and today's that haven't finished.
+  // An event with no time, or one that runs past midnight (ends "earlier" than it starts), counts until the day is over.
+  const finishesAt = (a: Activity) => (a.endTime && a.endTime >= a.startTime ? a.endTime : a.endTime ? '99:99' : a.startTime || '99:99');
   const eventsLeft = (d: string) =>
-    d > t ? counts[d] ?? 0 : d < t ? 0 : activities.filter((a) => a.date === d && (a.endTime || a.startTime || '99:99') > now).length;
+    d > t ? counts[d] ?? 0 : d < t ? 0 : activities.filter((a) => a.date === d && finishesAt(a) > now).length;
   const list = activities.filter((a) => a.date === day).sort(byTime);
   const spendOn = (d: string) => activities.filter((a) => a.date === d).reduce((n, a) => n + a.cost * Math.max(1, a.attendeeIds.length), 0);
   const spend = spendOn(day);
@@ -88,10 +89,11 @@ export function Itinerary(ctx: TripCtx) {
                 <span className={s.dayNum} style={vt('num', d)}>{parseDay(d).getDate()}</span>
                 {selected && <span className={s.dayMonth}>{formatDay(d, { month: 'short' })} · {formatDay(d, { weekday: 'short' })}</span>}
               </span>
+              {/* Read in the order it's seen: date, then the tag at its top right, then the day word. */}
+              {selected && !!counts[d] && <span className={[s.dayLabel, s.dayTag].join(' ')}>{toGo ? `${toGo} event${toGo === 1 ? '' : 's'} left` : 'All done'}</span>}
               <span className={s.dayDow} style={vt('word', d)}>{dayWord(d)}</span>
               {selected ? (
                 <>
-                  {!!counts[d] && <span className={[s.dayLabel, s.dayTag].join(' ')}>{toGo ? `${toGo} event${toGo === 1 ? '' : 's'} left` : 'All done'}</span>}
                   {groupBudget > 0 && <span className={s.dayLabels}><span className={[s.dayLabel, left < 0 && s.dayOver].filter(Boolean).join(' ')}>
                     {left < 0 ? `${money(-left, trip.currency)} over` : `${money(left, trip.currency)} left`}
                   </span></span>}
