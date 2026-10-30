@@ -87,12 +87,12 @@ function TripLoaded({ trip }: { trip: Trip }) {
         <Card tone="accent" flush className={s.hero}>
           <TripCover trip={trip} className={s.heroCover}>
             <CoverPeople trip={trip} size={32} />
-            {canManage && <IconButton icon="pencil" label="Edit trip" variant="inverse" className={s.heroEdit} onClick={() => setEditing(true)} />}
           </TripCover>
           <div className={s.heroBody}>
             <span><Icon name="pin" size={20} />{trip.destination?.name ?? 'No destination'}</span>
             <span><Icon name="calendar" size={20} />{formatRange(trip.startDate, trip.endDate)} · {nDays} day{nDays === 1 ? '' : 's'}</span>
           </div>
+          {canManage && <IconButton icon="pencil" label="Edit trip" variant="inverse" className={s.heroEdit} onClick={() => setEditing(true)} />}
         </Card>
         <div className={s.sectionNav}>
           <Tabs items={tabs} label="Trip sections" />

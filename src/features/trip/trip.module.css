@@ -1,15 +1,19 @@
-/* Trip header: the brand card. Cover on top (photo or illustrated scene) with the travellers and the
-   pencil on it, then the place and dates on emerald. */
-.hero { display: flex; flex-direction: column; }
-.heroCover { aspect-ratio: 4 / 1; min-height: 160px; max-height: 280px; }
+/* Trip header: the brand card, laid out like the home hero. From 744px the cover sits on the left with the
+   travellers on it, the place and dates beside it, the pencil in the card's top-right corner; on phones the cover is on top at 16:9. */
+.hero { position: relative; display: grid; grid-template-columns: minmax(0, 4fr) minmax(0, 8fr); }
+.heroCover { height: 100%; min-height: 160px; }
 .heroEdit { position: absolute; top: var(--space-sm); right: var(--space-sm); }
 .heroBody {
-  display: flex; flex-wrap: wrap; gap: var(--space-sm) var(--space-xl); align-items: center;
-  padding: var(--space-lg) var(--space-inset);
+  display: flex; flex-direction: column; justify-content: center; gap: var(--space-sm);
+  padding: var(--space-lg) var(--space-xl);
   font: var(--p-weight-semibold) var(--p-size-callout)/var(--p-leading-callout) var(--font-text);
 }
 .heroBody > span { display: inline-flex; align-items: center; gap: var(--space-xs); }
-@media (max-width: 743px) { .heroCover { aspect-ratio: 16 / 9; } }
+@media (max-width: 743px) {
+  .hero { grid-template-columns: minmax(0, 1fr); }
+  .heroCover { min-height: 0; aspect-ratio: 16 / 9; }
+  .heroBody { padding: var(--space-lg) var(--space-inset); }
+}
 
 /* Cover photo picker (trip form) */
 .coverField { display: flex; flex-direction: column; gap: var(--space-sm); }
