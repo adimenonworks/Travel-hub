@@ -3,7 +3,7 @@ import { Button, Card, FieldRow, List, ListRow, SegmentedControl, Section, Selec
 import { store } from '../../data';
 import { personName, useMe } from '../../data/hooks';
 import type { Category, Expense } from '../../data/types';
-import { formatDay, tripDays } from '../../lib/dates';
+import { dayWord, formatDay, tripDays } from '../../lib/dates';
 import { money } from '../../lib/format';
 import { CATEGORIES, categoryInfo } from '../../lib/categories';
 import type { TripCtx } from './TripPage';
@@ -65,12 +65,12 @@ export function Budget({ trip, activities, expenses, profiles, canManage }: Trip
 
       <Section title="Day by day" footer={dayLimit ? 'The line marks the daily budget.' : canManage ? 'Set a daily budget from Edit trip to compare each day.' : undefined}>
         <Card className={s.bars}>
-          {perDay.map((d, i) => {
+          {perDay.map((d) => {
             const over = dayLimit > 0 && d.total > dayLimit;
             return (
               <div key={d.date} className={s.barRow}>
-                <span className="t-secondary">Day {i + 1}<br /><span className="t-caption1">{formatDay(d.date, { month: 'short', day: 'numeric' })}</span></span>
-                <div className={s.barTrack} role="img" aria-label={`Day ${i + 1}: ${fmt(d.total)}`}>
+                <span className="t-secondary">{dayWord(d.date, trip.startDate)}<br /><span className="t-caption1">{formatDay(d.date, { month: 'short', day: 'numeric' })}</span></span>
+                <div className={s.barTrack} role="img" aria-label={`${dayWord(d.date, trip.startDate)}: ${fmt(d.total)}`}>
                   <div className={s.barFill} style={{ width: `${(d.total / scaleMax) * 100}%`, '--bar-color': over ? 'var(--status-error)' : 'var(--icon-brand)' } as CSSProperties} />
                   {dayLimit > 0 && <div className={s.barLimit} style={{ left: `calc(${(dayLimit / scaleMax) * 100}% - 1px)` }} />}
                 </div>
@@ -160,7 +160,7 @@ function ExpenseForm({ open, ctxTrip, profiles, expense, onClose }: {
       <FieldRow>
         <Select label="Day" value={f.date} onChange={(e) => set({ date: e.target.value })}>
           <option value="">Whole trip</option>
-          {tripDays(ctxTrip.startDate, ctxTrip.endDate).map((d, i) => <option key={d} value={d}>Day {i + 1} · {formatDay(d)}</option>)}
+          {tripDays(ctxTrip.startDate, ctxTrip.endDate).map((d) => <option key={d} value={d}>{dayWord(d, ctxTrip.startDate)} · {formatDay(d)}</option>)}
         </Select>
         <Select label="Paid by" value={f.paidBy} onChange={(e) => set({ paidBy: e.target.value })}>
           {ctxTrip.memberIds.map((id) => <option key={id} value={id}>{id === me.uid ? 'Me' : personName(profiles, id)}</option>)}

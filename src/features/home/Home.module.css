@@ -1,33 +1,34 @@
-/* Hero: the trip that matters now. Cover on the left (on top on phones), details and quick links beside it. */
-.hero {
-  display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
-  border-radius: var(--radius-card); overflow: hidden;
-  background: var(--surface-background-secondary);
+/* Hero: the trip that matters now, on the emerald brand card (Card tone="accent" remaps the text roles).
+   From 744px it's compact: cover on the left, name and details beside it, the countdown at the top right.
+   On phones the cover sits on top at 16:9. The travellers sit on the cover, as on the trip page. */
+.hero { display: grid; grid-template-columns: minmax(0, 4fr) minmax(0, 8fr); }
+.heroCover { height: 100%; min-height: 222px; }
+.heroBody {
+  display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "main count" "links links";
+  align-content: space-between; gap: var(--space-md) var(--space-lg);
+  padding: var(--space-lg) var(--space-xl);
 }
-.heroCover { width: 100%; height: 100%; min-height: 280px; object-fit: cover; display: block; }
-.heroBody { display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-xs); padding: var(--space-xl) var(--space-2xl); }
-.heroTitle { margin-top: var(--space-xs); }
+.heroMain { grid-area: main; display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-xxs); min-width: 0; }
+.heroTitle { margin-top: var(--space-xxs); }
 .heroLink { color: var(--text-primary); }
 .heroLink:hover { text-decoration: underline; text-underline-offset: 4px; text-decoration-thickness: 2px; }
-.countdown { display: flex; align-items: baseline; gap: var(--space-xs); margin: var(--space-sm) 0 var(--space-md); }
-.countBig { font: var(--p-weight-display) var(--p-size-display)/var(--p-leading-display) var(--font-display); font-stretch: var(--p-stretch-display); letter-spacing: var(--p-tracking-display); color: var(--text-brand); font-variant-numeric: tabular-nums; }
+.countdown { grid-area: count; display: flex; align-items: baseline; gap: var(--space-xs); margin: 0; }
+.countBig { font: var(--p-weight-display) var(--p-size-display)/var(--p-leading-display) var(--font-display); font-stretch: var(--p-stretch-display); letter-spacing: var(--p-tracking-display); color: var(--text-primary); font-variant-numeric: tabular-nums; }
 .countSmall { color: var(--text-subtle); }
-.heroFoot { margin-top: auto; align-self: stretch; display: flex; align-items: center; justify-content: space-between; gap: var(--space-md); flex-wrap: wrap; }
-.heroLinks { display: flex; gap: var(--space-xs); flex-wrap: wrap; }
+.heroLinks { grid-area: links; display: flex; gap: var(--space-xs); flex-wrap: wrap; }
 @media (max-width: 743px) {
   .hero { grid-template-columns: minmax(0, 1fr); }
   .heroCover { min-height: 0; aspect-ratio: 16 / 9; }
-  .heroBody { padding: var(--space-lg) var(--space-inset) var(--space-inset); }
+  .heroBody { grid-template-columns: minmax(0, 1fr); grid-template-areas: "main" "count" "links"; gap: var(--space-md); padding: var(--space-lg) var(--space-inset) var(--space-inset); }
 }
 
 /* Trip cards: every card has a cover on top (photo or illustrated scene), then the details on white. */
 .grid { display: grid; gap: var(--space-md); grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); }
 .trip { display: flex; flex-direction: column; border: 1px solid var(--border-subtle); }
 .coverWrap { position: relative; height: 140px; }
-.cover { width: 100%; height: 100%; object-fit: cover; display: block; }
 .coverBadge { position: absolute; top: var(--space-sm); left: var(--space-sm); background: var(--surface-background-tertiary); box-shadow: var(--shadow-subtle); color: var(--text-body); font: var(--p-weight-semibold) var(--p-size-caption1)/1 var(--font-text); padding: var(--space-xs) var(--space-sm); border-radius: var(--radius-pill); }
 .tripBody { flex: 1; padding: var(--space-md) var(--space-inset) var(--space-inset); display: flex; flex-direction: column; gap: var(--space-xxs); color: var(--text-body); }
-.tripFoot { display: flex; align-items: center; justify-content: space-between; margin-top: auto; padding-top: var(--space-sm); }
+.tripFoot { margin-top: auto; padding-top: var(--space-sm); }
 
 /* Plan tile: sits in the grid like a trip card, with a dashed outline so it reads as "add one". */
 .plan {
@@ -53,7 +54,7 @@
   margin: 0 calc(-1 * var(--space-gutter)); padding: 0 var(--space-gutter) var(--space-xs);
 }
 .past { scroll-snap-align: start; border: 1px solid var(--border-subtle); }
-.pastCover { width: 100%; height: 100px; object-fit: cover; display: block; }
+.pastCover { height: 100px; }
 .pastBody { padding: var(--space-sm) var(--space-md) var(--space-md); display: flex; flex-direction: column; gap: var(--space-xxs); }
 
 .emptyPast { border: 1px solid var(--border-subtle); background: transparent; }

@@ -36,7 +36,7 @@ export function Ideas(ctx: TripCtx) {
           <h2 className="t-title1">Ideas board</h2>
           <div className={s.dayBudget}>Drop ideas, vote, and {ctx.canManage ? 'approve the winners into the itinerary' : 'organizers will schedule the winners'}.</div>
         </div>
-        <Button icon="plus" onClick={() => setEditing('new')}>Add idea</Button>
+        <Button size="small" icon="plus" onClick={() => setEditing('new')}>Add idea</Button>
       </div>
       <SegmentedControl label="Filter ideas" value={filter} onChange={setFilter} options={[
         { value: 'open', label: `Open (${count('open')})` },
@@ -46,8 +46,7 @@ export function Ideas(ctx: TripCtx) {
       {shown.length === 0 ? (
         <Card>
           <EmptyState illustration="ideas" title={filter === 'open' ? 'No open ideas' : 'Nothing here yet'}
-            message={filter === 'open' ? 'Saw a great restaurant or tour? Add it so everyone can vote.' : undefined}
-            action={filter === 'open' && <Button variant="tinted" icon="plus" onClick={() => setEditing('new')}>Add idea</Button>} />
+            message={filter === 'open' ? 'Saw a great restaurant or tour? Add it so everyone can vote.' : undefined} />
         </Card>
       ) : (
         <div className={s.ideaGrid}>

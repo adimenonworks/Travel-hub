@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Avatar, Badge, Button, Card, List, ListRow, Section, Select } from '../../design/components';
+import { Avatar, Badge, Button, Card, Illustration, List, ListRow, Section, Select } from '../../design/components';
 import { store } from '../../data';
 import { personName, useMe } from '../../data/hooks';
 import type { TripCtx } from './TripPage';
@@ -13,6 +13,7 @@ export function People({ trip, profiles, canManage, isOwner }: TripCtx) {
   const [copied, setCopied] = useState(false);
   const [busy, setBusy] = useState(false);
 
+  // "Invite to trip" makes a link and opens the share sheet straight away (or copies it where there's no share sheet).
   const makeLink = async () => {
     setBusy(true);
     try {
@@ -20,16 +21,20 @@ export function People({ trip, profiles, canManage, isOwner }: TripCtx) {
       const url = `${location.origin}${location.pathname}#/join/${code}`;
       setLink(url);
       setCopied(false);
+      return url;
     } finally {
       setBusy(false);
     }
   };
-  const share = async () => {
+  const share = async (url = link) => {
     if (navigator.share) {
-      try { await navigator.share({ title: `Join ${trip.name}`, text: `Join our trip "${trip.name}" on Trip Hub`, url: link }); return; } catch { /* cancelled */ }
+      try { await navigator.share({ title: `Join ${trip.name}`, text: `Join our trip "${trip.name}" on Trip Hub`, url }); return; } catch { /* cancelled */ }
     }
-    await navigator.clipboard.writeText(link);
-    setCopied(true);
+    try { await navigator.clipboard.writeText(url); setCopied(true); } catch { /* the link is on screen to copy by hand */ }
+  };
+  const invite = async () => {
+    const url = await makeLink();
+    await share(url);
   };
 
   const members = trip.memberIds.slice().sort((a, b) => (trip.roles[a] === 'owner' ? -1 : trip.roles[b] === 'owner' ? 1 : 0));
@@ -66,21 +71,23 @@ export function People({ trip, profiles, canManage, isOwner }: TripCtx) {
       </Section>
 
       {canManage && (
-        <Section title="Invite people" footer="Anyone with the link can join for the next 14 days after signing in. Generate a new link at any time.">
-          <Card className={s.invite}>
+        <Card media={<Illustration name="people" size={120} />}>
+          <h2 className="t-headline">The more the merrier</h2>
+          <p className="t-subhead t-secondary">Invite friends to plan this trip with you. Anyone with the link can join for the next 14 days after signing in.</p>
+          <div className={s.inviteActions}>
             {link ? (
               <>
                 <div className={s.inviteRow}>
                   <div className={s.inviteUrl} title={link}>{link}</div>
-                  <Button icon={copied ? 'check' : 'share'} onClick={share}>{copied ? 'Copied' : 'Share'}</Button>
+                  <Button icon={copied ? 'check' : 'share'} onClick={() => share()}>{copied ? 'Copied' : 'Share'}</Button>
                 </div>
-                <Button variant="plain" size="small" onClick={makeLink} disabled={busy}>Generate a new link</Button>
+                <Button variant="plain" size="small" onClick={makeLink} disabled={busy}>Make a new link</Button>
               </>
             ) : (
-              <Button icon="link" onClick={makeLink} disabled={busy}>Create invite link</Button>
+              <Button icon="plus" onClick={invite} disabled={busy}>Invite to trip</Button>
             )}
-          </Card>
-        </Section>
+          </div>
+        </Card>
       )}
 
       {/* Deleting the trip lives in Edit trip; here members other than the owner can leave. */}

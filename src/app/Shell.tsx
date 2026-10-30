@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, type ReactNode } from 'react';
-import { Link, NavLink, useNavigate } from 'react-router-dom';
-import { Avatar, Banner, Button, Icon } from '../design/components';
+import { NavLink, useLocation, useNavigate } from 'react-router-dom';
+import { Avatar, Banner, Button } from '../design/components';
 import { store } from '../data';
 import { useMe, useProfile } from '../data/hooks';
 import { TripForm } from '../features/trip/TripForm';
@@ -11,13 +11,15 @@ const NewTripContext = createContext<() => void>(() => {});
 export const useNewTrip = () => useContext(NewTripContext);
 
 /**
- * App frame: a slim sticky top bar (brand on the left; New trip and your profile on the right),
- * then the page. The "New trip" sheet lives here so any page can open it.
+ * App frame: a light top bar with no background — on Home "Add a trip" on the left, and your profile
+ * on the right everywhere — then the page. The trip sheet lives here so any page can open it.
  */
 export function Shell({ children }: { children: ReactNode }) {
   const me = useMe();
   const profile = useProfile(me.uid);
   const navigate = useNavigate();
+  // "Add a trip" belongs to Home; inside a trip each page has its own main action.
+  const onHome = useLocation().pathname === '/';
   const [creating, setCreating] = useState(false);
   // The saved profile wins over the sign-in account, so a chosen nickname or photo shows here.
   const name = profile?.name || me.name;
@@ -29,19 +31,10 @@ export function Shell({ children }: { children: ReactNode }) {
       <div className={s.shell}>
         <header className={s.bar}>
           <div className={s.barInner}>
-            <Link to="/" className={s.brand} aria-label="Trip Hub, all trips">
-              <span className={s.mark}><Icon name="plane" size={22} /></span>
-              <span className={s.wordmark} aria-hidden="true">Trip Hub</span>
-            </Link>
-            <div className={s.barActions}>
-              <Button size="medium" icon="plus" onClick={newTrip} aria-label="New trip" className={s.newTrip}>
-                <span className={s.newTripText}>New trip</span>
-              </Button>
-              {/* The emerald ring marks the avatar as a button into your profile and settings. */}
-              <NavLink to="/profile" className={s.me} aria-label={`Your profile and settings (${name})`}>
-                <Avatar name={name} photo={photo} seed={me.uid} size={36} />
-              </NavLink>
-            </div>
+            {onHome && <Button size="small" icon="plus" onClick={newTrip}>Add a trip</Button>}
+            <NavLink to="/profile" className={s.me} aria-label={`Your profile and settings (${name})`}>
+              <Avatar name={name} photo={photo} seed={me.uid} size={44} />
+            </NavLink>
           </div>
         </header>
         <main id="main" className={s.main}>

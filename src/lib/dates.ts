@@ -31,6 +31,11 @@ export function tripDays(start: string, end: string) {
   return Array.from({ length: n + 1 }, (_, i) => addDays(start, i));
 }
 
+/** What a trip day is called: "Today", "Tomorrow" or "Yesterday" near today, otherwise "Day 3" (its number in the trip). */
+export function dayWord(d: string, tripStart: string, now = today()) {
+  return d === now ? 'Today' : d === addDays(now, 1) ? 'Tomorrow' : d === addDays(now, -1) ? 'Yesterday' : `Day ${daysBetween(tripStart, d) + 1}`;
+}
+
 export function formatDay(d: string, opts: Intl.DateTimeFormatOptions = { weekday: 'short', month: 'short', day: 'numeric' }) {
   return parseDay(d).toLocaleDateString(undefined, opts);
 }

@@ -1,7 +1,7 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import '@fontsource-variable/manrope';
-import '@fontsource-variable/bricolage-grotesque/standard.css'; // weight, width and optical-size axes
+import '@fontsource/poppins/latin-900.css'; // display: Poppins Black
 import './design/base.css';
 import { App } from './app/App';
 import { applyTheme, getTheme } from './lib/theme';

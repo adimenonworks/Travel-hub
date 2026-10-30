@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { AvatarStack, Badge, Button, Card, CardLink, COVER_ILLUSTRATIONS, Illustration, LinkButton, PageHeader, Section, Spinner } from '../../design/components';
-import { personName, useMe, useMyTrips, useProfile, useProfiles } from '../../data/hooks';
+import { Badge, Button, Card, CardLink, Illustration, LinkButton, PageHeader, Section, Spinner } from '../../design/components';
+import { useMe, useMyTrips, useProfile } from '../../data/hooks';
 import type { Trip } from '../../data/types';
-import { coverPosition } from '../../lib/image';
 import { daysBetween, formatRange, today, tripPhase } from '../../lib/dates';
 import { Content, useNewTrip } from '../../app/Shell';
+import { CoverPeople, TripCover } from '../shared/TripCover';
 import s from './Home.module.css';
 
 /**
@@ -70,43 +70,34 @@ function greeting(h = new Date().getHours()) {
   return h < 12 ? 'Good morning' : h < 18 ? 'Good afternoon' : 'Good evening';
 }
 
-/** The trip's photo, or else one of the illustrated scenes (always the same one for the same trip). */
-function Cover({ trip, className }: { trip: Trip; className: string }) {
-  if (trip.coverPhoto) return <img src={trip.coverPhoto} alt="" className={className} style={{ objectPosition: coverPosition(trip) }} />;
-  let h = 0;
-  for (const c of trip.id) h = (h * 31 + c.charCodeAt(0)) | 0;
-  return <div className={className}><Illustration name={COVER_ILLUSTRATIONS[Math.abs(h) % COVER_ILLUSTRATIONS.length]} /></div>;
-}
-
 const place = (t: Trip) => t.destination?.name.split(',').slice(0, 2).join(',') ?? 'No destination yet';
 
 /** The big card for the trip you're on or the next one: cover, countdown and quick links into it. */
 function Hero({ trip, now }: { trip: Trip; now: boolean }) {
-  const profiles = useProfiles(trip.memberIds);
   const total = daysBetween(trip.startDate, trip.endDate) + 1;
   const until = daysBetween(today(), trip.startDate);
   const [big, small] = now
-    ? [`Day ${daysBetween(trip.startDate, today()) + 1}`, `of ${total}`]
+    ? ['Today', `day ${daysBetween(trip.startDate, today()) + 1} of ${total}`]
     : until === 1 ? ['Tomorrow', ''] : [String(until), 'days to go'];
   const base = `/trip/${trip.id}`;
   return (
-    <section className={s.hero} aria-labelledby="hero-title">
-      <Cover trip={trip} className={s.heroCover} />
+    // The brand (accent) card: emerald, with every text, badge and button on it in the dark emerald partner.
+    <Card tone="accent" flush className={s.hero} role="region" aria-labelledby="hero-title">
+      <TripCover trip={trip} className={s.heroCover}><CoverPeople trip={trip} size={32} /></TripCover>
       <div className={s.heroBody}>
-        <Badge tone={now ? 'tint' : 'neutral'}>{now ? 'Happening now' : 'Next up'}</Badge>
-        <h2 id="hero-title" className={`t-title1 ${s.heroTitle}`}><Link to={base} className={s.heroLink}>{trip.name}</Link></h2>
-        <p className="t-callout t-secondary">{place(trip)} · {formatRange(trip.startDate, trip.endDate)}</p>
+        <div className={s.heroMain}>
+          <Badge>{now ? 'Happening now' : 'Next up'}</Badge>
+          <h2 id="hero-title" className={`t-title1 ${s.heroTitle}`}><Link to={base} className={s.heroLink}>{trip.name}</Link></h2>
+          <p className="t-callout t-secondary">{place(trip)} · {formatRange(trip.startDate, trip.endDate)}</p>
+        </div>
         <p className={s.countdown}><span className={s.countBig}>{big}</span> {small && <span className={`t-title3 ${s.countSmall}`}>{small}</span>}</p>
-        <div className={s.heroFoot}>
-          <div className={s.heroLinks}>
-            <LinkButton to={base} variant="tinted" icon="calendar">Itinerary</LinkButton>
-            <LinkButton to={`${base}/ideas`} variant="gray" icon="lightbulb">Ideas</LinkButton>
-            <LinkButton to={`${base}/budget`} variant="gray" icon="wallet">Budget</LinkButton>
-          </div>
-          <AvatarStack people={trip.memberIds.map((id) => ({ id, name: personName(profiles, id), photo: profiles[id]?.photo }))} size={32} />
+        <div className={s.heroLinks}>
+          <LinkButton to={base} variant="inverse" icon="calendar">Itinerary</LinkButton>
+          <LinkButton to={`${base}/ideas`} variant="ghost" icon="lightbulb">Ideas</LinkButton>
+          <LinkButton to={`${base}/budget`} variant="ghost" icon="wallet">Budget</LinkButton>
         </div>
       </div>
-    </section>
+    </Card>
   );
 }
 
@@ -114,22 +105,18 @@ const whenLabel = (until: number, n: number) => (until > 0 ? `in ${until} day${u
 
 /** A trip in the grid: cover on top, then its name, place, dates and who's going. */
 function TripCard({ trip }: { trip: Trip }) {
-  const profiles = useProfiles(trip.memberIds);
   const n = daysBetween(trip.startDate, trip.endDate) + 1;
   const until = daysBetween(today(), trip.startDate);
   return (
     <CardLink to={`/trip/${trip.id}`} flush className={s.trip}>
-      <div className={s.coverWrap}>
-        <Cover trip={trip} className={s.cover} />
+      <TripCover trip={trip} className={s.coverWrap}>
         <span className={s.coverBadge}>{tripPhase(trip.startDate, trip.endDate) === 'current' ? 'Happening now' : whenLabel(until, n)}</span>
-      </div>
+        <CoverPeople trip={trip} size={24} />
+      </TripCover>
       <div className={s.tripBody}>
         <div className="t-title3">{trip.name}</div>
         <div className="t-subhead t-secondary">{place(trip)}</div>
-        <div className={s.tripFoot}>
-          <span className="t-footnote t-secondary">{formatRange(trip.startDate, trip.endDate)}</span>
-          <AvatarStack people={trip.memberIds.map((id) => ({ id, name: personName(profiles, id), photo: profiles[id]?.photo }))} size={24} />
-        </div>
+        <div className={`t-footnote t-secondary ${s.tripFoot}`}>{formatRange(trip.startDate, trip.endDate)}</div>
       </div>
     </CardLink>
   );
@@ -139,7 +126,7 @@ function TripCard({ trip }: { trip: Trip }) {
 function PastCard({ trip }: { trip: Trip }) {
   return (
     <CardLink to={`/trip/${trip.id}`} flush className={s.past}>
-      <Cover trip={trip} className={s.pastCover} />
+      <TripCover trip={trip} className={s.pastCover} />
       <div className={s.pastBody}>
         <div className="t-headline">{trip.name}</div>
         <div className="t-footnote t-secondary">{formatRange(trip.startDate, trip.endDate)}</div>
@@ -189,7 +176,7 @@ function PlanTile({ wide }: { wide?: boolean }) {
         </h2>
         <p className="t-subhead t-secondary">There’s so much to see and do. Let’s plan it right.</p>
       </div>
-      <Button variant="tinted" icon="plus" onClick={newTrip}>Plan a trip</Button>
+      <Button icon="plus" onClick={newTrip}>Add a trip</Button>
     </div>
   );
 }

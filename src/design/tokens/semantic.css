@@ -46,7 +46,7 @@
   --status-error-subtle: var(--p-red-100);
 
   /* Surfaces, back to front, plus the brand surfaces */
-  --surface-background-primary: var(--p-neutral-100);   /* page canvas */
+  --surface-background-primary: var(--p-neutral-50);    /* page canvas */
   --surface-background-secondary: var(--p-neutral-0);   /* cards, lists, inputs */
   --surface-background-tertiary: var(--p-neutral-0);    /* sheets, menus, popovers — with --shadow-subtle */
   --surface-brand: var(--p-emerald-300);                /* accent card, trip hero, covers, brand mark */
@@ -110,7 +110,6 @@
   --space-gutter: var(--p-space-5);        /* page side margin, compact */
   --space-inset: var(--p-space-5);         /* list row / card padding */
   --space-stack: var(--p-space-8);         /* gap between sections */
-  --space-page-top: var(--p-space-8);      /* space between the top bar and the page title */
 
   /* Shape — everything is a pill or a soft rounded rectangle */
   --radius-button: var(--p-radius-full);
@@ -131,13 +130,14 @@
   --size-control: 48px;
   --size-control-md: 44px;        /* a compact control beside a medium button, e.g. a role picker in a list row */
   --size-control-sm: 36px;
-  --size-topbar: 64px;           /* the app's top bar */
+  --size-topbar: 64px;           /* the app's top bar row (Add a trip + profile) */
   --size-content-max: 1200px;
 
   /* Motion */
   --motion-fast: var(--p-duration-fast) var(--p-ease-standard);
   --motion-base: var(--p-duration-base) var(--p-ease-standard);
-  --motion-sheet: var(--p-duration-slow) var(--p-ease-spring);
+  --motion-sheet: var(--p-duration-sheet) var(--p-ease-spring);    /* a sheet gliding in */
+  --motion-sheet-out: var(--p-duration-base) var(--p-ease-exit);   /* and sliding away */
   --motion-fluid: var(--p-duration-fluid) var(--p-ease-fluid);      /* things that move: tab underline, segment pill, day cards */
   --motion-press: var(--p-duration-fast) var(--p-ease-standard);     /* a control pressing in */
   --motion-release: var(--p-duration-slow) var(--p-ease-bounce);      /* and springing back out */
@@ -149,7 +149,6 @@
     --space-gutter: var(--p-space-8);
     --space-inset: var(--p-space-6);
     --space-stack: var(--p-space-12);
-    --space-page-top: var(--p-space-12);
   }
 }
 @media (min-width: 1068px) {

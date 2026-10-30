@@ -3,7 +3,7 @@ import { Button, FieldRow, Select, Sheet, TextArea, TextField } from '../../desi
 import { store } from '../../data';
 import { useMe } from '../../data/hooks';
 import type { Activity, Category, LinkItem, Trip } from '../../data/types';
-import { formatDay, tripDays } from '../../lib/dates';
+import { dayWord, formatDay, tripDays } from '../../lib/dates';
 import { geocodePlace } from '../../lib/geocode';
 import { CATEGORIES } from '../../lib/categories';
 import { LinkEditor, cleanLinks } from '../shared/Links';
@@ -76,7 +76,7 @@ export function ActivityForm({ open, trip, date, activity, draft, onClose, onCre
       <TextField label="What" placeholder="Sunset at Miradouro da Graça" value={f.title} onChange={(e) => set({ title: e.target.value })} />
       <FieldRow>
         <Select label="Day" value={f.date} onChange={(e) => set({ date: e.target.value })}>
-          {tripDays(trip.startDate, trip.endDate).map((d, i) => <option key={d} value={d}>Day {i + 1} · {formatDay(d)}</option>)}
+          {tripDays(trip.startDate, trip.endDate).map((d) => <option key={d} value={d}>{dayWord(d, trip.startDate)} · {formatDay(d)}</option>)}
         </Select>
         <Select label="Type" value={f.category} onChange={(e) => set({ category: e.target.value as Category })}>
           {CATEGORIES.map((c) => <option key={c.value} value={c.value}>{c.label}</option>)}

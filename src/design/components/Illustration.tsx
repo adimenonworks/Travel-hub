@@ -1,7 +1,7 @@
 import s from './Illustration.module.css';
 
 export type IllustrationName =
-  | 'memories' | 'ideas' | 'calendar' | 'map' | 'ticket' | 'suitcase' | 'compass' | 'globe'
+  | 'memories' | 'ideas' | 'calendar' | 'map' | 'ticket' | 'suitcase' | 'compass' | 'globe' | 'people'
   | 'cover-hills' | 'cover-coast' | 'cover-city';
 
 /** Scenes used as a trip's cover when it has no photo; each trip always gets the same one. */
@@ -163,6 +163,32 @@ const spots = {
       </g>
       <circle className={s.sun} cx="100" cy="74" r="5" />
       <path className={s.spark} d="M14 12v8M10 16h8" />
+    </>
+  ),
+  people: (
+    <>
+      {/* Three friends side by side, the one in front a little taller, with a heart above */}
+      <g transform="rotate(-6 34 64)">
+        <path className={s.hill} d="M16 88v-12a18 18 0 0136 0v12z" />
+        <circle className={s.frame} cx="34" cy="46" r="11" />
+        <circle className={s.needle} cx="30.5" cy="46" r="1.4" />
+        <circle className={s.needle} cx="37.5" cy="46" r="1.4" />
+      </g>
+      <g transform="rotate(6 86 64)">
+        <path className={s.sun} d="M68 88v-12a18 18 0 0136 0v12z" />
+        <circle className={s.frame} cx="86" cy="46" r="11" />
+        <circle className={s.needle} cx="82.5" cy="46" r="1.4" />
+        <circle className={s.needle} cx="89.5" cy="46" r="1.4" />
+      </g>
+      <g transform="rotate(-2 60 60)">
+        <path className={s.hillDeep} d="M40 92v-16a20 20 0 0140 0v16z" />
+        <circle className={s.frame} cx="60" cy="38" r="13" />
+        <circle className={s.needle} cx="55.5" cy="37" r="1.6" />
+        <circle className={s.needle} cx="64.5" cy="37" r="1.6" />
+        <path className={s.smile} d="M55.5 42.5q4.5 3.5 9 0" />
+      </g>
+      <path className={s.hill} d="M60 20c-4-3-8-5.5-8-9a4 4 0 018-1.5 4 4 0 018 1.5c0 3.5-4 6-8 9z" transform="rotate(8 60 14)" />
+      <path className={s.spark} d="M14 16v8M10 20h8M106 12v8M102 16h8" />
     </>
   ),
 };
