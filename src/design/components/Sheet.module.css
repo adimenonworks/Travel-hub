@@ -26,10 +26,18 @@
 
 @media (min-width: 744px) {
   .backdrop { align-items: center; padding: var(--space-xl); }
-  .sheet { max-width: 600px; border-radius: var(--radius-sheet); max-height: min(760px, calc(100dvh - 48px)); animation: pop var(--motion-base); padding-bottom: 0; }
+  .sheet { max-width: 600px; border-radius: var(--radius-sheet); max-height: min(760px, calc(100dvh - 48px)); animation: pop var(--motion-sheet); padding-bottom: 0; }
   .grabber { display: none; }
 }
 
+/* Closing: the sheet slides back down (or shrinks away on wider screens) and the scrim fades, faster than it came in. */
+.closing { pointer-events: none; animation: fadeOut var(--motion-sheet-out) forwards; }
+.closing .sheet { animation: sink var(--motion-sheet-out) forwards; }
+@media (min-width: 744px) { .closing .sheet { animation: unpop var(--motion-sheet-out) forwards; } }
+
 @keyframes fade { from { opacity: 0; } }
+@keyframes fadeOut { to { opacity: 0; } }
+@keyframes sink { to { transform: translateY(100%); } }
+@keyframes unpop { to { transform: scale(0.96); opacity: 0; } }
 @keyframes rise { from { transform: translateY(100%); } }
 @keyframes pop { from { transform: scale(0.96); opacity: 0; } }

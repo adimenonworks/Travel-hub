@@ -97,6 +97,8 @@ function TripLoaded({ trip }: { trip: Trip }) {
         <div className={s.sectionNav}>
           <Tabs items={tabs} label="Trip sections" />
         </div>
+        {/* At least a screen tall, so switching to a shorter tab never pulls the page (and the tabs) up. */}
+        <div className={s.tabPanel}>
         <Routes>
           <Route index element={<Itinerary {...ctx} />} />
           <Route path="ideas" element={<Ideas {...ctx} />} />
@@ -105,6 +107,7 @@ function TripLoaded({ trip }: { trip: Trip }) {
           <Route path="info" element={<Navigate to={base} replace />} />
           <Route path="people" element={<People {...ctx} />} />
         </Routes>
+        </div>
       </Content>
       <TripForm open={editing} trip={trip} onClose={() => setEditing(false)} onDeleted={isOwner ? () => navigate('/') : undefined} />
     </>

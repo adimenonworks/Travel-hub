@@ -46,12 +46,6 @@ button { cursor: pointer; }
   overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap;
 }
 
-/* View transitions ("smart animate", e.g. the itinerary's day cards): everything glides with the fluid motion,
-   and parts that only exist on one side (a tag appearing) fade. */
-::view-transition-group(*) { animation-duration: var(--p-duration-fluid); animation-timing-function: var(--p-ease-fluid); }
-::view-transition-old(*), ::view-transition-new(*) { animation-duration: var(--p-duration-fluid); animation-timing-function: var(--p-ease-fluid); }
-::view-transition-old(root), ::view-transition-new(root) { animation-duration: var(--p-duration-base); }
-
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: 1ms !important; transition-duration: 1ms !important; }
 }

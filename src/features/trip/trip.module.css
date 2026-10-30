@@ -29,51 +29,68 @@
   background: var(--surface-background-primary);
 }
 
-/* Day strip */
-.days { display: flex; gap: var(--space-xs); overflow-x: auto; scroll-snap-type: x proximity; padding: 2px 2px var(--space-xxs); margin: 0 calc(-1 * var(--space-gutter)); padding-left: var(--space-gutter); padding-right: var(--space-gutter); scrollbar-width: none; }
+/* The tab's content: never shorter than the screen, so the page height doesn't jump between tabs. */
+.tabPanel { min-height: 100dvh; }
+
+/* Day strip. Push-expand: each card has a fixed size, so the browser can animate between them. In the strip the
+   tapped card widens (80 → 208px) as the old one narrows; in the side list (wide screens) it grows taller instead.
+   Both faces sit in the card; the open face is laid out at full size and revealed as the card grows. */
+.days {
+  display: flex; gap: var(--space-xs); overflow-x: auto; scroll-snap-type: x proximity; scrollbar-width: none;
+  margin: 0 calc(-1 * var(--space-gutter)); padding: 2px var(--space-gutter) var(--space-xxs);
+  scroll-padding-inline: var(--space-gutter);
+}
 .days::-webkit-scrollbar { display: none; }
 .day {
-  flex: none; scroll-snap-align: start;
-  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
-  min-width: 64px; min-height: 88px; padding: var(--space-sm) var(--space-xs);
-  border-radius: var(--radius-pill); border: 0;
+  --day-open: 208px;
+  position: relative; flex: none; scroll-snap-align: start; overflow: hidden;
+  width: 80px; height: 100px; padding: 0;
+  border-radius: var(--radius-card); border: 0; text-align: left;
   background: var(--surface-background-secondary); color: var(--text-body);
-  transition: background var(--motion-fast);
+  transition: width var(--motion-fluid), height var(--motion-fluid), background var(--motion-base), color var(--motion-base);
 }
 .day:hover { background-image: linear-gradient(var(--interactive-ghost-hover), var(--interactive-ghost-hover)); }
 .day:active { background-image: linear-gradient(var(--interactive-ghost-pressed), var(--interactive-ghost-pressed)); }
-.day[aria-pressed='true'] { background: var(--interactive-selected); color: var(--text-on-selected); }
+.day[aria-pressed='true'] { width: var(--day-open); background: var(--interactive-selected); color: var(--text-on-selected); }
 .day[aria-pressed='true']:hover { background: var(--interactive-selected-hover); }
 .day[aria-pressed='true']:active { background: var(--interactive-selected-pressed); }
-.dayDow { font-size: var(--p-size-caption1); font-weight: var(--p-weight-semibold); }
+
+/* The faces: the one leaving fades quickly, the one arriving fades in as the card finishes growing. */
+.dayCompact, .dayOpen { position: absolute; top: 0; left: 0; transition: opacity var(--motion-fast); }
+.dayCompact { transition: opacity var(--motion-base) var(--p-duration-fast); }
+.dayCompact {
+  width: 100%; height: 100%; padding: var(--space-sm) var(--space-xs);
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
+}
+.dayOpen {
+  width: var(--day-open); height: 100%; padding: var(--space-sm) var(--space-md);
+  display: flex; flex-direction: column; justify-content: center; align-items: flex-start; gap: var(--space-xxs);
+  opacity: 0; pointer-events: none;
+}
+.day[aria-pressed='true'] .dayCompact { opacity: 0; pointer-events: none; transition: opacity var(--motion-fast); }
+.day[aria-pressed='true'] .dayOpen { opacity: 1; transition: opacity var(--motion-base) var(--p-duration-fast); }
+
+.dayTop { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--space-sm); align-self: stretch; }
+.dayDow { font-size: var(--p-size-caption1); font-weight: var(--p-weight-semibold); white-space: nowrap; }
 .dayNum { font: var(--p-weight-display) var(--p-size-title1)/1 var(--font-display); font-stretch: var(--p-stretch-display); letter-spacing: var(--p-tracking-title1); }
 .dayDot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
-/* The selected day opens up: the date with its "events left" tag at the top right, the day word under it,
-   then the budget left. */
-.day[aria-pressed='true'] {
-  display: grid; grid-template-columns: 1fr auto; align-items: center; justify-items: start; text-align: left;
-  column-gap: var(--space-sm); row-gap: var(--space-xxs);
-  min-width: 200px; padding: var(--space-sm) var(--space-md); border-radius: var(--radius-card);
-}
-.day[aria-pressed='true'] .dayDate { grid-column: 1; grid-row: 1; }
-.dayTag { grid-column: 2; grid-row: 1; align-self: start; }
-.day[aria-pressed='true'] .dayDow, .day[aria-pressed='true'] .dayLabels { grid-column: 1 / -1; }
-.dayDate { display: flex; align-items: baseline; gap: var(--space-xxs); }
-.dayMonth { font-size: var(--p-size-footnote); font-weight: var(--p-weight-semibold); }
-.dayLabels { display: flex; flex-wrap: wrap; gap: 4px; }
-.dayLabel { padding: 2px 8px; border-radius: var(--radius-pill); background: color-mix(in srgb, currentColor 16%, transparent); font-size: var(--p-size-caption1); font-weight: var(--p-weight-semibold); white-space: nowrap; }
-.dayOver { box-shadow: inset 0 0 0 1px currentColor; }
 .dayDot.empty { opacity: 0; }
+.dayDate { display: flex; align-items: baseline; gap: var(--space-xxs); white-space: nowrap; }
+.dayMonth { font-size: var(--p-size-footnote); font-weight: var(--p-weight-semibold); }
+.dayLabel { padding: 2px 8px; border-radius: var(--radius-pill); background: color-mix(in srgb, currentColor 16%, transparent); font-size: var(--p-size-caption1); font-weight: var(--p-weight-semibold); white-space: nowrap; }
+.dayMoney { margin-top: 2px; }
+.dayOver { box-shadow: inset 0 0 0 1px currentColor; }
 
 .itinLayout { display: flex; flex-direction: column; gap: var(--space-xl); }
 @media (min-width: 1068px) {
   .itinLayout { display: grid; grid-template-columns: 240px minmax(0, 1fr); gap: var(--space-2xl); align-items: start; }
   .days { flex-direction: column; overflow: visible; margin: 0; padding: 0; position: sticky; top: 92px; }
-  .day { flex-direction: row; justify-content: flex-start; gap: var(--space-sm); min-height: 56px; padding: 0 var(--space-lg); }
-  .dayNum { font-size: var(--p-size-title2); letter-spacing: var(--p-tracking-title2); }
-  .dayDot { margin-left: auto; }
-  .day[aria-pressed='true'] { min-width: 0; min-height: 0; padding: var(--space-md) var(--space-lg); }
-  .day[aria-pressed='true'] .dayNum { font-size: var(--p-size-title1); letter-spacing: var(--p-tracking-title1); }
+  .day, .day[aria-pressed='true'] { --day-open: 100%; width: 100%; height: 56px; }
+  .day[aria-pressed='true'] { height: 112px; }
+  .dayCompact { flex-direction: row; justify-content: flex-start; gap: var(--space-sm); padding: 0 var(--space-lg); }
+  .dayCompact .dayNum { font-size: var(--p-size-title2); letter-spacing: var(--p-tracking-title2); }
+  .dayCompact .dayDot { margin-left: auto; }
+  .dayOpen { height: 112px; padding: var(--space-md) var(--space-lg); }
 }
 
 /* Timeline */
