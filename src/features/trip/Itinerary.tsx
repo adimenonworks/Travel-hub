@@ -11,8 +11,6 @@ import { ActivityForm } from './ActivityForm';
 import type { TripCtx } from './TripPage';
 import s from './trip.module.css';
 
-// A unique name per day and part, so a view transition can match each piece before and after.
-
 export const byTime = (a: Activity, b: Activity) => (a.startTime || '99').localeCompare(b.startTime || '99') || a.createdAt - b.createdAt;
 
 export function Itinerary(ctx: TripCtx) {
@@ -31,6 +29,14 @@ export function Itinerary(ctx: TripCtx) {
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     setTimeout(() => stripRef.current?.querySelector(`[data-day="${d}"]`)?.scrollIntoView({ block: 'nearest', inline: 'nearest', behavior: reduce ? 'auto' : 'smooth' }), reduce ? 0 : 420);
   };
+
+  // On arrival, slide the strip (sideways only, never the page) so the selected day starts fully in view.
+  useEffect(() => {
+    const strip = stripRef.current;
+    const el = strip?.querySelector<HTMLElement>(`[data-day="${day}"]`);
+    if (strip && el && strip.scrollWidth > strip.clientWidth)
+      strip.scrollLeft += el.getBoundingClientRect().left - strip.getBoundingClientRect().left - parseFloat(getComputedStyle(strip).paddingLeft);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const [adding, setAdding] = useState(false);
 

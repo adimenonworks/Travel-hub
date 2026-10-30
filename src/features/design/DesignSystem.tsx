@@ -18,7 +18,7 @@ const colorGroups: { title: string; tokens: string[] }[] = [
 ];
 
 const typeStyles = [
-  ['t-display', 'Display', '40–72 / 0.95 Bricolage Grotesque ExtraBold, 80% width'],
+  ['t-display', 'Display', '40–72 / 0.95 Poppins Black'],
   ['t-title1', 'Title 1', '32 / 38 Manrope Semibold'],
   ['t-title2', 'Title 2', '24 / 31 Semibold'],
   ['t-title3', 'Title 3', '20 / 26 Semibold'],
@@ -36,10 +36,11 @@ const radii = ['--radius-inner', '--radius-field', '--radius-card', '--radius-pi
 const controlSizes = ['--size-control-sm', '--size-control-md', '--size-tap', '--size-control', '--size-topbar'];
 const motions: [string, string][] = [
   ['--motion-fast', 'Colour and background changes (hover, press colours)'],
-  ['--motion-fluid', 'Things that move: the tab underline, the segmented pill, day cards morphing'],
+  ['--motion-fluid', 'Things that move: the tab underline, the segmented pill, day cards pushing and expanding'],
   ['--motion-press', 'A button or option pressing in (scales to 96%)'],
   ['--motion-release', 'Springing back out, with a small overshoot'],
-  ['--motion-sheet', 'Sheets sliding up'],
+  ['--motion-sheet', 'Sheets gliding up (or popping in on wider screens)'],
+  ['--motion-sheet-out', 'Sheets sliding away on Cancel, Save or close: quicker, speeding up as they leave'],
 ];
 const spotNames: IllustrationName[] = ['memories', 'ideas', 'calendar', 'map', 'ticket', 'suitcase', 'compass', 'globe', 'people'];
 const icons: IconName[] = ['plus', 'calendar', 'lightbulb', 'wallet', 'cloud', 'people', 'person', 'home', 'pin', 'link', 'doc', 'pencil', 'trash', 'check', 'thumbs-up', 'chat', 'clock', 'globe', 'sun', 'rain', 'map', 'share', 'plane', 'news', 'photo'];

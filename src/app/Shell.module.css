@@ -10,7 +10,7 @@
   display: flex; align-items: center; gap: var(--space-md);
 }
 .me { margin-left: auto; display: grid; place-items: center; border-radius: 50%; transition: transform var(--motion-release); }
-.me:hover { filter: brightness(0.96); }
+.me:hover { filter: brightness(1.06); }
 .me:active { transform: scale(0.96); transition: transform var(--motion-press); }
 .me[aria-current='page'] { box-shadow: 0 0 0 2px var(--surface-background-primary), 0 0 0 4px var(--border-selected); }
 

@@ -50,11 +50,11 @@ export function Sheet({ open, title, onClose, onSubmit, submitLabel = 'Done', su
 
   const submit = async (e: FormEvent) => {
     e.preventDefault();
-    if (onSubmit && !submitDisabled) await onSubmit();
+    if (open && onSubmit && !submitDisabled) await onSubmit();
   };
 
   return createPortal(
-    <div className={[s.backdrop, closing && s.closing].filter(Boolean).join(' ')} onMouseDown={(e) => open && e.target === e.currentTarget && onClose()}>
+    <div className={[s.backdrop, closing && s.closing].filter(Boolean).join(' ')} inert={closing} onMouseDown={(e) => open && e.target === e.currentTarget && onClose()}>
       <div ref={ref} className={s.sheet} role="dialog" aria-modal="true" aria-label={shown.current.title}
         onAnimationEnd={(e) => closing && e.target === e.currentTarget && setMounted(false)}>
         <div className={s.grabber} />

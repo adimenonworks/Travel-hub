@@ -13,14 +13,13 @@
 .heroLink { color: var(--text-primary); }
 .heroLink:hover { text-decoration: underline; text-underline-offset: 4px; text-decoration-thickness: 2px; }
 .countdown { grid-area: count; display: flex; align-items: baseline; gap: var(--space-xs); margin: 0; }
-.countBig { font: var(--p-weight-display) var(--p-size-title1)/1 var(--font-display); font-stretch: var(--p-stretch-display); letter-spacing: var(--p-tracking-title1); color: var(--text-primary); font-variant-numeric: tabular-nums; }
-@media (min-width: 744px) { .countBig { font-size: var(--p-size-display); line-height: var(--p-leading-display); letter-spacing: var(--p-tracking-display); } }
+.countBig { font: var(--p-weight-display) var(--p-size-display)/var(--p-leading-display) var(--font-display); font-stretch: var(--p-stretch-display); letter-spacing: var(--p-tracking-display); color: var(--text-primary); font-variant-numeric: tabular-nums; }
 .countSmall { color: var(--text-subtle); }
 .heroLinks { grid-area: links; display: flex; gap: var(--space-xs); flex-wrap: wrap; }
 @media (max-width: 743px) {
   .hero { grid-template-columns: minmax(0, 1fr); }
   .heroCover { min-height: 0; aspect-ratio: 16 / 9; }
-  .heroBody { grid-template-columns: minmax(0, 1fr); grid-template-areas: "main" "count" "links"; gap: var(--space-lg); padding: var(--space-lg) var(--space-inset) var(--space-inset); }
+  .heroBody { grid-template-columns: minmax(0, 1fr); grid-template-areas: "main" "count" "links"; gap: var(--space-md); padding: var(--space-lg) var(--space-inset) var(--space-inset); }
 }
 
 /* Trip cards: every card has a cover on top (photo or illustrated scene), then the details on white. */
