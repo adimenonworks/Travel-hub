@@ -81,20 +81,19 @@ function Hero({ trip, now }: { trip: Trip; now: boolean }) {
     : until === 1 ? ['Tomorrow', ''] : [String(until), 'days to go'];
   const base = `/trip/${trip.id}`;
   return (
-    // The brand (accent) card: emerald, with every text, badge and button on it in the dark emerald partner.
-    <Card tone="accent" flush className={s.hero} role="region" aria-labelledby="hero-title">
+    <Card flush className={s.hero} role="region" aria-labelledby="hero-title">
       <TripCover trip={trip} className={s.heroCover}><CoverPeople trip={trip} size={32} /></TripCover>
       <div className={s.heroBody}>
         <div className={s.heroMain}>
-          <Badge>{now ? 'Happening now' : 'Next up'}</Badge>
+          <Badge tone={now ? 'tint' : 'neutral'}>{now ? 'Happening now' : 'Next up'}</Badge>
           <h2 id="hero-title" className={`t-title1 ${s.heroTitle}`}><Link to={base} className={s.heroLink}>{trip.name}</Link></h2>
           <p className="t-callout t-secondary">{place(trip)} · {formatRange(trip.startDate, trip.endDate)}</p>
         </div>
         <p className={s.countdown}><span className={s.countBig}>{big}</span> {small && <span className={`t-title3 ${s.countSmall}`}>{small}</span>}</p>
         <div className={s.heroLinks}>
-          <LinkButton to={base} variant="inverse" icon="calendar">Itinerary</LinkButton>
-          <LinkButton to={`${base}/ideas`} variant="ghost" icon="lightbulb">Ideas</LinkButton>
-          <LinkButton to={`${base}/budget`} variant="ghost" icon="wallet">Budget</LinkButton>
+          <LinkButton to={base} variant="tinted" icon="calendar">Itinerary</LinkButton>
+          <LinkButton to={`${base}/ideas`} variant="gray" icon="lightbulb">Ideas</LinkButton>
+          <LinkButton to={`${base}/budget`} variant="gray" icon="wallet">Budget</LinkButton>
         </div>
       </div>
     </Card>

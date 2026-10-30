@@ -60,7 +60,7 @@ Some browsers (notably Safari on iPhone) block the cross-site storage that Googl
 | Semantic tokens | `tokens/semantic.css` | Role-based names components use (`--text-body`, `--surface-background-secondary`, `--interactive-primary`, `--border-subtle`, `--space-gutter`, `--size-tap`…), including dark mode; same names as the Figma "Color" collection |
 | Components | `components/` | Button, IconButton, LinkButton, TextField/TextArea/Select, Card (default or accent), Section, List/ListRow, SegmentedControl, ColorPicker, Sheet, PageHeader, Tabs, Avatar(Stack), Badge, EmptyState, Spinner, Banner, Icon |
 
-Navigation is a slim top bar (Add a trip on the home page, your profile) at every width; each trip has its own section tabs. Breakpoints: **compact** < 744px (bottom sheets), **regular** 744–1067px (modal sheets), **wide** ≥ 1068px (a day list beside the timeline). Every tappable element is at least 44×44px.
+Navigation is a slim top bar (your profile) at every width; each trip has its own section tabs. Breakpoints: **compact** < 744px (bottom sheets), **regular** 744–1067px (modal sheets), **wide** ≥ 1068px (a day list beside the timeline). Every tappable element is at least 44×44px.
 
 The live reference is at `/#/design` in the app.
 
