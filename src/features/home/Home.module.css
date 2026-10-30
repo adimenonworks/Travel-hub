@@ -1,23 +1,26 @@
-/* Hero: the trip that matters now. Cover on the left (on top on phones), details and quick links beside it. */
-.hero {
-  display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
-  border-radius: var(--radius-card); overflow: hidden;
-  background: var(--surface-background-secondary);
+/* Hero: the trip that matters now, on the emerald brand card (Card tone="accent" remaps the text roles).
+   Kept compact: cover on the left (on top on phones); name and details beside it, the countdown at the top right. */
+.hero { display: grid; grid-template-columns: minmax(0, 4fr) minmax(0, 8fr); }
+.heroCover { width: 100%; height: 100%; min-height: 222px; object-fit: cover; display: block; }
+.heroBody {
+  display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "main count" "foot foot";
+  align-content: space-between; gap: var(--space-md) var(--space-lg);
+  padding: var(--space-lg) var(--space-xl);
 }
-.heroCover { width: 100%; height: 100%; min-height: 280px; object-fit: cover; display: block; }
-.heroBody { display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-xs); padding: var(--space-xl) var(--space-2xl); }
-.heroTitle { margin-top: var(--space-xs); }
+.heroMain { grid-area: main; display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-xxs); min-width: 0; }
+.heroTitle { margin-top: var(--space-xxs); }
 .heroLink { color: var(--text-primary); }
 .heroLink:hover { text-decoration: underline; text-underline-offset: 4px; text-decoration-thickness: 2px; }
-.countdown { display: flex; align-items: baseline; gap: var(--space-xs); margin: var(--space-sm) 0 var(--space-md); }
-.countBig { font: var(--p-weight-display) var(--p-size-display)/var(--p-leading-display) var(--font-display); font-stretch: var(--p-stretch-display); letter-spacing: var(--p-tracking-display); color: var(--text-brand); font-variant-numeric: tabular-nums; }
+.countdown { grid-area: count; display: flex; align-items: baseline; gap: var(--space-xs); margin: 0; }
+.countBig { font: var(--p-weight-display) var(--p-size-title1)/1 var(--font-display); font-stretch: var(--p-stretch-display); letter-spacing: var(--p-tracking-title1); color: var(--text-primary); font-variant-numeric: tabular-nums; }
+@media (min-width: 744px) { .countBig { font-size: var(--p-size-display); line-height: var(--p-leading-display); letter-spacing: var(--p-tracking-display); } }
 .countSmall { color: var(--text-subtle); }
-.heroFoot { margin-top: auto; align-self: stretch; display: flex; align-items: center; justify-content: space-between; gap: var(--space-md); flex-wrap: wrap; }
+.heroFoot { grid-area: foot; display: flex; align-items: center; justify-content: space-between; gap: var(--space-md); flex-wrap: wrap; }
 .heroLinks { display: flex; gap: var(--space-xs); flex-wrap: wrap; }
 @media (max-width: 743px) {
   .hero { grid-template-columns: minmax(0, 1fr); }
-  .heroCover { min-height: 0; aspect-ratio: 16 / 9; }
-  .heroBody { padding: var(--space-lg) var(--space-inset) var(--space-inset); }
+  .heroCover { min-height: 0; aspect-ratio: 21 / 9; }
+  .heroBody { grid-template-columns: minmax(0, 1fr); grid-template-areas: "main" "count" "foot"; padding: var(--space-md) var(--space-inset) var(--space-inset); }
 }
 
 /* Trip cards: every card has a cover on top (photo or illustrated scene), then the details on white. */

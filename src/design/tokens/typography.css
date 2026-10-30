@@ -1,4 +1,4 @@
-/* Text styles (Bricolage Grotesque ExtraBold for the display style and big numbers only; Manrope semibold for titles) — use these classes (or the matching --p-size-* tokens) instead of raw sizes. */
+/* Text styles (Poppins Black for the display style and big numbers only; Manrope semibold for titles) — use these classes (or the matching --p-size-* tokens) instead of raw sizes. */
 .t-display { font: var(--p-weight-display) var(--p-size-display)/var(--p-leading-display) var(--font-display); font-stretch: var(--p-stretch-display); letter-spacing: var(--p-tracking-display); }
 .t-title1 { font: var(--p-weight-semibold) var(--p-size-title1)/var(--p-leading-title1) var(--font-heading); letter-spacing: var(--p-tracking-title1); }
 .t-title2 { font: var(--p-weight-semibold) var(--p-size-title2)/var(--p-leading-title2) var(--font-heading); letter-spacing: var(--p-tracking-title2); }

@@ -29,7 +29,7 @@
 
 /* Section tabs stay reachable while scrolling */
 .sectionNav {
-  position: sticky; top: calc(var(--size-topbar) + env(safe-area-inset-top)); z-index: 30;
+  position: sticky; top: env(safe-area-inset-top); z-index: 30;
   margin: calc(-1 * var(--space-sm)) calc(-1 * var(--space-gutter));
   padding: var(--space-sm) var(--space-gutter);
   background: var(--surface-background-primary);
@@ -74,7 +74,7 @@
 .itinLayout { display: flex; flex-direction: column; gap: var(--space-xl); }
 @media (min-width: 1068px) {
   .itinLayout { display: grid; grid-template-columns: 240px minmax(0, 1fr); gap: var(--space-2xl); align-items: start; }
-  .days { flex-direction: column; overflow: visible; margin: 0; padding: 0; position: sticky; top: calc(var(--size-topbar) + 92px); }
+  .days { flex-direction: column; overflow: visible; margin: 0; padding: 0; position: sticky; top: 92px; }
   .day { flex-direction: row; justify-content: flex-start; gap: var(--space-sm); min-height: 56px; padding: 0 var(--space-lg); }
   .dayNum { font-size: var(--p-size-title2); letter-spacing: var(--p-tracking-title2); }
   .dayDot { margin-left: auto; }

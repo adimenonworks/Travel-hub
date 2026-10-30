@@ -21,7 +21,7 @@
   --p-orange-600: #bd5b13; --p-orange-700: #8a471c; --p-orange-800: #63371e; --p-orange-900: #40291c; --p-orange-1000: #181d1b;
   --p-red-0: #ffffff; --p-red-100: #fdf1f1; --p-red-200: #fedfde; --p-red-300: #ffbcbb; --p-red-400: #ff8e90; --p-red-500: #fc606a;
   --p-red-600: #d3424f; --p-red-700: #a72837; --p-red-800: #76272d; --p-red-900: #4b2223; --p-red-1000: #181d1b;
-  --p-neutral-0: #ffffff; --p-neutral-100: #edf6f2; --p-neutral-200: #dfe8e4; --p-neutral-300: #c5cfcb; --p-neutral-400: #a7b1ad; --p-neutral-500: #8e9793;
+  --p-neutral-0: #ffffff; --p-neutral-50: #f6fbf9; --p-neutral-100: #edf6f2; --p-neutral-200: #dfe8e4; --p-neutral-300: #c5cfcb; --p-neutral-400: #a7b1ad; --p-neutral-500: #8e9793;
   --p-neutral-600: #707975; --p-neutral-700: #545b58; --p-neutral-800: #3e4441; --p-neutral-900: #2c2f2e; --p-neutral-1000: #181d1b;
 
   /* See-through black and white, for borders, overlays and neutral control fills that must work on any surface */
@@ -32,9 +32,9 @@
   --p-alpha-emerald-100-50: rgba(212, 253, 237, 0.5); --p-alpha-red-100-50: rgba(253, 241, 241, 0.5);
 
   /* Type families, both bundled (main.tsx) and free for commercial use (SIL Open Font License).
-     Bricolage Grotesque has character for titles and big numbers; Manrope is the quiet sans for everything else. */
+     Poppins Black gives titles and big numbers their weight; Manrope is the quiet sans for everything else. */
   --p-font-sans: "Manrope Variable", Manrope, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  --p-font-display: "Bricolage Grotesque Variable", "Bricolage Grotesque", "Manrope Variable", Manrope, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --p-font-display: Poppins, "Manrope Variable", Manrope, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   --p-font-mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
 
   /* Type scale (size / line-height / tracking) */
@@ -55,8 +55,8 @@
   --p-weight-semibold: 600;
   --p-weight-bold: 700;
   --p-weight-black: 900;
-  --p-weight-display: 800;   /* Bricolage Grotesque ExtraBold: page titles and big numbers only */
-  --p-stretch-display: 80%;  /* …set a little narrow (the font's width axis runs 75–100%) */
+  --p-weight-display: 900;   /* Poppins Black: page titles and big numbers only */
+  --p-stretch-display: 100%; /* Poppins has no width axis */
 
   /* Spacing — 4px base, 8px rhythm */
   --p-space-1: 4px;
