@@ -1,11 +1,11 @@
 import { useState } from 'react';
 import { Navigate, Route, Routes, useLocation, useMatch, useNavigate, useParams } from 'react-router-dom';
-import { Button, EmptyState, Icon, LinkButton, PageHeader, Spinner, Tabs, type TabItem } from '../../design/components';
+import { Card, EmptyState, Icon, IconButton, LinkButton, PageHeader, Spinner, Tabs, type TabItem } from '../../design/components';
 import { useProfiles, useRole, useSub, useTrip } from '../../data/hooks';
 import type { Activity, Album, Comment, Expense, Idea, Profile, Trip } from '../../data/types';
 import { daysBetween, formatRange } from '../../lib/dates';
-import { coverPosition } from '../../lib/image';
 import { Content } from '../../app/Shell';
+import { CoverPeople, TripCover } from '../shared/TripCover';
 import { ActivityPage } from './ActivityPage';
 import { Budget } from './Budget';
 import { Ideas } from './Ideas';
@@ -83,13 +83,17 @@ function TripLoaded({ trip }: { trip: Trip }) {
           title={trip.name}
           back={{ to: '/', label: 'Trips' }}
         />
-        <div className={s.hero}>
-          {trip.coverPhoto && <img src={trip.coverPhoto} alt="" className={s.heroPhoto} style={{ objectPosition: coverPosition(trip) }} />}
-          <span><Icon name="pin" size={20} />{trip.destination?.name ?? 'No destination'}</span>
-          <span><Icon name="calendar" size={20} />{formatRange(trip.startDate, trip.endDate)} · {nDays} day{nDays === 1 ? '' : 's'}</span>
-          <span><Icon name="people" size={20} />{trip.memberIds.length} traveler{trip.memberIds.length === 1 ? '' : 's'}</span>
-          {canManage && <Button variant="ghost" icon="pencil" className={s.heroEdit} onClick={() => setEditing(true)}>Edit trip</Button>}
-        </div>
+        {/* The trip's card, in the brand colour like the home hero: cover with who's going, then where and when. */}
+        <Card tone="accent" flush className={s.hero}>
+          <TripCover trip={trip} className={s.heroCover}>
+            <CoverPeople trip={trip} size={32} />
+            {canManage && <IconButton icon="pencil" label="Edit trip" variant="inverse" className={s.heroEdit} onClick={() => setEditing(true)} />}
+          </TripCover>
+          <div className={s.heroBody}>
+            <span><Icon name="pin" size={20} />{trip.destination?.name ?? 'No destination'}</span>
+            <span><Icon name="calendar" size={20} />{formatRange(trip.startDate, trip.endDate)} · {nDays} day{nDays === 1 ? '' : 's'}</span>
+          </div>
+        </Card>
         <div className={s.sectionNav}>
           <Tabs items={tabs} label="Trip sections" />
         </div>

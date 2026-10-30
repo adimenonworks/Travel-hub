@@ -4,7 +4,7 @@ import { useSearchParams } from 'react-router-dom';
 import { AvatarStack, Badge, Button, Card, CardLink, EmptyState, Icon } from '../../design/components';
 import { personName, useMe } from '../../data/hooks';
 import type { Activity } from '../../data/types';
-import { addDays, formatDay, formatTime, parseDay, today, tripDays } from '../../lib/dates';
+import { dayWord, formatDay, formatTime, parseDay, today, tripDays } from '../../lib/dates';
 import { money } from '../../lib/format';
 import { categoryInfo } from '../../lib/categories';
 import { defaultUnit, describeWeather, tripWeather, type DayWeather } from '../../lib/weather';
@@ -46,9 +46,7 @@ export function Itinerary(ctx: TripCtx) {
     return m;
   }, [activities]);
   const now = useNow();
-  // "Today", "Tomorrow" and "Yesterday" near today; otherwise the day's number in the trip.
-  const dayWord = (d: string) =>
-    d === t ? 'Today' : d === addDays(t, 1) ? 'Tomorrow' : d === addDays(t, -1) ? 'Yesterday' : `Day ${days.indexOf(d) + 1}`;
+  const word = (d: string) => dayWord(d, trip.startDate, t);
   // Events still to come: all of a future day's, none of a past day's, and today's that haven't finished.
   // An event with no time, or one that runs past midnight (ends "earlier" than it starts), counts until the day is over.
   const finishesAt = (a: Activity) => (a.endTime && a.endTime >= a.startTime ? a.endTime : a.endTime ? '99:99' : a.startTime || '99:99');
@@ -91,7 +89,7 @@ export function Itinerary(ctx: TripCtx) {
               </span>
               {/* Read in the order it's seen: date, then the tag at its top right, then the day word. */}
               {selected && !!counts[d] && <span className={[s.dayLabel, s.dayTag].join(' ')}>{toGo ? `${toGo} event${toGo === 1 ? '' : 's'} left` : 'All done'}</span>}
-              <span className={s.dayDow} style={vt('word', d)}>{dayWord(d)}</span>
+              <span className={s.dayDow} style={vt('word', d)}>{word(d)}</span>
               {selected ? (
                 <>
                   {groupBudget > 0 && <span className={s.dayLabels}><span className={[s.dayLabel, left < 0 && s.dayOver].filter(Boolean).join(' ')}>
@@ -110,7 +108,7 @@ export function Itinerary(ctx: TripCtx) {
         <div className={s.dayHead}>
           <div>
             <div className={s.dayTitle}>
-              <h2 className="t-title1">{dayWord(day)}</h2>
+              <h2 className="t-title1">{word(day)}</h2>
               {weather && <WeatherChip w={weather.day} typical={weather.typical} />}
             </div>
             <div className={s.dayBudget}>
