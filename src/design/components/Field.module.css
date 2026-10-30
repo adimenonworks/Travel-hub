@@ -31,3 +31,6 @@ select.input {
 }
 .hint { font-size: var(--p-size-footnote); line-height: var(--p-leading-footnote); color: var(--text-subtle); padding-left: var(--space-xxs); }
 .row { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: var(--space-md); }
+
+/* Compact select: the medium button's height */
+select.compact { min-height: var(--size-control-md); padding-left: var(--space-md); padding-right: var(--space-2xl); background-position: right var(--space-md) center; }  /* text stays 16px: iPhones zoom into fields with smaller text */

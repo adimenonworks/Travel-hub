@@ -13,10 +13,10 @@
   letter-spacing: var(--p-tracking-body);
   white-space: nowrap;
   text-decoration: none;
-  transition: background var(--motion-fast), transform var(--motion-fast);
+  transition: background var(--motion-fast), color var(--motion-fast), transform var(--motion-release);
   user-select: none;
 }
-.button:active:not(:disabled) { transform: scale(0.97); }
+.button:active:not(:disabled) { transform: scale(0.96); transition: background var(--motion-fast), color var(--motion-fast), transform var(--motion-press); }
 .button:disabled { background: var(--disabled-background); color: var(--disabled-foreground); cursor: default; }
 .plain:disabled { background: transparent; }
 
@@ -53,6 +53,7 @@
 .small { min-height: var(--size-control-sm); padding: 0 var(--space-md); font-size: var(--p-size-subhead); }
 /* Small controls keep a full 44px hit area */
 .small::after { content: ''; position: absolute; inset: calc((var(--size-control-sm) - var(--size-tap)) / 2) 0; }
+.medium { min-height: var(--size-control-md); padding: 0 var(--space-lg); }
 .large { min-height: 56px; padding: 0 var(--space-2xl); font-size: var(--p-size-headline); }
 .block { width: 100%; }
 

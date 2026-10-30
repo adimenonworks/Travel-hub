@@ -1,4 +1,5 @@
 .control {
+  position: relative;
   display: inline-grid;
   grid-auto-flow: column;
   grid-auto-columns: 1fr;
@@ -18,10 +19,22 @@
   font: var(--p-weight-semibold) var(--p-size-subhead)/1 var(--font-text);
   color: var(--text-body);
   white-space: nowrap;
-  transition: background var(--motion-fast), color var(--motion-fast);
+  position: relative; z-index: 1;
+  transition: background var(--motion-fast), color var(--motion-fluid), transform var(--motion-release);
 }
+.option:active { transform: scale(0.96); transition: background var(--motion-fast), color var(--motion-fluid), transform var(--motion-press); }
 .option:hover { background: var(--interactive-ghost-hover); }
 .option:active { background: var(--interactive-ghost-pressed); }
-.option[aria-checked='true'] { background: var(--interactive-selected); color: var(--text-on-selected); }
-.option[aria-checked='true']:hover { background: var(--interactive-selected-hover); }
-.option[aria-checked='true']:active { background: var(--interactive-selected-pressed); }
+.option[aria-checked='true'], .option[aria-checked='true']:hover, .option[aria-checked='true']:active { background: transparent; color: var(--text-on-selected); }
+
+/* The sliding pill: placed on the chosen option (position and width measured in SegmentedControl.tsx). */
+.thumb {
+  position: absolute; top: var(--space-xxs); bottom: var(--space-xxs); left: 0;
+  width: var(--w); transform: translateX(var(--x));
+  border-radius: var(--radius-pill);
+  background: var(--interactive-selected);
+  transition: background var(--motion-fast);
+}
+.animate { transition: transform var(--motion-fluid), width var(--motion-fluid), background var(--motion-fast); }
+.control:has(.option[aria-checked='true']:hover) .thumb { background: var(--interactive-selected-hover); }
+.control:has(.option[aria-checked='true']:active) .thumb { background: var(--interactive-selected-pressed); }

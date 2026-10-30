@@ -49,11 +49,11 @@ export function People({ trip, profiles, canManage, isOwner }: TripCtx) {
                 trailing={
                   editable ? (
                     <span style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-                      <Select aria-label={`Role for ${name}`} value={role} onChange={(e) => store.setRole(trip, id, e.target.value as 'editor' | 'member')}>
+                      <Select compact aria-label={`Role for ${name}`} value={role} onChange={(e) => store.setRole(trip, id, e.target.value as 'editor' | 'member')}>
                         <option value="member">Member</option>
                         <option value="editor">Organizer</option>
                       </Select>
-                      <Button size="small" variant="destructive" onClick={() => confirm(`Remove ${name} from this trip?`) && store.removeMember(trip, id)}>Remove</Button>
+                      <Button size="medium" variant="destructive" onClick={() => confirm(`Remove ${name} from this trip?`) && store.removeMember(trip, id)}>Remove</Button>
                     </span>
                   ) : (
                     <Badge tone={role === 'owner' ? 'tint' : role === 'editor' ? 'success' : 'neutral'}>{role === 'owner' ? 'Owner' : role === 'editor' ? 'Organizer' : 'Member'}</Badge>
@@ -83,23 +83,18 @@ export function People({ trip, profiles, canManage, isOwner }: TripCtx) {
         </Section>
       )}
 
-      <Section title="Trip">
-        <div className={s.dangerZone}>
-          {isOwner ? (
-            <Button variant="destructive" icon="trash" onClick={async () => {
-              if (!confirm(`Delete "${trip.name}" for everyone? This can't be undone.`)) return;
-              await store.deleteTrip(trip.id);
-              navigate('/');
-            }}>Delete trip</Button>
-          ) : (
+      {/* Deleting the trip lives in Edit trip; here members other than the owner can leave. */}
+      {!isOwner && (
+        <Section title="Trip">
+          <div className={s.dangerZone}>
             <Button variant="destructive" icon="signout" onClick={async () => {
               if (!confirm(`Leave "${trip.name}"?`)) return;
               await store.leaveTrip(trip.id, me.uid);
               navigate('/');
             }}>Leave trip</Button>
-          )}
-        </div>
-      </Section>
+          </div>
+        </Section>
+      )}
     </>
   );
 }

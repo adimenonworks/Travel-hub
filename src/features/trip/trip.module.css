@@ -52,13 +52,21 @@
 .day[aria-pressed='true']:hover { background: var(--interactive-selected-hover); }
 .day[aria-pressed='true']:active { background: var(--interactive-selected-pressed); }
 .dayDow { font-size: var(--p-size-caption1); font-weight: var(--p-weight-semibold); }
-.dayNum { font: var(--p-weight-display) var(--p-size-title2)/1 var(--font-display); font-stretch: var(--p-stretch-display); letter-spacing: var(--p-tracking-title2); }
+.dayNum { font: var(--p-weight-display) var(--p-size-title1)/1 var(--font-display); font-stretch: var(--p-stretch-display); letter-spacing: var(--p-tracking-title1); }
 .dayDot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
-/* The selected day opens up: date and month, plus small labels for plans and budget left. */
-.day[aria-pressed='true'] { min-width: 132px; padding: var(--space-sm) var(--space-md); border-radius: var(--radius-card); gap: var(--space-xxs); }
+/* The selected day opens up: the date with its "events left" tag at the top right, the day word under it,
+   then the budget left. */
+.day[aria-pressed='true'] {
+  display: grid; grid-template-columns: 1fr auto; align-items: center; justify-items: start; text-align: left;
+  column-gap: var(--space-sm); row-gap: var(--space-xxs);
+  min-width: 200px; padding: var(--space-sm) var(--space-md); border-radius: var(--radius-card);
+}
+.day[aria-pressed='true'] .dayDate { grid-column: 1; grid-row: 1; }
+.dayTag { grid-column: 2; grid-row: 1; align-self: start; }
+.day[aria-pressed='true'] .dayDow, .day[aria-pressed='true'] .dayLabels { grid-column: 1 / -1; }
 .dayDate { display: flex; align-items: baseline; gap: var(--space-xxs); }
 .dayMonth { font-size: var(--p-size-footnote); font-weight: var(--p-weight-semibold); }
-.dayLabels { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px; }
+.dayLabels { display: flex; flex-wrap: wrap; gap: 4px; }
 .dayLabel { padding: 2px 8px; border-radius: var(--radius-pill); background: color-mix(in srgb, currentColor 16%, transparent); font-size: var(--p-size-caption1); font-weight: var(--p-weight-semibold); white-space: nowrap; }
 .dayOver { box-shadow: inset 0 0 0 1px currentColor; }
 .dayDot.empty { opacity: 0; }
@@ -68,11 +76,10 @@
   .itinLayout { display: grid; grid-template-columns: 240px minmax(0, 1fr); gap: var(--space-2xl); align-items: start; }
   .days { flex-direction: column; overflow: visible; margin: 0; padding: 0; position: sticky; top: 92px; }
   .day { flex-direction: row; justify-content: flex-start; gap: var(--space-sm); min-height: 56px; padding: 0 var(--space-lg); }
-  .dayNum { font-size: var(--p-size-title3); }
+  .dayNum { font-size: var(--p-size-title2); letter-spacing: var(--p-tracking-title2); }
   .dayDot { margin-left: auto; }
-  .day[aria-pressed='true'] { flex-direction: column; align-items: flex-start; min-height: 0; padding: var(--space-md) var(--space-lg); }
-  .day[aria-pressed='true'] .dayNum { font-size: var(--p-size-title1); }
-  .dayLabels { justify-content: flex-start; }
+  .day[aria-pressed='true'] { min-width: 0; min-height: 0; padding: var(--space-md) var(--space-lg); }
+  .day[aria-pressed='true'] .dayNum { font-size: var(--p-size-title1); letter-spacing: var(--p-tracking-title1); }
 }
 
 /* Timeline */

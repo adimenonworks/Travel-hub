@@ -22,6 +22,7 @@
 /* Tabs: text tabs on a hairline; the current one is underlined in emerald and darker.
    Scrolls sideways inside itself if it can't fit. */
 .tabs {
+  position: relative;
   display: flex; gap: var(--space-xxs);
   overflow-x: auto; scrollbar-width: none;
   box-shadow: inset 0 -1px 0 var(--border-subtle);
@@ -35,12 +36,18 @@
   color: var(--text-subtle);
   font: var(--p-weight-semibold) var(--p-size-callout)/1 var(--font-text);
   white-space: nowrap;
-  transition: background var(--motion-fast), color var(--motion-fast);
+  transition: background var(--motion-fast), color var(--motion-fluid);
 }
-.tab::after { content: ''; position: absolute; left: var(--space-md); right: var(--space-md); bottom: 0; height: 3px; border-radius: 3px 3px 0 0; background: transparent; transition: background var(--motion-fast); }
+/* The current tab's underline: one bar that glides between tabs (set from Tabs in Bars.tsx). */
+.underline {
+  position: absolute; left: 0; bottom: 0; height: 3px; z-index: 1; pointer-events: none;
+  width: calc(var(--w) - 2 * var(--space-md));
+  transform: translateX(calc(var(--x) + var(--space-md)));
+  border-radius: 3px 3px 0 0; background: var(--border-selected);
+}
+.animate { transition: transform var(--motion-fluid), width var(--motion-fluid); }
 .tab:hover { background: var(--interactive-ghost-hover); color: var(--text-primary); }
 .tab:active { background: var(--interactive-ghost-pressed); }
 .tab:focus-visible { outline-offset: -3px; }
 .tab[aria-current='page'] { color: var(--text-primary); }
-.tab[aria-current='page']::after { background: var(--border-selected); }
 .count { font-variant-numeric: tabular-nums; min-width: 20px; padding: 2px 6px; border-radius: var(--radius-pill); background: var(--interactive-neutral); font-size: var(--p-size-caption1); line-height: 1.2; text-align: center; }

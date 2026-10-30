@@ -86,6 +86,9 @@
   --p-duration-slow: 400ms;
   --p-ease-standard: cubic-bezier(0.25, 0.1, 0.25, 1);
   --p-ease-spring: cubic-bezier(0.32, 0.72, 0, 1);
+  --p-duration-fluid: 420ms;
+  --p-ease-fluid: cubic-bezier(0.22, 1, 0.36, 1);    /* glides out fast, settles slowly */
+  --p-ease-bounce: cubic-bezier(0.34, 1.45, 0.64, 1); /* a small overshoot, like a spring letting go */
 }
 
 /* From 744px up nothing is smaller than 14px: the small styles (footnote, captions, tags) step up. Phones keep 12–13px. */

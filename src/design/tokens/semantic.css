@@ -129,6 +129,7 @@
   /* Sizing */
   --size-tap: 44px;               /* minimum hit target */
   --size-control: 48px;
+  --size-control-md: 44px;        /* a compact control beside a medium button, e.g. a role picker in a list row */
   --size-control-sm: 36px;
   --size-content-max: 1200px;
 
@@ -136,6 +137,9 @@
   --motion-fast: var(--p-duration-fast) var(--p-ease-standard);
   --motion-base: var(--p-duration-base) var(--p-ease-standard);
   --motion-sheet: var(--p-duration-slow) var(--p-ease-spring);
+  --motion-fluid: var(--p-duration-fluid) var(--p-ease-fluid);      /* things that move: tab underline, segment pill, day cards */
+  --motion-press: var(--p-duration-fast) var(--p-ease-standard);     /* a control pressing in */
+  --motion-release: var(--p-duration-slow) var(--p-ease-bounce);      /* and springing back out */
 }
 
 /* Regular width (tablet / desktop) */

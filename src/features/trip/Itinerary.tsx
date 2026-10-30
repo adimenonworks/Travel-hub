@@ -1,15 +1,19 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
+import { flushSync } from 'react-dom';
 import { useSearchParams } from 'react-router-dom';
 import { AvatarStack, Badge, Button, Card, CardLink, EmptyState, Icon } from '../../design/components';
 import { personName, useMe } from '../../data/hooks';
 import type { Activity } from '../../data/types';
-import { formatDay, formatTime, parseDay, today, tripDays } from '../../lib/dates';
+import { addDays, formatDay, formatTime, parseDay, today, tripDays } from '../../lib/dates';
 import { money } from '../../lib/format';
 import { categoryInfo } from '../../lib/categories';
 import { defaultUnit, describeWeather, tripWeather, type DayWeather } from '../../lib/weather';
 import { ActivityForm } from './ActivityForm';
 import type { TripCtx } from './TripPage';
 import s from './trip.module.css';
+
+// A unique name per day and part, so a view transition can match each piece before and after.
+const vt = (part: string, d: string) => ({ viewTransitionName: `${part}-${d}` }) as CSSProperties;
 
 export const byTime = (a: Activity, b: Activity) => (a.startTime || '99').localeCompare(b.startTime || '99') || a.createdAt - b.createdAt;
 
@@ -19,8 +23,20 @@ export function Itinerary(ctx: TripCtx) {
   const [params, setParams] = useSearchParams();
   const t = today();
   const fallback = days.includes(t) ? t : days[0];
-  const day = days.includes(params.get('day') ?? '') ? params.get('day')! : fallback;
-  const setDay = (d: string) => setParams({ day: d }, { replace: true });
+  // The tapped day shows at once (so the card animation can capture before and after); the address bar follows.
+  const [picked, setPicked] = useState<string | null>(null);
+  const fromUrl = params.get('day');
+  useEffect(() => setPicked(null), [fromUrl]);
+  const day = picked && days.includes(picked) ? picked : days.includes(fromUrl ?? '') ? fromUrl! : fallback;
+  const setDay = (d: string) => {
+    if (d === day) return;
+    const show = () => flushSync(() => setPicked(d));
+    // "Smart animate": the browser morphs each card (and its number, word and tag) from before to after.
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (document.startViewTransition && !reduce) document.startViewTransition(show);
+    else show();
+    setParams({ day: d }, { replace: true });
+  };
 
   const [adding, setAdding] = useState(false);
 
@@ -29,15 +45,22 @@ export function Itinerary(ctx: TripCtx) {
     activities.forEach((a) => (m[a.date] = (m[a.date] ?? 0) + 1));
     return m;
   }, [activities]);
+  const now = useNow();
+  // "Today", "Tomorrow" and "Yesterday" near today; otherwise the day's number in the trip.
+  const dayWord = (d: string) =>
+    d === t ? 'Today' : d === addDays(t, 1) ? 'Tomorrow' : d === addDays(t, -1) ? 'Yesterday' : `Day ${days.indexOf(d) + 1}`;
+  // Events still to come: all of a future day's, none of a past day's, and today's that haven't finished.
+  // An event with no time, or one that runs past midnight (ends "earlier" than it starts), counts until the day is over.
+  const finishesAt = (a: Activity) => (a.endTime && a.endTime >= a.startTime ? a.endTime : a.endTime ? '99:99' : a.startTime || '99:99');
+  const eventsLeft = (d: string) =>
+    d > t ? counts[d] ?? 0 : d < t ? 0 : activities.filter((a) => a.date === d && finishesAt(a) > now).length;
   const list = activities.filter((a) => a.date === day).sort(byTime);
   const spendOn = (d: string) => activities.filter((a) => a.date === d).reduce((n, a) => n + a.cost * Math.max(1, a.attendeeIds.length), 0);
   const spend = spendOn(day);
   const groupBudget = trip.dailyBudget * trip.memberIds.length;
-  const index = days.indexOf(day);
   const weather = useDayWeather(ctx, day);
 
   // On today's plan, a dotted "now" line sits before the next plan and is scrolled to the middle of the screen.
-  const now = useNow();
   const showNow = day === t && list.length > 1;
   const nextIndex = list.findIndex((a) => (a.startTime || '99:99') > now);
   const nowRef = useRef<HTMLDivElement>(null);
@@ -56,23 +79,25 @@ export function Itinerary(ctx: TripCtx) {
   return (
     <div className={s.itinLayout}>
       <div className={s.days} role="group" aria-label="Trip days">
-        {days.map((d, i) => {
+        {days.map((d) => {
           const selected = d === day;
           const left = groupBudget - spendOn(d);
+          const toGo = eventsLeft(d);
           return (
-            <button key={d} type="button" className={s.day} aria-pressed={selected} onClick={() => setDay(d)}>
-              <span className={s.dayDow}>{d === t ? 'Today' : `Day ${i + 1}`}</span>
+            <button key={d} type="button" className={s.day} aria-pressed={selected} onClick={() => setDay(d)} style={vt('day', d)}>
               <span className={s.dayDate}>
-                <span className={s.dayNum}>{parseDay(d).getDate()}</span>
+                <span className={s.dayNum} style={vt('num', d)}>{parseDay(d).getDate()}</span>
                 {selected && <span className={s.dayMonth}>{formatDay(d, { month: 'short' })} · {formatDay(d, { weekday: 'short' })}</span>}
               </span>
+              {/* Read in the order it's seen: date, then the tag at its top right, then the day word. */}
+              {selected && !!counts[d] && <span className={[s.dayLabel, s.dayTag].join(' ')}>{toGo ? `${toGo} event${toGo === 1 ? '' : 's'} left` : 'All done'}</span>}
+              <span className={s.dayDow} style={vt('word', d)}>{dayWord(d)}</span>
               {selected ? (
-                <span className={s.dayLabels}>
-                  <span className={s.dayLabel}>{counts[d] ?? 0} {counts[d] === 1 ? 'plan' : 'plans'}</span>
-                  {groupBudget > 0 && <span className={[s.dayLabel, left < 0 && s.dayOver].filter(Boolean).join(' ')}>
+                <>
+                  {groupBudget > 0 && <span className={s.dayLabels}><span className={[s.dayLabel, left < 0 && s.dayOver].filter(Boolean).join(' ')}>
                     {left < 0 ? `${money(-left, trip.currency)} over` : `${money(left, trip.currency)} left`}
-                  </span>}
-                </span>
+                  </span></span>}
+                </>
               ) : (
                 <span className={[s.dayDot, !counts[d] && s.empty].filter(Boolean).join(' ')} />
               )}
@@ -85,7 +110,7 @@ export function Itinerary(ctx: TripCtx) {
         <div className={s.dayHead}>
           <div>
             <div className={s.dayTitle}>
-              <h2 className="t-title1">{day === t ? 'Today’s plan' : `Day ${index + 1}`}</h2>
+              <h2 className="t-title1">{dayWord(day)}</h2>
               {weather && <WeatherChip w={weather.day} typical={weather.typical} />}
             </div>
             <div className={s.dayBudget}>

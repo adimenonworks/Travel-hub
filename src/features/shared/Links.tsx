@@ -31,7 +31,7 @@ export function LinkEditor({ links, onChange }: { links: LinkItem[]; onChange: (
         </div>
       ))}
       <div>
-        <Button variant="tinted" size="small" icon="plus" onClick={() => onChange([...links, { label: '', url: '' }])}>Add link or PDF</Button>
+        <Button variant="gray" size="small" icon="plus" onClick={() => onChange([...links, { label: '', url: '' }])}>Add link or PDF</Button>
       </div>
     </div>
   );
