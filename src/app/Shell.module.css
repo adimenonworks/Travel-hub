@@ -1,6 +1,34 @@
 .shell { min-height: 100dvh; }
 
-.main { min-width: 0; padding-top: calc(var(--space-page-top) + env(safe-area-inset-top)); }
+/* Top bar: white, a hairline underneath, the same width as the page content. */
+.bar {
+  position: sticky; top: 0; z-index: 40;
+  padding-top: env(safe-area-inset-top);
+  background: var(--surface-background-secondary);
+  border-bottom: 1px solid var(--border-subtle);
+}
+.barInner {
+  max-width: calc(var(--size-content-max) + 2 * var(--space-gutter));
+  min-height: var(--size-topbar);
+  margin: 0 auto; padding: 0 var(--space-gutter);
+  display: flex; align-items: center; justify-content: space-between; gap: var(--space-md);
+}
+.brand { display: inline-flex; align-items: center; gap: var(--space-sm); min-height: var(--size-tap); border-radius: var(--radius-pill); color: var(--text-brand); }
+.mark { display: grid; place-items: center; width: var(--size-tap); height: var(--size-tap); border-radius: var(--radius-icon); background: var(--surface-brand); color: var(--icon-on-brand); }
+.wordmark { font: var(--p-weight-display) var(--p-size-title2)/1 var(--font-display); font-stretch: var(--p-stretch-display); letter-spacing: var(--p-tracking-title2); }
+.barActions { display: flex; align-items: center; gap: var(--space-sm); }
+.me { display: grid; place-items: center; width: var(--size-tap); height: var(--size-tap); border-radius: 50%; background: var(--interactive-primary); transition: background var(--motion-fast), transform var(--motion-release); }
+.me:hover { background: var(--interactive-primary-hover); }
+.me:active { background: var(--interactive-primary-pressed); transform: scale(0.96); transition: background var(--motion-fast), transform var(--motion-press); }
+.me[aria-current='page'] { box-shadow: 0 0 0 2px var(--surface-background-secondary), 0 0 0 4px var(--border-selected); }
+
+/* Phones: the button shows just its plus; its name stays for screen readers (aria-label). */
+@media (max-width: 479px) {
+  .newTrip { width: var(--size-tap); padding: 0; }
+  .newTripText { display: none; }
+}
+
+.main { min-width: 0; padding-top: var(--space-page-top); }
 .content {
   max-width: calc(var(--size-content-max) + 2 * var(--space-gutter));
   margin: 0 auto;

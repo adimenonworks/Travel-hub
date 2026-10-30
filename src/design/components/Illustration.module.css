@@ -1,7 +1,17 @@
 .art { display: block; overflow: visible; }
-.frame { fill: var(--surface-background-secondary); stroke: var(--border-bold); stroke-width: 1.5; }
+/* A cover fills its box (a trip card's cover area); the scene is cropped to fit. */
+.cover { display: block; width: 100%; height: 100%; }
+
+/* One shared palette, all semantic tokens, so every scene follows light and dark mode */
+.frame { fill: var(--surface-background-secondary); stroke: var(--border-bold); stroke-width: 1.5; stroke-linejoin: round; }
 .photo { fill: var(--surface-brand-subtle); }
 .hill { fill: var(--interactive-primary); }
+.hillDeep { fill: var(--interactive-primary-pressed); }
 .sun { fill: var(--status-warning); }
 .line { fill: var(--surface-sunken); }
+.needle { fill: var(--border-bold); }
+.cloud { fill: var(--surface-background-secondary); stroke: var(--border-bold); stroke-width: 1.5; }
+.strap { fill: none; stroke: var(--border-bold); stroke-width: 4; stroke-linecap: round; }
+.route { fill: none; stroke: var(--icon-brand); stroke-width: 2; stroke-linecap: round; stroke-dasharray: 2 5; }
+.wave { fill: none; stroke: var(--surface-background-secondary); stroke-width: 3; stroke-linecap: round; }
 .spark { fill: none; stroke: var(--icon-brand); stroke-width: 2; stroke-linecap: round; }

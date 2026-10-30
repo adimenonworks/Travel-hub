@@ -1,5 +1,6 @@
 import type { CSSProperties, ReactNode } from 'react';
 import { Icon, type IconName } from './Icon';
+import { Illustration, type IllustrationName } from './Illustration';
 import s from './Misc.module.css';
 
 function initials(name: string) {
@@ -36,10 +37,11 @@ export function Badge({ tone = 'neutral', icon, children }: { tone?: BadgeTone; 
   );
 }
 
-export function EmptyState({ icon, title, message, action }: { icon: IconName; title: string; message?: ReactNode; action?: ReactNode }) {
+/** Shown where a list or a record is missing: an illustration, a title, a line of help, and an optional action. */
+export function EmptyState({ illustration, title, message, action }: { illustration: IllustrationName; title: string; message?: ReactNode; action?: ReactNode }) {
   return (
     <div className={s.empty}>
-      <span className={s.emptyIconWrap}><Icon name={icon} size={36} /></span>
+      <span className={s.emptyArt}><Illustration name={illustration} size={120} /></span>
       <div className={s.emptyTitle}>{title}</div>
       {message && <div>{message}</div>}
       {action && <div className={s.emptyAction}>{action}</div>}

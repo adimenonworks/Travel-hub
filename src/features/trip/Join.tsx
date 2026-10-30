@@ -30,7 +30,7 @@ export function Join() {
     return (
       <Content>
         <Card>
-          <EmptyState icon="link" title={expired ? 'This invite has expired' : 'Invite not found'} message="Ask the trip organizer for a new link."
+          <EmptyState illustration="ticket" title={expired ? 'This invite has expired' : 'Invite not found'} message="Ask the trip organizer for a new link."
             action={<LinkButton to="/" variant="tinted">Go to my trips</LinkButton>} />
         </Card>
       </Content>
@@ -52,7 +52,7 @@ export function Join() {
     <Content>
       <div />
       <Card>
-        <EmptyState icon="plane" title={`Join “${invite.tripName}”`} message="You've been invited to plan this trip together."
+        <EmptyState illustration="suitcase" title={`Join “${invite.tripName}”`} message="You've been invited to plan this trip together."
           action={<Button size="large" onClick={join} disabled={busy}>Join trip</Button>} />
         {error && <p className="t-footnote t-danger" style={{ textAlign: 'center' }}>{error}</p>}
       </Card>
