@@ -5,47 +5,52 @@
   border-radius: 50%;
   background: var(--surface-brand-subtle);
   color: var(--text-brand);
-  font: var(--p-weight-bold) calc(var(--avatar-size, 32px) * 0.4)/1 var(--font-heading);
+  font: var(--weight-medium) calc(var(--avatar-size, 32px) * 0.43)/1 var(--font-family); /* Label small at 28px */
   overflow: hidden;
   object-fit: cover;
 }
 .stack { display: inline-flex; align-items: center; }
 .stack > * + * { margin-left: -8px; }
 .stack > * { box-shadow: 0 0 0 2px var(--surface-background-secondary); }
-.more { background: var(--surface-sunken); color: var(--text-body); }
+.more { background: var(--surface-background-primary); color: var(--text-body); }
 
-/* Badge */
+/* Badge (Figma: tag/* tokens). Small: 24px, Label small. Large: 30px, Label. */
 .badge {
-  display: inline-flex; align-items: center; gap: 4px;
-  min-height: 26px; padding: 0 10px;
-  border-radius: var(--radius-pill);
-  font: var(--p-weight-semibold) var(--p-size-caption1)/1 var(--font-text);
-  background: var(--badge-bg, var(--surface-sunken));
-  color: var(--badge-fg, var(--text-subtle));
+  display: inline-flex; align-items: center; gap: var(--space-inline-xxs);
+  padding: var(--space-inline-xxxs) var(--space-inline-s) var(--space-inline-xxs);
+  border-radius: var(--radius-round);
+  font: var(--weight-medium) var(--size-body-small)/1.5 var(--font-family);
   white-space: nowrap;
 }
-.badge-tint { --badge-bg: var(--surface-brand); --badge-fg: var(--text-on-brand); }
-/* Categories: told apart by icon, on the light emerald wash */
-.badge-category { --badge-bg: var(--surface-brand-subtle); --badge-fg: var(--text-brand); }
-.badge-success { --badge-bg: var(--status-success-subtle); --badge-fg: var(--status-success); }
-.badge-warning { --badge-bg: var(--status-warning-subtle); --badge-fg: var(--status-warning); }
-.badge-error { --badge-bg: var(--status-error-subtle); --badge-fg: var(--status-error); }
+.badgeLarge { font: var(--weight-medium) 14px/1.5 var(--font-family); padding-top: var(--space-inline-xxs); }
+.badge-neutral { background: var(--tag-neutral-background); color: var(--tag-neutral-text); box-shadow: var(--shadow-subtle); }
+.badge-tint { background: var(--tag-brand-bold-background); color: var(--tag-brand-bold-text); }
+.badge-category { background: var(--tag-brand-subtle-background); color: var(--tag-brand-subtle-text); }
+.badge-success { background: var(--tag-success-background); color: var(--tag-success-text); }
+.badge-warning { background: var(--tag-warning-background); color: var(--tag-warning-text); }
+.badge-danger { background: var(--tag-danger-background); color: var(--tag-danger-text); }
+.badge-inverse { background: var(--tag-inverse-background); color: var(--tag-inverse-text); }
 
-/* Empty state */
-.empty {
-  display: flex; flex-direction: column; align-items: center; text-align: center;
-  gap: var(--space-xs); padding: var(--space-3xl) var(--space-xl);
-  color: var(--text-subtle);
-}
-.emptyArt { display: grid; place-items: center; margin-bottom: var(--space-xs); }
-.emptyTitle { font: var(--p-weight-semibold) var(--p-size-title3)/var(--p-leading-title3) var(--font-heading); letter-spacing: var(--p-tracking-title3); color: var(--text-primary); }
-.emptyAction { margin-top: var(--space-sm); }
+/* Empty state: a small Card with the illustration on top */
+.empty { align-items: center; text-align: center; }
 
 /* Spinner */
 .spinner { width: 20px; height: 20px; border-radius: 50%; border: 2.5px solid var(--surface-sunken); border-top-color: var(--icon-brand); animation: spin 0.8s linear infinite; }
-.center { display: grid; place-items: center; padding: var(--space-3xl); }
+.center { display: grid; place-items: center; padding: var(--space-inline-max); }
 @keyframes spin { to { transform: rotate(360deg); } }
 
-/* Banner */
-.banner { display: flex; gap: var(--space-sm); align-items: flex-start; padding: var(--space-md) var(--space-lg); border-radius: var(--radius-field); background: var(--status-warning-subtle); font-size: var(--p-size-subhead); line-height: var(--p-leading-subhead); }
-.banner svg { flex: none; color: var(--status-warning); }
+/* Notification (Figma): status background, 20px icon, Label + Body small */
+.note { display: flex; gap: var(--space-inline-s); align-items: flex-start; padding: var(--space-inline-m) var(--space-inline-l); border-radius: var(--radius-l); color: var(--text-body); }
+.note svg { flex: none; margin-top: 2px; }
+.noteText { display: flex; flex-direction: column; gap: var(--space-inline-xxs); font: var(--weight-regular) var(--size-body-small)/1.5 var(--font-family); }
+.noteLabel { font: var(--weight-medium) 14px/1.5 var(--font-family); }
+.note-warning { background: var(--status-warning-subtle); }
+.note-warning svg { color: var(--status-warning); }
+.note-success { background: var(--status-success-subtle); }
+.note-success svg { color: var(--status-success); }
+.note-error { background: var(--status-error-subtle); }
+.note-error svg { color: var(--status-error); }
+.note-neutral { background: var(--surface-background-secondary); border: 1px solid var(--border-subtle); }
+.note-neutral svg { color: var(--icon-primary); }
+.note-brand { background: var(--surface-brand-subtle); color: var(--text-brand); }
+.note-brand svg { color: var(--icon-brand); }

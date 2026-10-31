@@ -1,40 +1,57 @@
+/* Figma "Card": white surface, 1px border/subtle, 24px corners */
 .card {
   background: var(--surface-background-secondary);
-  border-radius: var(--radius-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-xl);
   padding: var(--space-inset);
+  color: var(--text-body);
 }
 .flush { padding: 0; overflow: hidden; }
-/* Card with media on the left and/or an action on the right */
-.split { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-md) var(--space-lg); }
-.media { flex: none; display: grid; place-items: center; color: var(--icon-brand); }
-.body { flex: 1 1 220px; min-width: 0; display: flex; flex-direction: column; gap: var(--space-xxs); }
-.action { flex: none; }
-@media (max-width: 743px) { .action { flex-basis: 100%; } }
-.interactive { position: relative; isolation: isolate; cursor: pointer; transition: transform var(--motion-fast), background var(--motion-fast); text-align: left; border: 0; width: 100%; color: inherit; display: block; }
-.interactive::after { content: ''; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; transition: background var(--motion-fast); }
-.interactive:hover::after { background: var(--interactive-ghost-hover); }
-.interactive:active::after { background: var(--interactive-ghost-pressed); }
-.interactive:active { transform: scale(0.99); }
 
-/* Bold brand card: bright emerald, with every text and icon role remapped to its deep partner. */
+/* Type=Large: media · text · buttons in a row (buttons drop below on phones) */
+.large { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-inline-s) var(--space-inline-m); padding: var(--space-inline-l); }
+.large .content { flex: 1 1 220px; }
+.large .title { font: var(--weight-semibold) var(--size-heading-3)/1 var(--font-family); letter-spacing: -0.02em; }
+.large .body { font: var(--weight-medium) 14px/1.5 var(--font-family); }
+@media (max-width: 743px) { .large .buttons { flex-basis: 100%; } }
+/* Type=Small: everything stacked */
+.small { display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-inline-m); padding: var(--space-inline-m); }
+.small .title { font: var(--weight-bold) 18px/1 var(--font-family); letter-spacing: -0.01em; }
+.small .body { font: var(--weight-medium) var(--size-body-small)/1.5 var(--font-family); }
+.small .buttons { flex-direction: column; align-self: stretch; }
+.small .buttons > * { width: 100%; }
+
+.media { flex: none; display: grid; place-items: center; color: var(--icon-brand); }
+/* The Media slot's default: an icon on the light emerald tile */
+.mediaTile { display: grid; place-items: center; padding: var(--space-inline-xs); border-radius: var(--radius-s); background: var(--surface-brand-subtle); color: var(--icon-brand); }
+.small .mediaTile { padding: var(--space-inline-xxs); border-radius: var(--radius-xs); }
+.content { min-width: 0; display: flex; flex-direction: column; gap: var(--space-inline-xs); }
+.title { color: var(--text-primary); }
+.body { color: var(--text-subtle); }
+.buttons { display: flex; flex-wrap: wrap; gap: var(--space-inline-xs); }
+
+/* Tone=Accent: bright emerald; text and icons use text/brand */
 .accent {
   background: var(--surface-brand);
-  color: var(--text-on-brand);
-  --text-primary: var(--text-on-brand);
-  --text-body: var(--text-on-brand);
-  --text-subtle: var(--text-on-brand);
-  --text-link: var(--text-on-brand);
+  border-color: transparent;
+  color: var(--text-brand);
+  --text-primary: var(--text-brand);
+  --text-body: var(--text-brand);
+  --text-subtle: var(--text-brand);
+  --text-link: var(--text-brand);
   --icon-primary: var(--icon-on-brand);
   --icon-brand: var(--icon-on-brand);
-  --border-focus: var(--text-on-brand);
-  --border-subtle: color-mix(in srgb, var(--text-on-brand) 20%, transparent);
+  --border-focus: var(--text-brand);
+  --border-subtle: color-mix(in srgb, var(--text-brand) 20%, transparent);
 }
 
-.section { display: flex; flex-direction: column; gap: var(--space-sm); }
-.sectionHeader {
-  display: flex; align-items: center; justify-content: space-between; gap: var(--space-sm);
-  min-height: var(--size-tap);
-  flex-wrap: wrap;
-}
-.sectionTitle { font: var(--p-weight-semibold) var(--p-size-title2)/var(--p-leading-title2) var(--font-heading); letter-spacing: var(--p-tracking-title2); color: var(--text-primary); }
-.sectionFooter { font-size: var(--p-size-footnote); line-height: var(--p-leading-footnote); color: var(--text-subtle); padding: 0 var(--space-xs); }
+.interactive { position: relative; isolation: isolate; cursor: pointer; transition: transform var(--motion-fast), background var(--motion-fast); text-align: left; width: 100%; color: inherit; display: block; }
+.interactive::after { content: ''; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; transition: background var(--motion-fast); }
+.interactive:hover::after { background: var(--interactive-button-ghost-background-hover); }
+.interactive:active::after { background: var(--interactive-button-ghost-background-pressed); }
+.interactive:active { transform: scale(0.99); }
+
+.section { display: flex; flex-direction: column; gap: var(--space-inline-s); }
+.sectionHeader { display: flex; align-items: center; justify-content: space-between; gap: var(--space-inline-s); min-height: var(--size-tap); flex-wrap: wrap; }
+.sectionTitle { font: var(--weight-semibold) var(--size-heading-2)/1 var(--font-family); letter-spacing: -0.02em; color: var(--text-primary); }
+.sectionFooter { font: var(--weight-medium) var(--size-body-small)/1.5 var(--font-family); color: var(--text-subtle); padding: 0 var(--space-inline-xs); }

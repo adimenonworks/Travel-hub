@@ -25,7 +25,7 @@ export function ColorPicker<T extends string>({ label, options, value, onChange,
           <label key={o.value} className={s.option}>
             <input type="radio" name={name} value={o.value} checked={o.value === value} onChange={() => onChange(o.value)} className={s.input} />
             <span className={s.swatch} style={{ background: o.color }} aria-hidden="true">
-              {o.value === value && <Icon name="check" size={22} strokeWidth={2.6} />}
+              {o.value === value && <Icon name="check" size={22}  />}
             </span>
             <span className={showLabels ? s.name : 'visually-hidden'}>{o.label}</span>
           </label>

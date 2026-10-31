@@ -29,7 +29,7 @@ export function ActivityPage(ctx: TripCtx) {
     return (
       <>
         <PageHeader title="Plan not found" back={{ to: itinerary, label: 'Itinerary' }} />
-        <Card><EmptyState illustration="calendar" title="This plan was deleted" message="It may have been removed from the itinerary." action={<LinkButton to={itinerary} variant="tinted">Back to itinerary</LinkButton>} /></Card>
+        <Card><EmptyState illustration="calendar" title="This plan was deleted" message="It may have been removed from the itinerary." action={<LinkButton to={itinerary} variant="secondary">Back to itinerary</LinkButton>} /></Card>
       </>
     );
 
@@ -66,18 +66,18 @@ export function ActivityPage(ctx: TripCtx) {
                 {a.location && <MapView pins={[{ lat: a.location.lat, lng: a.location.lng, label: a.locationText }]} zoom={15} height={200} />}
                 <div className={s.planAddress}>{a.locationText}</div>
                 <div className={s.planButtons}>
-                  <LinkButton href={mapsUrl(a.locationText, a.location, app)} icon="map" variant="tinted">Open in {mapsAppLabel(app)}</LinkButton>
-                  <LinkButton href={uberUrl(a.locationText, a.location)} icon="car" variant="gray">Get an Uber</LinkButton>
+                  <LinkButton href={mapsUrl(a.locationText, a.location, app)} icon="map" variant="secondary">Open in {mapsAppLabel(app)}</LinkButton>
+                  <LinkButton href={uberUrl(a.locationText, a.location)} icon="car" variant="secondary">Get an Uber</LinkButton>
                 </div>
               </Card>
             ) : (
               <Card><EmptyState illustration="map" title="No location yet" message="Add an address to get directions and an Uber in one tap."
-                action={<Button variant="tinted" icon="pencil" onClick={() => setEditing(true)}>Add location</Button>} /></Card>
+                action={<Button variant="secondary" icon="pencil" onClick={() => setEditing(true)}>Add location</Button>} /></Card>
             )}
           </Section>
 
           <Section title="Who’s going"
-            action={<Button size="small" variant={going ? 'filled' : 'gray'} icon={going ? 'check' : 'plus'}
+            action={<Button size="small" variant={going ? 'primary' : 'secondary'} icon={going ? 'check' : 'plus'}
               onClick={() => store.toggleInArray(trip.id, 'activities', a.id, 'attendeeIds', me.uid, !going)}>{going ? "I'm in" : 'Join'}</Button>}>
             {a.attendeeIds.length ? (
               <List>
@@ -93,7 +93,7 @@ export function ActivityPage(ctx: TripCtx) {
         </div>
 
         <div className={s.planCol}>
-          <Section title="Documents" action={<Button size="small" variant="tinted" icon="plus" onClick={() => setAddingDoc(true)}>Add</Button>}
+          <Section title="Documents" action={<Button size="small" variant="secondary" icon="plus" onClick={() => setAddingDoc(true)}>Add</Button>}
             footer="Tickets, bookings and PDFs. Add the email it came from to find it again quickly.">
             {a.links.length ? (
               <List>
@@ -105,7 +105,7 @@ export function ActivityPage(ctx: TripCtx) {
                       subtitle={`${isPdf(l.url) ? 'PDF · ' : ''}${hostOf(l.url)}${l.emailUrl ? ' · from email' : ''}`}
                       trailing={
                         <span className={s.docActions}>
-                          {l.emailUrl && <LinkButton href={l.emailUrl} size="small" variant="plain" icon="mail" label={`Open the email for ${name}`} />}
+                          {l.emailUrl && <LinkButton href={l.emailUrl} size="small" variant="ghost" icon="mail" label={`Open the email for ${name}`} />}
                           <IconButton icon="trash" size="small" label={`Remove ${name}`} onClick={() => removeDoc(i)} />
                         </span>
                       } />

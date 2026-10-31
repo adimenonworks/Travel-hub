@@ -9,24 +9,24 @@
   max-height: calc(100dvh - 40px);
   display: flex; flex-direction: column;
   background: var(--surface-background-tertiary);
-  border-radius: var(--radius-sheet) var(--radius-sheet) 0 0;
+  border-radius: var(--radius-xl) var(--radius-xl) 0 0;
   box-shadow: var(--shadow-overlay);
   animation: rise var(--motion-sheet);
   padding-bottom: env(safe-area-inset-bottom);
 }
-.grabber { width: 40px; height: 5px; border-radius: var(--radius-pill); background: var(--border-bold); margin: var(--space-xs) auto 0; }
+.grabber { width: 40px; height: 5px; border-radius: var(--radius-round); background: var(--border-bold); margin: var(--space-inline-xs) auto 0; }
 .header {
   display: grid; grid-template-columns: 1fr auto 1fr; align-items: center;
-  min-height: 64px; padding: var(--space-xs) var(--space-md); gap: var(--space-xs);
+  min-height: 64px; padding: var(--space-inline-xs) var(--space-inline-m); gap: var(--space-inline-xs);
 }
 .header > :first-child { justify-self: start; }
 .header > :last-child { justify-self: end; }
-.title { font: var(--p-weight-semibold) var(--p-size-headline)/1.2 var(--font-heading); letter-spacing: var(--p-tracking-headline); text-align: center; }
-.body { overflow-y: auto; padding: var(--space-xs) var(--space-lg) var(--space-2xl); display: flex; flex-direction: column; gap: var(--space-lg); }
+.title { font: var(--weight-bold) 18px/1.2 var(--font-family); letter-spacing: -0.01em; text-align: center; color: var(--text-primary); } /* Heading 4 */
+.body { overflow-y: auto; padding: var(--space-inline-xs) var(--space-inline-l) var(--space-inline-xxl); display: flex; flex-direction: column; gap: var(--space-inline-l); }
 
 @media (min-width: 744px) {
-  .backdrop { align-items: center; padding: var(--space-xl); }
-  .sheet { max-width: 600px; border-radius: var(--radius-sheet); max-height: min(760px, calc(100dvh - 48px)); animation: pop var(--motion-sheet); padding-bottom: 0; }
+  .backdrop { align-items: center; padding: var(--space-inline-xl); }
+  .sheet { max-width: 600px; border-radius: var(--radius-xl); max-height: min(760px, calc(100dvh - 48px)); animation: pop var(--motion-sheet); padding-bottom: 0; }
   .grabber { display: none; }
 }
 

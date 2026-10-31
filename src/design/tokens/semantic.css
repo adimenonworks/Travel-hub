@@ -1,279 +1,455 @@
 /*
- * Semantic tokens — what components use. Each name says the job, not the colour,
- * so light and dark mode only swap values here. Groups: text, icon, status,
- * surface, interactive, border, disabled, overlay (mirrors the Figma "Color" collection).
- * Every colour points at a primitive in primitives.css. Hover is lighter, pressed is darker.
+ * Semantic tokens — named exactly like the Figma "Color", "Layout" and "Typography" collections
+ * (text/link → --text-link, interactive/button/primary/background → --interactive-button-primary-background).
+ * Light is the default; dark mode (the Figma "Dark" mode) applies with the OS setting unless the person forces light,
+ * or when they force dark. See-through tokens are a palette colour at an opacity, as in Figma.
  */
 :root {
   color-scheme: light;
+  --text-primary: var(--color-neutral-800);
+  --text-body: var(--color-neutral-900);
+  --text-subtle: var(--color-neutral-700);
+  --text-inverse: var(--color-neutral-0);
+  --text-brand: var(--color-emerald-800);
+  --text-link: var(--color-emerald-700);
+  --text-link-hover: var(--color-emerald-600);
+  --text-link-pressed: var(--color-emerald-800);
+  --text-on-image: var(--color-neutral-0);
+  --text-on-brand-bold: var(--color-neutral-0);
+  --icon-primary: var(--color-neutral-800);
+  --icon-subtle: var(--color-neutral-700);
+  --icon-inverse: var(--color-neutral-0);
+  --icon-brand: var(--color-emerald-800);
+  --icon-brand-hover: var(--color-emerald-700);
+  --icon-on-brand: var(--color-emerald-900);
+  --icon-on-secondary: var(--color-emerald-800);
+  --icon-on-selected: var(--color-emerald-100);
+  --icon-on-destructive: var(--color-red-700);
+  --icon-on-image: var(--color-neutral-0);
+  --status-success: var(--color-green-700);
+  --status-warning: var(--color-orange-700);
+  --status-error: var(--color-red-700);
+  --status-success-subtle: var(--color-green-100);
+  --status-warning-subtle: var(--color-orange-100);
+  --status-error-subtle: var(--color-red-100);
+  --surface-background-primary: var(--color-neutral-50);
+  --surface-background-secondary: var(--color-neutral-0);
+  --surface-background-tertiary: var(--color-neutral-0);
+  --surface-brand: var(--color-emerald-300);
+  --surface-brand-subtle: var(--color-emerald-100);
+  --surface-brand-bold: var(--color-emerald-700);
+  --surface-sunken: color-mix(in srgb, var(--color-neutral-1000) 10%, transparent);
+  --border-subtle: color-mix(in srgb, var(--color-neutral-1000) 15%, transparent);
+  --border-bold: color-mix(in srgb, var(--color-neutral-1000) 50%, transparent);
+  --border-focus: var(--color-emerald-700);
+  --border-accent: var(--color-emerald-500);
+  --disabled-background: color-mix(in srgb, var(--color-neutral-1000) 5%, transparent);
+  --disabled-foreground: color-mix(in srgb, var(--color-neutral-1000) 30%, transparent);
+  --overlay-bar: color-mix(in srgb, var(--color-neutral-50) 85%, transparent);
+  --overlay-scrim: color-mix(in srgb, var(--color-neutral-1000) 50%, transparent);
+  --overlay-image: color-mix(in srgb, var(--color-neutral-1000) 70%, transparent);
+  --input-field-label: var(--color-neutral-900);
+  --input-field-label-subtle: var(--color-neutral-700);
+  --input-field-placeholder: var(--color-neutral-700);
+  --input-field-body: var(--color-neutral-900);
+  --input-field-background: var(--color-neutral-50);
+  --input-field-background-hover: var(--color-neutral-0);
+  --input-field-border: color-mix(in srgb, var(--color-neutral-1000) 50%, transparent);
+  --input-field-border-selected: var(--color-emerald-700);
+  --interactive-button-primary-background: var(--color-emerald-300);
+  --interactive-button-primary-background-hover: var(--color-emerald-200);
+  --interactive-button-primary-background-pressed: var(--color-emerald-400);
+  --interactive-button-primary-text: var(--color-emerald-800);
+  --interactive-button-primary-icon: var(--color-emerald-800);
+  --interactive-button-primary-disabled-background: color-mix(in srgb, var(--color-neutral-1000) 5%, transparent);
+  --interactive-button-primary-disabled-foreground: color-mix(in srgb, var(--color-neutral-1000) 30%, transparent);
+  --interactive-button-secondary-background: var(--color-emerald-100);
+  --interactive-button-secondary-background-hover: var(--color-emerald-50);
+  --interactive-button-secondary-background-pressed: var(--color-emerald-200);
+  --interactive-button-secondary-text: var(--color-emerald-700);
+  --interactive-button-secondary-icon: var(--color-emerald-700);
+  --interactive-button-secondary-disabled-background: color-mix(in srgb, var(--color-neutral-1000) 5%, transparent);
+  --interactive-button-secondary-disabled-foreground: color-mix(in srgb, var(--color-neutral-1000) 30%, transparent);
+  --interactive-button-destructive-background: var(--color-red-100);
+  --interactive-button-destructive-background-hover: var(--color-red-50);
+  --interactive-button-destructive-background-pressed: var(--color-red-200);
+  --interactive-button-destructive-text: var(--color-red-700);
+  --interactive-button-destructive-icon: var(--color-red-700);
+  --interactive-button-destructive-disabled-background: color-mix(in srgb, var(--color-neutral-1000) 5%, transparent);
+  --interactive-button-destructive-disabled-foreground: color-mix(in srgb, var(--color-neutral-1000) 30%, transparent);
+  --interactive-button-inverse-background: var(--color-emerald-800);
+  --interactive-button-inverse-background-hover: var(--color-emerald-700);
+  --interactive-button-inverse-background-pressed: var(--color-emerald-900);
+  --interactive-button-inverse-text: var(--color-emerald-200);
+  --interactive-button-inverse-icon: var(--color-emerald-200);
+  --interactive-button-inverse-disabled-background: color-mix(in srgb, var(--color-neutral-1000) 5%, transparent);
+  --interactive-button-inverse-disabled-foreground: color-mix(in srgb, var(--color-neutral-1000) 30%, transparent);
+  --interactive-button-ghost-background: transparent;
+  --interactive-button-ghost-background-hover: color-mix(in srgb, var(--color-neutral-1000) 5%, transparent);
+  --interactive-button-ghost-background-pressed: color-mix(in srgb, var(--color-neutral-1000) 10%, transparent);
+  --interactive-button-ghost-text: var(--color-neutral-800);
+  --interactive-button-ghost-icon: var(--color-neutral-800);
+  --interactive-button-ghost-disabled-background: transparent;
+  --interactive-button-ghost-disabled-foreground: color-mix(in srgb, var(--color-neutral-1000) 30%, transparent);
+  --interactive-unselected-background: transparent;
+  --interactive-unselected-background-hover: color-mix(in srgb, var(--color-neutral-1000) 5%, transparent);
+  --interactive-unselected-background-pressed: color-mix(in srgb, var(--color-neutral-1000) 10%, transparent);
+  --interactive-unselected-text: var(--color-emerald-800);
+  --interactive-unselected-icon: var(--color-emerald-800);
+  --interactive-unselected-border: color-mix(in srgb, var(--color-neutral-1000) 15%, transparent);
+  --interactive-selected-ghost-background: transparent;
+  --interactive-selected-ghost-background-hover: color-mix(in srgb, var(--color-neutral-1000) 5%, transparent);
+  --interactive-selected-ghost-background-pressed: color-mix(in srgb, var(--color-neutral-1000) 10%, transparent);
+  --interactive-selected-ghost-text: var(--color-emerald-800);
+  --interactive-selected-ghost-icon: var(--color-emerald-800);
+  --interactive-selected-ghost-border: var(--color-emerald-600);
+  --interactive-selected-primary-background: var(--color-emerald-700);
+  --interactive-selected-primary-background-hover: var(--color-emerald-600);
+  --interactive-selected-primary-background-pressed: var(--color-emerald-800);
+  --interactive-selected-primary-text: var(--color-emerald-0);
+  --interactive-selected-primary-icon: var(--color-emerald-0);
+  --interactive-selected-secondary-background: var(--color-emerald-800);
+  --interactive-selected-secondary-background-hover: var(--color-emerald-700);
+  --interactive-selected-secondary-background-pressed: var(--color-emerald-900);
+  --interactive-selected-secondary-text: var(--color-emerald-100);
+  --interactive-selected-secondary-icon: var(--color-emerald-100);
+  --tag-neutral-background: var(--color-neutral-0);
+  --tag-neutral-text: var(--color-neutral-1000);
+  --tag-neutral-icon: var(--color-neutral-1000);
+  --tag-brand-bold-background: var(--color-emerald-300);
+  --tag-brand-bold-text: var(--color-emerald-800);
+  --tag-brand-bold-icon: var(--color-emerald-800);
+  --tag-brand-subtle-background: var(--color-emerald-100);
+  --tag-brand-subtle-text: var(--color-emerald-700);
+  --tag-brand-subtle-icon: var(--color-emerald-700);
+  --tag-warning-background: var(--color-orange-200);
+  --tag-warning-text: var(--color-orange-700);
+  --tag-warning-icon: var(--color-orange-700);
+  --tag-danger-background: var(--color-red-100);
+  --tag-danger-text: var(--color-red-700);
+  --tag-danger-icon: var(--color-red-700);
+  --tag-success-background: var(--color-green-100);
+  --tag-success-text: var(--color-green-700);
+  --tag-success-icon: var(--color-green-700);
+  --tag-inverse-background: var(--color-emerald-50);
+  --tag-inverse-text: var(--color-emerald-700);
+  --tag-inverse-icon: var(--color-emerald-700);
 
-  /* Text — greys only for headings, body and form text; emerald only for links and brand text */
-  --text-primary: var(--p-neutral-800);          /* display and headings: a softer dark */
-  --text-body: var(--p-neutral-900);             /* body copy and UI labels */
-  --text-subtle: var(--p-neutral-700);           /* secondary copy, captions, hints */
-  --text-inverse: var(--p-neutral-0);            /* on dark fills */
-  --text-brand: var(--p-emerald-800);            /* emerald text that is not a link */
-  --text-link: var(--p-emerald-800);
-  --text-link-hover: var(--p-emerald-700);
-  --text-link-pressed: var(--p-emerald-900);
-  --text-on-brand: var(--p-emerald-900);         /* on bright emerald, both modes */
-  --text-on-secondary: var(--p-emerald-800);
-  --text-on-selected: var(--p-emerald-100);
-  --text-on-destructive: var(--p-red-700);
-  --text-on-inverse: var(--p-emerald-300);        /* on the dark inverse button, both modes */
-  --text-field-label: var(--p-neutral-800);
-  --text-field-placeholder: var(--p-neutral-700);
-  --text-on-image: var(--p-neutral-0);           /* over photos (with --overlay-image behind), both modes */
+  /* Layout (Figma "Layout" collection) */
+  --space-inline-zero: var(--space-0); --space-inline-xxxs: var(--space-2); --space-inline-xxs: var(--space-4); --space-inline-xs: var(--space-8);
+  --space-inline-s: var(--space-12); --space-inline-m: var(--space-16); --space-inline-l: var(--space-20); --space-inline-xl: var(--space-24);
+  --space-inline-xxl: var(--space-32); --space-inline-xxxl: var(--space-40); --space-inline-max: var(--space-48);
+  --space-page-xxs: var(--space-16); --space-page-xs: var(--space-24); --space-page-s: var(--space-32); --space-page-m: var(--space-40);
+  --space-page-l: var(--space-48); --space-page-xl: var(--space-96); --space-page-max: var(--space-120);
+  --radius-xxs: var(--radius-2); --radius-xs: var(--radius-4); --radius-s: var(--radius-8); --radius-m: var(--radius-12); --radius-l: var(--radius-16);
+  --radius-xl: var(--radius-24); --radius-xxl: var(--radius-32); --radius-xxxl: var(--radius-48); --radius-round: var(--radius-999);
 
-  /* Icons — mirror text so they can change independently */
-  --icon-primary: var(--p-neutral-800);
-  --icon-subtle: var(--p-neutral-700);
-  --icon-inverse: var(--p-neutral-0);
-  --icon-brand: var(--p-emerald-800);
-  --icon-brand-hover: var(--p-emerald-700);
-  --icon-on-brand: var(--p-emerald-900);
-  --icon-on-secondary: var(--p-emerald-800);
-  --icon-on-selected: var(--p-emerald-100);
-  --icon-on-destructive: var(--p-red-700);
-  --icon-on-image: var(--p-neutral-0);
+  /* Page layout (code only: how the Layout tokens are used for the page frame, by screen width) */
+  --space-gutter: var(--space-inline-l);   /* page side margin */
+  --space-inset: var(--space-inline-l);    /* padding inside cards and rows */
+  --space-stack: var(--space-page-s);      /* gap between sections */
+  --space-page-top: var(--space-page-l);   /* space above the page title */
 
-  /* Status */
-  --status-success: var(--p-green-700);
-  --status-warning: var(--p-orange-700);
-  --status-error: var(--p-red-700);
-  --status-success-subtle: var(--p-green-100);
-  --status-warning-subtle: var(--p-orange-100);
-  --status-error-subtle: var(--p-red-100);
+  /* Typography (Figma "Typography" collection; "Small" mode below 744px) */
+  --font-family: var(--font-manrope);
+  --font-display: var(--font-poppins);
+  --weight-regular: 400; --weight-medium: 500; --weight-semibold: 600; --weight-bold: 700; --weight-black: 900;
+  --size-display: 56px; --size-display-secondary: 40px; --size-heading-1: 28px; --size-heading-2: 20px; --size-heading-3: 18px;
+  --size-body: 14px; --size-body-small: 12px;
 
-  /* Surfaces, back to front, plus the brand surfaces */
-  --surface-background-primary: var(--p-neutral-50);    /* page canvas */
-  --surface-background-secondary: var(--p-neutral-0);   /* cards, lists, inputs */
-  --surface-background-tertiary: var(--p-neutral-0);    /* sheets, menus, popovers — with --shadow-subtle */
-  --surface-brand: var(--p-emerald-300);                /* accent card, trip hero, covers, brand mark */
-  --surface-brand-subtle: var(--p-emerald-100);         /* category badges, avatars, list icons */
-  --surface-sunken: var(--p-alpha-black-8);             /* progress tracks, segmented-control track */
+  /* Effects (Figma effect styles) */
+  --shadow-subtle: 0 1px 2px rgba(24, 29, 27, 0.06), 0 4px 12px rgba(24, 29, 27, 0.08);
+  --shadow-raised: 0 4px 40px rgba(14, 15, 12, 0.05), 0 2px 6px rgba(14, 15, 12, 0.04);
+  --shadow-overlay: 0 24px 64px rgba(14, 15, 12, 0.24), 0 4px 12px rgba(14, 15, 12, 0.1);
+  --blur-overlay: 20px;
 
-  /* Interactive fills — hover is lighter, pressed is darker */
-  --interactive-primary: var(--p-emerald-300);
-  --interactive-primary-hover: var(--p-emerald-200);
-  --interactive-primary-pressed: var(--p-emerald-400);
-  --interactive-secondary: var(--p-emerald-100);
-  --interactive-secondary-hover: var(--p-alpha-emerald-100-50);
-  --interactive-secondary-pressed: var(--p-emerald-200);
-  --interactive-neutral: var(--p-alpha-black-8);
-  --interactive-neutral-hover: var(--p-alpha-black-5);
-  --interactive-neutral-pressed: var(--p-alpha-black-15);
-  --interactive-selected: var(--p-emerald-800);
-  --interactive-selected-hover: var(--p-emerald-700);
-  --interactive-selected-pressed: var(--p-emerald-900);
-  --interactive-destructive: var(--p-red-100);
-  --interactive-destructive-hover: var(--p-alpha-red-100-50);
-  --interactive-destructive-pressed: var(--p-red-200);
-  --interactive-inverse: var(--p-emerald-900);         /* dark button for brand surfaces, both modes */
-  --interactive-inverse-hover: var(--p-emerald-800);
-  --interactive-inverse-pressed: var(--p-neutral-1000);
-  --interactive-ghost-hover: var(--p-alpha-black-5);    /* transparent controls: plain buttons, rows, unselected tabs */
-  --interactive-ghost-pressed: var(--p-alpha-black-8);
-
-  /* Borders — see-through so they work on any surface */
-  --border-subtle: var(--p-alpha-black-15);             /* dividers, hairlines */
-  --border-bold: var(--p-alpha-black-50);               /* input outlines, ≥ 3:1 */
-  --border-bold-hover: var(--p-alpha-black-70);
-  --border-focus: var(--p-emerald-800);
-  --border-selected: var(--p-emerald-800);              /* current tab underline, ≥ 3:1 */
-
-  /* Disabled (exempt from contrast rules) */
-  --disabled-background: var(--p-alpha-black-5);
-  --disabled-foreground: var(--p-alpha-black-30);
-
-  /* Overlays */
-  --overlay-bar: var(--p-alpha-white-85);               /* top bar, with --blur-overlay behind it */
-  --overlay-scrim: var(--p-alpha-black-50);
-  --overlay-image: var(--p-alpha-black-70);             /* bottom of a photo gradient, so text on it stays readable */
-  --blur-overlay: saturate(180%) blur(20px);
-
-  /* Typography */
-  --font-text: var(--p-font-sans);
-  --font-display: var(--p-font-display);  /* page titles and big numbers */
-  --font-heading: var(--p-font-sans);    /* titles 1–3 */
-  --font-mono: var(--p-font-mono);
-
-  /* Spacing roles */
-  --space-xxs: var(--p-space-1);
-  --space-xs: var(--p-space-2);
-  --space-sm: var(--p-space-3);
-  --space-md: var(--p-space-4);
-  --space-lg: var(--p-space-5);
-  --space-xl: var(--p-space-6);
-  --space-2xl: var(--p-space-8);
-  --space-3xl: var(--p-space-12);
-  --space-gutter: var(--p-space-5);        /* page side margin, compact */
-  --space-inset: var(--p-space-5);         /* list row / card padding */
-  --space-stack: var(--p-space-8);         /* gap between sections */
-
-  /* Shape — everything is a pill or a soft rounded rectangle */
-  --radius-button: var(--p-radius-full);
-  --radius-control: var(--p-radius-full);  /* single-line fields, chips */
-  --radius-field: var(--p-radius-lg);      /* multi-line fields, dropdown menus */
-  --radius-inner: var(--p-radius-md);      /* thumbnails, bubbles, things inside cards */
-  --radius-card: var(--p-radius-lg);
-  --radius-sheet: var(--p-radius-lg);
-  --radius-icon: var(--p-radius-full);
-  --radius-pill: var(--p-radius-full);
-
-  --shadow-subtle: var(--p-shadow-1);   /* third surface level */
-  --shadow-raised: var(--p-shadow-2);
-  --shadow-overlay: var(--p-shadow-3);
-
-  /* Sizing */
-  --size-tap: 44px;               /* minimum hit target */
-  --size-control: 48px;
-  --size-control-md: 44px;        /* a compact control beside a medium button, e.g. a role picker in a list row */
-  --size-control-sm: 36px;
-  --size-topbar: 64px;           /* the app's top bar row (profile) */
-  --size-content-max: 1200px;
-
-  /* Motion */
-  --motion-fast: var(--p-duration-fast) var(--p-ease-standard);
-  --motion-base: var(--p-duration-base) var(--p-ease-standard);
-  --motion-sheet: var(--p-duration-sheet) var(--p-ease-spring);    /* a sheet gliding in */
-  --motion-sheet-out: var(--p-duration-base) var(--p-ease-exit);   /* and sliding away */
-  --motion-fluid: var(--p-duration-fluid) var(--p-ease-fluid);      /* things that move: tab underline, segment pill, day cards */
-  --motion-press: var(--p-duration-fast) var(--p-ease-standard);     /* a control pressing in */
-  --motion-release: var(--p-duration-slow) var(--p-ease-bounce);      /* and springing back out */
+  /* Sizing and motion (code only) */
+  --size-tap: 44px; --size-control: 48px; --size-control-sm: 40px; --size-content-max: 1200px;
+  --motion-fast: var(--duration-fast) var(--ease-standard);
+  --motion-base: var(--duration-base) var(--ease-standard);
+  --motion-sheet: var(--duration-sheet) var(--ease-spring);
+  --motion-sheet-out: var(--duration-base) var(--ease-exit);
+  --motion-fluid: var(--duration-fluid) var(--ease-fluid);
+  --motion-press: var(--duration-fast) var(--ease-standard);
+  --motion-release: var(--duration-slow) var(--ease-bounce);
 }
 
-/* Regular width (tablet / desktop) */
+/* Figma Typography "Regular+" mode: 744px and wider. Nothing on these screens is smaller than 14px. */
 @media (min-width: 744px) {
   :root {
-    --space-gutter: var(--p-space-8);
-    --space-inset: var(--p-space-6);
-    --space-stack: var(--p-space-12);
+    --size-display: 72px; --size-display-secondary: 48px; --size-heading-1: 32px; --size-heading-2: 24px; --size-heading-3: 20px;
+    --size-body: 16px; --size-body-small: 14px;
+    --space-gutter: var(--space-page-s); --space-inset: var(--space-inline-xl); --space-stack: var(--space-page-l); --space-page-top: var(--space-page-xl);
   }
 }
 @media (min-width: 1068px) {
-  :root {
-    --space-gutter: var(--p-space-12);
-  }
+  :root { --space-gutter: var(--space-page-l); }
 }
 
-/* Dark appearance — follows the OS unless the user forces light */
+/* Dark mode: follows the OS unless the person forces light */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme='light']) {
     color-scheme: dark;
-    --text-primary: var(--p-neutral-200);
-    --text-body: var(--p-neutral-100);
-    --text-subtle: var(--p-neutral-400);
-    --text-inverse: var(--p-neutral-1000);
-    --text-brand: var(--p-emerald-300);
-    --text-link: var(--p-emerald-300);
-    --text-link-hover: var(--p-emerald-200);
-    --text-link-pressed: var(--p-emerald-400);
-    --text-on-secondary: var(--p-emerald-200);
-    --text-on-selected: var(--p-emerald-900);
-    --text-on-destructive: var(--p-red-200);
-    --text-field-label: var(--p-neutral-200);
-    --text-field-placeholder: var(--p-neutral-400);
-    --icon-primary: var(--p-neutral-200);
-    --icon-subtle: var(--p-neutral-400);
-    --icon-inverse: var(--p-neutral-1000);
-    --icon-brand: var(--p-emerald-300);
-    --icon-brand-hover: var(--p-emerald-200);
-    --icon-on-secondary: var(--p-emerald-200);
-    --icon-on-selected: var(--p-emerald-900);
-    --icon-on-destructive: var(--p-red-200);
-    --status-success: var(--p-green-300);
-    --status-warning: var(--p-orange-300);
-    --status-error: var(--p-red-300);
-    --status-success-subtle: var(--p-green-800);
-    --status-warning-subtle: var(--p-orange-800);
-    --status-error-subtle: var(--p-red-800);
-    --surface-background-primary: var(--p-neutral-1000);
-    --surface-background-secondary: var(--p-neutral-900);
-    --surface-background-tertiary: var(--p-neutral-800);
-    --surface-brand-subtle: var(--p-emerald-800);
-    --surface-sunken: var(--p-alpha-white-8);
-    --interactive-secondary: var(--p-emerald-800);
-    --interactive-secondary-hover: var(--p-emerald-700);
-    --interactive-secondary-pressed: var(--p-emerald-900);
-    --interactive-neutral: var(--p-alpha-white-8);
-    --interactive-neutral-hover: var(--p-alpha-white-12);
-    --interactive-neutral-pressed: var(--p-alpha-white-5);
-    --interactive-selected: var(--p-emerald-300);
-    --interactive-selected-hover: var(--p-emerald-200);
-    --interactive-selected-pressed: var(--p-emerald-400);
-    --interactive-destructive: var(--p-red-800);
-    --interactive-destructive-hover: var(--p-red-700);
-    --interactive-destructive-pressed: var(--p-red-900);
-    --interactive-ghost-hover: var(--p-alpha-white-5);
-    --interactive-ghost-pressed: var(--p-alpha-white-8);
-    --border-subtle: var(--p-alpha-white-15);
-    --border-bold: var(--p-alpha-white-40);
-    --border-bold-hover: var(--p-alpha-white-70);
-    --border-focus: var(--p-emerald-300);
-    --border-selected: var(--p-emerald-300);
-    --disabled-background: var(--p-alpha-white-5);
-    --disabled-foreground: var(--p-alpha-white-30);
-    --overlay-bar: var(--p-alpha-black-85);
-    --overlay-scrim: var(--p-alpha-black-70);
+    --text-primary: var(--color-neutral-100);
+    --text-body: var(--color-neutral-200);
+    --text-subtle: var(--color-neutral-400);
+    --text-inverse: var(--color-neutral-1000);
+    --text-brand: var(--color-emerald-300);
+    --text-link: var(--color-emerald-300);
+    --text-link-hover: var(--color-emerald-200);
+    --text-link-pressed: var(--color-emerald-400);
+    --text-on-image: var(--color-neutral-0);
+    --text-on-brand-bold: var(--color-neutral-0);
+    --icon-primary: var(--color-neutral-100);
+    --icon-subtle: var(--color-neutral-300);
+    --icon-inverse: var(--color-neutral-1000);
+    --icon-brand: var(--color-emerald-300);
+    --icon-brand-hover: var(--color-emerald-200);
+    --icon-on-brand: var(--color-emerald-900);
+    --icon-on-secondary: var(--color-emerald-100);
+    --icon-on-selected: var(--color-emerald-900);
+    --icon-on-destructive: var(--color-red-200);
+    --icon-on-image: var(--color-neutral-0);
+    --status-success: var(--color-green-300);
+    --status-warning: var(--color-orange-300);
+    --status-error: var(--color-red-300);
+    --status-success-subtle: var(--color-green-900);
+    --status-warning-subtle: var(--color-orange-900);
+    --status-error-subtle: var(--color-red-900);
+    --surface-background-primary: var(--color-neutral-1000);
+    --surface-background-secondary: var(--color-neutral-900);
+    --surface-background-tertiary: var(--color-neutral-800);
+    --surface-brand: var(--color-emerald-800);
+    --surface-brand-subtle: var(--color-emerald-800);
+    --surface-brand-bold: var(--color-emerald-900);
+    --surface-sunken: color-mix(in srgb, var(--color-neutral-0) 10%, transparent);
+    --border-subtle: color-mix(in srgb, var(--color-neutral-0) 15%, transparent);
+    --border-bold: color-mix(in srgb, var(--color-neutral-0) 40%, transparent);
+    --border-focus: var(--color-emerald-300);
+    --border-accent: var(--color-emerald-400);
+    --disabled-background: color-mix(in srgb, var(--color-neutral-0) 5%, transparent);
+    --disabled-foreground: color-mix(in srgb, var(--color-neutral-0) 30%, transparent);
+    --overlay-bar: color-mix(in srgb, var(--color-neutral-1000) 85%, transparent);
+    --overlay-scrim: color-mix(in srgb, var(--color-neutral-1000) 70%, transparent);
+    --overlay-image: color-mix(in srgb, var(--color-neutral-1000) 70%, transparent);
+    --input-field-label: var(--color-neutral-100);
+    --input-field-label-subtle: var(--color-neutral-400);
+    --input-field-placeholder: var(--color-neutral-400);
+    --input-field-body: var(--color-neutral-100);
+    --input-field-background: var(--color-neutral-1000);
+    --input-field-background-hover: var(--color-neutral-900);
+    --input-field-border: color-mix(in srgb, var(--color-neutral-0) 40%, transparent);
+    --input-field-border-selected: var(--color-emerald-300);
+    --interactive-button-primary-background: var(--color-emerald-300);
+    --interactive-button-primary-background-hover: var(--color-emerald-200);
+    --interactive-button-primary-background-pressed: var(--color-emerald-400);
+    --interactive-button-primary-text: var(--color-emerald-800);
+    --interactive-button-primary-icon: var(--color-emerald-800);
+    --interactive-button-primary-disabled-background: color-mix(in srgb, var(--color-neutral-0) 5%, transparent);
+    --interactive-button-primary-disabled-foreground: color-mix(in srgb, var(--color-neutral-0) 30%, transparent);
+    --interactive-button-secondary-background: var(--color-emerald-800);
+    --interactive-button-secondary-background-hover: var(--color-emerald-700);
+    --interactive-button-secondary-background-pressed: var(--color-emerald-900);
+    --interactive-button-secondary-text: var(--color-emerald-100);
+    --interactive-button-secondary-icon: var(--color-emerald-100);
+    --interactive-button-secondary-disabled-background: color-mix(in srgb, var(--color-neutral-0) 5%, transparent);
+    --interactive-button-secondary-disabled-foreground: color-mix(in srgb, var(--color-neutral-0) 30%, transparent);
+    --interactive-button-destructive-background: var(--color-red-800);
+    --interactive-button-destructive-background-hover: var(--color-red-700);
+    --interactive-button-destructive-background-pressed: var(--color-red-900);
+    --interactive-button-destructive-text: var(--color-red-200);
+    --interactive-button-destructive-icon: var(--color-red-200);
+    --interactive-button-destructive-disabled-background: color-mix(in srgb, var(--color-neutral-0) 5%, transparent);
+    --interactive-button-destructive-disabled-foreground: color-mix(in srgb, var(--color-neutral-0) 30%, transparent);
+    --interactive-button-inverse-background: var(--color-emerald-800);
+    --interactive-button-inverse-background-hover: var(--color-emerald-700);
+    --interactive-button-inverse-background-pressed: var(--color-emerald-900);
+    --interactive-button-inverse-text: var(--color-emerald-200);
+    --interactive-button-inverse-icon: var(--color-emerald-200);
+    --interactive-button-inverse-disabled-background: color-mix(in srgb, var(--color-neutral-0) 5%, transparent);
+    --interactive-button-inverse-disabled-foreground: color-mix(in srgb, var(--color-neutral-0) 30%, transparent);
+    --interactive-button-ghost-background: transparent;
+    --interactive-button-ghost-background-hover: color-mix(in srgb, var(--color-neutral-0) 5%, transparent);
+    --interactive-button-ghost-background-pressed: color-mix(in srgb, var(--color-neutral-0) 10%, transparent);
+    --interactive-button-ghost-text: var(--color-neutral-100);
+    --interactive-button-ghost-icon: var(--color-neutral-100);
+    --interactive-button-ghost-disabled-background: transparent;
+    --interactive-button-ghost-disabled-foreground: color-mix(in srgb, var(--color-neutral-0) 30%, transparent);
+    --interactive-unselected-background: transparent;
+    --interactive-unselected-background-hover: color-mix(in srgb, var(--color-neutral-0) 5%, transparent);
+    --interactive-unselected-background-pressed: color-mix(in srgb, var(--color-neutral-0) 10%, transparent);
+    --interactive-unselected-text: var(--color-emerald-200);
+    --interactive-unselected-icon: var(--color-emerald-200);
+    --interactive-unselected-border: color-mix(in srgb, var(--color-neutral-0) 15%, transparent);
+    --interactive-selected-ghost-background: transparent;
+    --interactive-selected-ghost-background-hover: color-mix(in srgb, var(--color-neutral-0) 5%, transparent);
+    --interactive-selected-ghost-background-pressed: color-mix(in srgb, var(--color-neutral-0) 10%, transparent);
+    --interactive-selected-ghost-text: var(--color-emerald-200);
+    --interactive-selected-ghost-icon: var(--color-emerald-200);
+    --interactive-selected-ghost-border: var(--color-emerald-300);
+    --interactive-selected-primary-background: var(--color-emerald-300);
+    --interactive-selected-primary-background-hover: var(--color-emerald-200);
+    --interactive-selected-primary-background-pressed: var(--color-emerald-400);
+    --interactive-selected-primary-text: var(--color-emerald-900);
+    --interactive-selected-primary-icon: var(--color-emerald-900);
+    --interactive-selected-secondary-background: var(--color-emerald-300);
+    --interactive-selected-secondary-background-hover: var(--color-emerald-200);
+    --interactive-selected-secondary-background-pressed: var(--color-emerald-400);
+    --interactive-selected-secondary-text: var(--color-emerald-900);
+    --interactive-selected-secondary-icon: var(--color-emerald-900);
+    --tag-neutral-background: var(--color-neutral-800);
+    --tag-neutral-text: var(--color-neutral-0);
+    --tag-neutral-icon: var(--color-neutral-0);
+    --tag-brand-bold-background: var(--color-emerald-300);
+    --tag-brand-bold-text: var(--color-emerald-800);
+    --tag-brand-bold-icon: var(--color-emerald-800);
+    --tag-brand-subtle-background: var(--color-emerald-800);
+    --tag-brand-subtle-text: var(--color-emerald-100);
+    --tag-brand-subtle-icon: var(--color-emerald-100);
+    --tag-warning-background: var(--color-orange-800);
+    --tag-warning-text: var(--color-orange-200);
+    --tag-warning-icon: var(--color-orange-200);
+    --tag-danger-background: var(--color-red-800);
+    --tag-danger-text: var(--color-red-200);
+    --tag-danger-icon: var(--color-red-200);
+    --tag-success-background: var(--color-green-800);
+    --tag-success-text: var(--color-green-200);
+    --tag-success-icon: var(--color-green-200);
+    --tag-inverse-background: var(--color-emerald-900);
+    --tag-inverse-text: var(--color-emerald-200);
+    --tag-inverse-icon: var(--color-emerald-200);
   }
 }
 
+/* Forced dark (Profile → Appearance) */
 :root[data-theme='dark'] {
   color-scheme: dark;
-  --text-primary: var(--p-neutral-200);
-  --text-body: var(--p-neutral-100);
-  --text-subtle: var(--p-neutral-400);
-  --text-inverse: var(--p-neutral-1000);
-  --text-brand: var(--p-emerald-300);
-  --text-link: var(--p-emerald-300);
-  --text-link-hover: var(--p-emerald-200);
-  --text-link-pressed: var(--p-emerald-400);
-  --text-on-secondary: var(--p-emerald-200);
-  --text-on-selected: var(--p-emerald-900);
-  --text-on-destructive: var(--p-red-200);
-  --text-field-label: var(--p-neutral-200);
-  --text-field-placeholder: var(--p-neutral-400);
-  --icon-primary: var(--p-neutral-200);
-  --icon-subtle: var(--p-neutral-400);
-  --icon-inverse: var(--p-neutral-1000);
-  --icon-brand: var(--p-emerald-300);
-  --icon-brand-hover: var(--p-emerald-200);
-  --icon-on-secondary: var(--p-emerald-200);
-  --icon-on-selected: var(--p-emerald-900);
-  --icon-on-destructive: var(--p-red-200);
-  --status-success: var(--p-green-300);
-  --status-warning: var(--p-orange-300);
-  --status-error: var(--p-red-300);
-  --status-success-subtle: var(--p-green-800);
-  --status-warning-subtle: var(--p-orange-800);
-  --status-error-subtle: var(--p-red-800);
-  --surface-background-primary: var(--p-neutral-1000);
-  --surface-background-secondary: var(--p-neutral-900);
-  --surface-background-tertiary: var(--p-neutral-800);
-  --surface-brand-subtle: var(--p-emerald-800);
-  --surface-sunken: var(--p-alpha-white-8);
-  --interactive-secondary: var(--p-emerald-800);
-  --interactive-secondary-hover: var(--p-emerald-700);
-  --interactive-secondary-pressed: var(--p-emerald-900);
-  --interactive-neutral: var(--p-alpha-white-8);
-  --interactive-neutral-hover: var(--p-alpha-white-12);
-  --interactive-neutral-pressed: var(--p-alpha-white-5);
-  --interactive-selected: var(--p-emerald-300);
-  --interactive-selected-hover: var(--p-emerald-200);
-  --interactive-selected-pressed: var(--p-emerald-400);
-  --interactive-destructive: var(--p-red-800);
-  --interactive-destructive-hover: var(--p-red-700);
-  --interactive-destructive-pressed: var(--p-red-900);
-  --interactive-ghost-hover: var(--p-alpha-white-5);
-  --interactive-ghost-pressed: var(--p-alpha-white-8);
-  --border-subtle: var(--p-alpha-white-15);
-  --border-bold: var(--p-alpha-white-40);
-  --border-bold-hover: var(--p-alpha-white-70);
-  --border-focus: var(--p-emerald-300);
-  --border-selected: var(--p-emerald-300);
-  --disabled-background: var(--p-alpha-white-5);
-  --disabled-foreground: var(--p-alpha-white-30);
-  --overlay-bar: var(--p-alpha-black-85);
-  --overlay-scrim: var(--p-alpha-black-70);
+  --text-primary: var(--color-neutral-100);
+  --text-body: var(--color-neutral-200);
+  --text-subtle: var(--color-neutral-400);
+  --text-inverse: var(--color-neutral-1000);
+  --text-brand: var(--color-emerald-300);
+  --text-link: var(--color-emerald-300);
+  --text-link-hover: var(--color-emerald-200);
+  --text-link-pressed: var(--color-emerald-400);
+  --text-on-image: var(--color-neutral-0);
+  --text-on-brand-bold: var(--color-neutral-0);
+  --icon-primary: var(--color-neutral-100);
+  --icon-subtle: var(--color-neutral-300);
+  --icon-inverse: var(--color-neutral-1000);
+  --icon-brand: var(--color-emerald-300);
+  --icon-brand-hover: var(--color-emerald-200);
+  --icon-on-brand: var(--color-emerald-900);
+  --icon-on-secondary: var(--color-emerald-100);
+  --icon-on-selected: var(--color-emerald-900);
+  --icon-on-destructive: var(--color-red-200);
+  --icon-on-image: var(--color-neutral-0);
+  --status-success: var(--color-green-300);
+  --status-warning: var(--color-orange-300);
+  --status-error: var(--color-red-300);
+  --status-success-subtle: var(--color-green-900);
+  --status-warning-subtle: var(--color-orange-900);
+  --status-error-subtle: var(--color-red-900);
+  --surface-background-primary: var(--color-neutral-1000);
+  --surface-background-secondary: var(--color-neutral-900);
+  --surface-background-tertiary: var(--color-neutral-800);
+  --surface-brand: var(--color-emerald-800);
+  --surface-brand-subtle: var(--color-emerald-800);
+  --surface-brand-bold: var(--color-emerald-900);
+  --surface-sunken: color-mix(in srgb, var(--color-neutral-0) 10%, transparent);
+  --border-subtle: color-mix(in srgb, var(--color-neutral-0) 15%, transparent);
+  --border-bold: color-mix(in srgb, var(--color-neutral-0) 40%, transparent);
+  --border-focus: var(--color-emerald-300);
+  --border-accent: var(--color-emerald-400);
+  --disabled-background: color-mix(in srgb, var(--color-neutral-0) 5%, transparent);
+  --disabled-foreground: color-mix(in srgb, var(--color-neutral-0) 30%, transparent);
+  --overlay-bar: color-mix(in srgb, var(--color-neutral-1000) 85%, transparent);
+  --overlay-scrim: color-mix(in srgb, var(--color-neutral-1000) 70%, transparent);
+  --overlay-image: color-mix(in srgb, var(--color-neutral-1000) 70%, transparent);
+  --input-field-label: var(--color-neutral-100);
+  --input-field-label-subtle: var(--color-neutral-400);
+  --input-field-placeholder: var(--color-neutral-400);
+  --input-field-body: var(--color-neutral-100);
+  --input-field-background: var(--color-neutral-1000);
+  --input-field-background-hover: var(--color-neutral-900);
+  --input-field-border: color-mix(in srgb, var(--color-neutral-0) 40%, transparent);
+  --input-field-border-selected: var(--color-emerald-300);
+  --interactive-button-primary-background: var(--color-emerald-300);
+  --interactive-button-primary-background-hover: var(--color-emerald-200);
+  --interactive-button-primary-background-pressed: var(--color-emerald-400);
+  --interactive-button-primary-text: var(--color-emerald-800);
+  --interactive-button-primary-icon: var(--color-emerald-800);
+  --interactive-button-primary-disabled-background: color-mix(in srgb, var(--color-neutral-0) 5%, transparent);
+  --interactive-button-primary-disabled-foreground: color-mix(in srgb, var(--color-neutral-0) 30%, transparent);
+  --interactive-button-secondary-background: var(--color-emerald-800);
+  --interactive-button-secondary-background-hover: var(--color-emerald-700);
+  --interactive-button-secondary-background-pressed: var(--color-emerald-900);
+  --interactive-button-secondary-text: var(--color-emerald-100);
+  --interactive-button-secondary-icon: var(--color-emerald-100);
+  --interactive-button-secondary-disabled-background: color-mix(in srgb, var(--color-neutral-0) 5%, transparent);
+  --interactive-button-secondary-disabled-foreground: color-mix(in srgb, var(--color-neutral-0) 30%, transparent);
+  --interactive-button-destructive-background: var(--color-red-800);
+  --interactive-button-destructive-background-hover: var(--color-red-700);
+  --interactive-button-destructive-background-pressed: var(--color-red-900);
+  --interactive-button-destructive-text: var(--color-red-200);
+  --interactive-button-destructive-icon: var(--color-red-200);
+  --interactive-button-destructive-disabled-background: color-mix(in srgb, var(--color-neutral-0) 5%, transparent);
+  --interactive-button-destructive-disabled-foreground: color-mix(in srgb, var(--color-neutral-0) 30%, transparent);
+  --interactive-button-inverse-background: var(--color-emerald-800);
+  --interactive-button-inverse-background-hover: var(--color-emerald-700);
+  --interactive-button-inverse-background-pressed: var(--color-emerald-900);
+  --interactive-button-inverse-text: var(--color-emerald-200);
+  --interactive-button-inverse-icon: var(--color-emerald-200);
+  --interactive-button-inverse-disabled-background: color-mix(in srgb, var(--color-neutral-0) 5%, transparent);
+  --interactive-button-inverse-disabled-foreground: color-mix(in srgb, var(--color-neutral-0) 30%, transparent);
+  --interactive-button-ghost-background: transparent;
+  --interactive-button-ghost-background-hover: color-mix(in srgb, var(--color-neutral-0) 5%, transparent);
+  --interactive-button-ghost-background-pressed: color-mix(in srgb, var(--color-neutral-0) 10%, transparent);
+  --interactive-button-ghost-text: var(--color-neutral-100);
+  --interactive-button-ghost-icon: var(--color-neutral-100);
+  --interactive-button-ghost-disabled-background: transparent;
+  --interactive-button-ghost-disabled-foreground: color-mix(in srgb, var(--color-neutral-0) 30%, transparent);
+  --interactive-unselected-background: transparent;
+  --interactive-unselected-background-hover: color-mix(in srgb, var(--color-neutral-0) 5%, transparent);
+  --interactive-unselected-background-pressed: color-mix(in srgb, var(--color-neutral-0) 10%, transparent);
+  --interactive-unselected-text: var(--color-emerald-200);
+  --interactive-unselected-icon: var(--color-emerald-200);
+  --interactive-unselected-border: color-mix(in srgb, var(--color-neutral-0) 15%, transparent);
+  --interactive-selected-ghost-background: transparent;
+  --interactive-selected-ghost-background-hover: color-mix(in srgb, var(--color-neutral-0) 5%, transparent);
+  --interactive-selected-ghost-background-pressed: color-mix(in srgb, var(--color-neutral-0) 10%, transparent);
+  --interactive-selected-ghost-text: var(--color-emerald-200);
+  --interactive-selected-ghost-icon: var(--color-emerald-200);
+  --interactive-selected-ghost-border: var(--color-emerald-300);
+  --interactive-selected-primary-background: var(--color-emerald-300);
+  --interactive-selected-primary-background-hover: var(--color-emerald-200);
+  --interactive-selected-primary-background-pressed: var(--color-emerald-400);
+  --interactive-selected-primary-text: var(--color-emerald-900);
+  --interactive-selected-primary-icon: var(--color-emerald-900);
+  --interactive-selected-secondary-background: var(--color-emerald-300);
+  --interactive-selected-secondary-background-hover: var(--color-emerald-200);
+  --interactive-selected-secondary-background-pressed: var(--color-emerald-400);
+  --interactive-selected-secondary-text: var(--color-emerald-900);
+  --interactive-selected-secondary-icon: var(--color-emerald-900);
+  --tag-neutral-background: var(--color-neutral-800);
+  --tag-neutral-text: var(--color-neutral-0);
+  --tag-neutral-icon: var(--color-neutral-0);
+  --tag-brand-bold-background: var(--color-emerald-300);
+  --tag-brand-bold-text: var(--color-emerald-800);
+  --tag-brand-bold-icon: var(--color-emerald-800);
+  --tag-brand-subtle-background: var(--color-emerald-800);
+  --tag-brand-subtle-text: var(--color-emerald-100);
+  --tag-brand-subtle-icon: var(--color-emerald-100);
+  --tag-warning-background: var(--color-orange-800);
+  --tag-warning-text: var(--color-orange-200);
+  --tag-warning-icon: var(--color-orange-200);
+  --tag-danger-background: var(--color-red-800);
+  --tag-danger-text: var(--color-red-200);
+  --tag-danger-icon: var(--color-red-200);
+  --tag-success-background: var(--color-green-800);
+  --tag-success-text: var(--color-green-200);
+  --tag-success-icon: var(--color-green-200);
+  --tag-inverse-background: var(--color-emerald-900);
+  --tag-inverse-text: var(--color-emerald-200);
+  --tag-inverse-icon: var(--color-emerald-200);
 }

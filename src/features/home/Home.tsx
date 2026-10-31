@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Badge, Button, Card, CardLink, Illustration, LinkButton, PageHeader, Section, Spinner } from '../../design/components';
-import { useMe, useMyTrips, useProfile } from '../../data/hooks';
+import { Badge, Button, Card, CardLink, ContentCard, Illustration, LinkButton, PageHeader, Section, Spinner } from '../../design/components';
+import { personName, useMe, useMyTrips, useProfile, useProfiles } from '../../data/hooks';
 import type { Trip } from '../../data/types';
 import { daysBetween, formatRange, today, tripPhase } from '../../lib/dates';
 import { Content, useNewTrip } from '../../app/Shell';
@@ -54,8 +54,8 @@ export function Home() {
               <div className={s.pastRow}>{past.map((t) => <PastCard key={t.id} trip={t} />)}</div>
             ) : (
               <Card className={s.emptyPast} media={<Illustration name="memories" />}>
-                <p className="t-headline">Looks a little empty…</p>
-                <p className="t-subhead t-secondary">Let’s make some memories. Trips you’ve finished will show up here.</p>
+                <p className="t-heading-4">Looks a little empty…</p>
+                <p className="t-body-small t-secondary">Let’s make some memories. Trips you’ve finished will show up here.</p>
               </Card>
             )}
           </Section>
@@ -86,14 +86,14 @@ function Hero({ trip, now }: { trip: Trip; now: boolean }) {
       <div className={s.heroBody}>
         <div className={s.heroMain}>
           <Badge tone={now ? 'tint' : 'neutral'}>{now ? 'Happening now' : 'Next up'}</Badge>
-          <h2 id="hero-title" className={`t-title1 ${s.heroTitle}`}><Link to={base} className={s.heroLink}>{trip.name}</Link></h2>
-          <p className="t-callout t-secondary">{place(trip)} · {formatRange(trip.startDate, trip.endDate)}</p>
+          <h2 id="hero-title" className={`t-heading-1 ${s.heroTitle}`}><Link to={base} className={s.heroLink}>{trip.name}</Link></h2>
+          <p className="t-body t-secondary">{place(trip)} · {formatRange(trip.startDate, trip.endDate)}</p>
         </div>
-        <p className={s.countdown}><span className={s.countBig}>{big}</span> {small && <span className={`t-title3 ${s.countSmall}`}>{small}</span>}</p>
+        <p className={s.countdown}><span className={s.countBig}>{big}</span> {small && <span className={`t-heading-3 ${s.countSmall}`}>{small}</span>}</p>
         <div className={s.heroLinks}>
-          <LinkButton to={base} variant="tinted" icon="calendar">Itinerary</LinkButton>
-          <LinkButton to={`${base}/ideas`} variant="gray" icon="lightbulb">Ideas</LinkButton>
-          <LinkButton to={`${base}/budget`} variant="gray" icon="wallet">Budget</LinkButton>
+          <LinkButton to={base} variant="secondary" icon="calendar">Itinerary</LinkButton>
+          <LinkButton to={`${base}/ideas`} variant="secondary" icon="lightbulb">Ideas</LinkButton>
+          <LinkButton to={`${base}#budget`} variant="secondary" icon="wallet">Budget</LinkButton>
         </div>
       </div>
     </Card>
@@ -102,22 +102,16 @@ function Hero({ trip, now }: { trip: Trip; now: boolean }) {
 
 const whenLabel = (until: number, n: number) => (until > 0 ? `in ${until} day${until === 1 ? '' : 's'}` : until === 0 ? 'Today' : `${n} day${n === 1 ? '' : 's'}`);
 
-/** A trip in the grid: cover on top, then its name, place, dates and who's going. */
+/** A trip in the grid (Figma "Content Card"): cover with when it is and who's going, then name, place and dates. */
 function TripCard({ trip }: { trip: Trip }) {
   const n = daysBetween(trip.startDate, trip.endDate) + 1;
   const until = daysBetween(today(), trip.startDate);
+  const profiles = useProfiles(trip.memberIds);
   return (
-    <CardLink to={`/trip/${trip.id}`} flush className={s.trip}>
-      <TripCover trip={trip} className={s.coverWrap}>
-        <span className={s.coverBadge}>{tripPhase(trip.startDate, trip.endDate) === 'current' ? 'Happening now' : whenLabel(until, n)}</span>
-        <CoverPeople trip={trip} size={24} />
-      </TripCover>
-      <div className={s.tripBody}>
-        <div className="t-title3">{trip.name}</div>
-        <div className="t-subhead t-secondary">{place(trip)}</div>
-        <div className={`t-footnote t-secondary ${s.tripFoot}`}>{formatRange(trip.startDate, trip.endDate)}</div>
-      </div>
-    </CardLink>
+    <ContentCard to={`/trip/${trip.id}`} cover={<TripCover trip={trip} />}
+      when={tripPhase(trip.startDate, trip.endDate) === 'current' ? 'Happening now' : whenLabel(until, n)}
+      people={trip.memberIds.map((id) => ({ id, name: personName(profiles, id), photo: profiles[id]?.photo }))}
+      name={trip.name} place={place(trip)} dates={formatRange(trip.startDate, trip.endDate)} />
   );
 }
 
@@ -127,8 +121,8 @@ function PastCard({ trip }: { trip: Trip }) {
     <CardLink to={`/trip/${trip.id}`} flush className={s.past}>
       <TripCover trip={trip} className={s.pastCover} />
       <div className={s.pastBody}>
-        <div className="t-headline">{trip.name}</div>
-        <div className="t-footnote t-secondary">{formatRange(trip.startDate, trip.endDate)}</div>
+        <div className="t-heading-4">{trip.name}</div>
+        <div className="t-label-small t-secondary">{formatRange(trip.startDate, trip.endDate)}</div>
       </div>
     </CardLink>
   );
@@ -163,7 +157,7 @@ function PlanTile({ wide }: { wide?: boolean }) {
     <div className={[s.plan, wide && s.planWide].filter(Boolean).join(' ')}>
       <Illustration name="globe" size={wide ? 120 : 96} />
       <div className={s.planText}>
-        <h2 className="t-title2">
+        <h2 className="t-heading-2">
           <span className="visually-hidden">Plan a new trip</span>
           <span key={`${i}-${leaving}`} className={[s.planWord, leaving && s.leaving].filter(Boolean).join(' ')} aria-hidden="true">
             {[...word].map((ch, n) => (
@@ -173,7 +167,7 @@ function PlanTile({ wide }: { wide?: boolean }) {
             ))}
           </span>
         </h2>
-        <p className="t-subhead t-secondary">There’s so much to see and do. Let’s plan it right.</p>
+        <p className="t-body-small t-secondary">There’s so much to see and do. Let’s plan it right.</p>
       </div>
       <Button icon="plus" onClick={newTrip}>Add a trip</Button>
     </div>

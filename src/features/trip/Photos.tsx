@@ -23,7 +23,7 @@ export function Photos(ctx: TripCtx) {
     <>
       <div className={s.dayHead}>
         <div>
-          <h2 className="t-title1">Photos</h2>
+          <h2 className="t-heading-1">Photos</h2>
           <div className={s.dayBudget}>Shared albums for this trip. Anyone on the trip can add one.</div>
         </div>
         <Button size="small" icon="plus" onClick={() => setEditing('new')}>Add album</Button>
@@ -54,11 +54,11 @@ function AlbumCard({ album, ctx, onEdit }: { album: Album; ctx: TripCtx; onEdit:
         <Icon name="photo" size={40} />
       </div>
       <div className={s.albumBody}>
-        <h3 className="t-title3">{album.title}</h3>
-        <div className="t-subhead t-secondary">{providerName[provider]} · added by {album.createdBy === me.uid ? 'you' : personName(ctx.profiles, album.createdBy)}</div>
+        <h3 className="t-heading-3">{album.title}</h3>
+        <div className="t-body-small t-secondary">{providerName[provider]} · added by {album.createdBy === me.uid ? 'you' : personName(ctx.profiles, album.createdBy)}</div>
         <div className={s.albumActions}>
           <LinkButton href={album.url} icon="arrow-up-right">Open album</LinkButton>
-          {canEdit && <IconButton icon="pencil" variant="gray" label={`Edit ${album.title}`} onClick={onEdit} />}
+          {canEdit && <IconButton icon="pencil" variant="secondary" label={`Edit ${album.title}`} onClick={onEdit} />}
         </div>
       </div>
     </Card>

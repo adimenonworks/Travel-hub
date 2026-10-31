@@ -1,9 +1,9 @@
-.head { display: flex; flex-direction: column; gap: var(--space-lg); }
-.who { display: flex; gap: var(--space-lg); align-items: center; }
+.head { display: flex; flex-direction: column; gap: var(--space-inline-l); }
+.who { display: flex; gap: var(--space-inline-l); align-items: center; }
 .whoText { min-width: 0; overflow-wrap: anywhere; }
-.photoButtons { display: flex; flex-wrap: wrap; gap: var(--space-sm); }
-.nameRow { display: flex; gap: var(--space-sm); align-items: flex-end; margin-bottom: calc(var(--space-sm) * -1); }
-.add { display: flex; gap: var(--space-sm); align-items: flex-end; }
+.photoButtons { display: flex; flex-wrap: wrap; gap: var(--space-inline-s); }
+.nameRow { display: flex; gap: var(--space-inline-s); align-items: flex-end; margin-bottom: calc(var(--space-inline-s) * -1); }
+.add { display: flex; gap: var(--space-inline-s); align-items: flex-end; }
 .addField { flex: 1; min-width: 0; }
-.appearance { display: flex; flex-direction: column; gap: var(--space-xl); }
-.appearanceRow { display: flex; flex-direction: column; gap: var(--space-sm); }
+.appearance { display: flex; flex-direction: column; gap: var(--space-inline-xl); }
+.appearanceRow { display: flex; flex-direction: column; gap: var(--space-inline-s); }

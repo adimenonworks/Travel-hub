@@ -1,13 +1,14 @@
-import { useState } from 'react';
-import { Navigate, Route, Routes, useLocation, useMatch, useNavigate, useParams } from 'react-router-dom';
-import { Card, EmptyState, Icon, IconButton, LinkButton, PageHeader, Spinner, Tabs, type TabItem } from '../../design/components';
-import { useProfiles, useRole, useSub, useTrip } from '../../data/hooks';
+import { useEffect, useState } from 'react';
+import { Navigate, Route, Routes, useLocation, useMatch, useNavigate, useParams, useSearchParams } from 'react-router-dom';
+import { Button, EmptyState, HeroCard, IconButton, LinkButton, PageHeader, Spinner, Tabs, type TabItem } from '../../design/components';
+import { personName, useProfiles, useRole, useSub, useTrip } from '../../data/hooks';
 import type { Activity, Album, Comment, Expense, Idea, Profile, Trip } from '../../data/types';
-import { daysBetween, formatRange } from '../../lib/dates';
+import { daysBetween, formatRange, today, tripDays } from '../../lib/dates';
+import { countryName, flagUrl, tripCountries } from '../../lib/countries';
 import { Content } from '../../app/Shell';
-import { CoverPeople, TripCover } from '../shared/TripCover';
+import { TripCover } from '../shared/TripCover';
 import { ActivityPage } from './ActivityPage';
-import { Budget } from './Budget';
+import { TripBudget } from './Budget';
 import { Ideas } from './Ideas';
 import { Itinerary } from './Itinerary';
 import { People } from './People';
@@ -35,7 +36,7 @@ export function TripPage() {
     return (
       <Content>
         <EmptyState illustration="compass" title="Trip not found" message="It may have been deleted, or you're not a member yet. Ask the organizer for an invite link."
-          action={<LinkButton to="/" variant="tinted">Back to trips</LinkButton>} />
+          action={<LinkButton to="/" variant="secondary">Back to trips</LinkButton>} />
       </Content>
     );
   return <TripLoaded trip={trip} />;
@@ -51,21 +52,36 @@ function TripLoaded({ trip }: { trip: Trip }) {
   const { canManage, isOwner } = useRole(trip);
   const [editing, setEditing] = useState(false);
   const navigate = useNavigate();
-  const { pathname } = useLocation();
+  const { pathname, hash } = useLocation();
   const planPage = useMatch('/trip/:tripId/plan/:activityId');
+  const [params] = useSearchParams();
+  const loaded = !!(activities && ideas && expenses && comments && albums);
+  // Home's "Budget" shortcut lands here with #budget: bring the budget card into view.
+  useEffect(() => {
+    if (loaded && hash === '#budget') document.getElementById('budget')?.scrollIntoView({ block: 'center' });
+  }, [loaded, hash]);
 
   if (!activities || !ideas || !expenses || !comments || !albums) return <Spinner center />;
   const ctx: TripCtx = { trip, activities, ideas, expenses, comments, albums, profiles, canManage, isOwner };
   const nDays = daysBetween(trip.startDate, trip.endDate) + 1;
+  const t = today();
+  const days = tripDays(trip.startDate, trip.endDate);
+  // The budget card follows the day picked in the itinerary; otherwise today (during the trip) or the first day.
+  const fromUrl = params.get('day') ?? '';
+  const budgetDay = days.includes(fromUrl) ? fromUrl : days.includes(t) ? t : days[0];
+  const until = daysBetween(t, trip.startDate);
+  const count = until > 0 ? { value: until, label: until === 1 ? 'Day to go' : 'Days to go' }
+    : t <= trip.endDate ? { value: daysBetween(trip.startDate, t) + 1, label: `Day of ${nDays}` } : undefined;
+  const people = trip.memberIds.map((id) => ({ id, name: personName(profiles, id), photo: profiles[id]?.photo }));
+  const countries = tripCountries(trip, activities).map((code) => ({ code, name: countryName(code), flag: flagUrl(code) }));
 
   const base = `/trip/${trip.id}`;
   const section = pathname.slice(base.length + 1).split('/')[0];
   const tabs: TabItem[] = [
-    { to: base, label: 'Itinerary', active: section === '' },
-    { to: `${base}/ideas`, label: 'Ideas', count: ideas.filter((i) => i.status === 'open').length, active: section === 'ideas' },
-    { to: `${base}/budget`, label: 'Budget', active: section === 'budget' },
-    { to: `${base}/photos`, label: 'Photos', count: albums.length, active: section === 'photos' },
-    { to: `${base}/people`, label: 'People', active: section === 'people' },
+    { to: base, label: 'Itinerary', icon: 'calendar', active: section === '' },
+    { to: `${base}/ideas`, label: 'Ideas', icon: 'lightbulb', count: ideas.filter((i) => i.status === 'open').length, active: section === 'ideas' },
+    { to: `${base}/photos`, label: 'Photos', icon: 'photo', count: albums.length, active: section === 'photos' },
+    { to: `${base}/people`, label: 'People', icon: 'people', active: section === 'people' },
   ];
 
   // A plan's own page replaces the trip header and tabs.
@@ -83,17 +99,22 @@ function TripLoaded({ trip }: { trip: Trip }) {
           title={trip.name}
           back={{ to: '/', label: 'Trips' }}
         />
-        {/* The trip's card, in the brand colour like the home hero: cover with who's going, then where and when. */}
-        <Card tone="accent" flush className={s.hero}>
-          <TripCover trip={trip} className={s.heroCover}>
-            <CoverPeople trip={trip} size={32} />
-          </TripCover>
-          <div className={s.heroBody}>
-            <span><Icon name="pin" size={20} />{trip.destination?.name ?? 'No destination'}</span>
-            <span><Icon name="calendar" size={20} />{formatRange(trip.startDate, trip.endDate)} · {nDays} day{nDays === 1 ? '' : 's'}</span>
-          </div>
-          {canManage && <IconButton icon="pencil" label="Edit trip" variant="inverse" className={s.heroEdit} onClick={() => setEditing(true)} />}
-        </Card>
+        {/* Figma "Hero Card": cover, name, dates, the countries it visits, who's going, and shortcuts into the trip. */}
+        <HeroCard
+          image={<TripCover trip={trip} />}
+          title={trip.name}
+          subtitle={`${formatRange(trip.startDate, trip.endDate)} · ${nDays} day${nDays === 1 ? '' : 's'}`}
+          countries={countries}
+          people={people}
+          count={count}
+          actions={<>
+            <LinkButton to={base} icon="calendar">Itinerary</LinkButton>
+            <Button variant="secondary" icon="wallet" onClick={() => document.getElementById('budget')?.scrollIntoView({ block: 'center', behavior: 'smooth' })}>Budget</Button>
+            <LinkButton to={`${base}/ideas`} variant="secondary" icon="lightbulb">Ideas</LinkButton>
+          </>}
+          edit={canManage && <IconButton icon="pencil" label="Edit trip" variant="inverse" onClick={() => setEditing(true)} />}
+        />
+        <TripBudget ctx={ctx} day={budgetDay} onSetBudget={canManage ? () => setEditing(true) : undefined} />
         <div className={s.sectionNav}>
           <Tabs items={tabs} label="Trip sections" />
         </div>
@@ -102,7 +123,7 @@ function TripLoaded({ trip }: { trip: Trip }) {
         <Routes>
           <Route index element={<Itinerary {...ctx} />} />
           <Route path="ideas" element={<Ideas {...ctx} />} />
-          <Route path="budget" element={<Budget {...ctx} />} />
+          <Route path="budget" element={<Navigate to={base} replace />} />
           <Route path="photos" element={<Photos {...ctx} />} />
           <Route path="info" element={<Navigate to={base} replace />} />
           <Route path="people" element={<People {...ctx} />} />

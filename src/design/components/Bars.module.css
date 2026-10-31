@@ -1,53 +1,43 @@
 /* Page header: back link, big heavy title, actions */
 .header {
-  display: flex; flex-direction: column; gap: var(--space-sm);
+  display: flex; flex-direction: column; gap: var(--space-inline-s);
 }
-.back {
-  align-self: flex-start;
-  display: inline-flex; align-items: center; gap: var(--space-xxs);
-  min-height: var(--size-tap); padding: 0 var(--space-md) 0 var(--space-sm);
-  margin-left: calc(-1 * var(--space-sm));
-  border-radius: var(--radius-pill);
-  color: var(--text-link);
-  font: var(--p-weight-semibold) var(--p-size-callout)/1 var(--font-text);
-}
-.back:hover { background: var(--interactive-ghost-hover); color: var(--text-link-hover); }
-.back:active { background: var(--interactive-ghost-pressed); color: var(--text-link-pressed); }
-.titleRow { display: flex; align-items: flex-end; justify-content: space-between; gap: var(--space-md); flex-wrap: wrap; }
-.titleText { display: flex; flex-direction: column; gap: var(--space-xs); min-width: 0; }
-.title { font: var(--p-weight-display) var(--p-size-display)/var(--p-leading-display) var(--font-display); font-stretch: var(--p-stretch-display); letter-spacing: var(--p-tracking-display); overflow-wrap: anywhere; color: var(--text-brand); }
-.subtitle { color: var(--text-subtle); font-size: var(--p-size-callout); line-height: var(--p-leading-callout); }
-.actions { display: flex; align-items: center; gap: var(--space-xs); }
+.header > div:first-child:has(a) { margin-left: calc(-1 * var(--space-inline-m)); }
+.titleRow { display: flex; align-items: flex-end; justify-content: space-between; gap: var(--space-inline-m); flex-wrap: wrap; }
+.titleText { display: flex; flex-direction: column; gap: var(--space-inline-xs); min-width: 0; }
+.title { font: var(--weight-black) var(--size-display)/1 var(--font-display); letter-spacing: -0.01em; overflow-wrap: anywhere; color: var(--text-brand); }
+.subtitle { color: var(--text-subtle); font: var(--weight-regular) var(--size-body)/1.5 var(--font-family); } /* Body */
+.actions { display: flex; align-items: center; gap: var(--space-inline-xs); }
 
 /* Tabs: text tabs on a hairline; the current one is underlined in emerald and darker.
    Scrolls sideways inside itself if it can't fit. */
 .tabs {
   position: relative;
-  display: flex; gap: var(--space-xxs);
+  display: flex; gap: var(--space-inline-xxs);
   overflow-x: auto; scrollbar-width: none;
   box-shadow: inset 0 -1px 0 var(--border-subtle);
 }
 .tabs::-webkit-scrollbar { display: none; }
 .tab {
   position: relative; flex: none;
-  display: inline-flex; align-items: center; justify-content: center; gap: var(--space-xs);
-  min-height: var(--size-tap); padding: var(--space-xs) var(--space-md);
-  border-radius: var(--radius-inner) var(--radius-inner) 0 0;
-  color: var(--text-subtle);
-  font: var(--p-weight-semibold) var(--p-size-callout)/1 var(--font-text);
+  display: inline-flex; align-items: center; justify-content: center; gap: var(--space-inline-xs);
+  min-height: var(--size-tap); padding: var(--space-inline-xs) var(--space-inline-m);
+  border-radius: var(--radius-l) var(--radius-l) 0 0;
+  color: var(--interactive-unselected-text);
+  font: var(--weight-medium) 14px/1.5 var(--font-family); /* Label */
   white-space: nowrap;
   transition: background var(--motion-fast), color var(--motion-fluid);
 }
 /* The current tab's underline: one bar that glides between tabs (set from Tabs in Bars.tsx). */
 .underline {
   position: absolute; left: 0; bottom: 0; height: 3px; z-index: 1; pointer-events: none;
-  width: calc(var(--w) - 2 * var(--space-md));
-  transform: translateX(calc(var(--x) + var(--space-md)));
-  border-radius: 3px 3px 0 0; background: var(--border-selected);
+  width: calc(var(--w) - 2 * var(--space-inline-m));
+  transform: translateX(calc(var(--x) + var(--space-inline-m)));
+  border-radius: 3px 3px 0 0; background: var(--interactive-selected-ghost-border);
 }
 .animate { transition: transform var(--motion-fluid), width var(--motion-fluid); }
-.tab:hover { background: var(--interactive-ghost-hover); color: var(--text-primary); }
-.tab:active { background: var(--interactive-ghost-pressed); }
+.tab:hover { background: var(--interactive-unselected-background-hover); }
+.tab:active { background: var(--interactive-unselected-background-pressed); }
 .tab:focus-visible { outline-offset: -3px; }
-.tab[aria-current='page'] { color: var(--text-primary); }
-.count { font-variant-numeric: tabular-nums; min-width: 20px; padding: 2px 6px; border-radius: var(--radius-pill); background: var(--interactive-neutral); font-size: var(--p-size-caption1); line-height: 1.2; text-align: center; }
+.tab[aria-current='page'] { color: var(--interactive-selected-ghost-text); }
+.count { font-variant-numeric: tabular-nums; min-width: 20px; padding: 2px 6px; border-radius: var(--radius-round); background: var(--surface-sunken); font-size: var(--size-body-small); line-height: 1.2; text-align: center; }

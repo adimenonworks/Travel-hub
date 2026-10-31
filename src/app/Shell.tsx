@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, type ReactNode } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
-import { Avatar, Banner } from '../design/components';
+import { Avatar, Notification } from '../design/components';
 import { store } from '../data';
 import { useMe, useProfile } from '../data/hooks';
 import { TripForm } from '../features/trip/TripForm';
@@ -36,7 +36,7 @@ export function Shell({ children }: { children: ReactNode }) {
         <main id="main" className={s.main}>
           {store.mode === 'demo' && (
             <div className={s.demo}>
-              <Banner>Demo mode: data is saved only in this browser. Connect Firebase to share trips with friends (see README).</Banner>
+              <Notification state="warning">Demo mode: data is saved only in this browser. Connect Firebase to share trips with friends (see README).</Notification>
             </div>
           )}
           {children}

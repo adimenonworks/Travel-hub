@@ -1,5 +1,5 @@
-.page { min-height: 100dvh; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--space-2xl); padding: var(--space-2xl) var(--space-gutter); }
-.hero { display: flex; flex-direction: column; align-items: center; text-align: center; gap: var(--space-md); max-width: 560px; }
-.mark { width: 88px; height: 88px; border-radius: var(--radius-icon); background: var(--surface-brand); color: var(--icon-on-brand); display: grid; place-items: center; margin-bottom: var(--space-xs); }
-.card { width: 100%; max-width: 440px; display: flex; flex-direction: column; gap: var(--space-md); }
-.form { display: flex; flex-direction: column; gap: var(--space-lg); }
+.page { min-height: 100dvh; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--space-inline-xxl); padding: var(--space-inline-xxl) var(--space-gutter); }
+.hero { display: flex; flex-direction: column; align-items: center; text-align: center; gap: var(--space-inline-m); max-width: 560px; }
+.mark { width: 88px; height: 88px; border-radius: var(--radius-round); background: var(--surface-brand); color: var(--icon-on-brand); display: grid; place-items: center; margin-bottom: var(--space-inline-xs); }
+.card { width: 100%; max-width: 440px; display: flex; flex-direction: column; gap: var(--space-inline-m); }
+.form { display: flex; flex-direction: column; gap: var(--space-inline-l); }

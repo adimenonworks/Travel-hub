@@ -1,23 +1,25 @@
-/* Text styles (Poppins Black for the display style and big numbers only; Manrope semibold for titles) — use these classes (or the matching --p-size-* tokens) instead of raw sizes. */
-.t-display { font: var(--p-weight-display) var(--p-size-display)/var(--p-leading-display) var(--font-display); font-stretch: var(--p-stretch-display); letter-spacing: var(--p-tracking-display); }
-.t-title1 { font: var(--p-weight-semibold) var(--p-size-title1)/var(--p-leading-title1) var(--font-heading); letter-spacing: var(--p-tracking-title1); }
-.t-title2 { font: var(--p-weight-semibold) var(--p-size-title2)/var(--p-leading-title2) var(--font-heading); letter-spacing: var(--p-tracking-title2); }
-.t-title3 { font: var(--p-weight-semibold) var(--p-size-title3)/var(--p-leading-title3) var(--font-heading); letter-spacing: var(--p-tracking-title3); }
-.t-headline { font: var(--p-weight-semibold) var(--p-size-headline)/var(--p-leading-headline) var(--font-text); letter-spacing: var(--p-tracking-headline); }
-.t-body { font: var(--p-weight-regular) var(--p-size-body)/var(--p-leading-body) var(--font-text); letter-spacing: var(--p-tracking-body); }
-.t-callout { font: var(--p-weight-regular) var(--p-size-callout)/var(--p-leading-callout) var(--font-text); letter-spacing: var(--p-tracking-callout); }
-.t-subhead { font: var(--p-weight-regular) var(--p-size-subhead)/var(--p-leading-subhead) var(--font-text); letter-spacing: var(--p-tracking-subhead); }
-.t-footnote { font: var(--p-weight-regular) var(--p-size-footnote)/var(--p-leading-footnote) var(--font-text); letter-spacing: var(--p-tracking-footnote); }
-.t-caption1 { font: var(--p-weight-medium) var(--p-size-caption1)/var(--p-leading-caption1) var(--font-text); letter-spacing: var(--p-tracking-caption1); }
-.t-caption2 { font: var(--p-weight-medium) var(--p-size-caption2)/var(--p-leading-caption2) var(--font-text); letter-spacing: var(--p-tracking-caption2); }
+/* Text styles — one class per Figma text style (Display → .t-display, Heading 1 → .t-heading-1, Label small → .t-label-small). */
+.t-display { font: var(--weight-black) var(--size-display)/1 var(--font-display); letter-spacing: -0.01em; }
+.t-display-small { font: var(--weight-black) 56px/1 var(--font-display); letter-spacing: -0.01em; }
+.t-display-secondary { font: var(--weight-black) var(--size-display-secondary)/1 var(--font-display); letter-spacing: -0.01em; }
+.t-heading-1 { font: var(--weight-bold) var(--size-heading-1)/1 var(--font-family); letter-spacing: -0.02em; }
+.t-heading-2 { font: var(--weight-semibold) var(--size-heading-2)/1 var(--font-family); letter-spacing: -0.02em; }
+.t-heading-3 { font: var(--weight-semibold) var(--size-heading-3)/1 var(--font-family); letter-spacing: -0.02em; }
+.t-heading-4 { font: var(--weight-bold) 18px/1 var(--font-family); letter-spacing: -0.01em; }
+.t-body { font: var(--weight-regular) var(--size-body)/1.5 var(--font-family); }
+.t-body-small { font: var(--weight-regular) var(--size-body-small)/1.5 var(--font-family); }
+.t-label { font: var(--weight-medium) 14px/1.5 var(--font-family); }
+.t-label-small { font: var(--weight-medium) var(--size-body-small)/1.5 var(--font-family); }
+.t-link { font: var(--weight-medium) var(--size-body)/1 var(--font-family); }
+.t-link-small { font: var(--weight-medium) var(--size-body-small)/1 var(--font-family); }
 
-/* Headings use the softer --text-primary; body copy inherits --text-body from <body>. */
-.t-display { color: var(--text-brand); }
-.t-title1, .t-title2, .t-title3, .t-headline { color: var(--text-primary); }
+.t-display, .t-display-small, .t-display-secondary { color: var(--text-brand); }
+.t-heading-1, .t-heading-2, .t-heading-3, .t-heading-4 { color: var(--text-primary); }
 
+/* Helpers */
 .t-secondary { color: var(--text-subtle); }
 .t-tertiary { color: var(--text-subtle); }
 .t-tint { color: var(--text-brand); }
 .t-danger { color: var(--status-error); }
-.t-bold { font-weight: var(--p-weight-semibold); }
+.t-bold { font-weight: var(--weight-semibold); }
 .t-num { font-variant-numeric: tabular-nums; }

@@ -1,6 +1,7 @@
 import { useLayoutEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react';
 import { NavLink, Link, useLocation } from 'react-router-dom';
 import { Icon, type IconName } from './Icon';
+import { LinkButton } from './Button';
 import s from './Bars.module.css';
 
 /** Page title block: optional back link, a big heavy title, and actions on the right. */
@@ -12,7 +13,7 @@ export function PageHeader({ title, subtitle, back, actions }: {
 }) {
   return (
     <header className={s.header}>
-      {back && <Link to={back.to} className={s.back}><Icon name="chevron-left" size={20} />{back.label}</Link>}
+      {back && <div><LinkButton to={back.to} variant="ghost" icon="chevron-left">{back.label}</LinkButton></div>}
       <div className={s.titleRow}>
         <div className={s.titleText}>
           <h1 className={s.title}>{title}</h1>
@@ -58,7 +59,7 @@ export function Tabs({ items, label, className }: { items: TabItem[]; label: str
       {items.map((t) => {
         const body = (
           <>
-            {t.icon && <Icon name={t.icon} size={20} />}
+            {t.icon && <Icon name={t.icon} size={24} />}
             {t.label}
             {!!t.count && <span className={s.count}>{t.count}</span>}
           </>

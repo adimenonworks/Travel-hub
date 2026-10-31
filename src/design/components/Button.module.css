@@ -1,62 +1,48 @@
+/* Figma "Button": pill, Label text style, trailing/leading icon. Hover is lighter, pressed darker. */
 .button {
   position: relative;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--space-xs);
-  min-height: var(--size-control);
-  min-width: var(--size-tap);
-  padding: 0 var(--space-xl);
-  border: 0;
-  border-radius: var(--radius-button);
-  font: var(--p-weight-semibold) var(--p-size-body)/1 var(--font-text);
-  letter-spacing: var(--p-tracking-body);
-  white-space: nowrap;
-  text-decoration: none;
+  display: inline-flex; align-items: center; justify-content: center;
+  border: 0; border-radius: var(--radius-round);
+  white-space: nowrap; text-decoration: none; user-select: none;
   transition: background var(--motion-fast), color var(--motion-fast), transform var(--motion-release);
-  user-select: none;
 }
 .button:active:not(:disabled) { transform: scale(0.96); transition: background var(--motion-fast), color var(--motion-fast), transform var(--motion-press); }
-.button:disabled { background: var(--disabled-background); color: var(--disabled-foreground); cursor: default; }
-.plain:disabled { background: transparent; }
+.glyph { flex: none; }
 
-/* Hover is lighter, pressed is darker (interactive-*-hover / -pressed). */
-/* Primary: bright emerald with its deep partner as text */
-.filled { background: var(--interactive-primary); color: var(--text-on-brand); }
-.filled:hover:not(:disabled) { background: var(--interactive-primary-hover); }
-.filled:active:not(:disabled) { background: var(--interactive-primary-pressed); }
-/* Secondary: a light emerald wash */
-.tinted { background: var(--interactive-secondary); color: var(--text-on-secondary); }
-.tinted:hover:not(:disabled) { background: var(--interactive-secondary-hover); }
-.tinted:active:not(:disabled) { background: var(--interactive-secondary-pressed); }
-/* Neutral: grey pill */
-.gray { background: var(--interactive-neutral); color: var(--text-body); }
-.gray:hover:not(:disabled) { background: var(--interactive-neutral-hover); }
-.gray:active:not(:disabled) { background: var(--interactive-neutral-pressed); }
-/* Tertiary: text only, underlined so it reads as an action without a fill */
-.plain { background: transparent; color: var(--text-link); padding: 0 var(--space-sm); text-decoration: underline; text-underline-offset: 3px; }
-.plain:hover:not(:disabled) { background: var(--interactive-ghost-hover); color: var(--text-link-hover); }
-.plain:active:not(:disabled) { background: var(--interactive-ghost-pressed); color: var(--text-link-pressed); }
-/* Ghost: no fill, grey text and icon; the fill appears on hover */
-.ghost { background: transparent; color: var(--text-body); }
-.ghost:hover:not(:disabled) { background: var(--interactive-ghost-hover); }
-.ghost:active:not(:disabled) { background: var(--interactive-ghost-pressed); }
-.ghost:disabled { background: transparent; }
-/* Inverse: dark, for sitting on bright emerald */
-.inverse { background: var(--interactive-inverse); color: var(--text-on-inverse); }
-.inverse:hover:not(:disabled) { background: var(--interactive-inverse-hover); }
-.inverse:active:not(:disabled) { background: var(--interactive-inverse-pressed); }
-.destructive { background: var(--interactive-destructive); color: var(--text-on-destructive); }
-.destructive:hover:not(:disabled) { background: var(--interactive-destructive-hover); }
-.destructive:active:not(:disabled) { background: var(--interactive-destructive-pressed); }
-
-.small { min-height: var(--size-control-sm); padding: 0 var(--space-md); font-size: var(--p-size-subhead); }
-/* Small controls keep a full 44px hit area */
+/* Size=Regular: 48px, padding 12/16, gap 4, Label */
+.regular { min-height: var(--size-control); padding: var(--space-inline-s) var(--space-inline-m); gap: var(--space-inline-xxs); font: var(--weight-medium) 14px/1.5 var(--font-family); }
+/* Size=Small: 40px, padding 8/12, gap 2, Label small; still a 44px tap area */
+.small { min-height: var(--size-control-sm); padding: var(--space-inline-xs) var(--space-inline-s); gap: var(--space-inline-xxxs); font: var(--weight-medium) var(--size-body-small)/1.5 var(--font-family); }
 .small::after { content: ''; position: absolute; inset: calc((var(--size-control-sm) - var(--size-tap)) / 2) 0; }
-.medium { min-height: var(--size-control-md); padding: 0 var(--space-lg); }
-.large { min-height: 56px; padding: 0 var(--space-2xl); font-size: var(--p-size-headline); }
-.block { width: 100%; }
 
-.icon { padding: 0; width: var(--size-tap); min-height: var(--size-tap); text-decoration: none; }
-.icon.small { width: var(--size-control-sm); min-width: var(--size-control-sm); min-height: var(--size-control-sm); }
-.icon.small::after { inset: calc((var(--size-control-sm) - var(--size-tap)) / 2); }
+.primary { background: var(--interactive-button-primary-background); color: var(--interactive-button-primary-text); }
+.primary:hover:not(:disabled) { background: var(--interactive-button-primary-background-hover); }
+.primary:active:not(:disabled) { background: var(--interactive-button-primary-background-pressed); }
+.primary:disabled { background: var(--interactive-button-primary-disabled-background); color: var(--interactive-button-primary-disabled-foreground); }
+
+.secondary { background: var(--interactive-button-secondary-background); color: var(--interactive-button-secondary-text); }
+.secondary:hover:not(:disabled) { background: var(--interactive-button-secondary-background-hover); }
+.secondary:active:not(:disabled) { background: var(--interactive-button-secondary-background-pressed); }
+.secondary:disabled { background: var(--interactive-button-secondary-disabled-background); color: var(--interactive-button-secondary-disabled-foreground); }
+
+.destructive { background: var(--interactive-button-destructive-background); color: var(--interactive-button-destructive-text); }
+.destructive:hover:not(:disabled) { background: var(--interactive-button-destructive-background-hover); }
+.destructive:active:not(:disabled) { background: var(--interactive-button-destructive-background-pressed); }
+.destructive:disabled { background: var(--interactive-button-destructive-disabled-background); color: var(--interactive-button-destructive-disabled-foreground); }
+
+.inverse { background: var(--interactive-button-inverse-background); color: var(--interactive-button-inverse-text); }
+.inverse:hover:not(:disabled) { background: var(--interactive-button-inverse-background-hover); }
+.inverse:active:not(:disabled) { background: var(--interactive-button-inverse-background-pressed); }
+.inverse:disabled { background: var(--interactive-button-inverse-disabled-background); color: var(--interactive-button-inverse-disabled-foreground); }
+
+.ghost { background: var(--interactive-button-ghost-background); color: var(--interactive-button-ghost-text); }
+.ghost:hover:not(:disabled) { background: var(--interactive-button-ghost-background-hover); }
+.ghost:active:not(:disabled) { background: var(--interactive-button-ghost-background-pressed); }
+.ghost:disabled { background: var(--interactive-button-ghost-disabled-background); color: var(--interactive-button-ghost-disabled-foreground); }
+
+.button:disabled { cursor: default; }
+.block { width: 100%; }
+/* Icon only ("Show text" off): a circle */
+.iconOnly.regular { width: var(--size-control); padding: 0; }
+.iconOnly.small { width: var(--size-control-sm); padding: 0; }
+.iconOnly.small::after { inset: calc((var(--size-control-sm) - var(--size-tap)) / 2); }

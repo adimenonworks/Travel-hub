@@ -6,6 +6,7 @@ import { DesignSystem } from '../features/design/DesignSystem';
 import { Home } from '../features/home/Home';
 import { Join } from '../features/trip/Join';
 import { TripPage } from '../features/trip/TripPage';
+import { CollectionPage } from '../features/profile/Collections';
 import { ProfilePage } from '../features/profile/ProfilePage';
 import { Shell } from './Shell';
 
@@ -25,6 +26,7 @@ function Routed() {
         <Route path="/trip/:tripId/*" element={<TripPage />} />
         <Route path="/join/:code" element={<Join />} />
         <Route path="/profile" element={<ProfilePage />} />
+        <Route path="/profile/collections/:key" element={<CollectionPage />} />
         <Route path="/design" element={<DesignSystem />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>

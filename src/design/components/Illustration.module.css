@@ -5,8 +5,8 @@
 /* One shared palette, all semantic tokens, so every scene follows light and dark mode */
 .frame { fill: var(--surface-background-secondary); stroke: var(--border-bold); stroke-width: 1.5; stroke-linejoin: round; }
 .photo { fill: var(--surface-brand-subtle); }
-.hill { fill: var(--interactive-primary); }
-.hillDeep { fill: var(--interactive-primary-pressed); }
+.hill { fill: var(--interactive-button-primary-background); }
+.hillDeep { fill: var(--interactive-button-primary-background-pressed); }
 .sun { fill: var(--status-warning); }
 .line { fill: var(--surface-sunken); }
 .needle { fill: var(--border-bold); }

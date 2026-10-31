@@ -7,12 +7,13 @@ export async function searchCities(q: string, signal?: AbortSignal): Promise<Pla
   const url = `https://geocoding-api.open-meteo.com/v1/search?count=6&language=en&name=${encodeURIComponent(q.trim())}`;
   const res = await fetch(url, { signal });
   if (!res.ok) throw new Error('City search failed');
-  const data = (await res.json()) as { results?: { name: string; latitude: number; longitude: number; country?: string; admin1?: string }[] };
+  const data = (await res.json()) as { results?: { name: string; latitude: number; longitude: number; country?: string; country_code?: string; admin1?: string }[] };
   return (data.results ?? []).map((r) => ({
     name: [r.name, r.admin1 && r.admin1 !== r.name ? r.admin1 : null, r.country].filter(Boolean).join(', '),
     lat: r.latitude,
     lng: r.longitude,
     country: r.country,
+    countryCode: r.country_code?.toLowerCase(),
   }));
 }
 
@@ -22,7 +23,7 @@ export async function searchCities(q: string, signal?: AbortSignal): Promise<Pla
  */
 export async function geocodePlace(q: string, near?: Place | null): Promise<Place | null> {
   if (!q.trim()) return null;
-  const params = new URLSearchParams({ q: q.trim(), format: 'jsonv2', limit: '1' });
+  const params = new URLSearchParams({ q: q.trim(), format: 'jsonv2', limit: '1', addressdetails: '1' });
   if (near) {
     const d = 0.5; // bias to roughly 50km around the destination
     params.set('viewbox', `${near.lng - d},${near.lat + d},${near.lng + d},${near.lat - d}`);
@@ -30,8 +31,8 @@ export async function geocodePlace(q: string, near?: Place | null): Promise<Plac
   try {
     const res = await fetch(`https://nominatim.openstreetmap.org/search?${params}`);
     if (!res.ok) return null;
-    const [hit] = (await res.json()) as { display_name: string; lat: string; lon: string }[];
-    return hit ? { name: hit.display_name, lat: Number(hit.lat), lng: Number(hit.lon) } : null;
+    const [hit] = (await res.json()) as { display_name: string; lat: string; lon: string; address?: { country?: string; country_code?: string } }[];
+    return hit ? { name: hit.display_name, lat: Number(hit.lat), lng: Number(hit.lon), country: hit.address?.country, countryCode: hit.address?.country_code?.toLowerCase() } : null;
   } catch {
     return null;
   }

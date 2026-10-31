@@ -1,127 +1,75 @@
-import { useEffect, useState, type CSSProperties } from 'react';
-import { Button, Card, FieldRow, List, ListRow, SegmentedControl, Section, Select, Sheet, TextField } from '../../design/components';
+import { useEffect, useState } from 'react';
+import { BudgetCard, Button, FieldRow, List, ListRow, Section, Select, Sheet, TextField } from '../../design/components';
 import { store } from '../../data';
 import { personName, useMe } from '../../data/hooks';
 import type { Category, Expense } from '../../data/types';
-import { dayWord, formatDay, tripDays } from '../../lib/dates';
+import { dayWord, formatDay, today, tripDays } from '../../lib/dates';
 import { money } from '../../lib/format';
 import { CATEGORIES, categoryInfo } from '../../lib/categories';
+import { tripBudget } from './tripBudget';
 import type { TripCtx } from './TripPage';
-import s from './trip.module.css';
-
-type View = 'me' | 'group';
 
 /**
- * Activity costs are per person (counted for each attendee). Expenses are
- * group totals split evenly across members. The daily budget is per person.
+ * The budget card under the trip header: the chosen day's budget (worked out from the trip's total) and the total.
+ * "Spending" opens the day-by-day breakdown and the expenses that aren't itinerary events (flights, hotels, car hire).
  */
-/** Categories have no colours of their own, so the chart uses shades of the brand ink (largest category darkest). */
-const shade = (i: number) => Math.max(0.25, 1 - i * 0.18);
-
-export function Budget({ trip, activities, expenses, profiles, canManage }: TripCtx) {
-  const me = useMe();
-  const [view, setView] = useState<View>('me');
+export function TripBudget({ ctx, day, onSetBudget }: { ctx: TripCtx; day: string; onSetBudget?: () => void }) {
+  const { trip, expenses, profiles } = ctx;
+  const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<Expense | 'new' | null>(null);
-  const days = tripDays(trip.startDate, trip.endDate);
-  const members = Math.max(1, trip.memberIds.length);
-
-  const activityCost = (a: (typeof activities)[number]) =>
-    view === 'group' ? a.cost * a.attendeeIds.length : a.attendeeIds.includes(me.uid) ? a.cost : 0;
-  const expenseCost = (e: Expense) => (view === 'group' ? e.amount : e.amount / members);
-
-  const perDay = days.map((d) => ({
-    date: d,
-    total: activities.filter((a) => a.date === d).reduce((n, a) => n + activityCost(a), 0) + expenses.filter((e) => e.date === d).reduce((n, e) => n + expenseCost(e), 0),
-  }));
-  const tripWide = expenses.filter((e) => !e.date || !days.includes(e.date)).reduce((n, e) => n + expenseCost(e), 0);
-  const total = perDay.reduce((n, d) => n + d.total, 0) + tripWide;
-  const dayLimit = view === 'group' ? trip.dailyBudget * members : trip.dailyBudget;
-  const budgetTotal = dayLimit * days.length;
-  const scaleMax = Math.max(dayLimit, ...perDay.map((d) => d.total), 1);
-
-  const byCat = new Map<Category, number>();
-  activities.forEach((a) => byCat.set(a.category, (byCat.get(a.category) ?? 0) + activityCost(a)));
-  expenses.forEach((e) => byCat.set(e.category, (byCat.get(e.category) ?? 0) + expenseCost(e)));
-  const cats = [...byCat.entries()].filter(([, v]) => v > 0).sort((a, b) => b[1] - a[1]);
-
+  const b = tripBudget(ctx);
   const fmt = (n: number) => money(n, trip.currency);
+  const t = today();
+  const word = dayWord(day, trip.startDate, t);
+  const spending = <Button variant="secondary" size="small" icon="wallet" onClick={() => setOpen(true)}>Spending</Button>;
 
+  const card = b.total > 0 ? (() => {
+    const d = b.forDay(day);
+    const when = day === t ? 'today' : word === 'Tomorrow' || word === 'Yesterday' ? word.toLowerCase() : `on ${word}`;
+    return <BudgetCard amount={fmt(Math.abs(d.left))} label={d.left < 0 ? `Over ${when}` : `Left ${when}`} total={fmt(b.total)} level={d.level} action={spending} />;
+  })() : (
+    <BudgetCard amount={fmt(b.planned)} label="Planned so far" total="No total set"  level="ok"
+      action={onSetBudget ? <Button variant="secondary" size="small" icon="wallet" onClick={onSetBudget}>Set budget</Button> : spending} />
+  );
+
+  const days = tripDays(trip.startDate, trip.endDate);
   return (
-    <>
-      <div className={s.dayHead}>
-        <h2 className="t-title1">Budget</h2>
-        <SegmentedControl label="Budget view" value={view} onChange={setView} options={[{ value: 'me', label: 'My share' }, { value: 'group', label: 'Whole group' }]} />
-      </div>
-
-      <div className={s.stats}>
-        <Card tone="accent" className={s.stat}><span className={s.statLabel}>Planned spend</span><span className={s.statValue}>{fmt(total)}</span></Card>
-        <Card className={s.stat}><span className={s.statLabel}>Budget</span><span className={s.statValue}>{budgetTotal ? fmt(budgetTotal) : '—'}</span></Card>
-        <Card className={s.stat}>
-          <span className={s.statLabel}>{budgetTotal && total > budgetTotal ? 'Over by' : 'Left'}</span>
-          <span className={[s.statValue, budgetTotal && total > budgetTotal ? s.over : ''].join(' ')}>{budgetTotal ? fmt(Math.abs(budgetTotal - total)) : '—'}</span>
-        </Card>
-        <Card className={s.stat}><span className={s.statLabel}>Daily budget</span><span className={s.statValue}>{dayLimit ? fmt(dayLimit) : '—'}</span></Card>
-      </div>
-
-      <Section title="Day by day" footer={dayLimit ? 'The line marks the daily budget.' : canManage ? 'Set a daily budget from Edit trip to compare each day.' : undefined}>
-        <Card className={s.bars}>
-          {perDay.map((d) => {
-            const over = dayLimit > 0 && d.total > dayLimit;
-            return (
-              <div key={d.date} className={s.barRow}>
-                <span className="t-secondary">{dayWord(d.date, trip.startDate)}<br /><span className="t-caption1">{formatDay(d.date, { month: 'short', day: 'numeric' })}</span></span>
-                <div className={s.barTrack} role="img" aria-label={`${dayWord(d.date, trip.startDate)}: ${fmt(d.total)}`}>
-                  <div className={s.barFill} style={{ width: `${(d.total / scaleMax) * 100}%`, '--bar-color': over ? 'var(--status-error)' : 'var(--icon-brand)' } as CSSProperties} />
-                  {dayLimit > 0 && <div className={s.barLimit} style={{ left: `calc(${(dayLimit / scaleMax) * 100}% - 1px)` }} />}
-                </div>
-                <span className={[s.barValue, over && s.over].filter(Boolean).join(' ')}>{fmt(d.total)}</span>
-              </div>
-            );
-          })}
-          {tripWide > 0 && (
-            <div className={s.barRow}>
-              <span className="t-secondary">Trip-wide</span>
-              <span className="t-footnote t-secondary">Flights, stays and other costs not tied to a day</span>
-              <span className={s.barValue}>{fmt(tripWide)}</span>
-            </div>
-          )}
-        </Card>
-      </Section>
-
-      {cats.length > 0 && (
-        <Section title="By category">
-          <Card className={s.bars}>
-            <div className={s.cats}>
-              {cats.map(([c, v], i) => <div key={c} style={{ flex: v, background: 'var(--icon-brand)', opacity: shade(i) }} title={`${categoryInfo(c).label}: ${fmt(v)}`} />)}
-            </div>
-            <div className={s.legend}>
-              {cats.map(([c, v], i) => <span key={c}><i style={{ background: 'var(--icon-brand)', opacity: shade(i) }} />{categoryInfo(c).label} {fmt(v)}</span>)}
-            </div>
-          </Card>
-        </Section>
-      )}
-
-      <Section title="Other expenses" action={<Button size="small" icon="plus" onClick={() => setEditing('new')}>Add expense</Button>}
-        footer="Activity prices come from the itinerary. Add flights, hotels, car hire and anything else here; they're split evenly across the group.">
-        {expenses.length === 0 ? (
-          <Card><span className="t-subhead t-secondary">No expenses yet.</span></Card>
-        ) : (
+    <div id="budget">
+      {card}
+      <Sheet open={open} title="Spending" onClose={() => setOpen(false)}>
+        <p className="t-body t-secondary">
+          {fmt(b.planned)} planned{b.total > 0 ? ` of ${fmt(b.total)}` : ''} for the whole group.
+          {b.total > 0 ? ' Each day gets what’s left of the total, shared over the days still to come.' : ''}
+        </p>
+        <Section title="Day by day">
           <List>
-            {expenses.slice().sort((a, b) => (a.date || '0').localeCompare(b.date || '0')).map((e) => {
-              const c = categoryInfo(e.category);
+            {days.map((d) => {
+              const x = b.forDay(d);
               return (
-                <ListRow key={e.id} icon={c.icon} title={e.title}
-                  subtitle={`${e.date ? formatDay(e.date) : 'Whole trip'} · paid by ${personName(profiles, e.paidBy)}`}
-                  trailing={<span className="t-num">{fmt(e.amount)}</span>} chevron onClick={() => setEditing(e)} />
+                <ListRow key={d} title={dayWord(d, trip.startDate, t)} subtitle={formatDay(d)}
+                  trailing={<span className={['t-num', x.left < 0 && b.total > 0 ? 't-danger' : ''].join(' ')}>
+                    {b.total > 0 ? (x.left < 0 ? `${fmt(-x.left)} over` : `${fmt(x.left)} left`) : fmt(x.daily - x.left)}
+                  </span>} />
               );
             })}
           </List>
-        )}
-      </Section>
-
+        </Section>
+        <Section title="Other expenses" action={<Button size="small" icon="plus" onClick={() => { setOpen(false); setEditing('new'); }}>Add expense</Button>}
+          footer="Event prices come from the itinerary. Add flights, hotels, car hire and anything else here.">
+          {expenses.length === 0 ? <p className="t-body-small t-secondary">No expenses yet.</p> : (
+            <List>
+              {expenses.slice().sort((x, y) => (x.date || '0').localeCompare(y.date || '0')).map((e) => (
+                <ListRow key={e.id} icon={categoryInfo(e.category).icon} title={e.title}
+                  subtitle={`${e.date ? formatDay(e.date) : 'Whole trip'} · paid by ${personName(profiles, e.paidBy)}`}
+                  trailing={<span className="t-num">{fmt(e.amount)}</span>} chevron onClick={() => { setOpen(false); setEditing(e); }} />
+              ))}
+            </List>
+          )}
+        </Section>
+      </Sheet>
       <ExpenseForm open={!!editing} ctxTrip={{ id: trip.id, currency: trip.currency, startDate: trip.startDate, endDate: trip.endDate, memberIds: trip.memberIds }}
-        profiles={profiles} expense={editing === 'new' ? undefined : editing ?? undefined} onClose={() => setEditing(null)} />
-    </>
+        profiles={profiles} expense={editing === 'new' ? undefined : editing ?? undefined} onClose={() => { setEditing(null); setOpen(true); }} />
+    </div>
   );
 }
 

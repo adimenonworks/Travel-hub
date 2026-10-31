@@ -72,7 +72,7 @@ export function ProfilePage() {
         <Section title="Directions" footer="Plans open their location in this app. Saved on this device.">
           <Card className={s.appearance}>
             <div className={s.appearanceRow}>
-              <div className="t-subhead t-bold">Maps app</div>
+              <div className="t-body-small t-bold">Maps app</div>
               <SegmentedControl block label="Maps app" value={maps} onChange={(m) => { setMaps(m); setMapsApp(m); }} options={MAPS_APPS} />
             </div>
           </Card>
@@ -81,7 +81,7 @@ export function ProfilePage() {
         <Section title="Appearance" footer="Saved on this device.">
           <Card className={s.appearance}>
             <div className={s.appearanceRow}>
-              <div className="t-subhead t-bold">Mode</div>
+              <div className="t-body-small t-bold">Mode</div>
               <SegmentedControl block label="Mode" value={theme} onChange={(t) => { setTheme(t); applyTheme(t); }}
                 options={[{ value: 'auto', label: 'Automatic' }, { value: 'light', label: 'Light' }, { value: 'dark', label: 'Dark' }]} />
             </div>
@@ -132,20 +132,20 @@ function ProfileCard({ uid, name, photo, email }: { uid: string; name: string; p
       <div className={s.who}>
         <Avatar name={name} photo={photo} seed={uid} size={72} />
         <div className={s.whoText}>
-          <h2 className="t-title2">{name}</h2>
-          {email && <div className="t-subhead t-secondary">{email}</div>}
-          <div className="t-subhead t-secondary">{store.mode === 'demo' ? 'Demo account' : 'Signed in with Google'}</div>
+          <h2 className="t-heading-2">{name}</h2>
+          {email && <div className="t-body-small t-secondary">{email}</div>}
+          <div className="t-body-small t-secondary">{store.mode === 'demo' ? 'Demo account' : 'Signed in with Google'}</div>
         </div>
       </div>
       <div className={s.photoButtons}>
-        <Button variant="tinted" size="small" icon="photo" onClick={() => input.current?.click()} disabled={busy}>
+        <Button variant="secondary" size="small" icon="photo" onClick={() => input.current?.click()} disabled={busy}>
           {busy ? 'Preparing photo…' : photo ? 'Change photo' : 'Add photo'}
         </Button>
-        {photo && <Button variant="plain" size="small" onClick={() => store.saveProfile(uid, { photo: null })}>Remove photo</Button>}
+        {photo && <Button variant="ghost" size="small" onClick={() => store.saveProfile(uid, { photo: null })}>Remove photo</Button>}
       </div>
       <input ref={input} type="file" accept="image/*" className="visually-hidden" tabIndex={-1} aria-hidden="true"
         onChange={(e) => pick(e.target.files?.[0])} />
-      {error && <p className="t-footnote t-danger" role="alert">{error}</p>}
+      {error && <p className="t-label-small t-danger" role="alert">{error}</p>}
       <form className={s.nameRow} onSubmit={saveName}>
         <div className={s.addField}>
           <TextField label="Nickname" value={draft} maxLength={40} autoComplete="nickname" aria-describedby="nickname-hint"
@@ -153,7 +153,7 @@ function ProfileCard({ uid, name, photo, email }: { uid: string; name: string; p
         </div>
         <Button type="submit" disabled={!trimmed || trimmed === name}>Save</Button>
       </form>
-      <p id="nickname-hint" className="t-footnote t-secondary" role="status">{saved && draft === name ? 'Saved.' : 'What people on your trips see.'}</p>
+      <p id="nickname-hint" className="t-label-small t-secondary" role="status">{saved && draft === name ? 'Saved.' : 'What people on your trips see.'}</p>
     </Card>
   );
 }

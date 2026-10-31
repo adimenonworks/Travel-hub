@@ -1,103 +1,24 @@
 /*
- * Primitives — raw values only. Nothing in the app should reference these
- * directly; components consume the semantic tokens in semantic.css.
- * Inspired by Wise (see DESIGN.md at the repo root): one bright brand colour (emerald)
- * with its deep partner as text, a pale neutral canvas with white cards, and hero
- * type at weight 900 while everything else is semibold.
+ * Primitives — raw values, named exactly like the Figma "Primitives" collection
+ * (color/emerald/300 → --color-emerald-300, space/16 → --space-16, radius/24 → --radius-24).
+ * Components never use these directly: they use the semantic tokens in semantic.css.
  */
 :root {
-  /*
-   * Colour palettes: white (0) to our black #181D1B (1000) in 11 steps.
-   * Every palette has the same contrast against white at the same step:
-   * 100 1.1:1 · 200 1.25 · 300 1.6 · 400 2.2 · 500 3 · 600 4.5 · 700 7 · 800 10 · 900 13.5 · 1000 17.1
-   * Emerald #2EE6B6 is the brand colour, locked at 300. Status hues come from emerald on the colour wheel:
-   * green = analogous (−30°), orange = triadic (+240°), red = split-complementary (+210°). Neutral uses the black’s own hue.
-   */
-  --p-emerald-0: #ffffff; --p-emerald-100: #d4fded; --p-emerald-200: #74fed2; --p-emerald-300: #2ee6b6; --p-emerald-400: #00c69a; --p-emerald-500: #00a983;
-  --p-emerald-600: #168669; --p-emerald-700: #1f6450; --p-emerald-800: #214a3c; --p-emerald-900: #1e332b; --p-emerald-1000: #181d1b;
-  --p-green-0: #ffffff; --p-green-100: #ddfdd5; --p-green-200: #9dfd85; --p-green-300: #7ee465; --p-green-400: #60c545; --p-green-500: #44aa25;
-  --p-green-600: #318812; --p-green-700: #2b661b; --p-green-800: #264b1d; --p-green-900: #20331c; --p-green-1000: #181d1b;
-  --p-orange-0: #ffffff; --p-orange-100: #fdf2ec; --p-orange-200: #fee0d0; --p-orange-300: #ffbe9b; --p-orange-400: #ff9353; --p-orange-500: #ef7000;
-  --p-orange-600: #bd5b13; --p-orange-700: #8a471c; --p-orange-800: #63371e; --p-orange-900: #40291c; --p-orange-1000: #181d1b;
-  --p-red-0: #ffffff; --p-red-100: #fdf1f1; --p-red-200: #fedfde; --p-red-300: #ffbcbb; --p-red-400: #ff8e90; --p-red-500: #fc606a;
-  --p-red-600: #d3424f; --p-red-700: #a72837; --p-red-800: #76272d; --p-red-900: #4b2223; --p-red-1000: #181d1b;
-  --p-neutral-0: #ffffff; --p-neutral-50: #f6fbf9; --p-neutral-100: #edf6f2; --p-neutral-200: #dfe8e4; --p-neutral-300: #c5cfcb; --p-neutral-400: #a7b1ad; --p-neutral-500: #8e9793;
-  --p-neutral-600: #707975; --p-neutral-700: #545b58; --p-neutral-800: #3e4441; --p-neutral-900: #2c2f2e; --p-neutral-1000: #181d1b;
+  --color-emerald-0: #ffffff; --color-emerald-50: #e9fef6; --color-emerald-100: #d4fded; --color-emerald-200: #74fed2; --color-emerald-300: #2ee6b6; --color-emerald-400: #00c69a; --color-emerald-500: #00a983; --color-emerald-600: #168669; --color-emerald-700: #1f6450; --color-emerald-800: #214a3c; --color-emerald-900: #1e332b; --color-emerald-1000: #181d1b;
+  --color-green-0: #ffffff; --color-green-100: #ddfdd5; --color-green-200: #9dfd85; --color-green-300: #7ee465; --color-green-400: #60c545; --color-green-500: #44aa25; --color-green-600: #318812; --color-green-700: #2b661b; --color-green-800: #264b1d; --color-green-900: #20331c; --color-green-1000: #181d1b;
+  --color-orange-0: #ffffff; --color-orange-100: #fdf2ec; --color-orange-200: #fee0d0; --color-orange-300: #ffbe9b; --color-orange-400: #ff9353; --color-orange-500: #ef7000; --color-orange-600: #bd5b13; --color-orange-700: #8a471c; --color-orange-800: #63371e; --color-orange-900: #40291c; --color-orange-1000: #181d1b;
+  --color-red-0: #ffffff; --color-red-50: #fef8f8; --color-red-100: #fdf1f1; --color-red-200: #fedfde; --color-red-300: #ffbcbb; --color-red-400: #ff8e90; --color-red-500: #fc606a; --color-red-600: #d3424f; --color-red-700: #a72837; --color-red-800: #76272d; --color-red-900: #4b2223; --color-red-1000: #181d1b;
+  --color-neutral-0: #ffffff; --color-neutral-50: #f6fbf9; --color-neutral-100: #edf6f2; --color-neutral-200: #dfe8e4; --color-neutral-300: #c5cfcb; --color-neutral-400: #a7b1ad; --color-neutral-500: #8e9793; --color-neutral-600: #707975; --color-neutral-700: #545b58; --color-neutral-800: #3e4441; --color-neutral-900: #2c2f2e; --color-neutral-1000: #181d1b;
+  --space-0: 0px; --space-2: 2px; --space-4: 4px; --space-8: 8px; --space-12: 12px; --space-16: 16px; --space-20: 20px; --space-24: 24px; --space-32: 32px; --space-40: 40px; --space-48: 48px; --space-96: 96px; --space-120: 120px;
+  --radius-0: 0px; --radius-2: 2px; --radius-4: 4px; --radius-8: 8px; --radius-12: 12px; --radius-16: 16px; --radius-20: 20px; --radius-24: 24px; --radius-32: 32px; --radius-40: 40px; --radius-48: 48px; --radius-96: 96px; --radius-999: 999px;
 
-  /* See-through black and white, for borders, overlays and neutral control fills that must work on any surface */
-  --p-alpha-black-5: rgba(24, 29, 27, 0.05); --p-alpha-black-8: rgba(24, 29, 27, 0.08); --p-alpha-black-15: rgba(24, 29, 27, 0.15); --p-alpha-black-30: rgba(24, 29, 27, 0.3);
-  --p-alpha-black-50: rgba(24, 29, 27, 0.5); --p-alpha-black-70: rgba(24, 29, 27, 0.7); --p-alpha-black-85: rgba(24, 29, 27, 0.85);
-  --p-alpha-white-5: rgba(255, 255, 255, 0.05); --p-alpha-white-8: rgba(255, 255, 255, 0.08); --p-alpha-white-12: rgba(255, 255, 255, 0.12); --p-alpha-white-15: rgba(255, 255, 255, 0.15); --p-alpha-white-30: rgba(255, 255, 255, 0.3);
-  --p-alpha-white-40: rgba(255, 255, 255, 0.4); --p-alpha-white-70: rgba(255, 255, 255, 0.7); --p-alpha-white-85: rgba(255, 255, 255, 0.85);
-  --p-alpha-emerald-100-50: rgba(212, 253, 237, 0.5); --p-alpha-red-100-50: rgba(253, 241, 241, 0.5);
+  /* Type families (Figma Typography: font/family, font/display). Both bundled in main.tsx, both SIL Open Font License. */
+  --font-manrope: "Manrope Variable", Manrope, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-poppins: Poppins, "Manrope Variable", Manrope, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
 
-  /* Type families, both bundled (main.tsx) and free for commercial use (SIL Open Font License).
-     Poppins Black gives titles and big numbers their weight; Manrope is the quiet sans for everything else. */
-  --p-font-sans: "Manrope Variable", Manrope, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  --p-font-display: Poppins, "Manrope Variable", Manrope, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  --p-font-mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
-
-  /* Type scale (size / line-height / tracking) */
-  --p-size-display: clamp(40px, 3.2vw + 28px, 72px); --p-leading-display: 0.95; --p-tracking-display: -0.03em;
-  --p-size-title1: 32px;   --p-leading-title1: 38px;   --p-tracking-title1: -0.03em;
-  --p-size-title2: 24px;   --p-leading-title2: 31px;   --p-tracking-title2: -0.02em;
-  --p-size-title3: 20px;   --p-leading-title3: 26px;   --p-tracking-title3: -0.015em;
-  --p-size-headline: 17px; --p-leading-headline: 24px; --p-tracking-headline: -0.012em;
-  --p-size-body: 16px;     --p-leading-body: 24px;     --p-tracking-body: -0.011em;
-  --p-size-callout: 15px;  --p-leading-callout: 22px;  --p-tracking-callout: -0.009em;
-  --p-size-subhead: 14px;  --p-leading-subhead: 20px;  --p-tracking-subhead: -0.006em;
-  --p-size-footnote: 13px; --p-leading-footnote: 18px; --p-tracking-footnote: 0;
-  --p-size-caption1: 12px; --p-leading-caption1: 16px; --p-tracking-caption1: 0;
-  --p-size-caption2: 11px; --p-leading-caption2: 14px; --p-tracking-caption2: 0.01em;
-
-  --p-weight-regular: 400;
-  --p-weight-medium: 500;
-  --p-weight-semibold: 600;
-  --p-weight-bold: 700;
-  --p-weight-black: 900;
-  --p-weight-display: 900;   /* Poppins Black: page titles and big numbers only */
-  --p-stretch-display: 100%; /* Poppins has no width axis */
-
-  /* Spacing — 4px base, 8px rhythm */
-  --p-space-1: 4px;
-  --p-space-2: 8px;
-  --p-space-3: 12px;
-  --p-space-4: 16px;
-  --p-space-5: 20px;
-  --p-space-6: 24px;
-  --p-space-8: 32px;
-  --p-space-10: 40px;
-  --p-space-12: 48px;
-  --p-space-24: 96px;
-
-  /* Corner radii — generous; pills wherever a shape allows */
-  --p-radius-md: 16px;
-  --p-radius-lg: 24px;
-  --p-radius-full: 999px;
-
-  /* Elevation — surfaces are flat; only floating things get shadows */
-  --p-shadow-1: 0 4px 12px rgba(24, 29, 27, 0.08), 0 1px 2px rgba(24, 29, 27, 0.06);
-  --p-shadow-2: 0 8px 24px rgba(24, 29, 27, 0.12), 0 2px 6px rgba(24, 29, 27, 0.06);
-  --p-shadow-3: 0 24px 64px rgba(24, 29, 27, 0.24), 0 4px 12px rgba(24, 29, 27, 0.1);
-
-  /* Motion */
-  --p-duration-fast: 150ms;
-  --p-duration-base: 250ms;
-  --p-duration-slow: 400ms;
-  --p-ease-standard: cubic-bezier(0.25, 0.1, 0.25, 1);
-  --p-ease-spring: cubic-bezier(0.32, 0.72, 0, 1);
-  --p-duration-fluid: 420ms;
-  --p-ease-fluid: cubic-bezier(0.22, 1, 0.36, 1);    /* glides out fast, settles slowly */
-  --p-duration-sheet: 520ms;
-  --p-ease-exit: cubic-bezier(0.4, 0, 0.9, 0.5);       /* speeds up as it leaves */
-  --p-ease-bounce: cubic-bezier(0.34, 1.45, 0.64, 1); /* a small overshoot, like a spring letting go */
-}
-
-/* From 744px up nothing is smaller than 14px: the small styles (footnote, captions, tags) step up. Phones keep 12–13px. */
-@media (min-width: 744px) {
-  :root {
-    --p-size-footnote: 14px; --p-leading-footnote: 20px;
-    --p-size-caption1: 14px; --p-leading-caption1: 18px;
-    --p-size-caption2: 14px; --p-leading-caption2: 18px;
-  }
+  /* Motion (code only — Figma has no motion tokens) */
+  --duration-fast: 150ms; --duration-base: 250ms; --duration-slow: 400ms; --duration-fluid: 420ms; --duration-sheet: 520ms;
+  --ease-standard: cubic-bezier(0.25, 0.1, 0.25, 1); --ease-spring: cubic-bezier(0.32, 0.72, 0, 1); --ease-fluid: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-exit: cubic-bezier(0.4, 0, 0.9, 0.5); --ease-bounce: cubic-bezier(0.34, 1.45, 0.64, 1);
 }

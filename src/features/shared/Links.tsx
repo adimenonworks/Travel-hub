@@ -27,11 +27,11 @@ export function LinkEditor({ links, onChange }: { links: LinkItem[]; onChange: (
           <TextField label={i === 0 ? 'Link name' : undefined} placeholder="Tickets (PDF)" value={l.label} onChange={(e) => set(i, { label: e.target.value })} />
           <TextField label={i === 0 ? 'URL' : undefined} placeholder="https://…" inputMode="url" value={l.url}
             onChange={(e) => set(i, { url: e.target.value })} onBlur={(e) => set(i, { url: normalizeUrl(e.target.value) })} />
-          <IconButton icon="trash" label="Remove link" variant="plain" onClick={() => onChange(links.filter((_, j) => j !== i))} />
+          <IconButton icon="trash" label="Remove link" variant="ghost" onClick={() => onChange(links.filter((_, j) => j !== i))} />
         </div>
       ))}
       <div>
-        <Button variant="gray" size="small" icon="plus" onClick={() => onChange([...links, { label: '', url: '' }])}>Add link or PDF</Button>
+        <Button variant="secondary" size="small" icon="plus" onClick={() => onChange([...links, { label: '', url: '' }])}>Add link or PDF</Button>
       </div>
     </div>
   );

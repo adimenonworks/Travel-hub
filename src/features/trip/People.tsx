@@ -58,7 +58,7 @@ export function People({ trip, profiles, canManage, isOwner }: TripCtx) {
                         <option value="member">Member</option>
                         <option value="editor">Organizer</option>
                       </Select>
-                      <Button size="medium" variant="destructive" onClick={() => confirm(`Remove ${name} from this trip?`) && store.removeMember(trip, id)}>Remove</Button>
+                      <Button size="regular" variant="destructive" onClick={() => confirm(`Remove ${name} from this trip?`) && store.removeMember(trip, id)}>Remove</Button>
                     </span>
                   ) : (
                     <Badge tone={role === 'owner' ? 'tint' : role === 'editor' ? 'success' : 'neutral'}>{role === 'owner' ? 'Owner' : role === 'editor' ? 'Organizer' : 'Member'}</Badge>
@@ -72,8 +72,8 @@ export function People({ trip, profiles, canManage, isOwner }: TripCtx) {
 
       {canManage && (
         <Card media={<Illustration name="people" size={120} />}>
-          <h2 className="t-headline">The more the merrier</h2>
-          <p className="t-subhead t-secondary">Invite friends to plan this trip with you. Anyone with the link can join for the next 14 days after signing in.</p>
+          <h2 className="t-heading-4">The more the merrier</h2>
+          <p className="t-body-small t-secondary">Invite friends to plan this trip with you. Anyone with the link can join for the next 14 days after signing in.</p>
           <div className={s.inviteActions}>
             {link ? (
               <>
@@ -81,7 +81,7 @@ export function People({ trip, profiles, canManage, isOwner }: TripCtx) {
                   <div className={s.inviteUrl} title={link}>{link}</div>
                   <Button icon={copied ? 'check' : 'share'} onClick={() => share()}>{copied ? 'Copied' : 'Share'}</Button>
                 </div>
-                <Button variant="plain" size="small" onClick={makeLink} disabled={busy}>Make a new link</Button>
+                <Button variant="ghost" size="small" onClick={makeLink} disabled={busy}>Make a new link</Button>
               </>
             ) : (
               <Button icon="plus" onClick={invite} disabled={busy}>Invite to trip</Button>

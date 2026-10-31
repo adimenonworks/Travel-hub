@@ -3,13 +3,13 @@ import { Button, FieldRow, Select, Sheet, TextField } from '../../design/compone
 import { store } from '../../data';
 import type { Place, Trip } from '../../data/types';
 import { COVER_COLORS, coverName } from '../../lib/colors';
-import { addDays, today } from '../../lib/dates';
+import { addDays, daysBetween, today } from '../../lib/dates';
 import { CURRENCIES } from '../../lib/format';
 import { shrinkPhoto } from '../../lib/image';
 import { CityPicker } from '../shared/CityPicker';
 import s from './trip.module.css';
 
-type Draft = { name: string; destination: Place | null; startDate: string; endDate: string; currency: string; dailyBudget: string; coverColor: string; coverPhoto: string | null; coverPosition: Pos | null };
+type Draft = { name: string; destination: Place | null; startDate: string; endDate: string; currency: string; totalBudget: string; coverColor: string; coverPhoto: string | null; coverPosition: Pos | null };
 type Pos = { x: number; y: number };
 
 const fromTrip = (t?: Trip): Draft => ({
@@ -18,7 +18,8 @@ const fromTrip = (t?: Trip): Draft => ({
   startDate: t?.startDate ?? addDays(today(), 30),
   endDate: t?.endDate ?? addDays(today(), 34),
   currency: t?.currency ?? (Intl.NumberFormat().resolvedOptions().locale.startsWith('en-GB') ? 'GBP' : 'USD'),
-  dailyBudget: t ? String(t.dailyBudget || '') : '',
+  // Older trips only have a per-person daily budget: show it as the total it adds up to.
+  totalBudget: t ? String(t.totalBudget ?? (Math.round(t.dailyBudget * t.memberIds.length * (daysBetween(t.startDate, t.endDate) + 1)) || '')) : '',
   coverColor: t ? coverName(t.coverColor) : COVER_COLORS[Math.floor(Math.random() * COVER_COLORS.length)].value,
   coverPhoto: t?.coverPhoto ?? null,
   coverPosition: t?.coverPosition ?? null,
@@ -37,13 +38,17 @@ export function TripForm({ open, trip, onClose, onSaved, onDeleted }: { open: bo
   const valid = d.name.trim() && d.startDate && d.endDate && d.endDate >= d.startDate;
 
   const submit = async () => {
+    const total = Number(d.totalBudget) || 0;
+    const people = trip?.memberIds.length ?? 1;
     const data = {
       name: d.name.trim(),
       destination: d.destination,
       startDate: d.startDate,
       endDate: d.endDate,
       currency: d.currency,
-      dailyBudget: Number(d.dailyBudget) || 0,
+      totalBudget: total,
+      // Still saved per person per day, for anyone on an older version of the app.
+      dailyBudget: Math.round(total / people / (daysBetween(d.startDate, d.endDate) + 1)),
       coverColor: d.coverColor,
       coverPhoto: d.coverPhoto,
       coverPosition: d.coverPhoto ? d.coverPosition : null,
@@ -82,14 +87,15 @@ export function TripForm({ open, trip, onClose, onSaved, onDeleted }: { open: bo
         <TextField label="End" type="date" value={d.endDate} min={d.startDate} onChange={(e) => set({ endDate: e.target.value })} />
       </FieldRow>
       <FieldRow>
-        <TextField label="Daily budget" type="number" inputMode="decimal" min={0} placeholder="150" value={d.dailyBudget} onChange={(e) => set({ dailyBudget: e.target.value })} />
+        <TextField label="Total budget" type="number" inputMode="decimal" min={0} placeholder="2000" value={d.totalBudget} onChange={(e) => set({ totalBudget: e.target.value })}
+          hint="For the whole group. Each day's budget is worked out from it." />
         <Select label="Currency" value={d.currency} onChange={(e) => set({ currency: e.target.value })}>
           {CURRENCIES.map((c) => <option key={c}>{c}</option>)}
         </Select>
       </FieldRow>
       <CoverPhotoField value={d.coverPhoto} position={d.coverPosition}
         onChange={(coverPhoto) => set({ coverPhoto, coverPosition: null })} onMove={(coverPosition) => set({ coverPosition })} />
-      {error && <p className="t-footnote t-danger">{error}</p>}
+      {error && <p className="t-label-small t-danger">{error}</p>}
       {trip && onDeleted && <Button variant="destructive" icon="trash" block onClick={remove}>Delete trip</Button>}
     </Sheet>
   );
@@ -119,19 +125,19 @@ function CoverPhotoField({ value, position, onChange, onMove }: {
 
   return (
     <div className={s.coverField}>
-      <div className="t-subhead t-bold">Cover photo</div>
+      <div className="t-body-small t-bold">Cover photo</div>
       {value && <CoverPositioner src={value} position={position ?? { x: 50, y: 50 }} onMove={onMove} />}
       <div className={s.coverButtons}>
-        <Button variant="tinted" size="small" icon="photo" onClick={() => input.current?.click()} disabled={busy}>
+        <Button variant="secondary" size="small" icon="photo" onClick={() => input.current?.click()} disabled={busy}>
           {busy ? 'Preparing photo…' : value ? 'Change photo' : 'Choose photo'}
         </Button>
         {value && position && <Button variant="ghost" size="small" onClick={() => onMove(null)}>Re-centre</Button>}
-        {value && <Button variant="plain" size="small" onClick={() => onChange(null)}>Remove photo</Button>}
+        {value && <Button variant="ghost" size="small" onClick={() => onChange(null)}>Remove photo</Button>}
       </div>
       <input ref={input} type="file" accept="image/*" className="visually-hidden" tabIndex={-1} aria-hidden="true"
         onChange={(e) => pick(e.target.files?.[0])} />
-      {error ? <p className="t-footnote t-danger" role="alert">{error}</p>
-        : <p className="t-footnote t-secondary" id="cover-hint">{value ? 'Drag the photo (or use the arrow keys) to choose which part shows.' : 'Optional. Fills the trip card and shows at the top of the trip.'}</p>}
+      {error ? <p className="t-label-small t-danger" role="alert">{error}</p>
+        : <p className="t-label-small t-secondary" id="cover-hint">{value ? 'Drag the photo (or use the arrow keys) to choose which part shows.' : 'Optional. Fills the trip card and shows at the top of the trip.'}</p>}
     </div>
   );
 }
