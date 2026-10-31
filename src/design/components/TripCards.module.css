@@ -3,19 +3,20 @@
 .hero {
   display: flex; flex-direction: column; gap: var(--space-inline-m);
   padding: var(--space-inline-m);
-  border-radius: var(--space-inline-xl);
+  border-radius: var(--radius-xl);
   background: var(--surface-brand);
 }
 .heroImage { position: relative; height: 231px; border-radius: var(--space-inline-l); overflow: hidden; box-shadow: var(--shadow-raised); }
 .heroImage > :first-child { position: absolute; inset: 0; width: 100%; height: 100%; }
 .heroPanel {
-  position: relative; min-height: 271px;
+  position: relative;
   display: flex; flex-direction: column; justify-content: space-between; gap: 10px;
   padding: var(--space-inline-l);
-  border-radius: var(--space-inline-xl);
+  border-radius: var(--radius-xl);
   background: var(--surface-brand-bold);
   color: var(--text-on-brand-bold);
 }
+.heroPanelButtons { min-height: 271px; } /* with shortcut buttons (Home); without them the panel hugs its content */
 .heroText { display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-inline-s); }
 .heroTitle { display: flex; flex-direction: column; gap: var(--space-inline-s); }
 .heroName { margin: 0; font: var(--weight-bold) var(--size-heading-1)/1 var(--font-family); letter-spacing: -0.02em; color: var(--text-on-brand-bold); overflow-wrap: anywhere; } /* Heading 1 */
@@ -23,29 +24,30 @@
 .countries { display: flex; flex-wrap: wrap; gap: var(--space-inline-xxs); }
 .flag { width: 16px; height: 16px; border-radius: 50%; flex: none; }
 .heroActions { display: flex; flex-wrap: wrap; gap: var(--space-inline-xxs); }
-/* The corner: a brand-coloured quarter-round tab with the big number. Small: 130×120 on the photo. */
+/* The corner: a brand-coloured tab with the big number and a rounded inner corner. Small: 130×120 on the photo, radius 64. */
 .count {
   position: absolute; top: 0; right: 0; z-index: 1;
   width: 130px; height: 120px;
   display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--space-inline-xxs);
   padding-left: var(--space-inline-l);
   background: var(--surface-brand); color: var(--text-brand);
-  border-bottom-left-radius: var(--radius-round);
+  border-bottom-left-radius: var(--radius-xxxxl);
 }
 .countValue { font: var(--weight-black) 56px/1 var(--font-display); letter-spacing: -0.01em; font-variant-numeric: tabular-nums; } /* Display small */
 .countLabel { font: var(--weight-medium) var(--size-body-small)/1.5 var(--font-family); white-space: nowrap; } /* Label small */
 @media (min-width: 744px) {
   /* Large: padding 24/32, gap 32; photo 400 wide filling the height; panel padding 48, gap 40, hugging its content. */
   .hero { flex-direction: row; gap: var(--space-inline-xxl); padding: var(--space-inline-xl) var(--space-inline-xxl); }
-  .heroImage { flex: 0 1 400px; height: auto; min-width: 0; }
-  .heroPanel { flex: 1; min-width: 0; min-height: 0; justify-content: flex-start; gap: var(--space-inline-xxxl); padding: var(--space-inline-max); }
+  /* The photo is 400 wide, shrinking to 35% of the card on narrower screens (744–1067px) so the panel keeps room */
+  .heroImage { flex: 0 0 min(400px, 35%); height: auto; min-width: 0; }
+  .heroPanel, .heroPanelButtons { flex: 1; min-width: 0; min-height: 0; justify-content: flex-start; gap: var(--space-inline-xxxl); padding: var(--space-inline-max); }
   .heroPanelCorner { border-top-right-radius: 0; }
   .heroPanelCorner .heroText { padding-right: 140px; }
   .heroActions { gap: var(--space-inline-xs); }
   .heroText { gap: var(--space-inline-m); }
   .heroTitle { gap: var(--space-inline-xs); }
   .flag { width: 24px; height: 24px; }
-  .count { width: 160px; height: 126px; }
+  .count { width: 160px; height: 126px; border-bottom-left-radius: var(--radius-xxxxxl); } /* Large: 160×126, radius 80 */
   .countValue { font-size: var(--size-display); } /* Display */
   .countLabel { font-size: 14px; } /* Label */
 }
@@ -75,29 +77,49 @@
 .contentAccent .contentPlace, .contentAccent .contentDates { color: var(--text-brand); }
 
 /* ---------- Event row (Figma: Size=Small below 744px, Size=Large from 744px) ---------- */
-/* Small: padding 24, gap 16; title over location (gap 4), small badges (gap 4), avatars and price (gap 16), then Maps | Uber */
+/* The whole row opens the event (the title's link stretches over it); the location and the buttons sit above that.
+   Small: padding 24, gap 16; title over location + time (gap 4 / 8), small badges (gap 4), avatars and price (gap 16), then Maps | Uber */
 .event {
+  position: relative;
   display: flex; flex-direction: column; gap: var(--space-inline-m);
   padding: var(--space-inline-xl);
   border-radius: var(--radius-xl);
-  background: var(--surface-background-secondary);
+  background: var(--interactive-unselected-primary-background);
+  color: var(--interactive-unselected-primary-text);
   box-shadow: var(--shadow-raised);
+  transition: background var(--motion-fast);
 }
+.event:hover { background: var(--interactive-unselected-primary-background-hover); }
+.event:active { background: var(--interactive-unselected-primary-background-pressed); }
+.event:has(.eventLink:focus-visible) { outline: 3px solid var(--border-focus); outline-offset: 2px; }
 .eventMain { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: var(--space-inline-m); }
 .eventTitle { display: flex; flex-direction: column; gap: var(--space-inline-xxs); min-width: 0; }
-.eventTitle h3 { margin: 0; font: var(--weight-semibold) var(--size-heading-2)/1 var(--font-family); letter-spacing: -0.02em; } /* Heading 2 */
-.eventLink { color: var(--text-brand); }
-.eventLink:hover { text-decoration: underline; text-underline-offset: 3px; }
-.eventSub { font: var(--weight-regular) var(--size-body-small)/1.5 var(--font-family); color: var(--text-subtle); } /* Body small */
+.eventTitle h3 { margin: 0; font: var(--weight-semibold) var(--size-heading-2)/1 var(--font-family); letter-spacing: -0.02em; color: var(--interactive-unselected-primary-text); } /* Heading 2 */
+.eventLink { color: inherit; outline: none; }
+.eventLink::after { content: ''; position: absolute; inset: 0; border-radius: inherit; }
+.eventMeta { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-inline-xs); }
+/* The location: a Link small (Link from 744px), underlined; tapping copies it */
+.eventPlace {
+  position: relative; z-index: 1;
+  padding: 0; border: 0; background: none; cursor: pointer; text-align: left;
+  font: var(--weight-medium) var(--size-body-small)/1 var(--font-family);
+  color: var(--text-link); text-decoration: underline; text-underline-offset: 3px;
+}
+.eventPlace:hover { color: var(--text-link-hover); }
+.eventPlace:active { color: var(--text-link-pressed); }
+.eventPlace::before { content: ''; position: absolute; inset: -12px -4px; } /* 44px tap area */
+.eventTime { font: var(--weight-regular) var(--size-body-small)/1.5 var(--font-family); color: var(--interactive-unselected-primary-text-subtle); font-variant-numeric: tabular-nums; } /* Body small */
 .eventBadges { display: flex; flex-wrap: wrap; gap: var(--space-inline-xxs); }
 .eventBottom { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-inline-m); }
-.eventButtons { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-inline-xs); }
+.eventButtons { position: relative; z-index: 1; display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-inline-xs); }
 @media (min-width: 744px) {
-  /* Large: padding 24, content and a 120-wide button column (gap 24); title over location (gap 8, Body), badges (gap 12), gap 20 between groups */
+  /* Large: padding 24, content and a 120-wide button column (gap 24); location + time gap 12 (Link, Body), badges gap 12, gap 20 between groups */
   .event { flex-direction: row; align-items: center; gap: var(--space-inline-xl); }
   .eventMain { gap: var(--space-inline-l); }
   .eventTitle { gap: var(--space-inline-xs); }
-  .eventSub { font-size: var(--size-body); } /* Body */
+  .eventMeta { gap: var(--space-inline-s); }
+  .eventPlace { font-size: var(--size-body); }
+  .eventTime { font-size: var(--size-body); }
   .eventBadges { gap: var(--space-inline-s); }
   .eventButtons { display: flex; flex-direction: column; justify-content: center; gap: var(--space-inline-m); width: 120px; flex: none; }
 }
@@ -118,9 +140,17 @@
 .budgetTotal { font: var(--weight-medium) var(--size-body-small)/1.5 var(--font-family); color: var(--text-subtle); font-variant-numeric: tabular-nums; }
 @media (min-width: 744px) { .budget { padding: var(--space-inline-m) var(--space-inline-xl); } }
 
-/* ---------- Timeline (now line) ---------- */
-.timeline { display: flex; align-items: center; gap: var(--space-inline-xs); scroll-margin: 40vh 0; }
-.timelineTab { display: grid; place-items: center; padding: var(--space-inline-xxxs) var(--space-inline-xxs); border-radius: var(--radius-round); background: var(--border-accent); color: var(--text-inverse); }
-.timelineTime { font: var(--weight-medium) var(--size-body-small)/1.5 var(--font-family); color: var(--text-brand); font-variant-numeric: tabular-nums; }
-.timelineLine { flex: 1; height: 0; border-top: 2px dashed var(--border-accent); }
-@media (min-width: 744px) { .timelineLine { border-top-width: 3px; } .timelineTab { padding: var(--space-inline-xxxs) var(--space-inline-xxs); } }
+/* ---------- Timeline (Figma: Size=Small below 744px, Size=Large from 744px) ---------- */
+/* An accent pill with the clock icon and the time (Label small / Label), then a dashed accent line (1px / 2px, dashes 6/6). */
+.timeline { display: flex; align-items: center; gap: var(--space-inline-xxs); scroll-margin: 40vh 0; }
+.timelineTab {
+  display: inline-flex; align-items: center; gap: var(--space-inline-xxxs);
+  padding: var(--space-inline-xxxs) var(--space-inline-xxs);
+  border-radius: var(--radius-round); background: var(--border-accent); color: var(--text-inverse);
+  font: var(--weight-medium) var(--size-body-small)/1.5 var(--font-family); font-variant-numeric: tabular-nums;
+}
+.timelineLine { flex: 1; height: 1px; background: repeating-linear-gradient(90deg, var(--border-accent) 0 6px, transparent 6px 12px); }
+@media (min-width: 744px) {
+  .timelineTab { font-size: 14px; }
+  .timelineLine { height: 2px; }
+}

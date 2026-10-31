@@ -7,6 +7,6 @@ export default defineConfig({
   plugins: [react()],
   build: {
     // Country flags stay separate files, fetched only when shown, instead of all ~400 being baked into the app.
-    assetsInlineLimit: (file) => (file.includes('circle-flags') ? false : undefined),
+    assetsInlineLimit: (file) => (file.includes('/assets/flags/') ? false : undefined),
   },
 });

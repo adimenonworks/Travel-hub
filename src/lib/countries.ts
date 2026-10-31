@@ -1,9 +1,9 @@
 import type { Place, Trip, Activity } from '../data/types';
 
-// Every circle flag the app ships (circle-flags, MIT). Vite turns each into its own small file, fetched only when shown.
-const FLAGS = import.meta.glob('/node_modules/circle-flags/flags/*.svg', { query: '?url', import: 'default', eager: true }) as Record<string, string>;
+// The flags from the Figma ".Flag styles" set, one small PNG per country code. Each is its own file, fetched only when shown.
+const FLAGS = import.meta.glob('../assets/flags/*.png', { query: '?url', import: 'default', eager: true }) as Record<string, string>;
 const byCode: Record<string, string> = {};
-for (const [path, url] of Object.entries(FLAGS)) byCode[path.split('/').pop()!.replace('.svg', '')] = url;
+for (const [path, url] of Object.entries(FLAGS)) byCode[path.split('/').pop()!.replace('.png', '')] = url;
 
 const names = typeof Intl !== 'undefined' && 'DisplayNames' in Intl ? new Intl.DisplayNames(['en'], { type: 'region' }) : null;
 const codeByName: Record<string, string> = {};

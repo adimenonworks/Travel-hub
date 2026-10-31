@@ -10,7 +10,7 @@ export const HeaderProfileContext = createContext<ReactNode>(null);
 
 /**
  * Figma "Page Header" (Small below 744px, Large from 744px): space above, an optional ghost back button, the Display title (and Body subtitle) on the left,
- * then an optional primary icon button and your profile picture on the right, level with the title.
+ * then an optional secondary icon button and your profile picture on the right, level with the title.
  */
 export function PageHeader({ title, subtitle, back, action }: {
   title: ReactNode;
@@ -31,7 +31,7 @@ export function PageHeader({ title, subtitle, back, action }: {
         </div>
         {(action || profile) && (
           <div className={s.actions}>
-            {action && <IconButton icon={action.icon} label={action.label} variant="primary" size={large ? 'regular' : 'small'} onClick={action.onClick} />}
+            {action && <IconButton icon={action.icon} label={action.label} variant="secondary" size={large ? 'regular' : 'small'} onClick={action.onClick} />}
             {profile}
           </div>
         )}
