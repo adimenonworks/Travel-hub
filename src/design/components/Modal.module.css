@@ -1,8 +1,8 @@
-/* Figma "Modal": 390 wide, surface/background-tertiary, padding 24, gap 16, 24px corners, Shadow/Overlay. */
+/* Figma "Modal": centred content, 390 wide, surface/background-tertiary, padding 24, gap 16, 24px corners, Shadow/Overlay. */
 .backdrop { position: fixed; inset: 0; z-index: 150; display: grid; place-items: center; padding: var(--space-inline-m); background: var(--overlay-scrim); animation: fadeIn var(--motion-fast) both; }
 .modal {
   width: min(390px, 100%);
-  display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-inline-m);
+  display: flex; flex-direction: column; align-items: center; gap: var(--space-inline-m); text-align: center;
   padding: var(--space-inline-xl);
   border-radius: var(--radius-xl);
   background: var(--surface-background-tertiary);

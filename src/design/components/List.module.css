@@ -33,8 +33,8 @@
   color: var(--icon-brand); background: var(--surface-brand-subtle);
 }
 .content { flex: 1; min-width: 0; display: flex; flex-direction: column; }
-.title { overflow: hidden; text-overflow: ellipsis; font: var(--weight-semibold) 16px/1.5 var(--font-family); color: var(--text-body); }
-.subtitle { font: var(--weight-regular) 14px/1.5 var(--font-family); color: var(--text-subtle); overflow: hidden; text-overflow: ellipsis; }
-.trailing { flex: none; display: flex; align-items: center; gap: var(--space-inline-xs); color: var(--text-subtle); }
+.title { overflow: hidden; text-overflow: ellipsis; font: var(--type-body); /* Body */ color: var(--text-body); }
+.subtitle { font: var(--type-body-small); /* Body small */ color: var(--text-subtle); overflow: hidden; text-overflow: ellipsis; }
+.trailing { flex: none; display: flex; align-items: center; gap: var(--space-inline-xs); font: var(--type-body-small); color: var(--text-subtle); } /* Body small */
 .chevron { color: var(--icon-subtle); }
 .actions { display: inline-flex; gap: var(--space-inline-xxs); margin-right: calc(-1 * var(--space-inline-xs)); }

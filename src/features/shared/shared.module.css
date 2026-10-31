@@ -48,3 +48,5 @@
 .map :global(.leaflet-control-attribution) { border-top-left-radius: var(--radius-l); padding: 0 var(--space-inline-xs); background: var(--surface-background-tertiary); color: var(--text-subtle); }
 .map :global(.leaflet-control-attribution a) { color: var(--text-link); }
 .map :global(.leaflet-tooltip) { border: 0; border-radius: var(--radius-round); padding: var(--space-inline-xxs) var(--space-inline-s); font: var(--weight-semibold) var(--size-body-small)/1.4 var(--font-family); box-shadow: var(--shadow-raised); }
+/* The map's space while it loads */
+.mapLoading { border-radius: var(--radius-xl); background: var(--surface-sunken); }

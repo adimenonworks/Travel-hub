@@ -3,18 +3,21 @@ import { Icon, type IconName } from './Icon';
 import { useLarge } from './TripCards';
 import s from './Toast.module.css';
 
-type ToastMessage = { id: number; icon?: IconName; label: string };
+type ToastMessage = { id: number; icon?: IconName; label: string; tone?: 'neutral' | 'error' };
 
 const ToastContext = createContext<(t: Omit<ToastMessage, 'id'>) => void>(() => {});
 
-/** Show a short message at the top of the screen, e.g. `toast({ icon: 'copy', label: 'Address copied' })`. */
+/**
+ * Show a short message at the top of the screen, e.g. `toast({ icon: 'copy', label: 'Address copied' })`,
+ * or `toast({ tone: 'error', label: "Couldn't save. Check your connection" })` when something fails.
+ */
 export const useToast = () => useContext(ToastContext);
 
 const SHOW_MS = 3000;
 const LEAVE_MS = 300;
 
 /**
- * Figma "Toast": a white pill (icon + Label) that slides down from the top, stays 3 seconds, then slides back up.
+ * Figma "Toast" (Tone Neutral or Error): a pill (icon + Label) that slides down from the top, stays 3 seconds, then slides back up.
  * Size=Small below 744px, Large from 744px. Screen readers hear the label (role="status").
  */
 export function ToastProvider({ children }: { children: ReactNode }) {
@@ -40,8 +43,8 @@ export function ToastProvider({ children }: { children: ReactNode }) {
       {children}
       <div className={s.region} role="status" aria-live="polite">
         {msg && (
-          <div key={msg.id} className={[s.toast, large ? s.large : s.small, leaving && s.leaving].filter(Boolean).join(' ')}>
-            {msg.icon && <Icon name={msg.icon} size={large ? 24 : 16} className={s.icon} />}
+          <div key={msg.id} className={[s.toast, large ? s.large : s.small, msg.tone === 'error' && s.error, leaving && s.leaving].filter(Boolean).join(' ')}>
+            {(msg.icon || msg.tone === 'error') && <Icon name={msg.icon ?? 'info'} size={large ? 24 : 16} className={s.icon} />}
             <span>{msg.label}</span>
           </div>
         )}

@@ -225,6 +225,7 @@ export function DesignSystem() {
             {(['brand', 'neutral', 'success', 'warning', 'error'] as const).map((st) => <Notification key={st} state={st}>Notification, state {st}.</Notification>)}
             <div className={s.row}>
               <Button variant="secondary" icon="copy" onClick={() => toast({ icon: 'copy', label: 'Address copied' })}>Show a toast</Button>
+              <Button variant="secondary" onClick={() => toast({ tone: 'error', label: "Couldn't save. Check your connection" })}>Error toast</Button>
               <Button variant="secondary" onClick={() => setModal(true)}>Open a modal</Button>
             </div>
             <Modal open={modal} title="Add to your favourites?" body="Beverly rooftop" badge={<Badge tone="category" icon="cocktail">Drinks</Badge>}

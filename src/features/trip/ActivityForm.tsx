@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Button, FieldRow, Select, Sheet, TextArea, TextField } from '../../design/components';
+import { Button, FieldRow, Select, Sheet, TextArea, TextField, useToast } from '../../design/components';
 import { store } from '../../data';
 import { useMe } from '../../data/hooks';
 import type { Activity, Category, LinkItem, Trip } from '../../data/types';
@@ -32,6 +32,7 @@ export function ActivityForm({ open, trip, date, activity, draft, onClose, onCre
   open: boolean; trip: Trip; date: string; activity?: Activity; draft?: ActivityDraft; onClose: () => void; onCreated?: (id: string) => void;
 }) {
   const me = useMe();
+  const toast = useToast();
   const [f, setF] = useState<Form>(() => toForm(activity ?? draft, date));
   const [busy, setBusy] = useState(false);
   useEffect(() => { if (open) setF(toForm(activity ?? draft, date)); }, [open, activity, draft, date]);
@@ -59,7 +60,10 @@ export function ActivityForm({ open, trip, date, activity, draft, onClose, onCre
         const id = await store.addSub(trip.id, 'activities', { ...data, attendeeIds: [me.uid] });
         onCreated?.(id);
       }
+      toast({ icon: 'check', label: activity ? 'Changes saved' : 'Event added' });
       onClose();
+    } catch {
+      toast({ tone: 'error', label: "Couldn't save. Check your connection" });
     } finally {
       setBusy(false);
     }
@@ -67,8 +71,13 @@ export function ActivityForm({ open, trip, date, activity, draft, onClose, onCre
 
   const remove = async () => {
     if (!activity || !confirm(`Delete "${activity.title}"?`)) return;
-    await store.deleteSub(trip.id, 'activities', activity.id);
-    onClose();
+    try {
+      await store.deleteSub(trip.id, 'activities', activity.id);
+      toast({ icon: 'trash', label: 'Event deleted' });
+      onClose();
+    } catch {
+      toast({ tone: 'error', label: "Couldn't delete. Check your connection" });
+    }
   };
 
   return (

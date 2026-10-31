@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Avatar, Badge, Button, Card, Illustration, List, ListRow, Section, Select } from '../../design/components';
+import { Avatar, Badge, Button, Card, Illustration, List, ListRow, Section, Select, useToast } from '../../design/components';
 import { store } from '../../data';
 import { personName, useMe } from '../../data/hooks';
 import type { TripCtx } from './TripPage';
@@ -10,7 +10,7 @@ export function People({ trip, profiles, canManage, isOwner }: TripCtx) {
   const me = useMe();
   const navigate = useNavigate();
   const [link, setLink] = useState('');
-  const [copied, setCopied] = useState(false);
+  const toast = useToast();
   const [busy, setBusy] = useState(false);
 
   // "Invite to trip" makes a link and opens the share sheet straight away (or copies it where there's no share sheet).
@@ -20,7 +20,6 @@ export function People({ trip, profiles, canManage, isOwner }: TripCtx) {
       const code = await store.createInvite(trip);
       const url = `${location.origin}${location.pathname}#/join/${code}`;
       setLink(url);
-      setCopied(false);
       return url;
     } finally {
       setBusy(false);
@@ -30,7 +29,7 @@ export function People({ trip, profiles, canManage, isOwner }: TripCtx) {
     if (navigator.share) {
       try { await navigator.share({ title: `Join ${trip.name}`, text: `Join our trip "${trip.name}" on Trip Hub`, url }); return; } catch { /* cancelled */ }
     }
-    try { await navigator.clipboard.writeText(url); setCopied(true); } catch { /* the link is on screen to copy by hand */ }
+    try { await navigator.clipboard.writeText(url); toast({ icon: 'copy', label: 'Invite link copied' }); } catch { /* the link is on screen to copy by hand */ }
   };
   const invite = async () => {
     const url = await makeLink();
@@ -79,7 +78,7 @@ export function People({ trip, profiles, canManage, isOwner }: TripCtx) {
               <>
                 <div className={s.inviteRow}>
                   <div className={s.inviteUrl} title={link}>{link}</div>
-                  <Button icon={copied ? 'check' : 'share'} onClick={() => share()}>{copied ? 'Copied' : 'Share'}</Button>
+                  <Button icon="share" onClick={() => share()}>Share</Button>
                 </div>
                 <Button variant="ghost" size="small" onClick={makeLink} disabled={busy}>Make a new link</Button>
               </>

@@ -12,6 +12,8 @@
 .icon { color: var(--icon-subtle); flex: none; }
 .small { font: var(--type-label-small); } /* Label small */
 .large { font: var(--type-label); } /* Label */
+.error { background: var(--status-error-subtle); color: var(--status-error); } /* Tone=Error */
+.error .icon { color: var(--status-error); }
 .leaving { animation: toastOut var(--motion-sheet-out) both; }
 @keyframes toastIn { from { transform: translateY(calc(-100% - 40px)); opacity: 0; } to { transform: none; opacity: 1; } }
 @keyframes toastOut { from { transform: none; opacity: 1; } to { transform: translateY(calc(-100% - 40px)); opacity: 0; } }

@@ -1,15 +1,14 @@
 import { useEffect, useRef, useState } from 'react';
-import { Button, FieldRow, Select, Sheet, TextField } from '../../design/components';
+import { Button, FieldRow, Select, Sheet, TextField, useToast } from '../../design/components';
 import { store } from '../../data';
 import type { Place, Trip } from '../../data/types';
-import { COVER_COLORS, coverName } from '../../lib/colors';
 import { addDays, daysBetween, today } from '../../lib/dates';
 import { CURRENCIES } from '../../lib/format';
 import { shrinkPhoto } from '../../lib/image';
 import { CityPicker } from '../shared/CityPicker';
 import s from './trip.module.css';
 
-type Draft = { name: string; destination: Place | null; startDate: string; endDate: string; currency: string; totalBudget: string; coverColor: string; coverPhoto: string | null; coverPosition: Pos | null };
+type Draft = { name: string; destination: Place | null; startDate: string; endDate: string; currency: string; totalBudget: string; coverPhoto: string | null; coverPosition: Pos | null };
 type Pos = { x: number; y: number };
 
 const fromTrip = (t?: Trip): Draft => ({
@@ -20,7 +19,6 @@ const fromTrip = (t?: Trip): Draft => ({
   currency: t?.currency ?? (Intl.NumberFormat().resolvedOptions().locale.startsWith('en-GB') ? 'GBP' : 'USD'),
   // Older trips only have a per-person daily budget: show it as the total it adds up to.
   totalBudget: t ? String(t.totalBudget ?? (Math.round(t.dailyBudget * t.memberIds.length * (daysBetween(t.startDate, t.endDate) + 1)) || '')) : '',
-  coverColor: t ? coverName(t.coverColor) : COVER_COLORS[Math.floor(Math.random() * COVER_COLORS.length)].value,
   coverPhoto: t?.coverPhoto ?? null,
   coverPosition: t?.coverPosition ?? null,
 });
@@ -32,6 +30,7 @@ const fromTrip = (t?: Trip): Draft => ({
 export function TripForm({ open, trip, onClose, onSaved, onDeleted }: { open: boolean; trip?: Trip; onClose: () => void; onSaved?: (id: string) => void; onDeleted?: () => void }) {
   const [d, setD] = useState<Draft>(() => fromTrip(trip));
   const [error, setError] = useState('');
+  const toast = useToast();
   useEffect(() => { if (open) { setD(fromTrip(trip)); setError(''); } }, [open, trip]);
   const set = (patch: Partial<Draft>) => setD((x) => ({ ...x, ...patch }));
 
@@ -49,16 +48,17 @@ export function TripForm({ open, trip, onClose, onSaved, onDeleted }: { open: bo
       totalBudget: total,
       // Still saved per person per day, for anyone on an older version of the app.
       dailyBudget: Math.round(total / people / (daysBetween(d.startDate, d.endDate) + 1)),
-      coverColor: d.coverColor,
       coverPhoto: d.coverPhoto,
       coverPosition: d.coverPhoto ? d.coverPosition : null,
     };
     try {
       if (trip) {
         await store.updateTrip(trip.id, data);
+        toast({ icon: 'check', label: 'Changes saved' });
         onSaved?.(trip.id);
       } else {
         const id = await store.createTrip(data);
+        toast({ icon: 'check', label: 'Trip created' });
         onSaved?.(id);
       }
       onClose();
@@ -71,6 +71,7 @@ export function TripForm({ open, trip, onClose, onSaved, onDeleted }: { open: bo
     if (!trip || !confirm(`Delete "${trip.name}" for everyone? This can't be undone.`)) return;
     try {
       await store.deleteTrip(trip.id);
+      toast({ icon: 'trash', label: 'Trip deleted' });
       onClose();
       onDeleted?.();
     } catch (e) {

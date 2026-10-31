@@ -4,7 +4,7 @@ import { useActivitiesFor, useMe, useMyTrips } from '../../data/hooks';
 import type { Activity, Category, Trip } from '../../data/types';
 import { formatDay, today } from '../../lib/dates';
 import { Content } from '../../app/Shell';
-import { MapView } from '../shared/MapView';
+import { MapView } from '../shared/Map';
 
 /** Your travel collections: the places you've been, grouped by kind. Cafés and restaurants share one. */
 export const COLLECTIONS: { key: string; label: string; one: string; icon: IconName; categories: Category[] }[] = [

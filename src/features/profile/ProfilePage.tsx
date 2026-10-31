@@ -9,7 +9,7 @@ import { MAPS_APPS, getMapsApp, setMapsApp, type MapsApp } from '../../lib/prefs
 import { applyTheme, getTheme, type ThemePref } from '../../lib/theme';
 import { Content } from '../../app/Shell';
 import { CityPicker } from '../shared/CityPicker';
-import { MapView } from '../shared/MapView';
+import { MapView } from '../shared/Map';
 import { TravelStats } from './TravelStats';
 import s from './Profile.module.css';
 

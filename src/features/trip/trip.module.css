@@ -58,8 +58,8 @@
 .day[aria-pressed='true'] .dayCompact { opacity: 0; pointer-events: none; }
 .day[aria-pressed='true'] .dayOpen { opacity: 1; }
 
-.dayNum { font: var(--weight-black) 32px/1 var(--font-display); letter-spacing: -0.01em; } /* Number: Poppins Black 32 */
-.dayWord { font: var(--weight-semibold) 14px/1 var(--font-family); white-space: nowrap; } /* Word: 14 */
+.dayNum { font: var(--type-display-tiny); letter-spacing: -0.01em; } /* Display tiny */
+.dayWord { font: var(--type-label); line-height: 1; white-space: nowrap; } /* Label */
 .dayTop { display: flex; align-items: baseline; gap: var(--space-inline-xxs); white-space: nowrap; }
 .dayBig { font: var(--type-display-small); letter-spacing: -0.01em; } /* Display small */
 .dayMonth { font: var(--type-body-small); } /* Body small */
@@ -73,7 +73,7 @@
   .day[aria-pressed='true'] { height: 131px; }
   /* List, not selected: padding 16/20, number (24) beside the word, gap 12 */
   .dayCompact { flex-direction: row; justify-content: flex-start; gap: var(--space-inline-s); padding: var(--space-inline-m) var(--space-inline-l); }
-  .dayCompact .dayNum { font-size: 24px; }
+  .dayCompact .dayNum { font-size: 24px; } /* List layout: Display tiny at 24 (Figma overrides the size here) */
   .dayOpen { height: 131px; padding: var(--space-inline-m) var(--space-inline-l); }
 }
 

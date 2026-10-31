@@ -28,6 +28,7 @@ export type Trip = {
   dayBudgets?: Record<string, number>;
   /** What the group actually spent on a past day, by date, when someone corrected it. Replaces the worked-out spend. */
   daySpent?: Record<string, number>;
+  /** No longer saved or shown; older trips may still have it. */
   coverColor?: string;
   /** Small JPEG as a data URL (see lib/image.ts), or null for none. */
   coverPhoto?: string | null;
