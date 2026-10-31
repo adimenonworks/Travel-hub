@@ -1,15 +1,15 @@
 .list {
   background: var(--surface-background-secondary);
-  border-radius: var(--radius-card);
+  border-radius: var(--radius-xl);
   overflow: hidden;
 }
 .row {
   position: relative;
   display: flex;
   align-items: center;
-  gap: var(--space-sm);
+  gap: var(--space-inline-s);
   min-height: 60px;
-  padding: var(--space-sm) var(--space-inset);
+  padding: var(--space-inline-s) var(--space-inset);
   width: 100%;
   background: transparent;
   border: 0;
@@ -25,15 +25,15 @@
   border-top: 0.5px solid var(--border-subtle);
 }
 .interactive { cursor: pointer; }
-.interactive:hover { background: var(--interactive-ghost-hover); }
-.interactive:active { background: var(--interactive-ghost-pressed); }
+.interactive:hover { background: var(--interactive-button-ghost-background-hover); }
+.interactive:active { background: var(--interactive-button-ghost-background-pressed); }
 .leading {
   flex: none; display: grid; place-items: center;
-  width: 40px; height: 40px; border-radius: var(--radius-icon);
+  width: 40px; height: 40px; border-radius: var(--radius-round);
   color: var(--icon-brand); background: var(--surface-brand-subtle);
 }
 .content { flex: 1; min-width: 0; display: flex; flex-direction: column; }
-.title { overflow: hidden; text-overflow: ellipsis; font-weight: var(--p-weight-semibold); }
-.subtitle { font-size: var(--p-size-subhead); line-height: var(--p-leading-subhead); color: var(--text-subtle); overflow: hidden; text-overflow: ellipsis; }
-.trailing { flex: none; display: flex; align-items: center; gap: var(--space-xs); color: var(--text-subtle); }
+.title { overflow: hidden; text-overflow: ellipsis; font: var(--weight-semibold) 16px/1.5 var(--font-family); color: var(--text-body); }
+.subtitle { font: var(--weight-regular) 14px/1.5 var(--font-family); color: var(--text-subtle); overflow: hidden; text-overflow: ellipsis; }
+.trailing { flex: none; display: flex; align-items: center; gap: var(--space-inline-xs); color: var(--text-subtle); }
 .chevron { color: var(--icon-subtle); }

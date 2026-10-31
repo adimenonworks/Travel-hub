@@ -72,7 +72,7 @@ export function ActivityForm({ open, trip, date, activity, draft, onClose, onCre
   };
 
   return (
-    <Sheet open={open} title={activity ? 'Edit event' : 'Add to itinerary'} onClose={onClose} onSubmit={submit} submitLabel={activity ? 'Save' : 'Add'} submitDisabled={!f.title.trim() || busy}>
+    <Sheet open={open} title={activity ? 'Edit event' : 'Add to itinerary'} onClose={onClose} onSubmit={submit} submitLabel={activity ? 'Save' : 'Add'} submitDisabled={!f.title.trim() || !f.locationText.trim() || busy}>
       <TextField label="What" placeholder="Sunset at Miradouro da Graça" value={f.title} onChange={(e) => set({ title: e.target.value })} />
       <FieldRow>
         <Select label="Day" value={f.date} onChange={(e) => set({ date: e.target.value })}>
@@ -86,8 +86,8 @@ export function ActivityForm({ open, trip, date, activity, draft, onClose, onCre
         <TextField label="Starts" type="time" value={f.startTime} onChange={(e) => set({ startTime: e.target.value })} />
         <TextField label="Ends" type="time" value={f.endTime} onChange={(e) => set({ endTime: e.target.value })} />
       </FieldRow>
-      <TextField label="Where" placeholder="Address or place name" value={f.locationText} onChange={(e) => set({ locationText: e.target.value })}
-        hint="We'll look it up on the map when you save." />
+      <TextField label="Where" placeholder="Address or place name" value={f.locationText} onChange={(e) => set({ locationText: e.target.value })} required
+        hint="Needed for directions and Uber. A flight or hotel in a new country adds it to the trip." />
       <FieldRow>
         <TextField label={`Cost per person (${trip.currency})`} type="number" inputMode="decimal" min={0} step="any" placeholder="0" value={f.cost} onChange={(e) => set({ cost: e.target.value })} />
       </FieldRow>

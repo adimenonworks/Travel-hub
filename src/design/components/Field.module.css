@@ -1,36 +1,37 @@
-.field { display: flex; flex-direction: column; gap: var(--space-xs); min-width: 0; }
+.field { display: flex; flex-direction: column; gap: var(--space-inline-xs); min-width: 0; }
 .label {
-  font: var(--p-weight-semibold) var(--p-size-subhead)/var(--p-leading-subhead) var(--font-text);
-  color: var(--text-field-label);
-  padding-left: var(--space-xxs);
+  font: var(--weight-medium) 14px/1.5 var(--font-family); /* Label */
+  color: var(--input-field-label);
+  padding-left: var(--space-inline-xxs);
 }
 .input {
   width: 100%;
   min-height: var(--size-control);
-  padding: 0 var(--space-lg);
-  background: var(--surface-background-secondary);
-  border: 1px solid var(--border-bold);
-  border-radius: var(--radius-control);
-  font-size: var(--p-size-body);
+  padding: 0 var(--space-inline-l);
+  background: var(--input-field-background);
+  border: 1px solid var(--input-field-border);
+  color: var(--input-field-body);
+  border-radius: var(--radius-round);
+  font-size: var(--size-body);
   outline: none;
   transition: border-color var(--motion-fast), box-shadow var(--motion-fast);
   -webkit-appearance: none;
   appearance: none;
 }
-.input::placeholder { color: var(--text-field-placeholder); opacity: 1; }
-.input:hover { border-color: var(--border-bold-hover); }
-/* Focus: a 2px ring in the accent's high-contrast form (border + inset shadow keeps layout still) */
-.input:focus { border-color: var(--border-focus); box-shadow: inset 0 0 0 1px var(--border-focus); }
-textarea.input { min-height: 112px; padding: var(--space-sm) var(--space-lg); border-radius: var(--radius-field); resize: vertical; line-height: var(--p-leading-body); }
+.input::placeholder { color: var(--input-field-placeholder); opacity: 1; }
+.input:hover { background: var(--input-field-background-hover); }
+/* Focus (Figma State=Focus): 2px border-selected, lighter fill (border + inset shadow keeps layout still) */
+.input:focus { background: var(--input-field-background-hover); border-color: var(--input-field-border-selected); box-shadow: inset 0 0 0 1px var(--input-field-border-selected); }
+textarea.input { min-height: 112px; padding: var(--space-inline-s) var(--space-inline-l); border-radius: var(--radius-xl); resize: vertical; line-height: 1.5; }
 input[type='date'].input, input[type='time'].input { line-height: calc(var(--size-control) - 2px); }
 select.input {
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5l5 5 5-5' fill='none' stroke='%23868685' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
-  background-position: right var(--space-lg) center;
-  padding-right: var(--space-3xl);
+  background-position: right var(--space-inline-l) center;
+  padding-right: var(--space-inline-max);
 }
-.hint { font-size: var(--p-size-footnote); line-height: var(--p-leading-footnote); color: var(--text-subtle); padding-left: var(--space-xxs); }
-.row { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: var(--space-md); }
+.hint { font: var(--weight-medium) var(--size-body-small)/1.5 var(--font-family); color: var(--input-field-label-subtle); padding-left: var(--space-inline-xxs); } /* Label small */
+.row { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: var(--space-inline-m); }
 
 /* Compact select: the medium button's height */
-select.compact { min-height: var(--size-control-md); padding-left: var(--space-md); padding-right: var(--space-2xl); background-position: right var(--space-md) center; }  /* text stays 16px: iPhones zoom into fields with smaller text */
+select.compact { min-height: var(--size-tap); padding-left: var(--space-inline-m); padding-right: var(--space-inline-xxl); background-position: right var(--space-inline-m) center; }  /* text stays 16px: iPhones zoom into fields with smaller text */

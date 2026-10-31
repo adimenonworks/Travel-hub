@@ -1,13 +1,16 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { AvatarStack, Badge, Button, Card, CardLink, EmptyState, Icon } from '../../design/components';
+import { Badge, Button, EmptyState, EventRow, Icon, Timeline } from '../../design/components';
+import { store } from '../../data';
 import { personName, useMe } from '../../data/hooks';
 import type { Activity } from '../../data/types';
 import { dayWord, formatDay, formatTime, parseDay, today, tripDays } from '../../lib/dates';
 import { money } from '../../lib/format';
 import { categoryInfo } from '../../lib/categories';
+import { mapsUrl, uberUrl } from '../../lib/geocode';
 import { defaultUnit, describeWeather, tripWeather, type DayWeather } from '../../lib/weather';
 import { ActivityForm } from './ActivityForm';
+import { tripBudget } from './budget';
 import type { TripCtx } from './TripPage';
 import s from './trip.module.css';
 
@@ -53,9 +56,7 @@ export function Itinerary(ctx: TripCtx) {
   const eventsLeft = (d: string) =>
     d > t ? counts[d] ?? 0 : d < t ? 0 : activities.filter((a) => a.date === d && finishesAt(a) > now).length;
   const list = activities.filter((a) => a.date === day).sort(byTime);
-  const spendOn = (d: string) => activities.filter((a) => a.date === d).reduce((n, a) => n + a.cost * Math.max(1, a.attendeeIds.length), 0);
-  const spend = spendOn(day);
-  const groupBudget = trip.dailyBudget * trip.memberIds.length;
+  const budget = tripBudget(ctx);
   const weather = useDayWeather(ctx, day);
 
   // On today's plan, a dotted "now" line sits before the next plan and is scrolled into view.
@@ -68,12 +69,7 @@ export function Itinerary(ctx: TripCtx) {
     // Only scrolls when the line is off screen, and only as far as needed, so opening the tab doesn't jolt the page.
     nowRef.current.scrollIntoView({ block: 'nearest', behavior: reduce ? 'auto' : 'smooth' });
   }, [showNow, day]);
-  const nowLine = (
-    <div ref={nowRef} className={s.now} role="note" aria-label={`Now, ${formatTime(now)}`}>
-      <span className={s.nowTime}>{formatTime(now)}</span>
-      <span className={s.nowLine} />
-    </div>
-  );
+  const nowLine = <Timeline innerRef={nowRef} time={formatTime(now)} />;
 
   return (
     <div className={s.itinLayout}>
@@ -82,27 +78,24 @@ export function Itinerary(ctx: TripCtx) {
       <div ref={stripRef} className={s.days} role="group" aria-label="Trip days">
         {days.map((d) => {
           const selected = d === day;
-          const left = groupBudget - spendOn(d);
           const toGo = eventsLeft(d);
+          const b = budget.total > 0 ? budget.forDay(d) : null;
           return (
             <button key={d} type="button" data-day={d} className={s.day} aria-pressed={selected} onClick={() => setDay(d)}>
               <span className={s.dayCompact} aria-hidden={selected}>
                 <span className={s.dayNum}>{parseDay(d).getDate()}</span>
-                <span className={s.dayDow}>{word(d)}</span>
+                <span className={s.dayWord}>{word(d)}</span>
                 <span className={[s.dayDot, !counts[d] && s.empty].filter(Boolean).join(' ')} />
               </span>
               <span className={s.dayOpen} aria-hidden={!selected}>
                 <span className={s.dayTop}>
-                  <span className={s.dayDate}>
-                    <span className={s.dayNum}>{parseDay(d).getDate()}</span>
-                    <span className={s.dayMonth}>{formatDay(d, { month: 'short' })} · {formatDay(d, { weekday: 'short' })}</span>
-                  </span>
-                  {!!counts[d] && <span className={s.dayLabel}>{toGo ? `${toGo} event${toGo === 1 ? '' : 's'} left` : 'All done'}</span>}
+                  <span className={s.dayBig}>{parseDay(d).getDate()}</span>
+                  <span className={s.dayMonth}>{formatDay(d, { month: 'short' })} · {word(d)}</span>
                 </span>
-                <span className={s.dayDow}>{word(d)}</span>
-                {groupBudget > 0 && <span className={[s.dayLabel, s.dayMoney, left < 0 && s.dayOver].filter(Boolean).join(' ')}>
-                  {left < 0 ? `${money(-left, trip.currency)} over` : `${money(left, trip.currency)} left`}
-                </span>}
+                <span className={s.dayBadges}>
+                  {!!counts[d] && <Badge tone="inverse">{toGo ? `${toGo} more event${toGo === 1 ? '' : 's'}` : 'All done'}</Badge>}
+                  {b && <Badge tone={b.left < 0 ? 'danger' : 'neutral'}>{b.left < 0 ? `${money(-b.left, trip.currency)} over` : `${money(b.left, trip.currency)} left`}</Badge>}
+                </span>
               </span>
             </button>
           );
@@ -113,28 +106,23 @@ export function Itinerary(ctx: TripCtx) {
         <div className={s.dayHead}>
           <div>
             <div className={s.dayTitle}>
-              <h2 className="t-title1">{word(day)}</h2>
+              <h2 className="t-heading-1">{word(day)}</h2>
               {weather && <WeatherChip w={weather.day} typical={weather.typical} />}
             </div>
-            <div className={s.dayBudget}>
-              {formatDay(day, { weekday: 'long', month: 'long', day: 'numeric' })}
-              {trip.dailyBudget > 0 && <> · {money(spend, trip.currency)} of {money(trip.dailyBudget * trip.memberIds.length, trip.currency)} group budget</>}
-            </div>
+            <div className={s.dayBudget}>{formatDay(day, { weekday: 'long', month: 'long', day: 'numeric' })}</div>
           </div>
           <Button icon="plus" onClick={() => setAdding(true)}>Add event</Button>
         </div>
 
         {list.length === 0 ? (
-          <Card>
-            <EmptyState illustration="calendar" title="Nothing planned yet" message="Add something to do, or approve an idea from the Ideas board."
-              action={<Button variant="tinted" icon="plus" onClick={() => setAdding(true)}>Add event</Button>} />
-          </Card>
+          <EmptyState illustration="calendar" title="Nothing planned yet" message="Add something to do, or approve an idea from the Ideas board."
+            action={<Button variant="secondary" icon="plus" onClick={() => setAdding(true)}>Add event</Button>} />
         ) : (
           <>
             {list.map((a, n) => (
               <div key={a.id} className={s.timelineItem}>
                 {showNow && n === nextIndex && nowLine}
-                <ActivityCard a={a} ctx={ctx} />
+                <ActivityRow a={a} ctx={ctx} />
               </div>
             ))}
             {showNow && nextIndex === -1 && nowLine}
@@ -147,45 +135,30 @@ export function Itinerary(ctx: TripCtx) {
   );
 }
 
-/** A plan in the timeline. The whole card opens the plan's own page (details, location, documents, comments). */
-function ActivityCard({ a, ctx }: { a: Activity; ctx: TripCtx }) {
+/** A plan in the timeline (Figma "Event row"): everything entered in the sheet. The title opens the plan's own page;
+    the star saves it to your travel collections; Maps and Uber take you there. */
+function ActivityRow({ a, ctx }: { a: Activity; ctx: TripCtx }) {
   const me = useMe();
   const cat = categoryInfo(a.category);
-  const going = a.attendeeIds.includes(me.uid);
+  const starred = !!a.starredBy?.includes(me.uid);
   const nComments = ctx.comments.filter((c) => c.targetId === a.id).length;
-  const nDocs = a.links.length;
-
+  const when = a.startTime ? `${formatTime(a.startTime)}${a.endTime ? `–${formatTime(a.endTime)}` : ''}` : 'Any time';
+  const where = a.locationText || a.location?.name;
   return (
-    <div className={s.activity}>
-      <div className={s.time}>
-        {a.startTime ? <>{formatTime(a.startTime)}{a.endTime && <><br /><span className="t-tertiary">{formatTime(a.endTime)}</span></>}</> : <span className="t-tertiary">Any time</span>}
-      </div>
-      <CardLink to={`/trip/${ctx.trip.id}/plan/${a.id}`} className={s.actCard}>
-        <div className={s.actTop}>
-          <div>
-            <h3 className="t-title3">{a.title}</h3>
-            <div className={s.actMeta}>
-              <Badge tone="category" icon={cat.icon}>{cat.label}</Badge>
-              {a.cost > 0 && <Badge>{money(a.cost, ctx.trip.currency)} pp</Badge>}
-              {going && <Badge tone="success" icon="check">You're going</Badge>}
-            </div>
-          </div>
-          <Icon name="chevron-right" size={20} className={s.actChevron} />
-        </div>
-        {a.locationText && <div className={s.actPlace}><Icon name="pin" size={18} />{a.locationText}</div>}
-        {a.notes && <div className={[s.actNotes, s.clamp].join(' ')}>{a.notes}</div>}
-        <div className={s.actFoot}>
-          <span className={s.attending}>
-            <AvatarStack people={a.attendeeIds.map((id) => ({ id, name: personName(ctx.profiles, id), photo: ctx.profiles[id]?.photo }))} size={26} />
-            <span className="t-footnote t-secondary">{a.attendeeIds.length ? `${a.attendeeIds.length} going` : 'No one yet'}</span>
-          </span>
-          <span className={[s.attending, 't-footnote t-secondary'].join(' ')}>
-            {nDocs > 0 && <span className={s.attending}><Icon name="doc" size={16} />{nDocs}<span className="visually-hidden"> {nDocs === 1 ? 'document' : 'documents'}</span></span>}
-            {nComments > 0 && <span className={s.attending}><Icon name="chat" size={16} />{nComments}<span className="visually-hidden"> {nComments === 1 ? 'comment' : 'comments'}</span></span>}
-          </span>
-        </div>
-      </CardLink>
-    </div>
+    <EventRow
+      to={`/trip/${ctx.trip.id}/plan/${a.id}`}
+      title={a.title}
+      subtext={where ? `${when} · ${where}` : when}
+      category={{ icon: cat.icon, label: cat.label }}
+      going={a.attendeeIds.includes(me.uid)}
+      people={a.attendeeIds.map((id) => ({ id, name: personName(ctx.profiles, id), photo: ctx.profiles[id]?.photo }))}
+      price={a.cost > 0 ? `${money(a.cost, ctx.trip.currency)} pp` : undefined}
+      starred={starred}
+      onStar={() => store.toggleInArray(ctx.trip.id, 'activities', a.id, 'starredBy', me.uid, !starred)}
+      mapsHref={where ? mapsUrl(where, a.location) : undefined}
+      uberHref={where ? uberUrl(where, a.location) : undefined}
+      extra={nComments > 0 && <Badge tone="neutral" size="large" icon="comment">{nComments}<span className="visually-hidden"> {nComments === 1 ? 'comment' : 'comments'}</span></Badge>}
+    />
   );
 }
 

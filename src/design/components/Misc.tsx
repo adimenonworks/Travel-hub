@@ -1,6 +1,7 @@
 import type { CSSProperties, ReactNode } from 'react';
 import { Icon, type IconName } from './Icon';
 import { Illustration, type IllustrationName } from './Illustration';
+import { Card } from './Card';
 import s from './Misc.module.css';
 
 function initials(name: string) {
@@ -26,26 +27,26 @@ export function AvatarStack({ people, max = 4, size = 28 }: { people: { id: stri
   );
 }
 
-export type BadgeTone = 'neutral' | 'tint' | 'category' | 'success' | 'warning' | 'error';
+/** Figma Badge "Tone". Neutral is a white pill with a soft shadow (for sitting on photos and covers). */
+export type BadgeTone = 'neutral' | 'tint' | 'success' | 'warning' | 'danger' | 'category' | 'inverse';
 
-export function Badge({ tone = 'neutral', icon, children }: { tone?: BadgeTone; icon?: IconName; children: ReactNode }) {
+/** Figma Badge: Small (Label small, 16px icon) or Large (Label, 24px icon). Categories always carry their icon. */
+export function Badge({ tone = 'neutral', size = 'small', icon, iconState, flag, children }: {
+  tone?: BadgeTone; size?: 'small' | 'large'; icon?: IconName; iconState?: 'default' | 'filled'; /** A country flag instead of an icon */ flag?: ReactNode; children: ReactNode;
+}) {
   return (
-    <span className={[s.badge, tone !== 'neutral' && s[`badge-${tone}`]].filter(Boolean).join(' ')}>
-      {icon && <Icon name={icon} size={13} />}
+    <span className={[s.badge, s[`badge-${tone}`], size === 'large' && s.badgeLarge].filter(Boolean).join(' ')}>
+      {flag}
+      {!flag && icon && <Icon name={icon} size={size === 'large' ? 24 : 16} state={iconState} style={{ color: 'inherit' }} />}
       {children}
     </span>
   );
 }
 
-/** Shown where a list or a record is missing: an illustration, a title, a line of help, and an optional action. */
+/** An empty list or missing record: a Card with an illustration, a title, a line of help and an optional action. */
 export function EmptyState({ illustration, title, message, action }: { illustration: IllustrationName; title: string; message?: ReactNode; action?: ReactNode }) {
   return (
-    <div className={s.empty}>
-      <span className={s.emptyArt}><Illustration name={illustration} size={120} /></span>
-      <div className={s.emptyTitle}>{title}</div>
-      {message && <div>{message}</div>}
-      {action && <div className={s.emptyAction}>{action}</div>}
-    </div>
+    <Card type="small" className={s.empty} media={<Illustration name={illustration} size={120} />} title={title} body={message} actions={action} />
   );
 }
 
@@ -54,6 +55,17 @@ export function Spinner({ center }: { center?: boolean }) {
   return center ? <div className={s.center}>{el}</div> : el;
 }
 
-export function Banner({ icon = 'info', children }: { icon?: IconName; children: ReactNode }) {
-  return <div className={s.banner}><Icon name={icon} size={20} /><div>{children}</div></div>;
+export type NotificationState = 'warning' | 'success' | 'error' | 'neutral' | 'brand';
+
+/** Figma Notification: an info icon, an optional label, and a message on a status colour. */
+export function Notification({ state = 'neutral', icon = 'info', label, children }: { state?: NotificationState; icon?: IconName; label?: ReactNode; children: ReactNode }) {
+  return (
+    <div className={[s.note, s[`note-${state}`]].filter(Boolean).join(' ')} role={state === 'error' ? 'alert' : undefined}>
+      <Icon name={icon} size={20} />
+      <div className={s.noteText}>
+        {label && <div className={s.noteLabel}>{label}</div>}
+        <div>{children}</div>
+      </div>
+    </div>
+  );
 }

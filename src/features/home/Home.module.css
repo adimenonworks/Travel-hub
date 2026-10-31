@@ -5,40 +5,35 @@
 .heroCover { height: 100%; min-height: 222px; }
 .heroBody {
   display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "main count" "links links";
-  align-content: space-between; gap: var(--space-md) var(--space-lg);
-  padding: var(--space-lg) var(--space-xl);
+  align-content: space-between; gap: var(--space-inline-m) var(--space-inline-l);
+  padding: var(--space-inline-l) var(--space-inline-xl);
 }
-.heroMain { grid-area: main; display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-xxs); min-width: 0; }
-.heroTitle { margin-top: var(--space-xxs); }
+.heroMain { grid-area: main; display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-inline-xxs); min-width: 0; }
+.heroTitle { margin-top: var(--space-inline-xxs); }
 .heroLink { color: var(--text-primary); }
 .heroLink:hover { text-decoration: underline; text-underline-offset: 4px; text-decoration-thickness: 2px; }
-.countdown { grid-area: count; display: flex; align-items: baseline; gap: var(--space-xs); margin: 0; }
-.countBig { font: var(--p-weight-display) var(--p-size-display)/var(--p-leading-display) var(--font-display); font-stretch: var(--p-stretch-display); letter-spacing: var(--p-tracking-display); color: var(--text-brand); font-variant-numeric: tabular-nums; }
+.countdown { grid-area: count; display: flex; align-items: baseline; gap: var(--space-inline-xs); margin: 0; }
+.countBig { font: var(--weight-black) var(--size-display)/1 var(--font-display); letter-spacing: -0.01em; color: var(--text-brand); font-variant-numeric: tabular-nums; }
 .countSmall { color: var(--text-subtle); }
-.heroLinks { grid-area: links; display: flex; gap: var(--space-xs); flex-wrap: wrap; }
+.heroLinks { grid-area: links; display: flex; gap: var(--space-inline-xs); flex-wrap: wrap; }
 @media (max-width: 743px) {
   .hero { grid-template-columns: minmax(0, 1fr); }
   .heroCover { min-height: 0; aspect-ratio: 16 / 9; }
-  .heroBody { grid-template-columns: minmax(0, 1fr); grid-template-areas: "main" "count" "links"; gap: var(--space-md); padding: var(--space-lg) var(--space-inset) var(--space-inset); }
+  .heroBody { grid-template-columns: minmax(0, 1fr); grid-template-areas: "main" "count" "links"; gap: var(--space-inline-m); padding: var(--space-inline-l) var(--space-inset) var(--space-inset); }
 }
 
 /* Trip cards: every card has a cover on top (photo or illustrated scene), then the details on white. */
-.grid { display: grid; gap: var(--space-md); grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); }
-.trip { display: flex; flex-direction: column; border: 1px solid var(--border-subtle); }
-.coverWrap { position: relative; height: 140px; }
-.coverBadge { position: absolute; top: var(--space-sm); left: var(--space-sm); background: var(--surface-background-tertiary); box-shadow: var(--shadow-subtle); color: var(--text-body); font: var(--p-weight-semibold) var(--p-size-caption1)/1 var(--font-text); padding: var(--space-xs) var(--space-sm); border-radius: var(--radius-pill); }
-.tripBody { flex: 1; padding: var(--space-md) var(--space-inset) var(--space-inset); display: flex; flex-direction: column; gap: var(--space-xxs); color: var(--text-body); }
-.tripFoot { margin-top: auto; padding-top: var(--space-sm); }
+.grid { display: grid; gap: var(--space-inline-m); grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); }
 
 /* Plan tile: sits in the grid like a trip card, with a dashed outline so it reads as "add one". */
 .plan {
-  display: flex; flex-direction: column; align-items: flex-start; justify-content: space-between; gap: var(--space-md);
+  display: flex; flex-direction: column; align-items: flex-start; justify-content: space-between; gap: var(--space-inline-m);
   min-height: 280px; padding: var(--space-inset);
-  border: 2px dashed var(--border-subtle); border-radius: var(--radius-card);
+  border: 2px dashed var(--border-subtle); border-radius: var(--radius-xl);
 }
-.planWide { flex-direction: row; align-items: center; flex-wrap: wrap; min-height: 0; padding: var(--space-xl); }
+.planWide { flex-direction: row; align-items: center; flex-wrap: wrap; min-height: 0; padding: var(--space-inline-xl); }
 .planWide .planText { flex: 1 1 260px; }
-.planText { display: flex; flex-direction: column; gap: var(--space-xxs); }
+.planText { display: flex; flex-direction: column; gap: var(--space-inline-xxs); }
 /* Each letter is its own box so it can slide up on its own; the word clips them as they enter and leave. */
 .planWord { display: inline-flex; overflow: hidden; padding: 2px 0; margin: -2px 0; vertical-align: bottom; }
 .letter { display: inline-block; animation-name: letterIn; animation-timing-function: cubic-bezier(0.2, 0.75, 0.25, 1); animation-fill-mode: both; }
@@ -49,12 +44,12 @@
 
 /* Past trips: smaller cards in a row that scrolls sideways inside itself. */
 .pastRow {
-  display: grid; grid-auto-flow: column; grid-auto-columns: 220px; gap: var(--space-md);
+  display: grid; grid-auto-flow: column; grid-auto-columns: 220px; gap: var(--space-inline-m);
   overflow-x: auto; scroll-snap-type: x proximity; scroll-padding-inline: var(--space-gutter); scrollbar-width: thin;
-  margin: 0 calc(-1 * var(--space-gutter)); padding: 0 var(--space-gutter) var(--space-xs);
+  margin: 0 calc(-1 * var(--space-gutter)); padding: 0 var(--space-gutter) var(--space-inline-xs);
 }
 .past { scroll-snap-align: start; border: 1px solid var(--border-subtle); }
 .pastCover { height: 100px; }
-.pastBody { padding: var(--space-sm) var(--space-md) var(--space-md); display: flex; flex-direction: column; gap: var(--space-xxs); }
+.pastBody { padding: var(--space-inline-s) var(--space-inline-m) var(--space-inline-m); display: flex; flex-direction: column; gap: var(--space-inline-xxs); }
 
 .emptyPast { border: 1px solid var(--border-subtle); background: transparent; }

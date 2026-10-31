@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Banner, Button, Card, Icon, TextField } from '../../design/components';
+import { Notification, Button, Card, Icon, TextField } from '../../design/components';
 import { store } from '../../data';
 import { describeAuthError, isInAppBrowser } from '../../lib/authErrors';
 import s from './SignIn.module.css';
@@ -30,24 +30,24 @@ export function SignIn({ message }: { message?: string }) {
     <div className={s.page}>
       <div className={s.hero}>
         <span className={s.mark}><Icon name="plane" size={40} /></span>
-        <h1 className="t-display">Plan trips together.</h1>
-        <p className="t-body t-secondary">Trip Hub gives your crew a day-by-day itinerary, an ideas board, a shared budget and local weather.</p>
+        <h1 className="t-display">Plan trips… together</h1>
+        <p className="t-body t-secondary">Whether you’re going solo or with people, plan your trips, know where’s next and keep your travels saved.</p>
       </div>
       <Card className={s.card}>
-        {message && <p className="t-subhead">{message}</p>}
+        {message && <p className="t-body-small">{message}</p>}
         {store.mode === 'firebase' && inApp && (
-          <Banner>You're in an app's built-in browser, where Google sign-in is blocked. Tap the menu (⋯ or ↗) and choose <b>Open in Safari</b> or <b>Open in Chrome</b>.</Banner>
+          <Notification state="warning">You're in an app's built-in browser, where Google sign-in is blocked. Tap the menu (⋯ or ↗) and choose <b>Open in Safari</b> or <b>Open in Chrome</b>.</Notification>
         )}
         {store.mode === 'firebase' ? (
-          <Button size="large" block onClick={go} disabled={busy}>Continue with Google</Button>
+          <Button size="regular" block onClick={go} disabled={busy}>Continue with Google</Button>
         ) : (
           <form onSubmit={(e) => { e.preventDefault(); go(); }} className={s.form}>
             <TextField label="Your name" placeholder="Alex" value={name} onChange={(e) => setName(e.target.value)} autoFocus
               hint="Demo mode: no account needed. Open another tab with a different name to try collaborating." />
-            <Button size="large" block type="submit" disabled={busy || !name.trim()}>Start planning</Button>
+            <Button size="regular" block type="submit" disabled={busy || !name.trim()}>Start planning</Button>
           </form>
         )}
-        {error && <p className="t-footnote t-danger">{error}</p>}
+        {error && <p className="t-label-small t-danger">{error}</p>}
       </Card>
     </div>
   );

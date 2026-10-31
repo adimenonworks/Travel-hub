@@ -3,13 +3,13 @@ import type { Category } from '../data/types';
 
 // Categories have no colours of their own: they are told apart by icon, shown on the light emerald wash (Badge tone="category").
 export const CATEGORIES: { value: Category; label: string; icon: IconName }[] = [
-  { value: 'activity', label: 'Activity', icon: 'sun' },
-  { value: 'food', label: 'Food', icon: 'pin' },
-  { value: 'cafe', label: 'Café', icon: 'clock' },
-  { value: 'drinks', label: 'Drinks', icon: 'globe' },
-  { value: 'sight', label: 'Sightseeing', icon: 'map' },
-  { value: 'transport', label: 'Transport', icon: 'plane' },
-  { value: 'stay', label: 'Stay', icon: 'home' },
+  { value: 'activity', label: 'Activity', icon: 'ticket' },
+  { value: 'food', label: 'Food', icon: 'utensils' },
+  { value: 'cafe', label: 'Café', icon: 'coffee' },
+  { value: 'drinks', label: 'Drinks', icon: 'cocktail' },
+  { value: 'sight', label: 'Sightseeing', icon: 'camera' },
+  { value: 'transport', label: 'Transport', icon: 'train' },
+  { value: 'stay', label: 'Stay', icon: 'bed' },
   { value: 'other', label: 'Other', icon: 'ellipsis' },
 ];
 

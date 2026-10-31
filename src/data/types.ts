@@ -1,4 +1,5 @@
-export type Place = { name: string; lat: number; lng: number; country?: string };
+/** `countryCode` is the ISO 3166 two-letter code (lowercase), used for flags and the trip's country badges. */
+export type Place = { name: string; lat: number; lng: number; country?: string; countryCode?: string };
 
 export type Role = 'owner' | 'editor' | 'member';
 
@@ -20,7 +21,9 @@ export type Trip = {
   startDate: string; // YYYY-MM-DD
   endDate: string;
   currency: string;
+  /** Old per-person daily budget. Newer trips set totalBudget (the whole group, whole trip) and the daily figure is worked out. */
   dailyBudget: number;
+  totalBudget?: number;
   coverColor?: string;
   /** Small JPEG as a data URL (see lib/image.ts), or null for none. */
   coverPhoto?: string | null;
@@ -51,6 +54,8 @@ export type Activity = {
   cost: number;
   links: LinkItem[];
   attendeeIds: string[];
+  /** People who starred this event: it shows in their travel collections as a favourite. */
+  starredBy?: string[];
   createdBy: string;
   createdAt: number;
 };

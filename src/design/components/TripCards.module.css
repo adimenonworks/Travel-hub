@@ -1,0 +1,122 @@
+/* ---------- Hero Card (Figma: Size=Large ≥744px, Size=Small below) ---------- */
+.hero {
+  position: relative;
+  display: grid; gap: var(--space-inline-m);
+  padding: var(--space-inline-m);
+  border-radius: var(--radius-xl);
+  background: var(--surface-brand);
+}
+.heroImage { position: relative; min-height: 180px; border-radius: var(--radius-l); overflow: hidden; box-shadow: var(--shadow-raised); display: grid; }
+.heroImage > :first-child { grid-area: 1 / 1; width: 100%; height: 100%; }
+.heroPanel {
+  position: relative;
+  display: flex; flex-direction: column; justify-content: space-between; gap: var(--space-inline-xl);
+  padding: var(--space-inline-l);
+  border-radius: var(--radius-xl);
+  background: var(--surface-brand-bold);
+  color: var(--text-on-brand-bold);
+  overflow: hidden;
+}
+.heroText { display: flex; flex-direction: column; gap: var(--space-inline-m); }
+.heroTitle { display: flex; flex-direction: column; gap: var(--space-inline-xs); max-width: calc(100% - 140px); }
+.heroName { margin: 0; font: var(--weight-bold) var(--size-heading-1)/1 var(--font-family); letter-spacing: -0.02em; color: var(--text-on-brand-bold); overflow-wrap: anywhere; } /* Heading 1 */
+.heroSub { font: var(--weight-medium) 14px/1.5 var(--font-family); } /* Label */
+.countries { display: flex; flex-wrap: wrap; gap: var(--space-inline-xxs); }
+.flag { width: 20px; height: 20px; border-radius: 50%; flex: none; }
+.heroActions { display: flex; flex-wrap: wrap; gap: var(--space-inline-xs); }
+.heroEdit { position: absolute; left: auto; right: var(--space-inline-s); bottom: var(--space-inline-s); }
+/* "Days to go": a brand-coloured corner tab with a big number */
+.count {
+  display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-inline-xxs);
+  padding: var(--space-inline-m) var(--space-inline-xl) var(--space-inline-l) var(--space-inline-xxl);
+  background: var(--surface-brand); color: var(--text-brand);
+  border-bottom-left-radius: var(--radius-xxxl);
+}
+.countValue { font: var(--weight-black) var(--size-display-secondary)/1 var(--font-display); letter-spacing: -0.01em; }
+.countLabel { font: var(--weight-medium) 14px/1.5 var(--font-family); }
+.cornerSmall { position: absolute; top: 0; right: 0; }
+.cornerLarge { display: none; position: absolute; top: 0; right: 0; }
+.heroEdit:empty, .cornerSmall:empty, .cornerLarge:empty { display: none; }
+@media (min-width: 744px) {
+  .hero { grid-template-columns: minmax(220px, 400px) minmax(0, 1fr); gap: var(--space-inline-xxl); padding: var(--space-inline-xl) var(--space-inline-xxl); }
+  .heroImage { min-height: 360px; }
+  .heroPanel { padding: var(--space-inline-max); }
+  .cornerSmall { display: none; }
+  .cornerLarge { display: block; }
+  .count .countValue { font-size: var(--size-display); }
+}
+
+/* ---------- Content Card ---------- */
+.content {
+  display: flex; flex-direction: column;
+  border: 1px solid var(--border-subtle); border-radius: var(--radius-xl); overflow: hidden;
+  background: var(--surface-background-secondary); color: var(--text-body);
+  position: relative; isolation: isolate;
+  transition: transform var(--motion-fast);
+}
+.content::after { content: ''; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; transition: background var(--motion-fast); }
+.content:hover::after { background: var(--interactive-button-ghost-background-hover); }
+.content:active::after { background: var(--interactive-button-ghost-background-pressed); }
+.content:active { transform: scale(0.99); }
+.contentAccent { background: var(--surface-brand); border-color: transparent; color: var(--text-brand); }
+.contentCover { position: relative; height: 140px; display: grid; overflow: hidden; }
+.contentCover > :first-child { grid-area: 1 / 1; width: 100%; height: 100%; }
+.contentWhen { position: absolute; top: var(--space-inline-m); left: var(--space-inline-m); }
+.contentPeople { position: absolute; bottom: var(--space-inline-s); left: var(--space-inline-m); }
+.contentBody { display: flex; flex-direction: column; gap: var(--space-inline-s); padding: var(--space-inline-m) var(--space-inline-xl) var(--space-inline-xl); }
+.contentText { display: flex; flex-direction: column; gap: var(--space-inline-xxs); }
+.contentName { font: var(--weight-semibold) var(--size-heading-3)/1 var(--font-family); letter-spacing: -0.02em; } /* Heading 3 */
+.contentPlace { font: var(--weight-medium) 14px/1.5 var(--font-family); color: var(--text-subtle); } /* Label */
+.contentDates { font: var(--weight-medium) var(--size-body-small)/1.5 var(--font-family); color: var(--text-subtle); } /* Label small */
+.contentAccent .contentPlace, .contentAccent .contentDates { color: var(--text-brand); }
+
+/* ---------- Event row (Figma: Size=Large ≥744px, Size=Small below) ---------- */
+.event {
+  position: relative;
+  display: flex; flex-direction: column; gap: var(--space-inline-m);
+  padding: var(--space-inline-xl);
+  border-radius: var(--radius-xl);
+  background: var(--surface-background-secondary);
+  box-shadow: var(--shadow-raised);
+}
+.eventMain { display: flex; flex-direction: column; gap: var(--space-inline-m); min-width: 0; flex: 1; }
+.eventTitleRow { display: flex; align-items: flex-start; gap: var(--space-inline-m); }
+.eventTitle { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: var(--space-inline-xxs); }
+.eventTitle h3 { margin: 0; font: var(--weight-semibold) var(--size-heading-2)/1.15 var(--font-family); letter-spacing: -0.02em; } /* Heading 2 */
+.eventLink { color: var(--text-brand); }
+.eventLink:hover { text-decoration: underline; text-underline-offset: 3px; }
+.eventSub { font: var(--weight-regular) var(--size-body-small)/1.5 var(--font-family); color: var(--text-subtle); }
+.eventStar { margin: calc(-1 * var(--space-inline-s)) calc(-1 * var(--space-inline-s)) 0 0; }
+.eventBadges { display: flex; flex-wrap: wrap; gap: var(--space-inline-xxs); }
+.eventBottom { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-inline-s) var(--space-inline-m); }
+.eventButtons { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-inline-xs); }
+@media (min-width: 744px) {
+  .event { flex-direction: row; align-items: stretch; gap: var(--space-inline-xl); }
+  .eventTitle h3 { font-size: var(--size-heading-2); }
+  .eventSub { font-size: var(--size-body); }
+  .eventButtons { display: flex; flex-direction: column; justify-content: flex-end; gap: var(--space-inline-m); min-width: 120px; padding-top: var(--space-inline-xxl); }
+  .eventStar { position: absolute; top: var(--space-inline-xl); right: var(--space-inline-xl); margin: calc(-1 * var(--space-inline-s)); }
+}
+
+/* ---------- Budget card ---------- */
+.budget {
+  display: flex; align-items: center; gap: var(--space-inline-xs);
+  padding: var(--space-inline-m);
+  border: 1px solid var(--border-subtle); border-radius: var(--radius-xl);
+  background: var(--surface-background-secondary);
+}
+.budgetText { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: var(--space-inline-xxs); }
+.budgetDaily { display: flex; align-items: center; gap: var(--space-inline-xxs); flex-wrap: wrap; }
+.budgetAmount { font: var(--weight-bold) var(--size-heading-1)/1 var(--font-family); letter-spacing: -0.02em; color: var(--text-brand); font-variant-numeric: tabular-nums; } /* Heading 1 */
+.budget-low { color: var(--status-warning); }
+.budget-over { color: var(--status-error); }
+.budgetLabel { font: var(--weight-medium) var(--size-body-small)/1.5 var(--font-family); color: var(--text-body); }
+.budgetTotal { font: var(--weight-medium) var(--size-body-small)/1.5 var(--font-family); color: var(--text-subtle); font-variant-numeric: tabular-nums; }
+@media (min-width: 744px) { .budget { padding: var(--space-inline-m) var(--space-inline-xl); } }
+
+/* ---------- Timeline (now line) ---------- */
+.timeline { display: flex; align-items: center; gap: var(--space-inline-xs); scroll-margin: 40vh 0; }
+.timelineTab { display: grid; place-items: center; padding: var(--space-inline-xxxs) var(--space-inline-xxs); border-radius: var(--radius-round); background: var(--border-accent); color: var(--text-inverse); }
+.timelineTime { font: var(--weight-medium) var(--size-body-small)/1.5 var(--font-family); color: var(--text-brand); font-variant-numeric: tabular-nums; }
+.timelineLine { flex: 1; height: 0; border-top: 2px dashed var(--border-accent); }
+@media (min-width: 744px) { .timelineLine { border-top-width: 3px; } .timelineTab { padding: var(--space-inline-xxxs) var(--space-inline-xxs); } }

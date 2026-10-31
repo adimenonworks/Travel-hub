@@ -38,7 +38,7 @@ export function Comments({ tripId, targetId, comments, profiles }: { tripId: str
           onChange={(e) => setText(e.target.value)}
           onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); send(); } }}
         />
-        <IconButton icon="chat" label="Send comment" variant="tinted" size="small" onClick={send} disabled={!text.trim()} />
+        <IconButton icon="chat" label="Send comment" variant="secondary" size="small" onClick={send} disabled={!text.trim()} />
       </div>
     </div>
   );

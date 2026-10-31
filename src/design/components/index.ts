@@ -1,11 +1,12 @@
-export { Icon, type IconName } from './Icon';
+export { Icon, ICON_NAMES, type IconName } from './Icon';
 export { Button, IconButton, LinkButton, type ButtonVariant } from './Button';
 export { TextField, TextArea, Select, FieldRow } from './Field';
 export { Card, CardLink, Section } from './Card';
 export { List, ListRow } from './List';
 export { SegmentedControl } from './SegmentedControl';
 export { Sheet } from './Sheet';
-export { Avatar, AvatarStack, Badge, EmptyState, Spinner, Banner, type BadgeTone } from './Misc';
+export { Avatar, AvatarStack, Badge, EmptyState, Spinner, Notification, type BadgeTone, type NotificationState } from './Misc';
 export { PageHeader, Tabs, type TabItem } from './Bars';
 export { ColorPicker, type ColorOption } from './ColorPicker';
 export { Illustration, COVER_ILLUSTRATIONS, type IllustrationName } from './Illustration';
+export { HeroCard, ContentCard, EventRow, BudgetCard, Timeline } from './TripCards';

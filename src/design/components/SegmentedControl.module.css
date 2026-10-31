@@ -3,38 +3,39 @@
   display: inline-grid;
   grid-auto-flow: column;
   grid-auto-columns: 1fr;
-  padding: var(--space-xxs);
-  gap: var(--space-xxs);
-  background: var(--surface-sunken);
-  border-radius: var(--radius-pill);
+  padding: var(--space-inline-xxs);
+  gap: var(--space-inline-xxs);
+  background: transparent;
+  border: 1px solid var(--interactive-unselected-border);
+  border-radius: var(--radius-round);
   max-width: 100%;
 }
 .block { display: grid; width: 100%; }
 .option {
-  min-height: 40px;
-  padding: 0 var(--space-md);
+  min-height: 45px;
+  padding: var(--space-inline-s) var(--space-inline-m);
   border: 0;
-  border-radius: var(--radius-pill);
+  border-radius: var(--radius-round);
   background: transparent;
-  font: var(--p-weight-semibold) var(--p-size-subhead)/1 var(--font-text);
-  color: var(--text-body);
+  font: var(--weight-medium) 14px/1.5 var(--font-family); /* Label */
+  color: var(--interactive-selected-ghost-text);
   white-space: nowrap;
   position: relative; z-index: 1;
   transition: background var(--motion-fast), color var(--motion-fluid), transform var(--motion-release);
 }
 .option:active { transform: scale(0.96); transition: background var(--motion-fast), color var(--motion-fluid), transform var(--motion-press); }
-.option:hover { background: var(--interactive-ghost-hover); }
-.option:active { background: var(--interactive-ghost-pressed); }
-.option[aria-checked='true'], .option[aria-checked='true']:hover, .option[aria-checked='true']:active { background: transparent; color: var(--text-on-selected); }
+.option:hover { background: var(--interactive-selected-ghost-background-hover); }
+.option:active { background: var(--interactive-selected-ghost-background-pressed); }
+.option[aria-checked='true'], .option[aria-checked='true']:hover, .option[aria-checked='true']:active { background: transparent; color: var(--interactive-selected-primary-text); }
 
 /* The sliding pill: placed on the chosen option (position and width measured in SegmentedControl.tsx). */
 .thumb {
-  position: absolute; top: var(--space-xxs); bottom: var(--space-xxs); left: 0;
+  position: absolute; top: var(--space-inline-xxs); bottom: var(--space-inline-xxs); left: 0;
   width: var(--w); transform: translateX(var(--x));
-  border-radius: var(--radius-pill);
-  background: var(--interactive-selected);
+  border-radius: var(--radius-round);
+  background: var(--interactive-selected-primary-background);
   transition: background var(--motion-fast);
 }
 .animate { transition: transform var(--motion-fluid), width var(--motion-fluid), background var(--motion-fast); }
-.control:has(.option[aria-checked='true']:hover) .thumb { background: var(--interactive-selected-hover); }
-.control:has(.option[aria-checked='true']:active) .thumb { background: var(--interactive-selected-pressed); }
+.control:has(.option[aria-checked='true']:hover) .thumb { background: var(--interactive-selected-primary-background-hover); }
+.control:has(.option[aria-checked='true']:active) .thumb { background: var(--interactive-selected-primary-background-pressed); }

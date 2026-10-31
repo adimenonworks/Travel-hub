@@ -15,8 +15,8 @@ body {
   min-height: 100dvh;
   background: var(--surface-background-primary);
   color: var(--text-body);
-  font: var(--p-weight-regular) var(--p-size-body)/var(--p-leading-body) var(--font-text);
-  letter-spacing: var(--p-tracking-body);
+  font: var(--weight-regular) var(--size-body)/1.5 var(--font-family);
+  letter-spacing: 0;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -28,7 +28,7 @@ fieldset { padding: 0; border: 0; min-width: 0; }
 img { max-width: 100%; display: block; }
 /* Plain text links are underlined so they don't rely on colour alone (WCAG 1.4.1). Styled links (with a class) opt out. */
 a { color: var(--text-link); }
-a:not([class]) { font-weight: var(--p-weight-semibold); text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 1px; }
+a:not([class]) { font-weight: var(--weight-semibold); text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 1px; }
 a:not([class]):hover { text-decoration-thickness: 2px; }
 a[class] { text-decoration: none; }
 button, input, select, textarea { font: inherit; color: inherit; letter-spacing: inherit; }
@@ -49,3 +49,6 @@ button { cursor: pointer; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: 1ms !important; transition-duration: 1ms !important; }
 }
+
+/* Map attribution follows the small text size (14px from 744px up). */
+.leaflet-container, .leaflet-container .leaflet-control-attribution { font-size: var(--size-body-small); }

@@ -60,7 +60,7 @@ export function Sheet({ open, title, onClose, onSubmit, submitLabel = 'Done', su
         <div className={s.grabber} />
         <form onSubmit={submit} style={{ display: 'contents' }}>
           <div className={s.header}>
-            <Button variant="plain" size="small" onClick={onClose}>{onSubmit ? 'Cancel' : 'Close'}</Button>
+            <Button variant="ghost" size="small" onClick={onClose}>{onSubmit ? 'Cancel' : 'Close'}</Button>
             <div className={s.title}>{shown.current.title}</div>
             {onSubmit ? <Button size="small" type="submit" disabled={submitDisabled}>{submitLabel}</Button> : <span />}
           </div>
