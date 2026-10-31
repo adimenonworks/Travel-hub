@@ -47,7 +47,7 @@ export function HeroCard({ image, title, subtitle, countries, people, count, act
   return (
     <section className={s.hero} aria-label="Trip">
       <div className={s.heroImage}>{image}{!large && corner}</div>
-      <div className={[s.heroPanel, actions && s.heroPanelButtons, count && large && s.heroPanelCorner].filter(Boolean).join(' ')}>
+      <div className={[s.heroPanel, count && large && s.heroPanelCorner].filter(Boolean).join(' ')}>
         {large && corner}
         <div className={s.heroText}>
           <div className={s.heroTitle}>
