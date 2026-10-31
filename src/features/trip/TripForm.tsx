@@ -81,7 +81,7 @@ export function TripForm({ open, trip, onClose, onSaved, onDeleted }: { open: bo
   return (
     <Sheet open={open} title={trip ? 'Edit trip' : 'New trip'} onClose={onClose} onSubmit={submit} submitLabel={trip ? 'Save' : 'Create'} submitDisabled={!valid}>
       <TextField label="Trip name" placeholder="Summer in Lisbon" value={d.name} onChange={(e) => set({ name: e.target.value })} required />
-      <CityPicker value={d.destination} onChange={(p) => set({ destination: p, name: d.name || (p ? `${p.name.split(',')[0]} trip` : '') })} />
+      <CityPicker hint="Your first stop. Add more stops to the itinerary and they'll show on the trip header." value={d.destination} onChange={(p) => set({ destination: p, name: d.name || (p ? `${p.name.split(',')[0]} trip` : '') })} />
       <FieldRow>
         <TextField label="Start" type="date" value={d.startDate} onChange={(e) => set({ startDate: e.target.value, endDate: d.endDate < e.target.value ? e.target.value : d.endDate })} />
         <TextField label="End" type="date" value={d.endDate} min={d.startDate} onChange={(e) => set({ endDate: e.target.value })} />
