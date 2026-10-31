@@ -10,7 +10,7 @@ import { mapsUrl, uberUrl } from '../../lib/geocode';
 import { getMapsApp, mapsAppLabel } from '../../lib/prefs';
 import { categoryInfo } from '../../lib/categories';
 import { Comments } from '../shared/Comments';
-import { MapView } from '../shared/MapView';
+import { MapView } from '../shared/Map';
 import { ActivityForm } from './ActivityForm';
 import type { TripCtx } from './TripPage';
 import s from './trip.module.css';

@@ -6,7 +6,7 @@
   border-radius: var(--radius-xl);
   background: var(--surface-brand);
 }
-.heroImage { position: relative; height: 231px; border-radius: var(--space-inline-l); overflow: hidden; box-shadow: var(--shadow-raised); }
+.heroImage { position: relative; height: 231px; border-radius: var(--radius-20); overflow: hidden; box-shadow: var(--shadow-raised); }
 .heroImage > :first-child { position: absolute; inset: 0; width: 100%; height: 100%; }
 .heroPanel {
   position: relative;

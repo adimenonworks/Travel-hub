@@ -3,5 +3,6 @@
 @media (min-width: 744px) { .stats { grid-template-columns: repeat(5, 1fr); } }
 .stat { display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-inline-xxs); padding: var(--space-inline-m); border-radius: var(--radius-xl); background: var(--surface-background-secondary); border: 1px solid var(--border-subtle); }
 .statIcon { display: grid; place-items: center; width: 32px; height: 32px; border-radius: 50%; background: var(--surface-brand-subtle); color: var(--icon-brand); margin-bottom: var(--space-inline-xs); }
-.statValue { font: var(--weight-black) var(--size-heading-1)/1.1 var(--font-display); letter-spacing: -0.02em; font-variant-numeric: tabular-nums; color: var(--text-primary); }
+/* Heading 1 */
+.statValue { font: var(--type-heading-1); letter-spacing: -0.02em; font-variant-numeric: tabular-nums; color: var(--text-primary); }
 

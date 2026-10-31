@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { BudgetCard, Button, IconButton, useLarge, FieldRow, List, ListRow, Section, Select, Sheet, TextField } from '../../design/components';
+import { BudgetCard, Button, IconButton, useLarge, useToast, FieldRow, List, ListRow, Section, Select, Sheet, TextField } from '../../design/components';
 import { store } from '../../data';
 import { personName, useMe } from '../../data/hooks';
 import type { Category, Expense } from '../../data/types';
@@ -19,6 +19,7 @@ export function TripBudget({ ctx, day, onSetBudget }: { ctx: TripCtx; day: strin
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<Expense | 'new' | null>(null);
   const [dayEdit, setDayEdit] = useState<string | null>(null);
+  const toast = useToast();
   const [amount, setAmount] = useState('');
   const large = useLarge();
   const b = tripBudget(ctx);
@@ -48,8 +49,13 @@ export function TripBudget({ ctx, day, onSetBudget }: { ctx: TripCtx; day: strin
     const n = Number(amount);
     const next = { ...(past ? trip.daySpent : trip.dayBudgets) };
     if (amount.trim() === '' || !(n >= 0)) delete next[dayEdit]; else next[dayEdit] = n;
-    await store.updateTrip(trip.id, past ? { daySpent: next } : { dayBudgets: next });
-    closeDay();
+    try {
+      await store.updateTrip(trip.id, past ? { daySpent: next } : { dayBudgets: next });
+      toast({ icon: 'check', label: 'Budget updated' });
+      closeDay();
+    } catch {
+      toast({ tone: 'error', label: "Couldn't save. Check your connection" });
+    }
   };
 
   const days = tripDays(trip.startDate, trip.endDate);
@@ -116,6 +122,7 @@ function ExpenseForm({ open, ctxTrip, profiles, expense, onClose }: {
   onClose: () => void;
 }) {
   const me = useMe();
+  const toast = useToast();
   const [f, setF] = useState<Form>({ title: '', amount: '', category: 'stay', date: '', paidBy: me.uid });
   useEffect(() => {
     if (open) setF(expense ? { title: expense.title, amount: String(expense.amount), category: expense.category, date: expense.date, paidBy: expense.paidBy } : { title: '', amount: '', category: 'stay', date: '', paidBy: me.uid });
@@ -124,9 +131,14 @@ function ExpenseForm({ open, ctxTrip, profiles, expense, onClose }: {
 
   const submit = async () => {
     const data = { title: f.title.trim(), amount: Number(f.amount) || 0, category: f.category, date: f.date, paidBy: f.paidBy };
-    if (expense) await store.updateSub(ctxTrip.id, 'expenses', expense.id, data);
-    else await store.addSub(ctxTrip.id, 'expenses', data);
-    onClose();
+    try {
+      if (expense) await store.updateSub(ctxTrip.id, 'expenses', expense.id, data);
+      else await store.addSub(ctxTrip.id, 'expenses', data);
+      toast({ icon: 'check', label: expense ? 'Expense saved' : 'Expense added' });
+      onClose();
+    } catch {
+      toast({ tone: 'error', label: "Couldn't save. Check your connection" });
+    }
   };
 
   return (
@@ -148,7 +160,10 @@ function ExpenseForm({ open, ctxTrip, profiles, expense, onClose }: {
         </Select>
       </FieldRow>
       {expense && (
-        <Button variant="destructive" icon="trash" block onClick={async () => { await store.deleteSub(ctxTrip.id, 'expenses', expense.id); onClose(); }}>Delete expense</Button>
+        <Button variant="destructive" icon="trash" block onClick={async () => {
+          try { await store.deleteSub(ctxTrip.id, 'expenses', expense.id); toast({ icon: 'trash', label: 'Expense deleted' }); onClose(); }
+          catch { toast({ tone: 'error', label: "Couldn't delete. Check your connection" }); }
+        }}>Delete expense</Button>
       )}
     </Sheet>
   );

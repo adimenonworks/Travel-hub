@@ -1,14 +1,17 @@
+import { lazy, Suspense } from 'react';
 import { HashRouter, Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import { Spinner } from '../design/components';
 import { AuthProvider, useAuth } from '../data/hooks';
 import { SignIn } from '../features/auth/SignIn';
-import { DesignSystem } from '../features/design/DesignSystem';
 import { Home } from '../features/home/Home';
 import { Join } from '../features/trip/Join';
 import { TripPage } from '../features/trip/TripPage';
 import { CollectionPage } from '../features/profile/Collections';
 import { ProfilePage } from '../features/profile/ProfilePage';
 import { Shell } from './Shell';
+
+// The design reference page is for builders only, so it loads on demand.
+const DesignSystem = lazy(() => import('../features/design/DesignSystem').then((m) => ({ default: m.DesignSystem })));
 
 function Routed() {
   const { user, loading } = useAuth();
@@ -27,7 +30,7 @@ function Routed() {
         <Route path="/join/:code" element={<Join />} />
         <Route path="/profile" element={<ProfilePage />} />
         <Route path="/profile/collections/:key" element={<CollectionPage />} />
-        <Route path="/design" element={<DesignSystem />} />
+        <Route path="/design" element={<Suspense fallback={null}><DesignSystem /></Suspense>} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Shell>

@@ -6,6 +6,7 @@
   --type-display: var(--weight-black) var(--size-display)/1 var(--font-display);
   --type-display-small: var(--weight-black) 56px/1 var(--font-display);
   --type-display-secondary: var(--weight-black) var(--size-display-secondary)/1 var(--font-display);
+  --type-display-tiny: var(--weight-black) 32px/1 var(--font-display);
   --type-heading-1: var(--weight-bold) var(--size-heading-1)/1 var(--font-family);
   --type-heading-2: var(--weight-semibold) var(--size-heading-2)/1 var(--font-family);
   --type-heading-3: var(--weight-semibold) var(--size-heading-3)/1 var(--font-family);
@@ -20,6 +21,7 @@
 .t-display { font: var(--type-display); letter-spacing: -0.01em; }
 .t-display-small { font: var(--type-display-small); letter-spacing: -0.01em; }
 .t-display-secondary { font: var(--type-display-secondary); letter-spacing: -0.01em; }
+.t-display-tiny { font: var(--type-display-tiny); letter-spacing: -0.01em; }
 .t-heading-1 { font: var(--type-heading-1); letter-spacing: -0.02em; }
 .t-heading-2 { font: var(--type-heading-2); letter-spacing: -0.02em; }
 .t-heading-3 { font: var(--type-heading-3); letter-spacing: -0.02em; }
@@ -31,7 +33,7 @@
 .t-link { font: var(--type-link); }
 .t-link-small { font: var(--type-link-small); }
 
-.t-display, .t-display-small, .t-display-secondary { color: var(--text-brand); }
+.t-display, .t-display-small, .t-display-secondary, .t-display-tiny { color: var(--text-brand); }
 .t-heading-1, .t-heading-2, .t-heading-3, .t-heading-4 { color: var(--text-primary); }
 
 /* Helpers */
