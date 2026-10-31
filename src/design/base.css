@@ -15,7 +15,7 @@ body {
   min-height: 100dvh;
   background: var(--surface-background-primary);
   color: var(--text-body);
-  font: var(--weight-regular) var(--size-body)/1.5 var(--font-family);
+  font: var(--type-body);
   letter-spacing: 0;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;

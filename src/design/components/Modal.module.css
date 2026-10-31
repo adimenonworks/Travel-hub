@@ -1,0 +1,21 @@
+/* Figma "Modal": 390 wide, surface/background-tertiary, padding 24, gap 16, 24px corners, Shadow/Overlay. */
+.backdrop { position: fixed; inset: 0; z-index: 150; display: grid; place-items: center; padding: var(--space-inline-m); background: var(--overlay-scrim); animation: fadeIn var(--motion-fast) both; }
+.modal {
+  width: min(390px, 100%);
+  display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-inline-m);
+  padding: var(--space-inline-xl);
+  border-radius: var(--radius-xl);
+  background: var(--surface-background-tertiary);
+  box-shadow: var(--shadow-overlay);
+  animation: pop var(--motion-sheet) both;
+}
+.text { display: flex; flex-direction: column; gap: var(--space-inline-xxs); }
+.title { margin: 0; font: var(--type-heading-2); letter-spacing: -0.02em; color: var(--text-primary); } /* Heading 2 */
+.body { font: var(--type-body-small); color: var(--text-subtle); } /* Body small */
+.buttons { align-self: stretch; display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-inline-xs); }
+@media (min-width: 744px) {
+  .text { gap: var(--space-inline-xs); }
+  .body { font: var(--type-body); } /* Body */
+}
+@keyframes fadeIn { from { opacity: 0; } }
+@keyframes pop { from { opacity: 0; transform: scale(0.96); } }

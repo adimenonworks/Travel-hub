@@ -11,7 +11,8 @@ function initials(name: string) {
 
 /** Initials on the light emerald wash. `seed` is accepted for older callers; every avatar now shares one colour. */
 export function Avatar({ name, photo, size = 32 }: { name: string; photo?: string | null; size?: number; seed?: string }) {
-  const style = { '--avatar-size': `${size}px` } as CSSProperties;
+  // Figma Avatar: initials are Label small up to Medium (32), 16px at Large (48), 26.67px at Extra large (72).
+  const style = { '--avatar-size': `${size}px`, fontSize: size >= 72 ? size * 0.37 : size >= 48 ? size / 3 : undefined } as CSSProperties;
   if (photo) return <img className={s.avatar} style={style} src={photo} alt={name} title={name} referrerPolicy="no-referrer" />;
   return <span className={s.avatar} style={style} title={name} role="img" aria-label={name}>{initials(name)}</span>;
 }
