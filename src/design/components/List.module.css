@@ -37,3 +37,4 @@
 .subtitle { font: var(--weight-regular) 14px/1.5 var(--font-family); color: var(--text-subtle); overflow: hidden; text-overflow: ellipsis; }
 .trailing { flex: none; display: flex; align-items: center; gap: var(--space-inline-xs); color: var(--text-subtle); }
 .chevron { color: var(--icon-subtle); }
+.actions { display: inline-flex; gap: var(--space-inline-xxs); margin-right: calc(-1 * var(--space-inline-xs)); }

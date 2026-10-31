@@ -12,21 +12,34 @@ export const HeaderProfileContext = createContext<ReactNode>(null);
  * Figma "Page Header" (Small below 744px, Large from 744px): space above, an optional ghost back button, the Display title (and Body subtitle) on the left,
  * then an optional secondary icon button and your profile picture on the right, level with the title.
  */
-export function PageHeader({ title, subtitle, back, action }: {
+export function PageHeader({ title, subtitle, back, action, fit }: {
   title: ReactNode;
   subtitle?: ReactNode;
   back?: { to: string; label: string };
   /** The one optional button, e.g. edit the trip or add a new trip */
   action?: { icon: IconName; label: string; onClick: () => void };
+  /** Keep the title on one line: if it doesn't fit, it steps down to the Heading 1 size */
+  fit?: boolean;
 }) {
   const profile = useContext(HeaderProfileContext);
   const large = useLarge();
+  const titleRef = useRef<HTMLHeadingElement>(null);
+  const [smaller, setSmaller] = useState(false);
+  useLayoutEffect(() => {
+    const el = titleRef.current;
+    if (!fit || !el) return;
+    const check = () => { setSmaller(false); requestAnimationFrame(() => setSmaller(el.scrollWidth > el.clientWidth)); };
+    check();
+    const ro = new ResizeObserver(check);
+    ro.observe(el.parentElement!);
+    return () => ro.disconnect();
+  }, [fit, title]);
   return (
     <header className={s.header}>
       {back && <div className={s.back}><LinkButton to={back.to} variant="ghost" size={large ? 'regular' : 'small'} icon="chevron-left">{back.label}</LinkButton></div>}
       <div className={s.titleRow}>
         <div className={s.titleText}>
-          <h1 className={s.title}>{title}</h1>
+          <h1 ref={titleRef} className={[s.title, fit && s.fit, fit && smaller && s.fitSmaller].filter(Boolean).join(' ')}>{title}</h1>
           {subtitle && <div className={s.subtitle}>{subtitle}</div>}
         </div>
         {(action || profile) && (

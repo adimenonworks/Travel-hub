@@ -3,16 +3,17 @@
 .header { display: flex; flex-direction: column; gap: var(--space-inline-s); padding-top: var(--space-page-top); }
 .back { margin-left: calc(-1 * var(--space-inline-s)); }
 .titleRow { display: flex; align-items: center; justify-content: space-between; gap: var(--space-inline-m); }
-/* Small: title over a Body small subtitle (gap 4); Small button and 48 avatar (gap 12).
+/* Small: title over a Body small subtitle (gap 12); Small button and 48 avatar (gap 12).
    The title breaks only between words (a single word too long for the line is the only thing split). */
-.titleText { flex: 1; display: flex; flex-direction: column; gap: var(--space-inline-xxs); min-width: 0; }
+.titleText { flex: 1; display: flex; flex-direction: column; gap: var(--space-inline-s); min-width: 0; } /* 12 between title and subtitle */
 .title { font: var(--type-display-secondary); letter-spacing: -0.01em; overflow-wrap: break-word; color: var(--text-brand); } /* Small: Display secondary (40) */
+.fit { white-space: nowrap; }
+.fitSmaller { font: var(--type-heading-1); letter-spacing: -0.02em; overflow: hidden; text-overflow: ellipsis; } /* steps down when the line still doesn't fit */
 .subtitle { color: var(--text-subtle); font: var(--type-body-small); } /* Body small */
 .actions { flex: none; display: flex; align-items: center; gap: var(--space-inline-s); }
-/* Large: Body subtitle (gap 8); Regular button and 72 avatar (gap 24) */
+/* Large: Body subtitle; Regular button and 72 avatar (gap 24) */
 @media (min-width: 744px) {
   .back { margin-left: calc(-1 * var(--space-inline-m)); }
-  .titleText { gap: var(--space-inline-xs); }
   .title { font-size: var(--size-display); } /* Large: Display (64) */
   .subtitle { font-size: var(--size-body); }
   .actions { gap: var(--space-inline-xl); }

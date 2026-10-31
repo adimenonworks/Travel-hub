@@ -26,8 +26,10 @@ export function useLarge() {
  * countries, who's going and shortcut buttons, plus the "days to go / days left" corner.
  * Size=Large from 744px (photo on the left, corner on the panel); Size=Small below (photo on top, corner on the photo).
  */
-export function HeroCard({ image, title, subtitle, countries, people, count, actions }: {
+export function HeroCard({ image, title, subtitle, countries, people, count, actions, to }: {
   image: ReactNode; title: ReactNode; subtitle: ReactNode;
+  /** On phones, the whole card opens this page */
+  to?: string;
   countries: { code: string; name: string; flag?: string }[];
   people: Person[];
   /** The corner, e.g. { value: 28, label: 'Days to go' } */
@@ -49,7 +51,7 @@ export function HeroCard({ image, title, subtitle, countries, people, count, act
         {large && corner}
         <div className={s.heroText}>
           <div className={s.heroTitle}>
-            <h2 className={s.heroName}>{title}</h2>
+            <h2 className={s.heroName}>{to && !large ? <Link to={to} className={s.heroLink}>{title}</Link> : title}</h2>
             <div className={s.heroSub}>{subtitle}</div>
           </div>
           {countries.length > 0 && (

@@ -14,13 +14,15 @@ type RowProps = {
   icon?: IconName;
   leading?: ReactNode;
   trailing?: ReactNode;
+  /** Figma "Show actions": small ghost icon buttons at the end of the row */
+  actions?: ReactNode;
   chevron?: boolean;
   to?: string;
   href?: string;
   onClick?: () => void;
 };
 
-export function ListRow({ title, subtitle, icon, leading, trailing, chevron, to, href, onClick }: RowProps) {
+export function ListRow({ title, subtitle, icon, leading, trailing, actions, chevron, to, href, onClick }: RowProps) {
   const body = (
     <>
       {icon && (
@@ -33,10 +35,11 @@ export function ListRow({ title, subtitle, icon, leading, trailing, chevron, to,
         <span className={s.title}>{title}</span>
         {subtitle && <span className={s.subtitle}>{subtitle}</span>}
       </span>
-      {(trailing || chevron) && (
+      {(trailing || chevron || actions) && (
         <span className={s.trailing}>
           {trailing}
           {chevron && <Icon name="chevron-right" size={16} className={s.chevron} />}
+          {actions && <span className={s.actions}>{actions}</span>}
         </span>
       )}
     </>

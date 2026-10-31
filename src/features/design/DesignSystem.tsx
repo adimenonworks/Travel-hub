@@ -175,7 +175,7 @@ export function DesignSystem() {
             countries={[{ code: 'pt', name: 'Portugal', flag: flagUrl('pt') }, { code: 'es', name: 'Spain', flag: flagUrl('es') }]}
             people={['Ana', 'Ben', 'Cy'].map((n) => ({ id: n, name: n }))} count={{ value: 28, label: 'Days to go' }}
             actions={(size) => <><Button size={size} icon="calendar">Itinerary</Button><Button size={size} variant="secondary" icon="wallet">Budget</Button><Button size={size} variant="secondary" icon="lightbulb">Ideas</Button></>} />
-          <BudgetCard amount="€120" label="Left today" total="€2,000" level="ok" action={<Button variant="secondary" icon="pencil">Edit today’s budget</Button>} />
+          <BudgetCard amount="€120" label="Left today" total="€2,000" level="ok" action={<Button variant="secondary" icon="pencil">Edit budgets</Button>} />
           <BudgetCard amount="€0" label="Planned so far" total="No total set" level="ok" action={<Button variant="secondary" icon="pencil">Add budget</Button>} />
           <BudgetCard amount="€35" label="Left today" total="€2,000" level="low" />
           <BudgetCard amount="€20" label="Over today" total="€2,000" level="over" />
@@ -207,6 +207,7 @@ export function DesignSystem() {
           <List>
             <ListRow icon="calendar" title="With icon" subtitle="And a subtitle" chevron onClick={() => {}} />
             <ListRow icon="wallet" title="Trailing value" trailing="$120" />
+            <ListRow title="With an action" subtitle="Figma “Show actions”" trailing="$80 used" actions={<IconButton icon="pencil" size="small" label="Edit" />} />
             <ListRow leading={<Avatar name="Sam Rivera" size={32} />} title="With avatar" trailing={<Badge tone="tint">Owner</Badge>} />
           </List>
         </Section>
