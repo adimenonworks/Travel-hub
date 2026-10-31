@@ -80,7 +80,6 @@ export function Sheet({ open, title, onClose, onSubmit, submitLabel = 'Done', su
     <div ref={backdrop} className={[s.backdrop, closing && s.closing].filter(Boolean).join(' ')} inert={closing} onMouseDown={(e) => open && e.target === e.currentTarget && onClose()}>
       <div ref={ref} className={s.sheet} role="dialog" aria-modal="true" aria-label={shown.current.title}
         onAnimationEnd={(e) => closing && e.target === e.currentTarget && setMounted(false)}>
-        <div className={s.grabber} />
         <form onSubmit={submit} style={{ display: 'contents' }}>
           <div className={s.header}>
             <Button variant="ghost" size="small" onClick={onClose}>{onSubmit ? 'Cancel' : 'Close'}</Button>
