@@ -7,8 +7,8 @@
    The title breaks only between words (a single word too long for the line is the only thing split). */
 .titleText { flex: 1; display: flex; flex-direction: column; gap: var(--space-inline-s); min-width: 0; } /* 12 between title and subtitle */
 .title { font: var(--type-display-secondary); letter-spacing: -0.01em; overflow-wrap: break-word; color: var(--text-brand); } /* Small: Display secondary (40) */
-.fit { white-space: nowrap; }
-.fitSmaller { font: var(--type-heading-1); letter-spacing: -0.02em; overflow: hidden; text-overflow: ellipsis; } /* steps down when the line still doesn't fit */
+.fit { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.fitSmaller { font-size: var(--size-heading-1); } /* same display font, Heading 1 size, when the line still does not fit */
 .subtitle { color: var(--text-subtle); font: var(--type-body-small); } /* Body small */
 .actions { flex: none; display: flex; align-items: center; gap: var(--space-inline-s); }
 /* Large: Body subtitle; Regular button and 72 avatar (gap 24) */

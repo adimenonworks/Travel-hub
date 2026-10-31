@@ -30,6 +30,7 @@ export function PageHeader({ title, subtitle, back, action, fit }: {
     if (!fit || !el) return;
     const check = () => { setSmaller(false); requestAnimationFrame(() => setSmaller(el.scrollWidth > el.clientWidth)); };
     check();
+    document.fonts?.ready.then(check); // measure again once the display font has loaded
     const ro = new ResizeObserver(check);
     ro.observe(el.parentElement!);
     return () => ro.disconnect();

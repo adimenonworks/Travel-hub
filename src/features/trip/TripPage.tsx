@@ -95,6 +95,7 @@ function TripLoaded({ trip }: { trip: Trip }) {
       <Content>
         <PageHeader
           title={trip.name}
+          fit
           back={{ to: '/', label: 'Trips' }}
           action={canManage ? { icon: 'pencil', label: 'Edit trip', onClick: () => setEditing(true) } : undefined}
         />
