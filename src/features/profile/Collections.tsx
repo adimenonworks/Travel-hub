@@ -53,12 +53,12 @@ export function CollectionPage() {
       <PageHeader title={c.label} back={{ to: '/profile', label: 'Profile' }} />
       {favourites.length + rest.length === 0 ? (
         <EmptyState illustration="memories" title="Nothing here yet"
-          message="Star an event in a trip’s itinerary to save it here. Places you’ve been show up once the day has passed." />
+          message="Places you’ve been show up here once the day has passed." />
       ) : (
         <>
           {pins.length > 0 && <Card flush><MapView pins={pins} height={280} /></Card>}
           <Section title={<>Favourites <Badge tone="neutral" icon="star" iconState="filled">{favourites.length}</Badge></>}
-            footer={favourites.length === 0 ? 'Star an event in a trip’s itinerary to add it here.' : undefined}>
+            footer={favourites.length === 0 ? 'Events you star show up here.' : undefined}>
             {favourites.length > 0 && <List>{favourites.map(row)}</List>}
           </Section>
           {rest.length > 0 && <Section title="Everywhere else"><List>{rest.map(row)}</List></Section>}

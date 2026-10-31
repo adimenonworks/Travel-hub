@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
-import { Badge, Button, Card, CardLink, ContentCard, Illustration, LinkButton, PageHeader, Section, Spinner } from '../../design/components';
-import { personName, useMe, useMyTrips, useProfile, useProfiles } from '../../data/hooks';
+import { Button, Card, CardLink, ContentCard, HeroCard, Illustration, LinkButton, PageHeader, Section, Spinner } from '../../design/components';
+import { personName, useMe, useMyTrips, useProfile, useProfiles, useSub } from '../../data/hooks';
 import type { Trip } from '../../data/types';
-import { daysBetween, formatRange, today, tripPhase } from '../../lib/dates';
+import { countdown, daysBetween, formatRange, today, tripPhase } from '../../lib/dates';
+import { countryName, flagUrl, tripCountries } from '../../lib/countries';
 import { Content, useNewTrip } from '../../app/Shell';
-import { CoverPeople, TripCover } from '../shared/TripCover';
+import { TripCover } from '../shared/TripCover';
 import s from './Home.module.css';
 
 /**
@@ -29,16 +29,18 @@ export function Home() {
   // The trip that matters now: one you're on, else the next one.
   const featured = current[0] ?? upcoming[0];
   const others = [...current, ...upcoming].filter((t) => t !== featured);
+  const newTrip = useNewTrip();
   const plural = (n: number, word: string) => `${n} ${word}${n === 1 ? '' : 's'}`;
 
   return (
     <Content>
       <PageHeader title={`${greeting()}, ${name.split(' ')[0]}`}
-        subtitle={`${plural(all.length, 'trip')} · ${plural(daysAway, 'day')} away · ${plural(places, 'place')}`} />
+        subtitle={`${plural(all.length, 'trip')} · ${plural(daysAway, 'day')} away · ${plural(places, 'place')}`}
+        action={{ icon: 'plus', label: 'New trip', onClick: newTrip }} />
 
       {trips === null ? <Spinner center /> : (
         <>
-          {featured && <Hero trip={featured} now={current.includes(featured)} />}
+          {featured && <Hero trip={featured} />}
           {others.length > 0 ? (
             <Section title="Coming up">
               <div className={s.grid}>
@@ -53,10 +55,8 @@ export function Home() {
             {past.length > 0 ? (
               <div className={s.pastRow}>{past.map((t) => <PastCard key={t.id} trip={t} />)}</div>
             ) : (
-              <Card className={s.emptyPast} media={<Illustration name="memories" />}>
-                <p className="t-heading-4">Looks a little empty…</p>
-                <p className="t-body-small t-secondary">Let’s make some memories. Trips you’ve finished will show up here.</p>
-              </Card>
+              <Card media={<Illustration name="memories" size={64} square />} title="Looks a little empty…"
+                body="Let’s make some memories. Trips you’ve finished will show up here." />
             )}
           </Section>
         </>
@@ -72,31 +72,26 @@ function greeting(h = new Date().getHours()) {
 
 const place = (t: Trip) => t.destination?.name.split(',').slice(0, 2).join(',') ?? 'No destination yet';
 
-/** The big card for the trip you're on or the next one: cover, countdown and quick links into it. */
-function Hero({ trip, now }: { trip: Trip; now: boolean }) {
-  const total = daysBetween(trip.startDate, trip.endDate) + 1;
-  const until = daysBetween(today(), trip.startDate);
-  const [big, small] = now
-    ? ['Today', `day ${daysBetween(trip.startDate, today()) + 1} of ${total}`]
-    : until === 1 ? ['Tomorrow', ''] : [String(until), 'days to go'];
+/** The trip you're on, or the next one, as the Figma Hero Card: shortcuts into its itinerary, budget and ideas. */
+function Hero({ trip }: { trip: Trip }) {
+  const profiles = useProfiles(trip.memberIds);
+  const activities = useSub(trip.id, 'activities');
+  const n = daysBetween(trip.startDate, trip.endDate) + 1;
   const base = `/trip/${trip.id}`;
   return (
-    <Card flush className={s.hero} role="region" aria-labelledby="hero-title">
-      <TripCover trip={trip} className={s.heroCover}><CoverPeople trip={trip} size={32} /></TripCover>
-      <div className={s.heroBody}>
-        <div className={s.heroMain}>
-          <Badge tone={now ? 'tint' : 'neutral'}>{now ? 'Happening now' : 'Next up'}</Badge>
-          <h2 id="hero-title" className={`t-heading-1 ${s.heroTitle}`}><Link to={base} className={s.heroLink}>{trip.name}</Link></h2>
-          <p className="t-body t-secondary">{place(trip)} · {formatRange(trip.startDate, trip.endDate)}</p>
-        </div>
-        <p className={s.countdown}><span className={s.countBig}>{big}</span> {small && <span className={`t-heading-3 ${s.countSmall}`}>{small}</span>}</p>
-        <div className={s.heroLinks}>
-          <LinkButton to={base} variant="secondary" icon="calendar">Itinerary</LinkButton>
-          <LinkButton to={`${base}/ideas`} variant="secondary" icon="lightbulb">Ideas</LinkButton>
-          <LinkButton to={`${base}#budget`} variant="secondary" icon="wallet">Budget</LinkButton>
-        </div>
-      </div>
-    </Card>
+    <HeroCard
+      image={<TripCover trip={trip} />}
+      title={trip.name}
+      subtitle={`${formatRange(trip.startDate, trip.endDate)} • ${n} day${n === 1 ? '' : 's'}`}
+      countries={tripCountries(trip, activities ?? []).map((code) => ({ code, name: countryName(code), flag: flagUrl(code) }))}
+      people={trip.memberIds.map((id) => ({ id, name: personName(profiles, id), photo: profiles[id]?.photo }))}
+      count={countdown(trip.startDate, trip.endDate)}
+      actions={(size) => <>
+        <LinkButton to={base} size={size} icon="calendar">Itinerary</LinkButton>
+        <LinkButton to={`${base}#budget`} variant="secondary" size={size} icon="wallet">Budget</LinkButton>
+        <LinkButton to={`${base}/ideas`} variant="secondary" size={size} icon="lightbulb">Ideas</LinkButton>
+      </>}
+    />
   );
 }
 
@@ -154,22 +149,19 @@ function PlanTile({ wide }: { wide?: boolean }) {
   }, [leaving, word]);
 
   return (
-    <div className={[s.plan, wide && s.planWide].filter(Boolean).join(' ')}>
-      <Illustration name="globe" size={wide ? 120 : 96} />
-      <div className={s.planText}>
-        <h2 className="t-heading-2">
-          <span className="visually-hidden">Plan a new trip</span>
-          <span key={`${i}-${leaving}`} className={[s.planWord, leaving && s.leaving].filter(Boolean).join(' ')} aria-hidden="true">
-            {[...word].map((ch, n) => (
-              <span key={n} className={s.letter} style={{ animationDelay: `${n * LETTER_DELAY}s`, animationDuration: `${LETTER_MOVE}s` }}>
-                {ch === ' ' ? ' ' : ch}
-              </span>
-            ))}
-          </span>
-        </h2>
-        <p className="t-body-small t-secondary">There’s so much to see and do. Let’s plan it right.</p>
-      </div>
-      <Button icon="plus" onClick={newTrip}>Add a trip</Button>
-    </div>
+    <Card type={wide ? 'large' : 'small'} className={s.plan}
+      media={<Illustration name="globe" size={64} square />}
+      title={<h2 className={s.planTitle}>
+        <span className="visually-hidden">Plan a new trip</span>
+        <span key={`${i}-${leaving}`} className={[s.planWord, leaving && s.leaving].filter(Boolean).join(' ')} aria-hidden="true">
+          {[...word].map((ch, n) => (
+            <span key={n} className={s.letter} style={{ animationDelay: `${n * LETTER_DELAY}s`, animationDuration: `${LETTER_MOVE}s` }}>
+              {ch === ' ' ? '\u00a0' : ch}
+            </span>
+          ))}
+        </span>
+      </h2>}
+      body="There’s so much to see and do. Let’s plan it right."
+      actions={<Button icon="plus" size={wide ? 'regular' : 'small'} onClick={newTrip}>Add a trip</Button>} />
   );
 }

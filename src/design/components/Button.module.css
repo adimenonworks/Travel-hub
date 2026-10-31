@@ -42,7 +42,5 @@
 
 .button:disabled { cursor: default; }
 .block { width: 100%; }
-/* Icon only ("Show text" off): a circle */
-.iconOnly.regular { width: var(--size-control); padding: 0; }
-.iconOnly.small { width: var(--size-control-sm); padding: 0; }
-.iconOnly.small::after { inset: calc((var(--size-control-sm) - var(--size-tap)) / 2); }
+/* Icon only ("Show text" off), as in Figma: Regular is a 56×48 pill (padding 12/16, 24 icon); Small a 48×40 pill (padding 8/12, 24 icon) */
+.iconOnly.small::after { inset: calc((var(--size-control-sm) - var(--size-tap)) / 2) 0; }

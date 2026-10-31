@@ -52,7 +52,7 @@ export function IconButton({ icon, label, variant = 'ghost', size = 'regular', s
 }) {
   return (
     <button type={type} className={cls({ variant, size }, true, className)} aria-label={label} title={label} {...rest}>
-      <Icon name={icon} size={size === 'small' ? 16 : 24} state={state} className={s.glyph} />
+      <Icon name={icon} size={24} state={state} className={s.glyph} />
     </button>
   );
 }

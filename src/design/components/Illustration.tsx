@@ -15,7 +15,8 @@ export const COVER_ILLUSTRATIONS = ['cover-hills', 'cover-coast', 'cover-city'] 
  *
  * Spot illustrations (empty states, cards) draw in a 120×96 box. Covers ('cover-*') fill their container.
  */
-export function Illustration({ name, size = 96 }: { name: IllustrationName; size?: number }) {
+/** `square` fits the drawing into a size × size box (e.g. 64×64 in a Card's media slot). */
+export function Illustration({ name, size = 96, square }: { name: IllustrationName; size?: number; square?: boolean }) {
   if (name.startsWith('cover-'))
     return (
       <svg className={s.cover} viewBox="0 0 320 160" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
@@ -23,7 +24,7 @@ export function Illustration({ name, size = 96 }: { name: IllustrationName; size
       </svg>
     );
   return (
-    <svg className={s.art} width={size} height={size * 0.8} viewBox="0 0 120 96" aria-hidden="true">
+    <svg className={s.art} width={size} height={square ? size : size * 0.8} viewBox="0 0 120 96" aria-hidden="true">
       {spots[name as Exclude<IllustrationName, (typeof COVER_ILLUSTRATIONS)[number]>]}
     </svg>
   );

@@ -134,6 +134,14 @@
   --tag-inverse-background: var(--color-emerald-50);
   --tag-inverse-text: var(--color-emerald-700);
   --tag-inverse-icon: var(--color-emerald-700);
+  --illustration-primary: var(--color-neutral-0);
+  --illustration-secondary: var(--color-neutral-200);
+  --illustration-accent: var(--color-emerald-300);
+  --illustration-accent-subtle: var(--color-emerald-100);
+  --illustration-accent-bold: var(--color-emerald-700);
+  --illustration-border: color-mix(in srgb, var(--color-neutral-1000) 50%, transparent);
+  --illustration-warm: var(--color-orange-400);
+  --illustration-warm-bold: var(--color-orange-600);
 
   /* Layout (Figma "Layout" collection) */
   --space-inline-zero: var(--space-0); --space-inline-xxxs: var(--space-2); --space-inline-xxs: var(--space-4); --space-inline-xs: var(--space-8);
@@ -154,7 +162,7 @@
   --font-family: var(--font-manrope);
   --font-display: var(--font-poppins);
   --weight-regular: 400; --weight-medium: 500; --weight-semibold: 600; --weight-bold: 700; --weight-black: 900;
-  --size-display: 56px; --size-display-secondary: 40px; --size-heading-1: 28px; --size-heading-2: 20px; --size-heading-3: 18px;
+  --size-display: 48px; --size-display-secondary: 40px; --size-heading-1: 28px; --size-heading-2: 20px; --size-heading-3: 18px;
   --size-body: 14px; --size-body-small: 12px;
 
   /* Effects (Figma effect styles) */
@@ -177,7 +185,7 @@
 /* Figma Typography "Regular+" mode: 744px and wider. Nothing on these screens is smaller than 14px. */
 @media (min-width: 744px) {
   :root {
-    --size-display: 72px; --size-display-secondary: 48px; --size-heading-1: 32px; --size-heading-2: 24px; --size-heading-3: 20px;
+    --size-display: 64px; --size-display-secondary: 48px; --size-heading-1: 32px; --size-heading-2: 24px; --size-heading-3: 20px;
     --size-body: 16px; --size-body-small: 14px;
     --space-gutter: var(--space-page-s); --space-inset: var(--space-inline-xl); --space-stack: var(--space-page-l); --space-page-top: var(--space-page-xl);
   }
@@ -318,6 +326,14 @@
     --tag-inverse-background: var(--color-emerald-900);
     --tag-inverse-text: var(--color-emerald-200);
     --tag-inverse-icon: var(--color-emerald-200);
+    --illustration-primary: var(--color-neutral-900);
+    --illustration-secondary: var(--color-neutral-800);
+    --illustration-accent: var(--color-emerald-300);
+    --illustration-accent-subtle: var(--color-emerald-800);
+    --illustration-accent-bold: var(--color-emerald-200);
+    --illustration-border: color-mix(in srgb, var(--color-neutral-0) 50%, transparent);
+    --illustration-warm: var(--color-orange-400);
+    --illustration-warm-bold: var(--color-orange-500);
   }
 }
 
@@ -452,4 +468,12 @@
   --tag-inverse-background: var(--color-emerald-900);
   --tag-inverse-text: var(--color-emerald-200);
   --tag-inverse-icon: var(--color-emerald-200);
+  --illustration-primary: var(--color-neutral-900);
+  --illustration-secondary: var(--color-neutral-800);
+  --illustration-accent: var(--color-emerald-300);
+  --illustration-accent-subtle: var(--color-emerald-800);
+  --illustration-accent-bold: var(--color-emerald-200);
+  --illustration-border: color-mix(in srgb, var(--color-neutral-0) 50%, transparent);
+  --illustration-warm: var(--color-orange-400);
+  --illustration-warm-bold: var(--color-orange-500);
 }

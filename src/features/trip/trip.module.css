@@ -15,66 +15,66 @@
 /* The tab's content: never shorter than the screen, so the page height doesn't jump between tabs. */
 .tabPanel { min-height: 100dvh; display: flex; flex-direction: column; gap: var(--space-stack); }
 
-/* Day strip (Figma "Day card"). Push-expand: each card has a fixed size, so the browser can animate between them.
-   In the strip the tapped card widens (74 → 208px) as the old one narrows; in the side list (wide screens) it grows
-   taller instead. Both faces sit in the card; the open face is laid out at full size and revealed as the card grows. */
+/* Day strip (Figma "Day Card"). Push-expand: each card has a fixed size, so the browser can animate between them.
+   Strip: the tapped card widens (74 → 178px) as the old one narrows; all cards share the open card's height (139).
+   List (wide screens): 240 wide, the tapped card grows taller (58 → 131).
+   Both faces sit in the card. The leaving face stays visible (clipped by the card) while it resizes, then the two
+   cross-fade, so the card is never empty mid-move; colours change over the same time as the size. */
 .days {
+  --day-move: var(--duration-sheet) var(--ease-fluid);
   display: flex; gap: var(--space-inline-xs); overflow-x: auto; scroll-snap-type: x proximity; scrollbar-width: none;
   margin: 0 calc(-1 * var(--space-gutter)); padding: 2px var(--space-gutter) var(--space-inline-xxs);
   scroll-padding-inline: var(--space-gutter);
 }
 .days::-webkit-scrollbar { display: none; }
 .day {
-  --day-open: 208px;
+  --day-open: 178px;
   position: relative; flex: none; scroll-snap-align: start; overflow: hidden;
-  width: 74px; height: 118px; padding: 0;
+  width: 74px; height: 139px; padding: 0;
   border-radius: var(--radius-xl); border: 1px solid var(--interactive-unselected-border); text-align: left;
   background: var(--interactive-unselected-background); color: var(--interactive-unselected-text);
-  transition: width var(--motion-fluid), height var(--motion-fluid), background var(--motion-base), color var(--motion-base), border-color var(--motion-base);
+  transition: width var(--day-move), height var(--day-move), background-color var(--day-move), color var(--day-move), border-color var(--day-move);
 }
-.day:hover { background: var(--interactive-unselected-background-hover); }
-.day:active { background: var(--interactive-unselected-background-pressed); }
-.day[aria-pressed='true'] { width: var(--day-open); border-color: transparent; background: var(--interactive-selected-secondary-background); color: var(--interactive-selected-secondary-text); }
-.day[aria-pressed='true']:hover { background: var(--interactive-selected-secondary-background-hover); }
-.day[aria-pressed='true']:active { background: var(--interactive-selected-secondary-background-pressed); }
+.day:hover { background-color: var(--interactive-unselected-background-hover); }
+.day:active { background-color: var(--interactive-unselected-background-pressed); }
+.day[aria-pressed='true'] { width: var(--day-open); border-color: transparent; background-color: var(--interactive-selected-secondary-background); color: var(--interactive-selected-secondary-text); }
+.day[aria-pressed='true']:hover { background-color: var(--interactive-selected-secondary-background-hover); }
+.day[aria-pressed='true']:active { background-color: var(--interactive-selected-secondary-background-pressed); }
 
-/* The faces: the one leaving fades quickly, the one arriving fades in as the card finishes growing. */
-.dayCompact, .dayOpen { position: absolute; top: 0; left: 0; transition: opacity var(--motion-fast); }
-.dayCompact { transition: opacity var(--motion-base) var(--duration-fast); }
+.dayCompact, .dayOpen { position: absolute; top: 0; left: 0; }
+/* Strip, not selected: padding 16, number over the day word, centred */
 .dayCompact {
-  width: 100%; height: 100%; padding: var(--space-inline-s) var(--space-inline-xxs);
-  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--space-inline-xxs);
+  width: 100%; height: 100%; padding: var(--space-inline-m);
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--space-inline-xxxs);
+  transition: opacity var(--duration-base) var(--ease-standard) calc(var(--duration-sheet) * 0.45);
 }
+/* Selected: padding 20/16, the date row then the events badge, gap 12 */
 .dayOpen {
-  width: var(--day-open); height: 100%; padding: var(--space-inline-s) var(--space-inline-m);
-  display: flex; flex-direction: column; justify-content: center; align-items: flex-start; gap: var(--space-inline-xs);
+  width: var(--day-open); height: 100%; padding: var(--space-inline-l) var(--space-inline-m);
+  display: flex; flex-direction: column; justify-content: center; align-items: flex-start; gap: var(--space-inline-s);
   opacity: 0; pointer-events: none;
+  transition: opacity var(--duration-base) var(--ease-standard) calc(var(--duration-sheet) * 0.45);
 }
-.day[aria-pressed='true'] .dayCompact { opacity: 0; pointer-events: none; transition: opacity var(--motion-fast); }
-.day[aria-pressed='true'] .dayOpen { opacity: 1; transition: opacity var(--motion-base) var(--duration-fast); }
+.day[aria-pressed='true'] .dayCompact { opacity: 0; pointer-events: none; }
+.day[aria-pressed='true'] .dayOpen { opacity: 1; }
 
-/* Compact: Poppins Black number over the day word */
-.dayNum { font: var(--weight-black) 32px/1 var(--font-display); letter-spacing: -0.01em; }
-.dayWord { font: var(--weight-semibold) 14px/1.5 var(--font-family); white-space: nowrap; }
-.dayDot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
-.dayDot.empty { opacity: 0; }
-/* Open: Display small number beside "Oct · Today", then the events-left and money badges */
-.dayTop { display: flex; align-items: flex-end; gap: var(--space-inline-xs); white-space: nowrap; }
-.dayBig { font: var(--weight-black) 56px/1 var(--font-display); letter-spacing: -0.01em; }
-.dayMonth { font: var(--weight-regular) var(--size-body-small)/1.5 var(--font-family); padding-bottom: 4px; }
+.dayNum { font: var(--weight-black) 32px/1 var(--font-display); letter-spacing: -0.01em; } /* Number: Poppins Black 32 */
+.dayWord { font: var(--weight-semibold) 14px/1 var(--font-family); white-space: nowrap; } /* Word: 14 */
+.dayTop { display: flex; align-items: baseline; gap: var(--space-inline-xxs); white-space: nowrap; }
+.dayBig { font: var(--weight-black) 56px/1 var(--font-display); letter-spacing: -0.01em; } /* Display small */
+.dayMonth { font: var(--weight-regular) var(--size-body-small)/1.5 var(--font-family); } /* Body small */
 .dayBadges { display: flex; gap: var(--space-inline-xxs); white-space: nowrap; }
 
 .itinLayout { display: flex; flex-direction: column; gap: var(--space-inline-xl); }
-@media (min-width: 744px) { .day { --day-open: 248px; } }
 @media (min-width: 1068px) {
-  .itinLayout { display: grid; grid-template-columns: 248px minmax(0, 1fr); gap: var(--space-inline-xxl); align-items: start; }
+  .itinLayout { display: grid; grid-template-columns: 240px minmax(0, 1fr); gap: var(--space-inline-xxl); align-items: start; }
   .days { flex-direction: column; overflow: visible; margin: 0; padding: 0; position: sticky; top: 92px; }
-  .day, .day[aria-pressed='true'] { --day-open: 100%; width: 100%; height: 56px; }
-  .day[aria-pressed='true'] { height: 124px; }
-  .dayCompact { flex-direction: row; justify-content: flex-start; gap: var(--space-inline-s); padding: 0 var(--space-inline-l); }
-  .dayCompact .dayNum { font-size: var(--size-heading-2); }
-  .dayCompact .dayDot { margin-left: auto; }
-  .dayOpen { height: 124px; padding: var(--space-inline-m) var(--space-inline-l); }
+  .day, .day[aria-pressed='true'] { --day-open: 100%; width: 100%; height: 58px; }
+  .day[aria-pressed='true'] { height: 131px; }
+  /* List, not selected: padding 16/20, number (24) beside the word, gap 12 */
+  .dayCompact { flex-direction: row; justify-content: flex-start; gap: var(--space-inline-s); padding: var(--space-inline-m) var(--space-inline-l); }
+  .dayCompact .dayNum { font-size: 24px; }
+  .dayOpen { height: 131px; padding: var(--space-inline-m) var(--space-inline-l); }
 }
 
 /* The day's plan */

@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Badge, Button, EmptyState, EventRow, Icon, Timeline } from '../../design/components';
-import { store } from '../../data';
 import { personName, useMe } from '../../data/hooks';
 import type { Activity } from '../../data/types';
 import { dayWord, formatDay, formatTime, parseDay, today, tripDays } from '../../lib/dates';
@@ -10,7 +9,6 @@ import { categoryInfo } from '../../lib/categories';
 import { mapsUrl, uberUrl } from '../../lib/geocode';
 import { defaultUnit, describeWeather, tripWeather, type DayWeather } from '../../lib/weather';
 import { ActivityForm } from './ActivityForm';
-import { tripBudget } from './tripBudget';
 import type { TripCtx } from './TripPage';
 import s from './trip.module.css';
 
@@ -30,7 +28,7 @@ export function Itinerary(ctx: TripCtx) {
     setParams({ day: d }, { replace: true });
     // Once the tapped card has finished growing, make sure all of it is on screen (phones scroll the strip sideways).
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    setTimeout(() => stripRef.current?.querySelector(`[data-day="${d}"]`)?.scrollIntoView({ block: 'nearest', inline: 'nearest', behavior: reduce ? 'auto' : 'smooth' }), reduce ? 0 : 420);
+    setTimeout(() => stripRef.current?.querySelector(`[data-day="${d}"]`)?.scrollIntoView({ block: 'nearest', inline: 'nearest', behavior: reduce ? 'auto' : 'smooth' }), reduce ? 0 : 520);
   };
 
   // On arrival, slide the strip (sideways only, never the page) so the selected day starts fully in view.
@@ -56,7 +54,6 @@ export function Itinerary(ctx: TripCtx) {
   const eventsLeft = (d: string) =>
     d > t ? counts[d] ?? 0 : d < t ? 0 : activities.filter((a) => a.date === d && finishesAt(a) > now).length;
   const list = activities.filter((a) => a.date === day).sort(byTime);
-  const budget = tripBudget(ctx);
   const weather = useDayWeather(ctx, day);
 
   // On today's plan, a dotted "now" line sits before the next plan and is scrolled into view.
@@ -78,24 +75,24 @@ export function Itinerary(ctx: TripCtx) {
       <div ref={stripRef} className={s.days} role="group" aria-label="Trip days">
         {days.map((d) => {
           const selected = d === day;
-          const toGo = eventsLeft(d);
-          const b = budget.total > 0 ? budget.forDay(d) : null;
+          // Today counts the events still to come; any other day shows its total.
+          const n = d === t ? eventsLeft(d) : counts[d] ?? 0;
           return (
             <button key={d} type="button" data-day={d} className={s.day} aria-pressed={selected} onClick={() => setDay(d)}>
               <span className={s.dayCompact} aria-hidden={selected}>
                 <span className={s.dayNum}>{parseDay(d).getDate()}</span>
                 <span className={s.dayWord}>{word(d)}</span>
-                <span className={[s.dayDot, !counts[d] && s.empty].filter(Boolean).join(' ')} />
               </span>
               <span className={s.dayOpen} aria-hidden={!selected}>
                 <span className={s.dayTop}>
                   <span className={s.dayBig}>{parseDay(d).getDate()}</span>
                   <span className={s.dayMonth}>{formatDay(d, { month: 'short' })} · {word(d)}</span>
                 </span>
-                <span className={s.dayBadges}>
-                  {!!counts[d] && <Badge tone="inverse">{toGo ? `${toGo} more event${toGo === 1 ? '' : 's'}` : 'All done'}</Badge>}
-                  {b && <Badge tone={b.left < 0 ? 'danger' : 'neutral'}>{b.left < 0 ? `${money(-b.left, trip.currency)} over` : `${money(b.left, trip.currency)} left`}</Badge>}
-                </span>
+                {n > 0 && (
+                  <span className={s.dayBadges}>
+                    <Badge tone="inverse">{d === t ? `${n} more event${n === 1 ? '' : 's'}` : `${n} event${n === 1 ? '' : 's'}`}</Badge>
+                  </span>
+                )}
               </span>
             </button>
           );
@@ -135,29 +132,23 @@ export function Itinerary(ctx: TripCtx) {
   );
 }
 
-/** A plan in the timeline (Figma "Event row"): everything entered in the sheet. The title opens the plan's own page;
-    the star saves it to your travel collections; Maps and Uber take you there. */
+/** A plan in the timeline (Figma "Event row"): what was entered in the sheet. The title opens the plan's own page;
+    Maps and Uber take you to its location. */
 function ActivityRow({ a, ctx }: { a: Activity; ctx: TripCtx }) {
   const me = useMe();
   const cat = categoryInfo(a.category);
-  const starred = !!a.starredBy?.includes(me.uid);
-  const nComments = ctx.comments.filter((c) => c.targetId === a.id).length;
-  const when = a.startTime ? `${formatTime(a.startTime)}${a.endTime ? `–${formatTime(a.endTime)}` : ''}` : 'Any time';
   const where = a.locationText || a.location?.name;
   return (
     <EventRow
       to={`/trip/${ctx.trip.id}/plan/${a.id}`}
       title={a.title}
-      subtext={where ? `${when} · ${where}` : when}
+      subtext={where}
       category={{ icon: cat.icon, label: cat.label }}
       going={a.attendeeIds.includes(me.uid)}
       people={a.attendeeIds.map((id) => ({ id, name: personName(ctx.profiles, id), photo: ctx.profiles[id]?.photo }))}
       price={a.cost > 0 ? `${money(a.cost, ctx.trip.currency)} pp` : undefined}
-      starred={starred}
-      onStar={() => store.toggleInArray(ctx.trip.id, 'activities', a.id, 'starredBy', me.uid, !starred)}
       mapsHref={where ? mapsUrl(where, a.location) : undefined}
       uberHref={where ? uberUrl(where, a.location) : undefined}
-      extra={nComments > 0 && <Badge tone="neutral" size="large" icon="comment">{nComments}<span className="visually-hidden"> {nComments === 1 ? 'comment' : 'comments'}</span></Badge>}
     />
   );
 }

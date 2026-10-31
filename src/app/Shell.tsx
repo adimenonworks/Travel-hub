@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, type ReactNode } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
-import { Avatar, Notification } from '../design/components';
+import { Avatar, HeaderProfileContext, Notification, useLarge } from '../design/components';
 import { store } from '../data';
 import { useMe, useProfile } from '../data/hooks';
 import { TripForm } from '../features/trip/TripForm';
@@ -11,7 +11,8 @@ const NewTripContext = createContext<() => void>(() => {});
 export const useNewTrip = () => useContext(NewTripContext);
 
 /**
- * App frame: a light top bar with no background holding just your profile on the right, then the page. The trip sheet lives here so any page can open it.
+ * App frame: the page, with your profile picture handed to every Page Header (it sits at the right of the title).
+ * The trip sheet lives here so any page can open it.
  */
 export function Shell({ children }: { children: ReactNode }) {
   const me = useMe();
@@ -22,17 +23,17 @@ export function Shell({ children }: { children: ReactNode }) {
   const name = profile?.name || me.name;
   const photo = profile ? profile.photo : me.photo;
   const newTrip = () => setCreating(true);
+  // Figma Page Header: Extra large avatar (72) from 744px, Large (48) on phones.
+  const large = useLarge();
 
   return (
     <NewTripContext.Provider value={newTrip}>
+      <HeaderProfileContext.Provider value={
+        <NavLink to="/profile" className={s.me} aria-label={`Your profile and settings (${name})`}>
+          <Avatar name={name} photo={photo} seed={me.uid} size={large ? 72 : 48} />
+        </NavLink>
+      }>
       <div className={s.shell}>
-        <header className={s.bar}>
-          <div className={s.barInner}>
-            <NavLink to="/profile" className={s.me} aria-label={`Your profile and settings (${name})`}>
-              <Avatar name={name} photo={photo} seed={me.uid} size={44} />
-            </NavLink>
-          </div>
-        </header>
         <main id="main" className={s.main}>
           {store.mode === 'demo' && (
             <div className={s.demo}>
@@ -43,6 +44,7 @@ export function Shell({ children }: { children: ReactNode }) {
         </main>
         <TripForm open={creating} onClose={() => setCreating(false)} onSaved={(id) => navigate(`/trip/${id}`)} />
       </div>
+      </HeaderProfileContext.Provider>
     </NewTripContext.Provider>
   );
 }

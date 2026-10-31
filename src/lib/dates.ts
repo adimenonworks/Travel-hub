@@ -62,3 +62,10 @@ export function tripPhase(start: string, end: string, now = today()): TripPhase 
   if (now > end) return 'past';
   return 'current';
 }
+
+/** The Hero Card corner: days until the trip starts, then days left once it has started (counting today), none after. */
+export function countdown(start: string, end: string, now = today()): { value: number; label: string } | undefined {
+  if (now < start) { const n = daysBetween(now, start); return { value: n, label: n === 1 ? 'Day to go' : 'Days to go' }; }
+  if (now <= end) { const n = daysBetween(now, end) + 1; return { value: n, label: n === 1 ? 'Day left' : 'Days left' }; }
+  return undefined;
+}

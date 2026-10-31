@@ -17,15 +17,24 @@ export function tripBudget({ trip, activities, expenses }: Pick<TripCtx, 'trip' 
   const perDay = days.map(spendOn);
   const planned = perDay.reduce((n, x) => n + x, 0) + tripWide;
 
-  /** One day's budget, what's left of it, and how close it is to running out (orange under half, red under a fifth). */
+  const fixed = trip.dayBudgets ?? {};
+
+  /**
+   * One day's budget, what's left of it, and how close it is to running out (orange under half, red under a fifth).
+   * A day given its own budget keeps it; any other day gets what's left of the total (after costs not tied to a day,
+   * spending on earlier days and the budgets set for later days), shared over the remaining days without one.
+   */
   const forDay = (d: string) => {
     const i = Math.max(0, days.indexOf(d));
     const before = perDay.slice(0, i).reduce((n, x) => n + x, 0);
-    const daily = (total - tripWide - before) / (days.length - i);
+    const later = days.slice(i + 1);
+    const reserved = later.reduce((n, x) => n + (fixed[x] ?? 0), 0);
+    const sharing = 1 + later.filter((x) => fixed[x] === undefined).length;
+    const daily = fixed[days[i]] ?? (total - tripWide - before - reserved) / sharing;
     const left = daily - perDay[i];
     const share = daily > 0 ? left / daily : -1;
     const level: 'ok' | 'low' | 'over' = share >= 0.5 ? 'ok' : share >= 0.2 ? 'low' : 'over';
     return { daily: Math.round(daily), left: Math.round(left), level };
   };
-  return { total, planned, tripWide, forDay };
+  return { total, planned, tripWide, forDay, fixed };
 }

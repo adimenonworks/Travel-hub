@@ -48,7 +48,7 @@ export function ActivityPage(ctx: TripCtx) {
         title={a.title}
         subtitle={`${formatDay(a.date, { weekday: 'long', month: 'long', day: 'numeric' })} · ${time}`}
         back={{ to: itinerary, label: 'Itinerary' }}
-        actions={<Button variant="ghost" icon="pencil" onClick={() => setEditing(true)}>Edit</Button>}
+        action={{ icon: 'pencil', label: 'Edit event', onClick: () => setEditing(true) }}
       />
 
       <div className={s.planMeta}>
