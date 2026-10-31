@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
 import { Navigate, Route, Routes, useLocation, useMatch, useNavigate, useParams, useSearchParams } from 'react-router-dom';
-import { Button, EmptyState, HeroCard, IconButton, LinkButton, PageHeader, Spinner, Tabs, type TabItem } from '../../design/components';
+import { Button, EmptyState, HeroCard, LinkButton, PageHeader, Spinner, Tabs, type TabItem } from '../../design/components';
 import { personName, useProfiles, useRole, useSub, useTrip } from '../../data/hooks';
 import type { Activity, Album, Comment, Expense, Idea, Profile, Trip } from '../../data/types';
-import { daysBetween, formatRange, today, tripDays } from '../../lib/dates';
+import { countdown, daysBetween, formatRange, today, tripDays } from '../../lib/dates';
 import { countryName, flagUrl, tripCountries } from '../../lib/countries';
 import { Content } from '../../app/Shell';
 import { TripCover } from '../shared/TripCover';
@@ -69,9 +69,7 @@ function TripLoaded({ trip }: { trip: Trip }) {
   // The budget card follows the day picked in the itinerary; otherwise today (during the trip) or the first day.
   const fromUrl = params.get('day') ?? '';
   const budgetDay = days.includes(fromUrl) ? fromUrl : days.includes(t) ? t : days[0];
-  const until = daysBetween(t, trip.startDate);
-  const count = until > 0 ? { value: until, label: until === 1 ? 'Day to go' : 'Days to go' }
-    : t <= trip.endDate ? { value: daysBetween(trip.startDate, t) + 1, label: `Day of ${nDays}` } : undefined;
+  const count = countdown(trip.startDate, trip.endDate, t);
   const people = trip.memberIds.map((id) => ({ id, name: personName(profiles, id), photo: profiles[id]?.photo }));
   const countries = tripCountries(trip, activities).map((code) => ({ code, name: countryName(code), flag: flagUrl(code) }));
 
@@ -98,21 +96,21 @@ function TripLoaded({ trip }: { trip: Trip }) {
         <PageHeader
           title={trip.name}
           back={{ to: '/', label: 'Trips' }}
+          action={canManage ? { icon: 'pencil', label: 'Edit trip', onClick: () => setEditing(true) } : undefined}
         />
         {/* Figma "Hero Card": cover, name, dates, the countries it visits, who's going, and shortcuts into the trip. */}
         <HeroCard
           image={<TripCover trip={trip} />}
           title={trip.name}
-          subtitle={`${formatRange(trip.startDate, trip.endDate)} · ${nDays} day${nDays === 1 ? '' : 's'}`}
+          subtitle={`${formatRange(trip.startDate, trip.endDate)} • ${nDays} day${nDays === 1 ? '' : 's'}`}
           countries={countries}
           people={people}
           count={count}
-          actions={<>
-            <LinkButton to={base} icon="calendar">Itinerary</LinkButton>
-            <Button variant="secondary" icon="wallet" onClick={() => document.getElementById('budget')?.scrollIntoView({ block: 'center', behavior: 'smooth' })}>Budget</Button>
-            <LinkButton to={`${base}/ideas`} variant="secondary" icon="lightbulb">Ideas</LinkButton>
+          actions={(size) => <>
+            <LinkButton to={base} size={size} icon="calendar">Itinerary</LinkButton>
+            <Button variant="secondary" size={size} icon="wallet" onClick={() => document.getElementById('budget')?.scrollIntoView({ block: 'center', behavior: 'smooth' })}>Budget</Button>
+            <LinkButton to={`${base}/ideas`} variant="secondary" size={size} icon="lightbulb">Ideas</LinkButton>
           </>}
-          edit={canManage && <IconButton icon="pencil" label="Edit trip" variant="inverse" onClick={() => setEditing(true)} />}
         />
         <TripBudget ctx={ctx} day={budgetDay} onSetBudget={canManage ? () => setEditing(true) : undefined} />
         <div className={s.sectionNav}>

@@ -1,20 +1,12 @@
 .shell { min-height: 100dvh; }
 
-/* Top bar: no background or line; "Add a trip" on the left (Home only), your profile on the right.
-   It scrolls away with the page. */
-.bar { padding-top: env(safe-area-inset-top); }
-.barInner {
-  max-width: calc(var(--size-content-max) + 2 * var(--space-gutter));
-  min-height: var(--size-tap);
-  margin: 0 auto; padding: 0 var(--space-gutter);
-  display: flex; align-items: center; gap: var(--space-inline-m);
-}
-.me { margin-left: auto; display: grid; place-items: center; border-radius: 50%; transition: transform var(--motion-release); }
+/* Your profile picture, at the right of each Page Header */
+.me { display: grid; place-items: center; border-radius: 50%; transition: transform var(--motion-release); }
 .me:hover { filter: brightness(1.06); }
 .me:active { transform: scale(0.96); transition: transform var(--motion-press); }
 .me[aria-current='page'] { box-shadow: 0 0 0 2px var(--surface-background-primary), 0 0 0 4px var(--interactive-selected-ghost-border); }
 
-.main { min-width: 0; padding-top: var(--space-inline-xs); }
+.main { min-width: 0; padding-top: env(safe-area-inset-top); }
 .content {
   max-width: calc(var(--size-content-max) + 2 * var(--space-gutter));
   margin: 0 auto;
@@ -22,4 +14,4 @@
   display: flex; flex-direction: column; gap: var(--space-stack);
 }
 
-.demo { max-width: calc(var(--size-content-max) + 2 * var(--space-gutter)); margin: 0 auto var(--space-inline-xl); padding: 0 var(--space-gutter); }
+.demo { max-width: calc(var(--size-content-max) + 2 * var(--space-gutter)); margin: var(--space-inline-m) auto 0; padding: 0 var(--space-gutter); }

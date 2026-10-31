@@ -9,7 +9,7 @@
 .flush { padding: 0; overflow: hidden; }
 
 /* Type=Large: media · text · buttons in a row (buttons drop below on phones) */
-.large { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-inline-s) var(--space-inline-m); padding: var(--space-inline-l); }
+.large { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-inline-s); padding: var(--space-inline-xl); } /* padding 24, gap 12 */
 .large .content { flex: 1 1 220px; }
 .large .title { font: var(--weight-semibold) var(--size-heading-3)/1 var(--font-family); letter-spacing: -0.02em; }
 .large .body { font: var(--weight-medium) 14px/1.5 var(--font-family); }
@@ -18,7 +18,7 @@
 .small { display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-inline-m); padding: var(--space-inline-m); }
 .small .title { font: var(--weight-bold) 18px/1 var(--font-family); letter-spacing: -0.01em; }
 .small .body { font: var(--weight-medium) var(--size-body-small)/1.5 var(--font-family); }
-.small .buttons { flex-direction: column; align-self: stretch; }
+.small .buttons { flex-direction: column; align-self: stretch; margin-top: var(--space-inline-xxs); } /* 20 below the text */
 .small .buttons > * { width: 100%; }
 
 .media { flex: none; display: grid; place-items: center; color: var(--icon-brand); }

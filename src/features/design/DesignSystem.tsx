@@ -16,12 +16,14 @@ const colorGroups: { title: string; tokens: string[] }[] = [
   { title: 'Surface', tokens: ['--surface-background-primary', '--surface-background-secondary', '--surface-background-tertiary', '--surface-brand', '--surface-brand-subtle', '--surface-brand-bold', '--surface-sunken'] },
   { title: 'Interactive / button (hover lighter, pressed darker)', tokens: ['--interactive-button-primary-background', '--interactive-button-primary-background-hover', '--interactive-button-primary-background-pressed', '--interactive-button-secondary-background', '--interactive-button-secondary-background-hover', '--interactive-button-secondary-background-pressed', '--interactive-button-ghost-background-hover', '--interactive-button-ghost-background-pressed', '--interactive-button-inverse-background', '--interactive-button-destructive-background', '--interactive-button-destructive-background-hover', '--interactive-button-destructive-background-pressed'] },
   { title: 'Interactive / selected & unselected', tokens: ['--interactive-selected-primary-background', '--interactive-selected-secondary-background', '--interactive-selected-ghost-border', '--interactive-unselected-background', '--interactive-unselected-border', '--interactive-unselected-text'] },
+  { title: 'Illustration', tokens: ['--illustration-primary', '--illustration-secondary', '--illustration-accent', '--illustration-accent-subtle', '--illustration-accent-bold', '--illustration-border', '--illustration-warm', '--illustration-warm-bold'] },
   { title: 'Border', tokens: ['--border-subtle', '--border-bold', '--border-accent', '--border-focus', '--input-field-border'] },
 ];
 
 // One row per Figma text style. Sizes are phone → 744px and up.
 const typeStyles = [
-  ['t-display', 'Display', '56 → 72 · Poppins Black · 100%'],
+  ['t-display', 'Display', '48 → 64 · Poppins Black · 100%'],
+  ['t-display-small', 'Display small', '56 · Poppins Black · 100%'],
   ['t-display-secondary', 'Display secondary', '40 → 48 · Poppins Black · 100%'],
   ['t-heading-1', 'Heading 1', '28 → 32 · Manrope Bold · 100%'],
   ['t-heading-2', 'Heading 2', '20 → 24 · Semibold · 100%'],
@@ -57,7 +59,7 @@ export function DesignSystem() {
   return (
     <>
       <div className={s.page}>
-        <PageHeader title="Design system" subtitle="Primitives → semantic tokens → components. One brand colour (emerald), light and dark mode. Every text pairing meets WCAG 2.2 AA." />
+        <PageHeader title="Design system" action={{ icon: 'pencil', label: 'Example header button', onClick: () => {} }} subtitle="Primitives → semantic tokens → components. One brand colour (emerald), light and dark mode. Every text pairing meets WCAG 2.2 AA." />
         <Section title="Colour" footer="Semantic tokens from src/design/tokens/semantic.css. Switch light/dark mode in Profile → Appearance.">
           {colorGroups.map((g) => (
             <Card key={g.title}>
@@ -172,14 +174,14 @@ export function DesignSystem() {
           <HeroCard image={<Illustration name={COVER_ILLUSTRATIONS[0]} />} title="Summer in Lisbon" subtitle="Jul 3 – 9 · 7 days"
             countries={[{ code: 'pt', name: 'Portugal', flag: flagUrl('pt') }, { code: 'es', name: 'Spain', flag: flagUrl('es') }]}
             people={['Ana', 'Ben', 'Cy'].map((n) => ({ id: n, name: n }))} count={{ value: 28, label: 'Days to go' }}
-            actions={<><Button icon="calendar">Itinerary</Button><Button variant="secondary" icon="wallet">Budget</Button><Button variant="secondary" icon="lightbulb">Ideas</Button></>}
-            edit={<IconButton icon="pencil" label="Edit trip" variant="inverse" />} />
-          <BudgetCard amount="€120" label="Left today" total="€2,000" level="ok" action={<Button variant="secondary" size="small" icon="wallet">Spending</Button>} />
+            actions={(size) => <><Button size={size} icon="calendar">Itinerary</Button><Button size={size} variant="secondary" icon="wallet">Budget</Button><Button size={size} variant="secondary" icon="lightbulb">Ideas</Button></>} />
+          <BudgetCard amount="€120" label="Left today" total="€2,000" level="ok" action={<Button variant="secondary" icon="pencil">Edit today’s budget</Button>} />
+          <BudgetCard amount="€0" label="Planned so far" total="No total set" level="ok" action={<Button variant="secondary" icon="pencil">Add budget</Button>} />
           <BudgetCard amount="€35" label="Left today" total="€2,000" level="low" />
           <BudgetCard amount="€20" label="Over today" total="€2,000" level="over" />
           <Timeline time="2:30 PM" />
           <EventRow to="/design" title="Sunset at Miradouro" subtext="7:30 PM · Miradouro da Graça" category={{ icon: 'camera', label: 'Sightseeing' }}
-            going people={['Ana', 'Ben'].map((n) => ({ id: n, name: n }))} price="€12 pp" starred onStar={() => {}} mapsHref="https://maps.google.com" uberHref="https://m.uber.com" />
+            going people={['Ana', 'Ben'].map((n) => ({ id: n, name: n }))} price="€12 pp" mapsHref="https://maps.google.com" uberHref="https://m.uber.com" />
           <div className={s.cards}>
             <ContentCard to="/design" cover={<Illustration name={COVER_ILLUSTRATIONS[1]} />} when="in 12 days" people={['Ana', 'Ben'].map((n) => ({ id: n, name: n }))}
               name="Tokyo trip" place="Tokyo, Japan" dates="Nov 12 – 20" />

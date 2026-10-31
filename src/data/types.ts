@@ -24,6 +24,8 @@ export type Trip = {
   /** Old per-person daily budget. Newer trips set totalBudget (the whole group, whole trip) and the daily figure is worked out. */
   dailyBudget: number;
   totalBudget?: number;
+  /** Days given their own budget ("Edit today's budget"), by date. The other days share what's left of the total. */
+  dayBudgets?: Record<string, number>;
   coverColor?: string;
   /** Small JPEG as a data URL (see lib/image.ts), or null for none. */
   coverPhoto?: string | null;

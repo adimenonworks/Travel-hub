@@ -1,49 +1,53 @@
-/* ---------- Hero Card (Figma: Size=Large ≥744px, Size=Small below) ---------- */
+/* ---------- Hero Card (Figma: Size=Small below 744px, Size=Large from 744px) ---------- */
+/* Small: brand frame, padding 16, gap 16; photo 231 tall with the corner on it; panel padding 20, at least 271 tall. */
 .hero {
-  position: relative;
-  display: grid; gap: var(--space-inline-m);
+  display: flex; flex-direction: column; gap: var(--space-inline-m);
   padding: var(--space-inline-m);
-  border-radius: var(--radius-xl);
+  border-radius: var(--space-inline-xl);
   background: var(--surface-brand);
 }
-.heroImage { position: relative; min-height: 180px; border-radius: var(--radius-l); overflow: hidden; box-shadow: var(--shadow-raised); display: grid; }
-.heroImage > :first-child { grid-area: 1 / 1; width: 100%; height: 100%; }
+.heroImage { position: relative; height: 231px; border-radius: var(--space-inline-l); overflow: hidden; box-shadow: var(--shadow-raised); }
+.heroImage > :first-child { position: absolute; inset: 0; width: 100%; height: 100%; }
 .heroPanel {
-  position: relative;
-  display: flex; flex-direction: column; justify-content: space-between; gap: var(--space-inline-xl);
+  position: relative; min-height: 271px;
+  display: flex; flex-direction: column; justify-content: space-between; gap: 10px;
   padding: var(--space-inline-l);
-  border-radius: var(--radius-xl);
+  border-radius: var(--space-inline-xl);
   background: var(--surface-brand-bold);
   color: var(--text-on-brand-bold);
-  overflow: hidden;
 }
-.heroText { display: flex; flex-direction: column; gap: var(--space-inline-m); }
-.heroTitle { display: flex; flex-direction: column; gap: var(--space-inline-xs); max-width: calc(100% - 140px); }
+.heroText { display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-inline-s); }
+.heroTitle { display: flex; flex-direction: column; gap: var(--space-inline-s); }
 .heroName { margin: 0; font: var(--weight-bold) var(--size-heading-1)/1 var(--font-family); letter-spacing: -0.02em; color: var(--text-on-brand-bold); overflow-wrap: anywhere; } /* Heading 1 */
 .heroSub { font: var(--weight-medium) 14px/1.5 var(--font-family); } /* Label */
 .countries { display: flex; flex-wrap: wrap; gap: var(--space-inline-xxs); }
-.flag { width: 20px; height: 20px; border-radius: 50%; flex: none; }
-.heroActions { display: flex; flex-wrap: wrap; gap: var(--space-inline-xs); }
-.heroEdit { position: absolute; left: auto; right: var(--space-inline-s); bottom: var(--space-inline-s); }
-/* "Days to go": a brand-coloured corner tab with a big number */
+.flag { width: 16px; height: 16px; border-radius: 50%; flex: none; }
+.heroActions { display: flex; flex-wrap: wrap; gap: var(--space-inline-xxs); }
+/* The corner: a brand-coloured quarter-round tab with the big number. Small: 130×120 on the photo. */
 .count {
-  display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-inline-xxs);
-  padding: var(--space-inline-m) var(--space-inline-xl) var(--space-inline-l) var(--space-inline-xxl);
+  position: absolute; top: 0; right: 0; z-index: 1;
+  width: 130px; height: 120px;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--space-inline-xxs);
+  padding-left: var(--space-inline-l);
   background: var(--surface-brand); color: var(--text-brand);
-  border-bottom-left-radius: var(--radius-xxxl);
+  border-bottom-left-radius: var(--radius-round);
 }
-.countValue { font: var(--weight-black) var(--size-display-secondary)/1 var(--font-display); letter-spacing: -0.01em; }
-.countLabel { font: var(--weight-medium) 14px/1.5 var(--font-family); }
-.cornerSmall { position: absolute; top: 0; right: 0; }
-.cornerLarge { display: none; position: absolute; top: 0; right: 0; }
-.heroEdit:empty, .cornerSmall:empty, .cornerLarge:empty { display: none; }
+.countValue { font: var(--weight-black) 56px/1 var(--font-display); letter-spacing: -0.01em; font-variant-numeric: tabular-nums; } /* Display small */
+.countLabel { font: var(--weight-medium) var(--size-body-small)/1.5 var(--font-family); white-space: nowrap; } /* Label small */
 @media (min-width: 744px) {
-  .hero { grid-template-columns: minmax(220px, 400px) minmax(0, 1fr); gap: var(--space-inline-xxl); padding: var(--space-inline-xl) var(--space-inline-xxl); }
-  .heroImage { min-height: 360px; }
-  .heroPanel { padding: var(--space-inline-max); }
-  .cornerSmall { display: none; }
-  .cornerLarge { display: block; }
-  .count .countValue { font-size: var(--size-display); }
+  /* Large: padding 24/32, gap 32; photo 400 wide filling the height; panel padding 48, gap 40, hugging its content. */
+  .hero { flex-direction: row; gap: var(--space-inline-xxl); padding: var(--space-inline-xl) var(--space-inline-xxl); }
+  .heroImage { flex: 0 1 400px; height: auto; min-width: 0; }
+  .heroPanel { flex: 1; min-width: 0; min-height: 0; justify-content: flex-start; gap: var(--space-inline-xxxl); padding: var(--space-inline-max); }
+  .heroPanelCorner { border-top-right-radius: 0; }
+  .heroPanelCorner .heroText { padding-right: 140px; }
+  .heroActions { gap: var(--space-inline-xs); }
+  .heroText { gap: var(--space-inline-m); }
+  .heroTitle { gap: var(--space-inline-xs); }
+  .flag { width: 24px; height: 24px; }
+  .count { width: 160px; height: 126px; }
+  .countValue { font-size: var(--size-display); } /* Display */
+  .countLabel { font-size: 14px; } /* Label */
 }
 
 /* ---------- Content Card ---------- */
@@ -70,32 +74,32 @@
 .contentDates { font: var(--weight-medium) var(--size-body-small)/1.5 var(--font-family); color: var(--text-subtle); } /* Label small */
 .contentAccent .contentPlace, .contentAccent .contentDates { color: var(--text-brand); }
 
-/* ---------- Event row (Figma: Size=Large ≥744px, Size=Small below) ---------- */
+/* ---------- Event row (Figma: Size=Small below 744px, Size=Large from 744px) ---------- */
+/* Small: padding 24, gap 16; title over location (gap 4), small badges (gap 4), avatars and price (gap 16), then Maps | Uber */
 .event {
-  position: relative;
   display: flex; flex-direction: column; gap: var(--space-inline-m);
   padding: var(--space-inline-xl);
   border-radius: var(--radius-xl);
   background: var(--surface-background-secondary);
   box-shadow: var(--shadow-raised);
 }
-.eventMain { display: flex; flex-direction: column; gap: var(--space-inline-m); min-width: 0; flex: 1; }
-.eventTitleRow { display: flex; align-items: flex-start; gap: var(--space-inline-m); }
-.eventTitle { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: var(--space-inline-xxs); }
-.eventTitle h3 { margin: 0; font: var(--weight-semibold) var(--size-heading-2)/1.15 var(--font-family); letter-spacing: -0.02em; } /* Heading 2 */
+.eventMain { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: var(--space-inline-m); }
+.eventTitle { display: flex; flex-direction: column; gap: var(--space-inline-xxs); min-width: 0; }
+.eventTitle h3 { margin: 0; font: var(--weight-semibold) var(--size-heading-2)/1 var(--font-family); letter-spacing: -0.02em; } /* Heading 2 */
 .eventLink { color: var(--text-brand); }
 .eventLink:hover { text-decoration: underline; text-underline-offset: 3px; }
-.eventSub { font: var(--weight-regular) var(--size-body-small)/1.5 var(--font-family); color: var(--text-subtle); }
-.eventStar { margin: calc(-1 * var(--space-inline-s)) calc(-1 * var(--space-inline-s)) 0 0; }
+.eventSub { font: var(--weight-regular) var(--size-body-small)/1.5 var(--font-family); color: var(--text-subtle); } /* Body small */
 .eventBadges { display: flex; flex-wrap: wrap; gap: var(--space-inline-xxs); }
-.eventBottom { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-inline-s) var(--space-inline-m); }
+.eventBottom { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-inline-m); }
 .eventButtons { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-inline-xs); }
 @media (min-width: 744px) {
-  .event { flex-direction: row; align-items: stretch; gap: var(--space-inline-xl); }
-  .eventTitle h3 { font-size: var(--size-heading-2); }
-  .eventSub { font-size: var(--size-body); }
-  .eventButtons { display: flex; flex-direction: column; justify-content: flex-end; gap: var(--space-inline-m); min-width: 120px; padding-top: var(--space-inline-xxl); }
-  .eventStar { position: absolute; top: var(--space-inline-xl); right: var(--space-inline-xl); margin: calc(-1 * var(--space-inline-s)); }
+  /* Large: padding 24, content and a 120-wide button column (gap 24); title over location (gap 8, Body), badges (gap 12), gap 20 between groups */
+  .event { flex-direction: row; align-items: center; gap: var(--space-inline-xl); }
+  .eventMain { gap: var(--space-inline-l); }
+  .eventTitle { gap: var(--space-inline-xs); }
+  .eventSub { font-size: var(--size-body); } /* Body */
+  .eventBadges { gap: var(--space-inline-s); }
+  .eventButtons { display: flex; flex-direction: column; justify-content: center; gap: var(--space-inline-m); width: 120px; flex: none; }
 }
 
 /* ---------- Budget card ---------- */

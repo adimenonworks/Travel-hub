@@ -1,13 +1,22 @@
-/* Page header: back link, big heavy title, actions */
-.header {
-  display: flex; flex-direction: column; gap: var(--space-inline-s);
+/* Figma "Page Header": page-top space (48 on phones, 96 from 744px), back button, then the title row:
+   Display title + Body subtitle on the left; the optional button and your profile picture on the right, centred on the title. */
+.header { display: flex; flex-direction: column; gap: var(--space-inline-s); padding-top: var(--space-page-top); }
+.back { margin-left: calc(-1 * var(--space-inline-s)); }
+.titleRow { display: flex; align-items: center; justify-content: space-between; gap: var(--space-inline-m); }
+/* Small: title over a Body small subtitle (gap 4); Small button and 48 avatar (gap 12).
+   The title breaks only between words (a single word too long for the line is the only thing split). */
+.titleText { flex: 1; display: flex; flex-direction: column; gap: var(--space-inline-xxs); min-width: 0; }
+.title { font: var(--weight-black) var(--size-display-secondary)/1 var(--font-display); letter-spacing: -0.01em; overflow-wrap: break-word; color: var(--text-brand); } /* Small: Display secondary (40) */
+.subtitle { color: var(--text-subtle); font: var(--weight-regular) var(--size-body-small)/1.5 var(--font-family); } /* Body small */
+.actions { flex: none; display: flex; align-items: center; gap: var(--space-inline-s); }
+/* Large: Body subtitle (gap 8); Regular button and 72 avatar (gap 24) */
+@media (min-width: 744px) {
+  .back { margin-left: calc(-1 * var(--space-inline-m)); }
+  .titleText { gap: var(--space-inline-xs); }
+  .title { font-size: var(--size-display); } /* Large: Display (64) */
+  .subtitle { font-size: var(--size-body); }
+  .actions { gap: var(--space-inline-xl); }
 }
-.header > div:first-child:has(a) { margin-left: calc(-1 * var(--space-inline-m)); }
-.titleRow { display: flex; align-items: flex-end; justify-content: space-between; gap: var(--space-inline-m); flex-wrap: wrap; }
-.titleText { display: flex; flex-direction: column; gap: var(--space-inline-xs); min-width: 0; }
-.title { font: var(--weight-black) var(--size-display)/1 var(--font-display); letter-spacing: -0.01em; overflow-wrap: anywhere; color: var(--text-brand); }
-.subtitle { color: var(--text-subtle); font: var(--weight-regular) var(--size-body)/1.5 var(--font-family); } /* Body */
-.actions { display: flex; align-items: center; gap: var(--space-inline-xs); }
 
 /* Tabs: text tabs on a hairline; the current one is underlined in emerald and darker.
    Scrolls sideways inside itself if it can't fit. */
