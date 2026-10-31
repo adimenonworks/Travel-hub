@@ -148,7 +148,7 @@
 
 /* ---------- Timeline (Figma: Size=Small below 744px, Size=Large from 744px) ---------- */
 /* A deep emerald pill (surface/brand-bold) with the clock and time in text/on-brand-bold (Label small / Label), then a dashed accent line (1px / 2px, dashes 6/6). */
-.timeline { display: flex; align-items: center; gap: var(--space-inline-xxs); scroll-margin: 40vh 0; }
+.timeline { display: flex; align-items: center; gap: var(--space-inline-xxs); }
 .timelineTab {
   display: inline-flex; align-items: center; gap: var(--space-inline-xxxs);
   padding: var(--space-inline-xxxs) var(--space-inline-xs) var(--space-inline-xxxs) var(--space-inline-xxs);

@@ -158,10 +158,10 @@ export function BudgetCard({ amount, label, total, level, action }: { amount: st
 }
 
 /** Figma "Timeline": the "now" marker in today's plan: a pill with a clock and the time, then a dashed line. */
-export function Timeline({ time, innerRef }: { time: string; innerRef?: React.Ref<HTMLDivElement> }) {
+export function Timeline({ time }: { time: string }) {
   const large = useLarge();
   return (
-    <div ref={innerRef} className={s.timeline} role="note" aria-label={`Now, ${time}`}>
+    <div className={s.timeline} role="note" aria-label={`Now, ${time}`}>
       <span className={s.timelineTab} aria-hidden="true"><Icon name="time" size={large ? 24 : 16} />{time}</span>
       <span className={s.timelineLine} />
     </div>

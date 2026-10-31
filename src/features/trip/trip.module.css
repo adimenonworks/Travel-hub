@@ -65,7 +65,7 @@
 .dayMonth { font: var(--type-body-small); } /* Body small */
 .dayBadges { display: flex; gap: var(--space-inline-xxs); white-space: nowrap; }
 
-.itinLayout { display: flex; flex-direction: column; gap: var(--space-inline-xl); }
+.itinLayout { display: flex; flex-direction: column; gap: calc(var(--space-inline-xxl) - var(--space-inline-xxs)); } /* 32 from the day cards to the day's plan (the strip keeps 4 below the cards for focus rings) */
 @media (min-width: 1068px) {
   .itinLayout { display: grid; grid-template-columns: 240px minmax(0, 1fr); gap: var(--space-inline-xxl); align-items: start; }
   .days { flex-direction: column; overflow: visible; margin: 0; padding: 0; position: sticky; top: 92px; }
