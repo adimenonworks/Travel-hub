@@ -12,8 +12,8 @@
   background: var(--surface-background-primary);
 }
 
-/* The tab's content: never shorter than the screen, so the page height doesn't jump between tabs. */
-.tabPanel { min-height: 100dvh; display: flex; flex-direction: column; gap: var(--space-stack); }
+/* The tab's content */
+.tabPanel { display: flex; flex-direction: column; gap: var(--space-stack); }
 
 /* Day strip (Figma "Day Card"). Push-expand: each card has a fixed size, so the browser can animate between them.
    Strip: the tapped card widens (74 → 178px) as the old one narrows; all cards share the open card's height (139).
@@ -31,12 +31,12 @@
   --day-open: 178px;
   position: relative; flex: none; scroll-snap-align: start; overflow: hidden;
   width: 74px; height: 139px; padding: 0;
-  border-radius: var(--radius-xl); border: 1px solid var(--interactive-unselected-border); text-align: left;
-  background: var(--interactive-unselected-background); color: var(--interactive-unselected-text);
+  border-radius: var(--radius-xl); border: 1px solid var(--interactive-unselected-ghost-border); text-align: left;
+  background: var(--interactive-unselected-ghost-background); color: var(--interactive-unselected-ghost-text);
   transition: width var(--day-move), height var(--day-move), background-color var(--day-move), color var(--day-move), border-color var(--day-move);
 }
-.day:hover { background-color: var(--interactive-unselected-background-hover); }
-.day:active { background-color: var(--interactive-unselected-background-pressed); }
+.day:hover { background-color: var(--interactive-unselected-ghost-background-hover); }
+.day:active { background-color: var(--interactive-unselected-ghost-background-pressed); }
 .day[aria-pressed='true'] { width: var(--day-open); border-color: transparent; background-color: var(--interactive-selected-secondary-background); color: var(--interactive-selected-secondary-text); }
 .day[aria-pressed='true']:hover { background-color: var(--interactive-selected-secondary-background-hover); }
 .day[aria-pressed='true']:active { background-color: var(--interactive-selected-secondary-background-pressed); }

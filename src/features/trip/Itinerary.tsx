@@ -142,7 +142,8 @@ function ActivityRow({ a, ctx }: { a: Activity; ctx: TripCtx }) {
     <EventRow
       to={`/trip/${ctx.trip.id}/plan/${a.id}`}
       title={a.title}
-      subtext={where}
+      location={where}
+      time={a.startTime ? `${formatTime(a.startTime)}${a.endTime ? `–${formatTime(a.endTime)}` : ''}` : undefined}
       category={{ icon: cat.icon, label: cat.label }}
       going={a.attendeeIds.includes(me.uid)}
       people={a.attendeeIds.map((id) => ({ id, name: personName(ctx.profiles, id), photo: ctx.profiles[id]?.photo }))}

@@ -1,4 +1,10 @@
+import hills from '../../assets/covers/hills.jpg';
+import coast from '../../assets/covers/coast.jpg';
+import city from '../../assets/covers/city.jpg';
 import s from './Illustration.module.css';
+
+/** The Figma "Cover Scene" images (Hills, Coast, City). */
+const covers = { 'cover-hills': hills, 'cover-coast': coast, 'cover-city': city };
 
 export type IllustrationName =
   | 'memories' | 'ideas' | 'calendar' | 'map' | 'ticket' | 'suitcase' | 'compass' | 'globe' | 'people'
@@ -13,16 +19,13 @@ export const COVER_ILLUSTRATIONS = ['cover-hills', 'cover-coast', 'cover-city'] 
  * Drawn with semantic tokens (Illustration.module.css) so they follow light and dark mode.
  * Always decorative: hidden from screen readers; the text beside them carries the meaning.
  *
- * Spot illustrations (empty states, cards) draw in a 120×96 box. Covers ('cover-*') fill their container.
+ * Spot illustrations (empty states, cards) draw in a 120×96 box. Covers ('cover-*') are the Figma Cover Scene
+ * images and fill their container (cropped to fit).
  */
 /** `square` fits the drawing into a size × size box (e.g. 64×64 in a Card's media slot). */
 export function Illustration({ name, size = 96, square }: { name: IllustrationName; size?: number; square?: boolean }) {
   if (name.startsWith('cover-'))
-    return (
-      <svg className={s.cover} viewBox="0 0 320 160" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
-        {covers[name as (typeof COVER_ILLUSTRATIONS)[number]]}
-      </svg>
-    );
+    return <img className={s.cover} src={covers[name as (typeof COVER_ILLUSTRATIONS)[number]]} alt="" />;
   return (
     <svg className={s.art} width={size} height={square ? size : size * 0.8} viewBox="0 0 120 96" aria-hidden="true">
       {spots[name as Exclude<IllustrationName, (typeof COVER_ILLUSTRATIONS)[number]>]}
@@ -194,44 +197,3 @@ const spots = {
   ),
 };
 
-const covers = {
-  'cover-hills': (
-    <>
-      <rect className={s.photo} width="320" height="160" />
-      <circle className={s.sun} cx="246" cy="52" r="20" />
-      <path className={s.cloud} d="M150 46a12 12 0 0124-2 10 10 0 0118 8h-50a8 8 0 018-6z" />
-      <path className={s.hill} d="M0 118l52-42 40 30 36-26 60 52 46-34 86 54v8H0z" />
-      <path className={s.hillDeep} d="M0 136l70-30 60 26 70-34 120 44v18H0z" />
-      <path className={s.spark} d="M110 34v10M105 39h10M212 84v8M208 88h8" />
-    </>
-  ),
-  'cover-coast': (
-    <>
-      <rect className={s.photo} width="320" height="160" />
-      <circle className={s.sun} cx="88" cy="56" r="22" />
-      <path className={s.hill} d="M0 104h320v56H0z" />
-      <path className={s.wave} d="M24 122c10-6 20-6 30 0s20 6 30 0M150 132c10-6 20-6 30 0s20 6 30 0M240 116c10-6 20-6 30 0" />
-      <g transform="translate(212 64)">
-        <path className={s.frame} d="M20 0v40H0z" />
-        <path className={s.frame} d="M24 8l18 32H24z" />
-        <path className={s.hillDeep} d="M-4 44h52l-8 10H4z" />
-      </g>
-      <path className={s.spark} d="M150 30v10M145 35h10M250 40v8M246 44h8" />
-    </>
-  ),
-  'cover-city': (
-    <>
-      <rect className={s.photo} width="320" height="160" />
-      <circle className={s.sun} cx="268" cy="46" r="18" />
-      <path className={s.cloud} d="M196 36a12 12 0 0124-2 10 10 0 0118 8h-50a8 8 0 018-6z" />
-      {[[30, 70, 34], [70, 52, 40], [116, 82, 30], [150, 40, 36], [192, 66, 34], [232, 58, 30]].map(([x, top, w]) => (
-        <g key={x}>
-          <rect className={s.frame} x={x} y={top} width={w} height={160 - top} rx="4" />
-          {[0, 1, 2, 3].map((r) => <rect key={r} className={s.line} x={x + 8} y={top + 12 + r * 16} width={w - 16} height="5" rx="2" />)}
-        </g>
-      ))}
-      <path className={s.hillDeep} d="M0 140c60-10 110-6 160 0s110 8 160-2v22H0z" />
-      <path className={s.spark} d="M120 30v10M115 35h10M276 96v8M272 100h8" />
-    </>
-  ),
-};

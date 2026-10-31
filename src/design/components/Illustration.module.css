@@ -1,6 +1,6 @@
 .art { display: block; overflow: visible; }
 /* A cover fills its box (a trip card's cover area); the scene is cropped to fit. */
-.cover { display: block; width: 100%; height: 100%; }
+.cover { display: block; width: 100%; height: 100%; object-fit: cover; }
 
 /* One shared palette: the Figma Illustration tokens (illustration/*), so every scene follows light and dark mode */
 .frame { fill: var(--illustration-primary); stroke: var(--illustration-border); stroke-width: 1.5; stroke-linejoin: round; }

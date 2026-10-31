@@ -10,7 +10,7 @@
 .content {
   max-width: calc(var(--size-content-max) + 2 * var(--space-gutter));
   margin: 0 auto;
-  padding: 0 var(--space-gutter) var(--space-inline-max);
+  padding: 0 var(--space-gutter) var(--space-page-xl); /* 96px below every page */
   display: flex; flex-direction: column; gap: var(--space-stack);
 }
 

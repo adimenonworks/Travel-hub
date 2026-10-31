@@ -15,7 +15,7 @@ const colorGroups: { title: string; tokens: string[] }[] = [
   { title: 'Status', tokens: ['--status-success', '--status-warning', '--status-error', '--status-success-subtle', '--status-warning-subtle', '--status-error-subtle'] },
   { title: 'Surface', tokens: ['--surface-background-primary', '--surface-background-secondary', '--surface-background-tertiary', '--surface-brand', '--surface-brand-subtle', '--surface-brand-bold', '--surface-sunken'] },
   { title: 'Interactive / button (hover lighter, pressed darker)', tokens: ['--interactive-button-primary-background', '--interactive-button-primary-background-hover', '--interactive-button-primary-background-pressed', '--interactive-button-secondary-background', '--interactive-button-secondary-background-hover', '--interactive-button-secondary-background-pressed', '--interactive-button-ghost-background-hover', '--interactive-button-ghost-background-pressed', '--interactive-button-inverse-background', '--interactive-button-destructive-background', '--interactive-button-destructive-background-hover', '--interactive-button-destructive-background-pressed'] },
-  { title: 'Interactive / selected & unselected', tokens: ['--interactive-selected-primary-background', '--interactive-selected-secondary-background', '--interactive-selected-ghost-border', '--interactive-unselected-background', '--interactive-unselected-border', '--interactive-unselected-text'] },
+  { title: 'Interactive / selected & unselected', tokens: ['--interactive-selected-primary-background', '--interactive-selected-secondary-background', '--interactive-selected-ghost-border', '--interactive-unselected-ghost-background', '--interactive-unselected-ghost-border', '--interactive-unselected-ghost-text'] },
   { title: 'Illustration', tokens: ['--illustration-primary', '--illustration-secondary', '--illustration-accent', '--illustration-accent-subtle', '--illustration-accent-bold', '--illustration-border', '--illustration-warm', '--illustration-warm-bold'] },
   { title: 'Border', tokens: ['--border-subtle', '--border-bold', '--border-accent', '--border-focus', '--input-field-border'] },
 ];
@@ -180,7 +180,7 @@ export function DesignSystem() {
           <BudgetCard amount="€35" label="Left today" total="€2,000" level="low" />
           <BudgetCard amount="€20" label="Over today" total="€2,000" level="over" />
           <Timeline time="2:30 PM" />
-          <EventRow to="/design" title="Sunset at Miradouro" subtext="7:30 PM · Miradouro da Graça" category={{ icon: 'camera', label: 'Sightseeing' }}
+          <EventRow to="/design" title="Sunset at Miradouro" location="Miradouro da Graça" time="7:30 PM" category={{ icon: 'camera', label: 'Sightseeing' }}
             going people={['Ana', 'Ben'].map((n) => ({ id: n, name: n }))} price="€12 pp" mapsHref="https://maps.google.com" uberHref="https://m.uber.com" />
           <div className={s.cards}>
             <ContentCard to="/design" cover={<Illustration name={COVER_ILLUSTRATIONS[1]} />} when="in 12 days" people={['Ana', 'Ben'].map((n) => ({ id: n, name: n }))}

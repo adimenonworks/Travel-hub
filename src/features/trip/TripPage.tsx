@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Navigate, Route, Routes, useLocation, useMatch, useNavigate, useParams, useSearchParams } from 'react-router-dom';
-import { Button, EmptyState, HeroCard, LinkButton, PageHeader, Spinner, Tabs, type TabItem } from '../../design/components';
+import { EmptyState, HeroCard, LinkButton, PageHeader, Spinner, Tabs, type TabItem } from '../../design/components';
 import { personName, useProfiles, useRole, useSub, useTrip } from '../../data/hooks';
 import type { Activity, Album, Comment, Expense, Idea, Profile, Trip } from '../../data/types';
 import { countdown, daysBetween, formatRange, today, tripDays } from '../../lib/dates';
@@ -98,7 +98,7 @@ function TripLoaded({ trip }: { trip: Trip }) {
           back={{ to: '/', label: 'Trips' }}
           action={canManage ? { icon: 'pencil', label: 'Edit trip', onClick: () => setEditing(true) } : undefined}
         />
-        {/* Figma "Hero Card": cover, name, dates, the countries it visits, who's going, and shortcuts into the trip. */}
+        {/* Figma "Hero Card": cover, name, dates, the countries it visits and who's going. No shortcut buttons inside the trip. */}
         <HeroCard
           image={<TripCover trip={trip} />}
           title={trip.name}
@@ -106,11 +106,6 @@ function TripLoaded({ trip }: { trip: Trip }) {
           countries={countries}
           people={people}
           count={count}
-          actions={(size) => <>
-            <LinkButton to={base} size={size} icon="calendar">Itinerary</LinkButton>
-            <Button variant="secondary" size={size} icon="wallet" onClick={() => document.getElementById('budget')?.scrollIntoView({ block: 'center', behavior: 'smooth' })}>Budget</Button>
-            <LinkButton to={`${base}/ideas`} variant="secondary" size={size} icon="lightbulb">Ideas</LinkButton>
-          </>}
         />
         <TripBudget ctx={ctx} day={budgetDay} onSetBudget={canManage ? () => setEditing(true) : undefined} />
         <div className={s.sectionNav}>

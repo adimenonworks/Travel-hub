@@ -44,7 +44,7 @@ export function HeroCard({ image, title, subtitle, countries, people, count, act
   return (
     <section className={s.hero} aria-label="Trip">
       <div className={s.heroImage}>{image}{!large && corner}</div>
-      <div className={[s.heroPanel, count && large && s.heroPanelCorner].filter(Boolean).join(' ')}>
+      <div className={[s.heroPanel, actions && s.heroPanelButtons, count && large && s.heroPanelCorner].filter(Boolean).join(' ')}>
         {large && corner}
         <div className={s.heroText}>
           <div className={s.heroTitle}>
@@ -89,23 +89,34 @@ export function ContentCard({ to, cover, when, people, name, place, dates, tone 
 }
 
 /**
- * Figma "Event row": one event in the day plan, with what was entered in the sheet. The title opens the event;
- * Maps and Uber take you to its location. Size=Large from 744px (buttons stacked on the right), Small below.
+ * Figma "Event row": one event in the day plan, with what was entered in the sheet. The whole row opens the event;
+ * the location copies itself to the clipboard; Maps and Uber take you there. Size=Large from 744px, Small below.
  */
-export function EventRow({ to, title, subtext, category, going, people, price, mapsHref, uberHref }: {
-  to: string; title: string; subtext?: ReactNode;
+export function EventRow({ to, title, location, time, category, going, people, price, mapsHref, uberHref }: {
+  to: string; title: string; location?: string; time?: string;
   category: { icon: IconName; label: string };
   going: boolean; people: Person[]; price?: string;
   mapsHref?: string; uberHref?: string;
 }) {
   const large = useLarge();
   const size = large ? 'large' : 'small';
+  const [copied, setCopied] = useState(false);
+  const copy = async () => {
+    if (!location) return;
+    try { await navigator.clipboard.writeText(location); setCopied(true); setTimeout(() => setCopied(false), 2000); } catch { /* clipboard blocked */ }
+  };
   return (
     <article className={s.event}>
       <div className={s.eventMain}>
         <div className={s.eventTitle}>
           <h3><Link to={to} className={s.eventLink}>{title}</Link></h3>
-          {subtext && <div className={s.eventSub}>{subtext}</div>}
+          {(location || time) && (
+            <div className={s.eventMeta}>
+              {location && <button type="button" className={s.eventPlace} onClick={copy} aria-label={`Copy address: ${location}`}>{location}</button>}
+              {time && <span className={s.eventTime}>{time}</span>}
+              <span className="visually-hidden" role="status">{copied ? 'Address copied' : ''}</span>
+            </div>
+          )}
         </div>
         <div className={s.eventBadges}>
           <Badge tone="category" size={size} icon={category.icon}>{category.label}</Badge>
@@ -144,12 +155,12 @@ export function BudgetCard({ amount, label, total, level, action }: { amount: st
   );
 }
 
-/** Figma "Timeline": the dashed "now" line in today's plan, with a clock tab. */
+/** Figma "Timeline": the "now" marker in today's plan: a pill with a clock and the time, then a dashed line. */
 export function Timeline({ time, innerRef }: { time: string; innerRef?: React.Ref<HTMLDivElement> }) {
+  const large = useLarge();
   return (
     <div ref={innerRef} className={s.timeline} role="note" aria-label={`Now, ${time}`}>
-      <span className={s.timelineTab}><Icon name="time" size={16} /></span>
-      <span className={s.timelineTime} aria-hidden="true">{time}</span>
+      <span className={s.timelineTab} aria-hidden="true"><Icon name="time" size={large ? 24 : 16} />{time}</span>
       <span className={s.timelineLine} />
     </div>
   );
