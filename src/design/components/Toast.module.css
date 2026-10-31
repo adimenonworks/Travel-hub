@@ -1,0 +1,22 @@
+/* Figma "Toast": surface/background-tertiary pill, padding 4/16/4/12, gap 4, Shadow/Overlay; icon and text subtle. */
+.region { position: fixed; top: 0; left: 0; right: 0; z-index: 200; display: flex; justify-content: center; pointer-events: none; padding-top: calc(env(safe-area-inset-top) + var(--space-inline-m)); }
+.toast {
+  display: inline-flex; align-items: center; gap: var(--space-inline-xxs);
+  padding: var(--space-inline-xxs) var(--space-inline-m) var(--space-inline-xxs) var(--space-inline-s);
+  border-radius: var(--radius-round);
+  background: var(--surface-background-tertiary);
+  box-shadow: var(--shadow-overlay);
+  color: var(--text-subtle);
+  animation: toastIn var(--motion-sheet) both;
+}
+.icon { color: var(--icon-subtle); flex: none; }
+.small { font: var(--weight-medium) var(--size-body-small)/1.5 var(--font-family); } /* Label small */
+.large { font: var(--weight-medium) 14px/1.5 var(--font-family); } /* Label */
+.leaving { animation: toastOut var(--motion-sheet-out) both; }
+@keyframes toastIn { from { transform: translateY(calc(-100% - 40px)); opacity: 0; } to { transform: none; opacity: 1; } }
+@keyframes toastOut { from { transform: none; opacity: 1; } to { transform: translateY(calc(-100% - 40px)); opacity: 0; } }
+@media (prefers-reduced-motion: reduce) {
+  .toast, .leaving { animation-name: fade; }
+  .leaving { animation-direction: reverse; }
+  @keyframes fade { from { opacity: 0; } to { opacity: 1; } }
+}

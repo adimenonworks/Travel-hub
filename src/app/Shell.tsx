@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, type ReactNode } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
-import { Avatar, HeaderProfileContext, Notification, useLarge } from '../design/components';
+import { Avatar, HeaderProfileContext, Notification, ToastProvider, useLarge } from '../design/components';
 import { store } from '../data';
 import { useMe, useProfile } from '../data/hooks';
 import { TripForm } from '../features/trip/TripForm';
@@ -33,6 +33,7 @@ export function Shell({ children }: { children: ReactNode }) {
           <Avatar name={name} photo={photo} seed={me.uid} size={large ? 72 : 48} />
         </NavLink>
       }>
+      <ToastProvider>
       <div className={s.shell}>
         <main id="main" className={s.main}>
           {store.mode === 'demo' && (
@@ -44,6 +45,7 @@ export function Shell({ children }: { children: ReactNode }) {
         </main>
         <TripForm open={creating} onClose={() => setCreating(false)} onSaved={(id) => navigate(`/trip/${id}`)} />
       </div>
+      </ToastProvider>
       </HeaderProfileContext.Provider>
     </NewTripContext.Provider>
   );

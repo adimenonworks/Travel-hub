@@ -141,12 +141,12 @@
 @media (min-width: 744px) { .budget { padding: var(--space-inline-m) var(--space-inline-xl); } }
 
 /* ---------- Timeline (Figma: Size=Small below 744px, Size=Large from 744px) ---------- */
-/* An accent pill with the clock icon and the time (Label small / Label), then a dashed accent line (1px / 2px, dashes 6/6). */
+/* A deep emerald pill (surface/brand-bold) with the clock and time in text/on-brand-bold (Label small / Label), then a dashed accent line (1px / 2px, dashes 6/6). */
 .timeline { display: flex; align-items: center; gap: var(--space-inline-xxs); scroll-margin: 40vh 0; }
 .timelineTab {
   display: inline-flex; align-items: center; gap: var(--space-inline-xxxs);
-  padding: var(--space-inline-xxxs) var(--space-inline-xxs);
-  border-radius: var(--radius-round); background: var(--border-accent); color: var(--text-inverse);
+  padding: var(--space-inline-xxxs) var(--space-inline-xs) var(--space-inline-xxxs) var(--space-inline-xxs);
+  border-radius: var(--radius-round); background: var(--surface-brand-bold); color: var(--text-on-brand-bold);
   font: var(--weight-medium) var(--size-body-small)/1.5 var(--font-family); font-variant-numeric: tabular-nums;
 }
 .timelineLine { flex: 1; height: 1px; background: repeating-linear-gradient(90deg, var(--border-accent) 0 6px, transparent 6px 12px); }

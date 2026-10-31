@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Icon, type IconName } from './Icon';
 import { AvatarStack, Badge } from './Misc';
 import { LinkButton } from './Button';
+import { useToast } from './Toast';
 import s from './TripCards.module.css';
 
 type Person = { id: string; name: string; photo?: string | null };
@@ -100,10 +101,10 @@ export function EventRow({ to, title, location, time, category, going, people, p
 }) {
   const large = useLarge();
   const size = large ? 'large' : 'small';
-  const [copied, setCopied] = useState(false);
+  const toast = useToast();
   const copy = async () => {
     if (!location) return;
-    try { await navigator.clipboard.writeText(location); setCopied(true); setTimeout(() => setCopied(false), 2000); } catch { /* clipboard blocked */ }
+    try { await navigator.clipboard.writeText(location); toast({ icon: 'copy', label: 'Address copied' }); } catch { /* clipboard blocked */ }
   };
   return (
     <article className={s.event}>
@@ -114,7 +115,6 @@ export function EventRow({ to, title, location, time, category, going, people, p
             <div className={s.eventMeta}>
               {location && <button type="button" className={s.eventPlace} onClick={copy} aria-label={`Copy address: ${location}`}>{location}</button>}
               {time && <span className={s.eventTime}>{time}</span>}
-              <span className="visually-hidden" role="status">{copied ? 'Address copied' : ''}</span>
             </div>
           )}
         </div>
