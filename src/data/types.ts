@@ -26,6 +26,8 @@ export type Trip = {
   totalBudget?: number;
   /** Days given their own budget ("Edit today's budget"), by date. The other days share what's left of the total. */
   dayBudgets?: Record<string, number>;
+  /** What the group actually spent on a past day, by date, when someone corrected it. Replaces the worked-out spend. */
+  daySpent?: Record<string, number>;
   coverColor?: string;
   /** Small JPEG as a data URL (see lib/image.ts), or null for none. */
   coverPhoto?: string | null;

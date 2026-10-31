@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { BudgetCard, Button, useLarge, FieldRow, List, ListRow, Section, Select, Sheet, TextField } from '../../design/components';
+import { BudgetCard, Button, IconButton, useLarge, FieldRow, List, ListRow, Section, Select, Sheet, TextField } from '../../design/components';
 import { store } from '../../data';
 import { personName, useMe } from '../../data/hooks';
 import type { Category, Expense } from '../../data/types';
@@ -11,61 +11,67 @@ import type { TripCtx } from './TripPage';
 
 /**
  * Figma "Budget card" under the trip header: the chosen day's budget (worked out from the trip's total) and the total.
- * Its button: "Add budget" (no total yet) opens Edit trip; "Edit today's budget" sets the shown day's own budget,
- * and the other days re-share what's left. Organizers only, like the total.
+ * Its button: "Add budget" (no total yet) opens Edit trip; "Edit budgets" opens the budgets sheet, where each day has
+ * a pencil: past days correct what was spent, today and later days set that day's own budget. Organizers only.
  */
 export function TripBudget({ ctx, day, onSetBudget }: { ctx: TripCtx; day: string; onSetBudget?: () => void }) {
   const { trip, expenses, profiles, canManage } = ctx;
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<Expense | 'new' | null>(null);
+  const [dayEdit, setDayEdit] = useState<string | null>(null);
   const [amount, setAmount] = useState('');
   const large = useLarge();
   const b = tripBudget(ctx);
   const fmt = (n: number) => money(n, trip.currency);
   const t = today();
-  const word = dayWord(day, trip.startDate, t);
-  const whose = day === t ? 'today’s' : `${word === 'Tomorrow' || word === 'Yesterday' ? word.toLowerCase() : word}’s`;
+  const word = (d: string) => dayWord(d, trip.startDate, t);
+  const lower = (w: string) => (w === 'Today' || w === 'Tomorrow' || w === 'Yesterday' ? w.toLowerCase() : w);
   const size = large ? 'regular' : 'small';
   const d = b.forDay(day);
-  const openEditor = () => { setAmount(String(d.daily)); setOpen(true); };
 
   const card = b.total > 0 ? (() => {
-    const when = day === t ? 'today' : word === 'Tomorrow' || word === 'Yesterday' ? word.toLowerCase() : `on ${word}`;
+    const w = word(day);
+    const when = day === t ? 'today' : w === 'Tomorrow' || w === 'Yesterday' ? w.toLowerCase() : `on ${w}`;
     return <BudgetCard amount={fmt(Math.abs(d.left))} label={d.left < 0 ? `Over ${when}` : `Left ${when}`} total={fmt(b.total)} level={d.level}
-      action={canManage && <Button variant="secondary" size={size} icon="pencil" onClick={openEditor}>Edit {whose} budget</Button>} />;
+      action={canManage && <Button variant="secondary" size={size} icon="pencil" onClick={() => setOpen(true)}>Edit budgets</Button>} />;
   })() : (
     <BudgetCard amount={fmt(b.planned)} label="Planned so far" total="No total set" level="ok"
       action={onSetBudget && <Button variant="secondary" size={size} icon="pencil" onClick={onSetBudget}>Add budget</Button>} />
   );
 
-  const save = async () => {
+  // One day's editor: a past day corrects what was spent; today and later set the day's own budget.
+  const past = !!dayEdit && dayEdit < t;
+  const editDay = (x: string) => { const f = b.forDay(x); setAmount(String(x < t ? f.spent : f.daily)); setOpen(false); setDayEdit(x); };
+  const closeDay = () => { setDayEdit(null); setOpen(true); };
+  const saveDay = async () => {
+    if (!dayEdit) return;
     const n = Number(amount);
-    const next = { ...b.fixed };
-    if (amount.trim() === '' || !(n >= 0)) delete next[day]; else next[day] = n;
-    await store.updateTrip(trip.id, { dayBudgets: next });
-    setOpen(false);
+    const next = { ...(past ? trip.daySpent : trip.dayBudgets) };
+    if (amount.trim() === '' || !(n >= 0)) delete next[dayEdit]; else next[dayEdit] = n;
+    await store.updateTrip(trip.id, past ? { daySpent: next } : { dayBudgets: next });
+    closeDay();
   };
+
   const days = tripDays(trip.startDate, trip.endDate);
   return (
     <div id="budget">
       {card}
-      <Sheet open={open} title={`${whose[0].toUpperCase()}${whose.slice(1)} budget`} onClose={() => setOpen(false)} onSubmit={save} submitLabel="Save">
-        <TextField label={`Budget for ${day === t ? 'today' : word} (${trip.currency})`} type="number" inputMode="decimal" min={0} step="any"
-          value={amount} onChange={(e) => setAmount(e.target.value)}
-          hint="For the whole group. The other days share what's left of the total. Leave it empty to go back to the worked-out amount." />
+      <Sheet open={open} title="Budgets" onClose={() => setOpen(false)}>
         <p className="t-body t-secondary">
           {fmt(b.planned)} planned{b.total > 0 ? ` of ${fmt(b.total)}` : ''} for the whole group.
           {b.total > 0 ? ' Each day gets what’s left of the total, shared over the days still to come.' : ''}
         </p>
         <Section title="Day by day">
           <List>
-            {days.map((d) => {
-              const x = b.forDay(d);
+            {days.map((x) => {
+              const f = b.forDay(x);
+              const isPast = x < t;
               return (
-                <ListRow key={d} title={dayWord(d, trip.startDate, t)} subtitle={formatDay(d)}
-                  trailing={<span className={['t-num', x.left < 0 && b.total > 0 ? 't-danger' : ''].join(' ')}>
-                    {b.total > 0 ? (x.left < 0 ? `${fmt(-x.left)} over` : `${fmt(x.left)} left`) : fmt(x.daily - x.left)}
-                  </span>} />
+                <ListRow key={x} title={word(x)} subtitle={formatDay(x)}
+                  trailing={<span className={['t-num', !isPast && f.left < 0 && b.total > 0 ? 't-danger' : ''].join(' ')}>
+                    {isPast ? `${fmt(f.spent)} used` : b.total > 0 ? (f.left < 0 ? `${fmt(-f.left)} over` : `${fmt(f.left)} left`) : fmt(f.spent)}
+                  </span>}
+                  actions={canManage && <IconButton icon="pencil" size="small" label={isPast ? `Edit what was spent ${lower(word(x))}` : `Edit ${lower(word(x))}’s budget`} onClick={() => editDay(x)} />} />
               );
             })}
           </List>
@@ -82,6 +88,17 @@ export function TripBudget({ ctx, day, onSetBudget }: { ctx: TripCtx; day: strin
             </List>
           )}
         </Section>
+      </Sheet>
+      <Sheet open={!!dayEdit} title={dayEdit ? (past ? `Spent ${lower(word(dayEdit))}` : `${word(dayEdit)}’s budget`) : ''} onClose={closeDay} onSubmit={saveDay} submitLabel="Save">
+        {dayEdit && (past ? (
+          <TextField label={`Spent ${lower(word(dayEdit))} (${trip.currency})`} type="number" inputMode="decimal" min={0} step="any"
+            value={amount} onChange={(e) => setAmount(e.target.value)}
+            hint="What the whole group actually spent that day. The days still to come re-share what's left. Leave it empty to go back to the amount worked out from events and expenses." />
+        ) : (
+          <TextField label={`Budget for ${lower(word(dayEdit))} (${trip.currency})`} type="number" inputMode="decimal" min={0} step="any"
+            value={amount} onChange={(e) => setAmount(e.target.value)}
+            hint="For the whole group. The other days share what's left of the total. Leave it empty to go back to the worked-out amount." />
+        ))}
       </Sheet>
       <ExpenseForm open={!!editing} ctxTrip={{ id: trip.id, currency: trip.currency, startDate: trip.startDate, endDate: trip.endDate, memberIds: trip.memberIds }}
         profiles={profiles} expense={editing === 'new' ? undefined : editing ?? undefined} onClose={() => { setEditing(null); setOpen(true); }} />

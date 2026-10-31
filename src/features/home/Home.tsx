@@ -34,7 +34,7 @@ export function Home() {
 
   return (
     <Content>
-      <PageHeader title={`${greeting()}, ${name.split(' ')[0]}`}
+      <PageHeader title={`Hi, ${name.split(' ')[0]}`} fit
         subtitle={`${plural(all.length, 'trip')} · ${plural(daysAway, 'day')} away · ${plural(places, 'place')}`}
         action={{ icon: 'plus', label: 'New trip', onClick: newTrip }} />
 
@@ -65,10 +65,6 @@ export function Home() {
   );
 }
 
-/** "Good morning" before noon, "Good afternoon" until 6pm, then "Good evening". */
-function greeting(h = new Date().getHours()) {
-  return h < 12 ? 'Good morning' : h < 18 ? 'Good afternoon' : 'Good evening';
-}
 
 const place = (t: Trip) => t.destination?.name.split(',').slice(0, 2).join(',') ?? 'No destination yet';
 
@@ -81,6 +77,7 @@ function Hero({ trip }: { trip: Trip }) {
   return (
     <HeroCard
       image={<TripCover trip={trip} />}
+      to={base}
       title={trip.name}
       subtitle={`${formatRange(trip.startDate, trip.endDate)} • ${n} day${n === 1 ? '' : 's'}`}
       countries={tripCountries(trip, activities ?? []).map((code) => ({ code, name: countryName(code), flag: flagUrl(code) }))}

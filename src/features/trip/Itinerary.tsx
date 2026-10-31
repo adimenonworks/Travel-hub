@@ -106,7 +106,6 @@ export function Itinerary(ctx: TripCtx) {
               <h2 className="t-heading-1">{word(day)}</h2>
               {weather && <WeatherChip w={weather.day} typical={weather.typical} />}
             </div>
-            <div className={s.dayBudget}>{formatDay(day, { weekday: 'long', month: 'long', day: 'numeric' })}</div>
           </div>
           <Button icon="plus" onClick={() => setAdding(true)}>Add event</Button>
         </div>

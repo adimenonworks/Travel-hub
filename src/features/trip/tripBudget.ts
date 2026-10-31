@@ -14,7 +14,8 @@ export function tripBudget({ trip, activities, expenses }: Pick<TripCtx, 'trip' 
     activities.filter((a) => a.date === d).reduce((n, a) => n + a.cost * Math.max(1, a.attendeeIds.length), 0)
     + expenses.filter((e) => e.date === d).reduce((n, e) => n + e.amount, 0);
   const tripWide = expenses.filter((e) => !days.includes(e.date)).reduce((n, e) => n + e.amount, 0);
-  const perDay = days.map(spendOn);
+  // A corrected amount for a past day replaces what its events and expenses add up to.
+  const perDay = days.map((d) => trip.daySpent?.[d] ?? spendOn(d));
   const planned = perDay.reduce((n, x) => n + x, 0) + tripWide;
 
   const fixed = trip.dayBudgets ?? {};
@@ -34,7 +35,7 @@ export function tripBudget({ trip, activities, expenses }: Pick<TripCtx, 'trip' 
     const left = daily - perDay[i];
     const share = daily > 0 ? left / daily : -1;
     const level: 'ok' | 'low' | 'over' = share >= 0.5 ? 'ok' : share >= 0.2 ? 'low' : 'over';
-    return { daily: Math.round(daily), left: Math.round(left), level };
+    return { daily: Math.round(daily), left: Math.round(left), spent: Math.round(perDay[i]), level };
   };
   return { total, planned, tripWide, forDay, fixed };
 }
