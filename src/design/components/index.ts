@@ -10,3 +10,4 @@ export { PageHeader, HeaderProfileContext, Tabs, type TabItem } from './Bars';
 export { ColorPicker, type ColorOption } from './ColorPicker';
 export { Illustration, COVER_ILLUSTRATIONS, type IllustrationName } from './Illustration';
 export { HeroCard, ContentCard, EventRow, BudgetCard, Timeline, useLarge } from './TripCards';
+export { ToastProvider, useToast } from './Toast';

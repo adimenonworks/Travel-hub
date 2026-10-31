@@ -2,7 +2,7 @@ import { useState, type CSSProperties } from 'react';
 import {
   Avatar, AvatarStack, Badge, BudgetCard, Notification, Button, Card, ColorPicker, ContentCard, EmptyState, EventRow, FieldRow, HeroCard, Icon, IconButton,
   LinkButton, List, ListRow, PageHeader, SegmentedControl, Section, Select, Sheet, Spinner, Tabs, TextArea, TextField, Timeline, Illustration,
-  type IllustrationName, COVER_ILLUSTRATIONS, ICON_NAMES,
+  type IllustrationName, COVER_ILLUSTRATIONS, ICON_NAMES, useToast,
 } from '../../design/components';
 import { flagUrl } from '../../lib/countries';
 import { COVER_COLORS } from '../../lib/colors';
@@ -55,6 +55,7 @@ export function DesignSystem() {
   const [seg, setSeg] = useState<'a' | 'b' | 'c'>('a');
   const [color, setColor] = useState('emerald');
   const [sheet, setSheet] = useState(false);
+  const toast = useToast();
 
   return (
     <>
@@ -223,6 +224,7 @@ export function DesignSystem() {
               <Spinner />
             </div>
             {(['brand', 'neutral', 'success', 'warning', 'error'] as const).map((st) => <Notification key={st} state={st}>Notification, state {st}.</Notification>)}
+            <div><Button variant="secondary" icon="copy" onClick={() => toast({ icon: 'copy', label: 'Address copied' })}>Show a toast</Button></div>
           </Card>
           <Card><EmptyState illustration="ideas" title="Empty state" message="Explains what goes here and how to start." action={<Button variant="secondary" onClick={() => setSheet(true)}>Open a sheet</Button>} /></Card>
         </Section>
