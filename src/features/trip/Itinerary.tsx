@@ -56,17 +56,10 @@ export function Itinerary(ctx: TripCtx) {
   const list = activities.filter((a) => a.date === day).sort(byTime);
   const weather = useDayWeather(ctx, day);
 
-  // On today's plan, a dotted "now" line sits before the next plan and is scrolled into view.
+  // On today's plan, the "now" line (Figma Timeline) sits before the next plan. The page doesn't scroll to it.
   const showNow = day === t && list.length > 1;
   const nextIndex = list.findIndex((a) => (a.startTime || '99:99') > now);
-  const nowRef = useRef<HTMLDivElement>(null);
-  useEffect(() => {
-    if (!showNow || !nowRef.current) return;
-    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    // Only scrolls when the line is off screen, and only as far as needed, so opening the tab doesn't jolt the page.
-    nowRef.current.scrollIntoView({ block: 'nearest', behavior: reduce ? 'auto' : 'smooth' });
-  }, [showNow, day]);
-  const nowLine = <Timeline innerRef={nowRef} time={formatTime(now)} />;
+  const nowLine = <Timeline time={formatTime(now)} />;
 
   return (
     <div className={s.itinLayout}>
