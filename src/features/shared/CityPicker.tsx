@@ -5,8 +5,10 @@ import { searchCities } from '../../lib/geocode';
 import s from './shared.module.css';
 
 /** Text field with city autocomplete; resolves to a Place with coordinates. */
-export function CityPicker({ label = 'Destination', value, onChange, placeholder = 'Lisbon, Portugal' }: {
+export function CityPicker({ label = 'Destination', value, onChange, placeholder = 'Lisbon, Portugal', hint }: {
   label?: string;
+  /** Helper text shown under the field when there's nothing more urgent to say */
+  hint?: string;
   value: Place | null;
   onChange: (p: Place | null) => void;
   placeholder?: string;
@@ -43,7 +45,7 @@ export function CityPicker({ label = 'Destination', value, onChange, placeholder
         autoComplete="off"
         onChange={(e) => { setText(e.target.value); setOpen(true); if (value) onChange(null); }}
         onBlur={() => setTimeout(() => setOpen(false), 150)}
-        hint={error ? 'City search is unavailable right now. You can still save; weather and maps need a picked city.' : value ? undefined : text && !open ? 'Pick a suggestion so we can show weather and maps.' : undefined}
+        hint={error ? 'City search is unavailable right now. You can still save; weather and maps need a picked city.' : value ? hint : text && !open ? 'Pick a suggestion so we can show weather and maps.' : hint}
       />
       {open && results.length > 0 && (
         <div className={s.suggestList} role="listbox">
