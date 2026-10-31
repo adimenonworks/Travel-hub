@@ -10,7 +10,7 @@ import { categoryInfo } from '../../lib/categories';
 import { mapsUrl, uberUrl } from '../../lib/geocode';
 import { defaultUnit, describeWeather, tripWeather, type DayWeather } from '../../lib/weather';
 import { ActivityForm } from './ActivityForm';
-import { tripBudget } from './budget';
+import { tripBudget } from './tripBudget';
 import type { TripCtx } from './TripPage';
 import s from './trip.module.css';
 

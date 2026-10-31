@@ -6,7 +6,7 @@ import type { Category, Expense } from '../../data/types';
 import { dayWord, formatDay, today, tripDays } from '../../lib/dates';
 import { money } from '../../lib/format';
 import { CATEGORIES, categoryInfo } from '../../lib/categories';
-import { tripBudget } from './budget';
+import { tripBudget } from './tripBudget';
 import type { TripCtx } from './TripPage';
 
 /**
