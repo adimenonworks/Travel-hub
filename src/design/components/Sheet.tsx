@@ -39,12 +39,35 @@ export function Sheet({ open, title, onClose, onSubmit, submitLabel = 'Done', su
     document.addEventListener('keydown', onKey);
     const prev = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
-    ref.current?.querySelector<HTMLElement>('input, textarea, select')?.focus();
+    // Focus the first field once the sheet has finished rising, without letting the browser scroll the page for it.
+    const focusTimer = setTimeout(() => ref.current?.querySelector<HTMLElement>('input, textarea, select')?.focus({ preventScroll: true }), 360);
     return () => {
+      clearTimeout(focusTimer);
       document.removeEventListener('keydown', onKey);
       document.body.style.overflow = prev;
     };
   }, [open, onClose]);
+
+  // Keep the sheet above the on-screen keyboard: pin the backdrop to the part of the screen that's still visible
+  // (the visual viewport) and bring the field you're typing in into view.
+  const backdrop = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const vv = window.visualViewport;
+    if (!open || !vv) return;
+    const fit = () => {
+      const el = backdrop.current;
+      if (!el) return;
+      el.style.top = `${vv.offsetTop}px`;
+      el.style.height = `${vv.height}px`;
+      el.style.bottom = 'auto';
+      const active = document.activeElement as HTMLElement | null;
+      if (active && ref.current?.contains(active)) active.scrollIntoView({ block: 'nearest' });
+    };
+    fit();
+    vv.addEventListener('resize', fit);
+    vv.addEventListener('scroll', fit);
+    return () => { vv.removeEventListener('resize', fit); vv.removeEventListener('scroll', fit); };
+  }, [open, mounted]);
 
   if (!mounted) return null;
 
@@ -54,7 +77,7 @@ export function Sheet({ open, title, onClose, onSubmit, submitLabel = 'Done', su
   };
 
   return createPortal(
-    <div className={[s.backdrop, closing && s.closing].filter(Boolean).join(' ')} inert={closing} onMouseDown={(e) => open && e.target === e.currentTarget && onClose()}>
+    <div ref={backdrop} className={[s.backdrop, closing && s.closing].filter(Boolean).join(' ')} inert={closing} onMouseDown={(e) => open && e.target === e.currentTarget && onClose()}>
       <div ref={ref} className={s.sheet} role="dialog" aria-modal="true" aria-label={shown.current.title}
         onAnimationEnd={(e) => closing && e.target === e.currentTarget && setMounted(false)}>
         <div className={s.grabber} />

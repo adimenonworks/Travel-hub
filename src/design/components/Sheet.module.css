@@ -6,7 +6,7 @@
 }
 .sheet {
   width: 100%;
-  max-height: calc(100dvh - 40px);
+  max-height: calc(100% - 40px); /* of the visible area, so it shrinks when the keyboard is up */
   display: flex; flex-direction: column;
   background: var(--surface-background-tertiary);
   border-radius: var(--radius-xl) var(--radius-xl) 0 0;
@@ -26,7 +26,7 @@
 
 @media (min-width: 744px) {
   .backdrop { align-items: center; padding: var(--space-inline-xl); }
-  .sheet { max-width: 600px; border-radius: var(--radius-xl); max-height: min(760px, calc(100dvh - 48px)); animation: pop var(--motion-sheet); padding-bottom: 0; }
+  .sheet { max-width: 600px; border-radius: var(--radius-xl); max-height: min(760px, 100%); animation: pop var(--motion-sheet); padding-bottom: 0; }
   .grabber { display: none; }
 }
 
