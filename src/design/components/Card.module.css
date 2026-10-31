@@ -11,13 +11,13 @@
 /* Type=Large: media · text · buttons in a row (buttons drop below on phones) */
 .large { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-inline-s); padding: var(--space-inline-xl); } /* padding 24, gap 12 */
 .large .content { flex: 1 1 220px; }
-.large .title { font: var(--weight-semibold) var(--size-heading-3)/1 var(--font-family); letter-spacing: -0.02em; }
-.large .body { font: var(--weight-medium) 14px/1.5 var(--font-family); }
+.large .title { font: var(--type-heading-3); letter-spacing: -0.02em; }
+.large .body { font: var(--type-label); }
 @media (max-width: 743px) { .large .buttons { flex-basis: 100%; } }
 /* Type=Small: everything stacked */
 .small { display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-inline-m); padding: var(--space-inline-m); }
-.small .title { font: var(--weight-bold) 18px/1 var(--font-family); letter-spacing: -0.01em; }
-.small .body { font: var(--weight-medium) var(--size-body-small)/1.5 var(--font-family); }
+.small .title { font: var(--type-heading-4); letter-spacing: -0.01em; }
+.small .body { font: var(--type-label-small); }
 .small .buttons { flex-direction: column; align-self: stretch; margin-top: var(--space-inline-xxs); } /* 20 below the text */
 .small .buttons > * { width: 100%; }
 
@@ -53,5 +53,5 @@
 
 .section { display: flex; flex-direction: column; gap: var(--space-inline-s); }
 .sectionHeader { display: flex; align-items: center; justify-content: space-between; gap: var(--space-inline-s); min-height: var(--size-tap); flex-wrap: wrap; }
-.sectionTitle { font: var(--weight-semibold) var(--size-heading-2)/1 var(--font-family); letter-spacing: -0.02em; color: var(--text-primary); }
-.sectionFooter { font: var(--weight-medium) var(--size-body-small)/1.5 var(--font-family); color: var(--text-subtle); padding: 0 var(--space-inline-xs); }
+.sectionTitle { font: var(--type-heading-2); letter-spacing: -0.02em; color: var(--text-primary); }
+.sectionFooter { font: var(--type-label-small); color: var(--text-subtle); padding: 0 var(--space-inline-xs); }

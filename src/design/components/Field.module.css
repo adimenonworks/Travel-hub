@@ -1,6 +1,6 @@
 .field { display: flex; flex-direction: column; gap: var(--space-inline-xs); min-width: 0; }
 .label {
-  font: var(--weight-medium) 14px/1.5 var(--font-family); /* Label */
+  font: var(--type-label); /* Label */
   color: var(--input-field-label);
   padding-left: var(--space-inline-xxs);
 }
@@ -30,7 +30,7 @@ select.input {
   background-position: right var(--space-inline-l) center;
   padding-right: var(--space-inline-max);
 }
-.hint { font: var(--weight-medium) var(--size-body-small)/1.5 var(--font-family); color: var(--input-field-label-subtle); padding-left: var(--space-inline-xxs); } /* Label small */
+.hint { font: var(--type-label-small); color: var(--input-field-label-subtle); padding-left: var(--space-inline-xxs); } /* Label small */
 .row { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: var(--space-inline-m); }
 
 /* Compact select: the medium button's height */

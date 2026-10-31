@@ -1,25 +1,41 @@
-/* Text styles — one class per Figma text style (Display → .t-display, Heading 1 → .t-heading-1, Label small → .t-label-small). */
-.t-display { font: var(--weight-black) var(--size-display)/1 var(--font-display); letter-spacing: -0.01em; }
-.t-display-small { font: var(--weight-black) 56px/1 var(--font-display); letter-spacing: -0.01em; }
-.t-display-secondary { font: var(--weight-black) var(--size-display-secondary)/1 var(--font-display); letter-spacing: -0.01em; }
-.t-heading-1 { font: var(--weight-bold) var(--size-heading-1)/1 var(--font-family); letter-spacing: -0.02em; }
-.t-heading-2 { font: var(--weight-semibold) var(--size-heading-2)/1 var(--font-family); letter-spacing: -0.02em; }
-.t-heading-3 { font: var(--weight-semibold) var(--size-heading-3)/1 var(--font-family); letter-spacing: -0.02em; }
-.t-heading-4 { font: var(--weight-bold) 18px/1 var(--font-family); letter-spacing: -0.01em; }
-.t-body { font: var(--weight-regular) var(--size-body)/1.5 var(--font-family); }
-.t-body-small { font: var(--weight-regular) var(--size-body-small)/1.5 var(--font-family); }
-.t-label { font: var(--weight-medium) 14px/1.5 var(--font-family); }
-.t-label-small { font: var(--weight-medium) var(--size-body-small)/1.5 var(--font-family); }
-.t-link { font: var(--weight-medium) var(--size-body)/1 var(--font-family); }
-.t-link-small { font: var(--weight-medium) var(--size-body-small)/1 var(--font-family); }
+/*
+ * Text styles: one per Figma text style. Use the class (.t-heading-1) in markup, or the matching
+ * shorthand in CSS (font: var(--type-heading-1)); letter-spacing is set by the class only.
+ */
+:root {
+  --type-display: var(--weight-black) var(--size-display)/1 var(--font-display);
+  --type-display-small: var(--weight-black) 56px/1 var(--font-display);
+  --type-display-secondary: var(--weight-black) var(--size-display-secondary)/1 var(--font-display);
+  --type-heading-1: var(--weight-bold) var(--size-heading-1)/1 var(--font-family);
+  --type-heading-2: var(--weight-semibold) var(--size-heading-2)/1 var(--font-family);
+  --type-heading-3: var(--weight-semibold) var(--size-heading-3)/1 var(--font-family);
+  --type-heading-4: var(--weight-bold) 18px/1 var(--font-family);
+  --type-body: var(--weight-regular) var(--size-body)/1.5 var(--font-family);
+  --type-body-small: var(--weight-regular) var(--size-body-small)/1.5 var(--font-family);
+  --type-label: var(--weight-medium) 14px/1.5 var(--font-family);
+  --type-label-small: var(--weight-medium) var(--size-body-small)/1.5 var(--font-family);
+  --type-link: var(--weight-medium) var(--size-body)/1 var(--font-family);
+  --type-link-small: var(--weight-medium) var(--size-body-small)/1 var(--font-family);
+}
+.t-display { font: var(--type-display); letter-spacing: -0.01em; }
+.t-display-small { font: var(--type-display-small); letter-spacing: -0.01em; }
+.t-display-secondary { font: var(--type-display-secondary); letter-spacing: -0.01em; }
+.t-heading-1 { font: var(--type-heading-1); letter-spacing: -0.02em; }
+.t-heading-2 { font: var(--type-heading-2); letter-spacing: -0.02em; }
+.t-heading-3 { font: var(--type-heading-3); letter-spacing: -0.02em; }
+.t-heading-4 { font: var(--type-heading-4); letter-spacing: -0.01em; }
+.t-body { font: var(--type-body); }
+.t-body-small { font: var(--type-body-small); }
+.t-label { font: var(--type-label); }
+.t-label-small { font: var(--type-label-small); }
+.t-link { font: var(--type-link); }
+.t-link-small { font: var(--type-link-small); }
 
 .t-display, .t-display-small, .t-display-secondary { color: var(--text-brand); }
 .t-heading-1, .t-heading-2, .t-heading-3, .t-heading-4 { color: var(--text-primary); }
 
 /* Helpers */
 .t-secondary { color: var(--text-subtle); }
-.t-tertiary { color: var(--text-subtle); }
-.t-tint { color: var(--text-brand); }
 .t-danger { color: var(--status-error); }
 .t-bold { font-weight: var(--weight-semibold); }
 .t-num { font-variant-numeric: tabular-nums; }

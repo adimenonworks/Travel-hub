@@ -22,7 +22,7 @@
   position: absolute;
   top: 0; right: var(--space-inset);
   left: var(--row-inset, var(--space-inset));
-  border-top: 0.5px solid var(--border-subtle);
+  border-top: 1px solid var(--border-subtle);
 }
 .interactive { cursor: pointer; }
 .interactive:hover { background: var(--interactive-button-ghost-background-hover); }

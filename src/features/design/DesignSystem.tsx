@@ -1,11 +1,10 @@
 import { useState, type CSSProperties } from 'react';
 import {
-  Avatar, AvatarStack, Badge, BudgetCard, Notification, Button, Card, ColorPicker, ContentCard, EmptyState, EventRow, FieldRow, HeroCard, Icon, IconButton,
+  Avatar, AvatarStack, Badge, BudgetCard, Notification, Button, Card, ContentCard, EmptyState, EventRow, FieldRow, HeroCard, Icon, IconButton,
   LinkButton, List, ListRow, PageHeader, SegmentedControl, Section, Select, Sheet, Spinner, Tabs, TextArea, TextField, Timeline, Illustration,
-  type IllustrationName, COVER_ILLUSTRATIONS, ICON_NAMES, useToast,
+  type IllustrationName, COVER_ILLUSTRATIONS, ICON_NAMES, useToast, Modal,
 } from '../../design/components';
 import { flagUrl } from '../../lib/countries';
-import { COVER_COLORS } from '../../lib/colors';
 import s from './DesignSystem.module.css';
 
 // Same groups and names as the Figma "Color" collection.
@@ -53,9 +52,9 @@ const icons = ICON_NAMES;
 /** Living reference for tokens and components, at /#/design. */
 export function DesignSystem() {
   const [seg, setSeg] = useState<'a' | 'b' | 'c'>('a');
-  const [color, setColor] = useState('emerald');
   const [sheet, setSheet] = useState(false);
   const toast = useToast();
+  const [modal, setModal] = useState(false);
 
   return (
     <>
@@ -201,7 +200,6 @@ export function DesignSystem() {
             </FieldRow>
             <TextArea label="Text area" placeholder="Notes" />
             <SegmentedControl label="Demo" value={seg} onChange={setSeg} options={[{ value: 'a', label: 'First' }, { value: 'b', label: 'Second' }, { value: 'c', label: 'Third' }]} />
-            <ColorPicker label="Colour picker" options={COVER_COLORS} value={color} onChange={setColor} />
           </Card>
         </Section>
 
@@ -224,7 +222,12 @@ export function DesignSystem() {
               <Spinner />
             </div>
             {(['brand', 'neutral', 'success', 'warning', 'error'] as const).map((st) => <Notification key={st} state={st}>Notification, state {st}.</Notification>)}
-            <div><Button variant="secondary" icon="copy" onClick={() => toast({ icon: 'copy', label: 'Address copied' })}>Show a toast</Button></div>
+            <div className={s.row}>
+              <Button variant="secondary" icon="copy" onClick={() => toast({ icon: 'copy', label: 'Address copied' })}>Show a toast</Button>
+              <Button variant="secondary" onClick={() => setModal(true)}>Open a modal</Button>
+            </div>
+            <Modal open={modal} title="Add to your favourites?" body="Beverly rooftop" badge={<Badge tone="category" icon="cocktail">Drinks</Badge>}
+              confirmLabel="Add" onCancel={() => setModal(false)} onConfirm={() => setModal(false)} />
           </Card>
           <Card><EmptyState illustration="ideas" title="Empty state" message="Explains what goes here and how to start." action={<Button variant="secondary" onClick={() => setSheet(true)}>Open a sheet</Button>} /></Card>
         </Section>

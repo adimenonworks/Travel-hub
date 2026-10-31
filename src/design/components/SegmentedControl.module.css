@@ -17,7 +17,7 @@
   border: 0;
   border-radius: var(--radius-round);
   background: transparent;
-  font: var(--weight-medium) 14px/1.5 var(--font-family); /* Label */
+  font: var(--type-label); /* Label */
   color: var(--interactive-selected-ghost-text);
   white-space: nowrap;
   position: relative; z-index: 1;

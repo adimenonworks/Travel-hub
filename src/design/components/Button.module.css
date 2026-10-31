@@ -10,9 +10,9 @@
 .glyph { flex: none; }
 
 /* Size=Regular: 48px, padding 12/16, gap 4, Label */
-.regular { min-height: var(--size-control); padding: var(--space-inline-s) var(--space-inline-m); gap: var(--space-inline-xxs); font: var(--weight-medium) 14px/1.5 var(--font-family); }
+.regular { min-height: var(--size-control); padding: var(--space-inline-s) var(--space-inline-m); gap: var(--space-inline-xxs); font: var(--type-label); }
 /* Size=Small: 40px, padding 8/12, gap 2, Label small; still a 44px tap area */
-.small { min-height: var(--size-control-sm); padding: var(--space-inline-xs) var(--space-inline-s); gap: var(--space-inline-xxxs); font: var(--weight-medium) var(--size-body-small)/1.5 var(--font-family); }
+.small { min-height: var(--size-control-sm); padding: var(--space-inline-xs) var(--space-inline-s); gap: var(--space-inline-xxxs); font: var(--type-label-small); }
 .small::after { content: ''; position: absolute; inset: calc((var(--size-control-sm) - var(--size-tap)) / 2) 0; }
 
 .primary { background: var(--interactive-button-primary-background); color: var(--interactive-button-primary-text); }

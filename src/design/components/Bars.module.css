@@ -6,8 +6,8 @@
 /* Small: title over a Body small subtitle (gap 4); Small button and 48 avatar (gap 12).
    The title breaks only between words (a single word too long for the line is the only thing split). */
 .titleText { flex: 1; display: flex; flex-direction: column; gap: var(--space-inline-xxs); min-width: 0; }
-.title { font: var(--weight-black) var(--size-display-secondary)/1 var(--font-display); letter-spacing: -0.01em; overflow-wrap: break-word; color: var(--text-brand); } /* Small: Display secondary (40) */
-.subtitle { color: var(--text-subtle); font: var(--weight-regular) var(--size-body-small)/1.5 var(--font-family); } /* Body small */
+.title { font: var(--type-display-secondary); letter-spacing: -0.01em; overflow-wrap: break-word; color: var(--text-brand); } /* Small: Display secondary (40) */
+.subtitle { color: var(--text-subtle); font: var(--type-body-small); } /* Body small */
 .actions { flex: none; display: flex; align-items: center; gap: var(--space-inline-s); }
 /* Large: Body subtitle (gap 8); Regular button and 72 avatar (gap 24) */
 @media (min-width: 744px) {
@@ -33,7 +33,7 @@
   min-height: var(--size-tap); padding: var(--space-inline-xs) var(--space-inline-m);
   border-radius: var(--radius-l) var(--radius-l) 0 0;
   color: var(--interactive-unselected-ghost-text);
-  font: var(--weight-medium) 14px/1.5 var(--font-family); /* Label */
+  font: var(--type-label); /* Label */
   white-space: nowrap;
   transition: background var(--motion-fast), color var(--motion-fluid);
 }

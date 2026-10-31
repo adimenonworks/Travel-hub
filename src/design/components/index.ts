@@ -7,7 +7,7 @@ export { SegmentedControl } from './SegmentedControl';
 export { Sheet } from './Sheet';
 export { Avatar, AvatarStack, Badge, EmptyState, Spinner, Notification, type BadgeTone, type NotificationState } from './Misc';
 export { PageHeader, HeaderProfileContext, Tabs, type TabItem } from './Bars';
-export { ColorPicker, type ColorOption } from './ColorPicker';
 export { Illustration, COVER_ILLUSTRATIONS, type IllustrationName } from './Illustration';
 export { HeroCard, ContentCard, EventRow, BudgetCard, Timeline, useLarge } from './TripCards';
 export { ToastProvider, useToast } from './Toast';
+export { Modal } from './Modal';

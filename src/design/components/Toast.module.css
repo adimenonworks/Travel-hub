@@ -10,8 +10,8 @@
   animation: toastIn var(--motion-sheet) both;
 }
 .icon { color: var(--icon-subtle); flex: none; }
-.small { font: var(--weight-medium) var(--size-body-small)/1.5 var(--font-family); } /* Label small */
-.large { font: var(--weight-medium) 14px/1.5 var(--font-family); } /* Label */
+.small { font: var(--type-label-small); } /* Label small */
+.large { font: var(--type-label); } /* Label */
 .leaving { animation: toastOut var(--motion-sheet-out) both; }
 @keyframes toastIn { from { transform: translateY(calc(-100% - 40px)); opacity: 0; } to { transform: none; opacity: 1; } }
 @keyframes toastOut { from { transform: none; opacity: 1; } to { transform: translateY(calc(-100% - 40px)); opacity: 0; } }

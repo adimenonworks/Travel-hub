@@ -61,8 +61,8 @@
 .dayNum { font: var(--weight-black) 32px/1 var(--font-display); letter-spacing: -0.01em; } /* Number: Poppins Black 32 */
 .dayWord { font: var(--weight-semibold) 14px/1 var(--font-family); white-space: nowrap; } /* Word: 14 */
 .dayTop { display: flex; align-items: baseline; gap: var(--space-inline-xxs); white-space: nowrap; }
-.dayBig { font: var(--weight-black) 56px/1 var(--font-display); letter-spacing: -0.01em; } /* Display small */
-.dayMonth { font: var(--weight-regular) var(--size-body-small)/1.5 var(--font-family); } /* Body small */
+.dayBig { font: var(--type-display-small); letter-spacing: -0.01em; } /* Display small */
+.dayMonth { font: var(--type-body-small); } /* Body small */
 .dayBadges { display: flex; gap: var(--space-inline-xxs); white-space: nowrap; }
 
 .itinLayout { display: flex; flex-direction: column; gap: var(--space-inline-xl); }

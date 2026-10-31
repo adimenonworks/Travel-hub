@@ -10,9 +10,7 @@
 .sun { fill: var(--illustration-warm-bold); }
 .line { fill: var(--illustration-secondary); }
 .needle { fill: var(--illustration-border); }
-.cloud { fill: var(--illustration-primary); stroke: var(--illustration-border); stroke-width: 1.5; }
 .smile { fill: none; stroke: var(--illustration-border); stroke-width: 1.5; stroke-linecap: round; }
 .strap { fill: none; stroke: var(--illustration-border); stroke-width: 4; stroke-linecap: round; }
 .route { fill: none; stroke: var(--illustration-accent-bold); stroke-width: 2; stroke-linecap: round; stroke-dasharray: 2 5; }
-.wave { fill: none; stroke: var(--illustration-primary); stroke-width: 3; stroke-linecap: round; }
 .spark { fill: none; stroke: var(--illustration-accent-bold); stroke-width: 2; stroke-linecap: round; }

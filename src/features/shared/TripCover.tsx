@@ -1,6 +1,5 @@
 import type { ReactNode } from 'react';
-import { AvatarStack, COVER_ILLUSTRATIONS, Illustration } from '../../design/components';
-import { personName, useProfiles } from '../../data/hooks';
+import { COVER_ILLUSTRATIONS, Illustration } from '../../design/components';
 import type { Trip } from '../../data/types';
 import { coverPosition } from '../../lib/image';
 import s from './TripCover.module.css';
@@ -19,16 +18,5 @@ export function TripCover({ trip, className, children }: { trip: Trip; className
         : <Illustration name={COVER_ILLUSTRATIONS[Math.abs(h) % COVER_ILLUSTRATIONS.length]} />}
       {children}
     </div>
-  );
-}
-
-/** Who's going, as a row of faces on a white pill in the cover's bottom-left corner. */
-export function CoverPeople({ trip, size = 28 }: { trip: Trip; size?: number }) {
-  const profiles = useProfiles(trip.memberIds);
-  const n = trip.memberIds.length;
-  return (
-    <span className={s.people} role="img" aria-label={`${n} traveler${n === 1 ? '' : 's'}`}>
-      <AvatarStack people={trip.memberIds.map((id) => ({ id, name: personName(profiles, id), photo: profiles[id]?.photo }))} size={size} />
-    </span>
   );
 }
