@@ -248,8 +248,8 @@
     --interactive-unselected-ghost-background: transparent;
     --interactive-unselected-ghost-background-hover: color-mix(in srgb, var(--color-neutral-0) 5%, transparent);
     --interactive-unselected-ghost-background-pressed: color-mix(in srgb, var(--color-neutral-0) 10%, transparent);
-    --interactive-unselected-ghost-text: var(--color-emerald-200);
-    --interactive-unselected-ghost-icon: var(--color-emerald-200);
+    --interactive-unselected-ghost-text: var(--color-neutral-0);
+    --interactive-unselected-ghost-icon: var(--color-neutral-0);
     --interactive-unselected-ghost-border: color-mix(in srgb, var(--color-neutral-0) 15%, transparent);
     --interactive-selected-primary-background: var(--color-emerald-300);
     --interactive-selected-primary-background-hover: var(--color-emerald-200);
@@ -397,8 +397,8 @@
   --interactive-unselected-ghost-background: transparent;
   --interactive-unselected-ghost-background-hover: color-mix(in srgb, var(--color-neutral-0) 5%, transparent);
   --interactive-unselected-ghost-background-pressed: color-mix(in srgb, var(--color-neutral-0) 10%, transparent);
-  --interactive-unselected-ghost-text: var(--color-emerald-200);
-  --interactive-unselected-ghost-icon: var(--color-emerald-200);
+  --interactive-unselected-ghost-text: var(--color-neutral-0);
+  --interactive-unselected-ghost-icon: var(--color-neutral-0);
   --interactive-unselected-ghost-border: color-mix(in srgb, var(--color-neutral-0) 15%, transparent);
   --interactive-selected-primary-background: var(--color-emerald-300);
   --interactive-selected-primary-background-hover: var(--color-emerald-200);
