@@ -1,6 +1,6 @@
 {
-  "name": "Trip Hub",
-  "short_name": "Trip Hub",
+  "name": "Rove",
+  "short_name": "Rove",
   "description": "Plan trips together: itinerary, ideas, budget and more.",
   "start_url": "./",
   "scope": "./",

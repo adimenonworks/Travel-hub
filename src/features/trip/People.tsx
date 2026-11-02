@@ -27,7 +27,7 @@ export function People({ trip, profiles, canManage, isOwner }: TripCtx) {
   };
   const share = async (url = link) => {
     if (navigator.share) {
-      try { await navigator.share({ title: `Join ${trip.name}`, text: `Join our trip "${trip.name}" on Trip Hub`, url }); return; } catch { /* cancelled */ }
+      try { await navigator.share({ title: `Join ${trip.name}`, text: `Join our trip "${trip.name}" on Rove`, url }); return; } catch { /* cancelled */ }
     }
     try { await navigator.clipboard.writeText(url); toast({ icon: 'copy', label: 'Invite link copied' }); } catch { /* the link is on screen to copy by hand */ }
   };

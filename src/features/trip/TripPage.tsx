@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Navigate, Route, Routes, useLocation, useMatch, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { EmptyState, HeroCard, LinkButton, PageHeader, Spinner, Tabs, type TabItem } from '../../design/components';
 import { personName, useProfiles, useRole, useSub, useTrip } from '../../data/hooks';
@@ -52,14 +52,9 @@ function TripLoaded({ trip }: { trip: Trip }) {
   const { canManage, isOwner } = useRole(trip);
   const [editing, setEditing] = useState(false);
   const navigate = useNavigate();
-  const { pathname, hash } = useLocation();
+  const { pathname } = useLocation();
   const planPage = useMatch('/trip/:tripId/plan/:activityId');
   const [params] = useSearchParams();
-  const loaded = !!(activities && ideas && expenses && comments && albums);
-  // Home's "Budget" shortcut lands here with #budget: bring the budget card into view.
-  useEffect(() => {
-    if (loaded && hash === '#budget') document.getElementById('budget')?.scrollIntoView({ block: 'center' });
-  }, [loaded, hash]);
 
   if (!activities || !ideas || !expenses || !comments || !albums) return <Spinner center />;
   const ctx: TripCtx = { trip, activities, ideas, expenses, comments, albums, profiles, canManage, isOwner };
