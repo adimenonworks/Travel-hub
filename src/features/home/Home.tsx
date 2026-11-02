@@ -68,7 +68,7 @@ export function Home() {
 
 const place = (t: Trip) => t.destination?.name.split(',').slice(0, 2).join(',') ?? 'No destination yet';
 
-/** The trip you're on, or the next one, as the Figma Hero Card: shortcuts into its itinerary, budget and ideas. */
+/** The trip you're on, or the next one, as the Figma Hero Card: shortcuts into its itinerary, ideas and people. */
 function Hero({ trip }: { trip: Trip }) {
   const profiles = useProfiles(trip.memberIds);
   const activities = useSub(trip.id, 'activities');
@@ -85,8 +85,8 @@ function Hero({ trip }: { trip: Trip }) {
       count={countdown(trip.startDate, trip.endDate)}
       actions={(size) => <>
         <LinkButton to={base} size={size} icon="calendar">Itinerary</LinkButton>
-        <LinkButton to={`${base}#budget`} variant="secondary" size={size} icon="wallet">Budget</LinkButton>
         <LinkButton to={`${base}/ideas`} variant="secondary" size={size} icon="lightbulb">Ideas</LinkButton>
+        <LinkButton to={`${base}/people`} variant="secondary" size={size} icon="people">People</LinkButton>
       </>}
     />
   );

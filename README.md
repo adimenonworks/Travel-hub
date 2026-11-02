@@ -1,4 +1,4 @@
-# Trip Hub
+# Rove
 
 A shared vacation planner. Create trips, invite friends, and plan together:
 
