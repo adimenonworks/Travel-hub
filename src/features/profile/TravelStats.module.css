@@ -1,8 +1,8 @@
 /* Your travels */
 .stats { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-inline-s); }
 @media (min-width: 744px) { .stats { grid-template-columns: repeat(5, 1fr); } }
-.stat { display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-inline-xxs); padding: var(--space-inline-m); border-radius: var(--radius-xl); background: var(--surface-background-secondary); border: 1px solid var(--border-subtle); }
-.statIcon { display: grid; place-items: center; width: 32px; height: 32px; border-radius: 50%; background: var(--surface-brand-subtle); color: var(--icon-brand); margin-bottom: var(--space-inline-xs); }
+.stat { display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-inline-xxs); padding: var(--space-inline-m); border-radius: var(--radius-xl); background: var(--on-light-surface-primary); border: 1px solid var(--on-light-border-subtle); }
+.statIcon { display: grid; place-items: center; width: 32px; height: 32px; border-radius: 50%; background: var(--on-light-surface-brand); color: var(--on-light-icon-brand); margin-bottom: var(--space-inline-xs); }
 /* Heading 1 */
-.statValue { font: var(--type-heading-1); letter-spacing: -0.02em; font-variant-numeric: tabular-nums; color: var(--text-primary); }
+.statValue { font: var(--type-heading-1); letter-spacing: -0.02em; font-variant-numeric: tabular-nums; color: var(--on-light-text-primary); }
 

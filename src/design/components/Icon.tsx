@@ -24,7 +24,7 @@ export function Icon({ name, size = 24, state = 'default', title, style, ...rest
       aria-hidden={title ? undefined : true}
       role={title ? 'img' : undefined}
       // Filled icons are brand-coloured by default (Figma: icon/brand)
-      style={state === 'filled' ? { color: 'var(--icon-brand)', ...style } : style}
+      style={state === 'filled' ? { color: 'var(--on-light-icon-brand)', ...style } : style}
       {...rest}
     >
       {title && <title>{title}</title>}

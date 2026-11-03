@@ -8,7 +8,7 @@
   width: 100%;
   max-height: calc(100% - 40px); /* of the visible area, so it shrinks when the keyboard is up */
   display: flex; flex-direction: column;
-  background: var(--surface-background-tertiary);
+  background: var(--on-light-surface-primary);
   border-radius: var(--radius-xl) var(--radius-xl) 0 0;
   box-shadow: var(--shadow-overlay);
   animation: rise var(--motion-sheet);
@@ -20,7 +20,7 @@
 }
 .header > :first-child { justify-self: start; }
 .header > :last-child { justify-self: end; }
-.title { font: var(--type-heading-4); /* Heading 4 */ letter-spacing: -0.01em; text-align: center; color: var(--text-primary); } /* Heading 4 */
+.title { font: var(--type-heading-4); /* Heading 4 */ letter-spacing: -0.01em; text-align: center; color: var(--on-light-text-primary); } /* Heading 4 */
 .body { overflow-y: auto; padding: var(--space-inline-xs) var(--space-inline-l) var(--space-inline-xxl); display: flex; flex-direction: column; gap: var(--space-inline-l); }
 
 @media (min-width: 744px) {

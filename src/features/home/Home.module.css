@@ -18,7 +18,7 @@
   overflow-x: auto; scroll-snap-type: x proximity; scroll-padding-inline: var(--space-gutter); scrollbar-width: thin;
   margin: 0 calc(-1 * var(--space-gutter)); padding: 0 var(--space-gutter) var(--space-inline-xs);
 }
-.past { scroll-snap-align: start; border: 1px solid var(--border-subtle); }
+.past { scroll-snap-align: start; border: 1px solid var(--on-light-border-subtle); }
 .pastCover { height: 100px; }
 .pastBody { padding: var(--space-inline-s) var(--space-inline-m) var(--space-inline-m); display: flex; flex-direction: column; gap: var(--space-inline-xxs); }
 
