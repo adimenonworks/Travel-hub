@@ -6,10 +6,11 @@
   background: var(--on-light-surface-brand);
   color: var(--on-light-text-brand);
   font: var(--type-label-small); line-height: 1; /* Label small */
-  font-size: min(var(--size-body-small), calc(var(--avatar-size, 32px) * 0.5)); /* 12px at the default text size (as in Figma); grows with it, but never past half the circle */
+  font-size: min(var(--size-body-small), calc(var(--avatar-size, 32px) * 0.375)); /* Figma: 9px in a 24px avatar, 12px from Small (28) up; never outgrows the circle */
   overflow: hidden;
   object-fit: cover;
 }
+.tiny { font-weight: var(--weight-bold); } /* Figma Avatar/Initials/24: Bold initials */
 .stack { display: inline-flex; align-items: center; }
 .stack > * + * { margin-left: -8px; }
 .stack > * { box-shadow: 0 0 0 2px var(--on-light-surface-primary); }
