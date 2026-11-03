@@ -3,16 +3,16 @@
   flex: none; display: inline-grid; place-items: center;
   width: var(--avatar-size, 32px); height: var(--avatar-size, 32px);
   border-radius: 50%;
-  background: var(--surface-brand-subtle);
-  color: var(--text-brand);
+  background: var(--on-light-surface-brand);
+  color: var(--on-light-text-brand);
   font: var(--type-label-small); line-height: 1; /* Small and Medium: Label small; Large and Extra large set their size (Avatar.tsx) */
   overflow: hidden;
   object-fit: cover;
 }
 .stack { display: inline-flex; align-items: center; }
 .stack > * + * { margin-left: -8px; }
-.stack > * { box-shadow: 0 0 0 2px var(--surface-background-secondary); }
-.more { background: var(--surface-background-primary); color: var(--text-body); }
+.stack > * { box-shadow: 0 0 0 2px var(--on-light-surface-primary); }
+.more { background: var(--on-light-surface-secondary); color: var(--on-light-text-primary); }
 
 /* Badge (Figma: tag/* tokens). Small: 24px, Label small. Large: 30px, Label. */
 .badge {
@@ -35,22 +35,22 @@
 .empty { align-items: center; text-align: center; }
 
 /* Spinner */
-.spinner { width: 20px; height: 20px; border-radius: 50%; border: 2.5px solid var(--surface-sunken); border-top-color: var(--icon-brand); animation: spin 0.8s linear infinite; }
+.spinner { width: 20px; height: 20px; border-radius: 50%; border: 2.5px solid var(--on-light-surface-sunken); border-top-color: var(--on-light-icon-brand); animation: spin 0.8s linear infinite; }
 .center { display: grid; place-items: center; padding: var(--space-inline-max); }
 @keyframes spin { to { transform: rotate(360deg); } }
 
 /* Notification (Figma): status background, 20px icon, Label + Body small */
-.note { display: flex; gap: var(--space-inline-s); align-items: flex-start; padding: var(--space-inline-m) var(--space-inline-l); border-radius: var(--radius-xl); color: var(--text-body); }
+.note { display: flex; gap: var(--space-inline-s); align-items: flex-start; padding: var(--space-inline-m) var(--space-inline-l); border-radius: var(--radius-xl); color: var(--on-light-text-primary); }
 .note svg { flex: none; margin-top: 2px; }
 .noteText { display: flex; flex-direction: column; gap: var(--space-inline-xxs); font: var(--type-body-small); }
 .noteLabel { font: var(--type-label); }
-.note-warning { background: var(--status-warning-subtle); }
-.note-warning svg { color: var(--status-warning); }
-.note-success { background: var(--status-success-subtle); }
-.note-success svg { color: var(--status-success); }
-.note-error { background: var(--status-error-subtle); }
-.note-error svg { color: var(--status-error); }
-.note-neutral { background: var(--surface-background-secondary); border: 1px solid var(--border-subtle); }
-.note-neutral svg { color: var(--icon-primary); }
-.note-brand { background: var(--surface-brand-subtle); color: var(--text-brand); }
-.note-brand svg { color: var(--icon-brand); }
+.note-warning { background: var(--on-light-status-warning-subtle); }
+.note-warning svg { color: var(--on-light-status-warning); }
+.note-success { background: var(--on-light-status-success-subtle); }
+.note-success svg { color: var(--on-light-status-success); }
+.note-error { background: var(--on-light-status-error-subtle); }
+.note-error svg { color: var(--on-light-status-error); }
+.note-neutral { background: var(--on-light-surface-primary); border: 1px solid var(--on-light-border-subtle); }
+.note-neutral svg { color: var(--on-light-icon-primary); }
+.note-brand { background: var(--on-light-surface-brand); color: var(--on-light-text-brand); }
+.note-brand svg { color: var(--on-light-icon-brand); }

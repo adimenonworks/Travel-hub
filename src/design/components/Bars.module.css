@@ -6,10 +6,10 @@
 /* Small: title over a Body small subtitle (gap 12); Small button and 48 avatar (gap 12).
    The title breaks only between words (a single word too long for the line is the only thing split). */
 .titleText { flex: 1; display: flex; flex-direction: column; gap: var(--space-inline-s); min-width: 0; } /* 12 between title and subtitle */
-.title { font: var(--type-display-secondary); letter-spacing: -0.01em; overflow-wrap: break-word; color: var(--text-brand); } /* Small: Display secondary (40) */
+.title { font: var(--type-display-secondary); letter-spacing: -0.01em; overflow-wrap: break-word; color: var(--on-light-text-brand); } /* Small: Display secondary (40) */
 .fit { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .fitSmaller { font-size: var(--size-heading-1); } /* same display font, Heading 1 size, when the line still does not fit */
-.subtitle { color: var(--text-subtle); font: var(--type-body-small); } /* Body small */
+.subtitle { color: var(--on-light-text-secondary); font: var(--type-body-small); } /* Body small */
 .actions { flex: none; display: flex; align-items: center; gap: var(--space-inline-s); }
 /* Large: Body subtitle; Regular button and 72 avatar (gap 24) */
 @media (min-width: 744px) {
@@ -25,7 +25,7 @@
   position: relative;
   display: flex; gap: var(--space-inline-xxs);
   overflow-x: auto; scrollbar-width: none;
-  box-shadow: inset 0 -1px 0 var(--border-subtle);
+  box-shadow: inset 0 -1px 0 var(--on-light-divider-default);
 }
 .tabs::-webkit-scrollbar { display: none; }
 .tab {
@@ -50,4 +50,4 @@
 .tab:active { background: var(--interactive-unselected-ghost-background-pressed); }
 .tab:focus-visible { outline-offset: -3px; }
 .tab[aria-current='page'] { color: var(--interactive-selected-ghost-text); }
-.count { font-variant-numeric: tabular-nums; min-width: 20px; padding: 2px 6px; border-radius: var(--radius-round); background: var(--surface-sunken); font-size: var(--size-body-small); line-height: 1.2; text-align: center; }
+.count { font-variant-numeric: tabular-nums; min-width: 20px; padding: 2px 6px; border-radius: var(--radius-round); background: var(--on-light-surface-sunken); font-size: var(--size-body-small); line-height: 1.2; text-align: center; }

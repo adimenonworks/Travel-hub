@@ -1,10 +1,10 @@
 /* Figma "Card": white surface, 1px border/subtle, 24px corners */
 .card {
-  background: var(--surface-background-secondary);
-  border: 1px solid var(--border-subtle);
+  background: var(--on-light-surface-primary);
+  border: 1px solid var(--on-light-border-subtle);
   border-radius: var(--radius-xl);
   padding: var(--space-inset);
-  color: var(--text-body);
+  color: var(--on-light-text-primary);
 }
 .flush { padding: 0; overflow: hidden; }
 
@@ -21,28 +21,53 @@
 .small .buttons { flex-direction: column; align-self: stretch; margin-top: var(--space-inline-xxs); } /* 20 below the text */
 .small .buttons > * { width: 100%; }
 
-.media { flex: none; display: grid; place-items: center; color: var(--icon-brand); }
+.media { flex: none; display: grid; place-items: center; color: var(--on-light-icon-brand); }
 /* The Media slot's default: an icon on the light emerald tile */
-.mediaTile { display: grid; place-items: center; padding: var(--space-inline-xs); border-radius: var(--radius-s); background: var(--surface-brand-subtle); color: var(--icon-brand); }
+.mediaTile { display: grid; place-items: center; padding: var(--space-inline-xs); border-radius: var(--radius-s); background: var(--on-light-surface-brand); color: var(--on-light-icon-brand); }
 .small .mediaTile { padding: var(--space-inline-xxs); border-radius: var(--radius-xs); }
 .content { min-width: 0; display: flex; flex-direction: column; gap: var(--space-inline-xs); }
-.title { color: var(--text-primary); }
-.body { color: var(--text-subtle); }
+.title { color: var(--on-light-text-primary); }
+.body { color: var(--on-light-text-secondary); }
 .buttons { display: flex; flex-wrap: wrap; gap: var(--space-inline-xs); }
 
-/* Tone=Accent: bright emerald; text and icons use text/brand */
+/* Tone=Accent: the card is an on-mid (emerald) surface. Everything inside it that asks for an on-light token
+   gets the on-mid token of the same name instead: the two sets match 1:1, so this is a straight swap. */
 .accent {
-  background: var(--surface-brand);
+  background: var(--on-mid-surface-primary);
   border-color: transparent;
-  color: var(--text-brand);
-  --text-primary: var(--text-brand);
-  --text-body: var(--text-brand);
-  --text-subtle: var(--text-brand);
-  --text-link: var(--text-brand);
-  --icon-primary: var(--icon-on-brand);
-  --icon-brand: var(--icon-on-brand);
-  --border-focus: var(--text-brand);
-  --border-subtle: color-mix(in srgb, var(--text-brand) 20%, transparent);
+  color: var(--on-mid-text-primary);
+  --on-light-surface-primary: var(--on-mid-surface-primary);
+  --on-light-surface-secondary: var(--on-mid-surface-secondary);
+  --on-light-surface-brand: var(--on-mid-surface-brand);
+  --on-light-surface-sunken: var(--on-mid-surface-sunken);
+  --on-light-text-primary: var(--on-mid-text-primary);
+  --on-light-text-secondary: var(--on-mid-text-secondary);
+  --on-light-text-brand: var(--on-mid-text-brand);
+  --on-light-link-default: var(--on-mid-link-default);
+  --on-light-link-hover: var(--on-mid-link-hover);
+  --on-light-link-pressed: var(--on-mid-link-pressed);
+  --on-light-icon-primary: var(--on-mid-icon-primary);
+  --on-light-icon-secondary: var(--on-mid-icon-secondary);
+  --on-light-icon-brand: var(--on-mid-icon-brand);
+  --on-light-border-subtle: var(--on-mid-border-subtle);
+  --on-light-border-bold: var(--on-mid-border-bold);
+  --on-light-border-focus: var(--on-mid-border-focus);
+  --on-light-border-brand: var(--on-mid-border-brand);
+  --on-light-divider-default: var(--on-mid-divider-default);
+  --on-light-illustration-primary: var(--on-mid-illustration-primary);
+  --on-light-illustration-secondary: var(--on-mid-illustration-secondary);
+  --on-light-illustration-accent: var(--on-mid-illustration-accent);
+  --on-light-illustration-accent-bold: var(--on-mid-illustration-accent-bold);
+  --on-light-illustration-accent-subtle: var(--on-mid-illustration-accent-subtle);
+  --on-light-illustration-warm: var(--on-mid-illustration-warm);
+  --on-light-illustration-warm-bold: var(--on-mid-illustration-warm-bold);
+  --on-light-illustration-border: var(--on-mid-illustration-border);
+  --on-light-status-success: var(--on-mid-status-success);
+  --on-light-status-success-subtle: var(--on-mid-status-success-subtle);
+  --on-light-status-warning: var(--on-mid-status-warning);
+  --on-light-status-warning-subtle: var(--on-mid-status-warning-subtle);
+  --on-light-status-error: var(--on-mid-status-error);
+  --on-light-status-error-subtle: var(--on-mid-status-error-subtle);
 }
 
 .interactive { position: relative; isolation: isolate; cursor: pointer; transition: transform var(--motion-fast), background var(--motion-fast); text-align: left; width: 100%; color: inherit; display: block; }
@@ -53,5 +78,5 @@
 
 .section { display: flex; flex-direction: column; gap: var(--space-inline-s); }
 .sectionHeader { display: flex; align-items: center; justify-content: space-between; gap: var(--space-inline-s); min-height: var(--size-tap); flex-wrap: wrap; }
-.sectionTitle { font: var(--type-heading-2); letter-spacing: -0.02em; color: var(--text-primary); }
-.sectionFooter { font: var(--type-label-small); color: var(--text-subtle); padding: 0 var(--space-inline-xs); }
+.sectionTitle { font: var(--type-heading-2); letter-spacing: -0.02em; color: var(--on-light-text-primary); }
+.sectionFooter { font: var(--type-label-small); color: var(--on-light-text-secondary); padding: 0 var(--space-inline-xs); }

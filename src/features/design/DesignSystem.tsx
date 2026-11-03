@@ -7,16 +7,23 @@ import {
 import { flagUrl } from '../../lib/countries';
 import s from './DesignSystem.module.css';
 
-// Same groups and names as the Figma "Color" collection.
+// Colour by surface: same groups and names as the Figma "Color" collection. Every set has the same token names
+// (accents leave out status), so each one is shown on its own surface.
+const SET_TOKENS = ["surface-primary", "surface-secondary", "surface-brand", "surface-sunken", "text-primary", "text-secondary", "text-brand", "link-default", "link-hover", "link-pressed", "icon-primary", "icon-secondary", "icon-brand", "border-subtle", "border-bold", "border-focus", "border-brand", "divider-default", "illustration-primary", "illustration-secondary", "illustration-accent", "illustration-accent-bold", "illustration-accent-subtle", "illustration-warm", "illustration-warm-bold", "illustration-border", "status-success", "status-success-subtle", "status-warning", "status-warning-subtle", "status-error", "status-error-subtle"];
+const surfaceSets: { name: string; title: string; note: string }[] = [
+  { name: 'on-light', title: 'On light', note: 'White and light grey: the canvas, cards and sheets.' },
+  { name: 'on-mid', title: 'On mid', note: 'Bright emerald: the Hero Card frame and accent cards.' },
+  { name: 'on-dark', title: 'On dark', note: 'Deep emerald: the Hero Card panel.' },
+  { name: 'on-yellow', title: 'Accent: yellow', note: 'Sparingly, for stand-out cards.' },
+  { name: 'on-orange', title: 'Accent: orange', note: 'Sparingly, for stand-out cards.' },
+  { name: 'on-green', title: 'Accent: green', note: 'Sparingly, for stand-out cards.' },
+  { name: 'on-pink', title: 'Accent: pink', note: 'Sparingly, for stand-out cards.' },
+];
+const isAccent = (name: string) => !['on-light', 'on-mid', 'on-dark'].includes(name);
 const colorGroups: { title: string; tokens: string[] }[] = [
-  { title: 'Text', tokens: ['--text-primary', '--text-body', '--text-subtle', '--text-inverse', '--text-brand', '--text-on-brand-bold', '--text-on-image', '--text-link', '--text-link-hover', '--text-link-pressed'] },
-  { title: 'Icon', tokens: ['--icon-primary', '--icon-subtle', '--icon-inverse', '--icon-brand', '--icon-brand-hover', '--icon-on-brand', '--icon-on-secondary', '--icon-on-selected', '--icon-on-destructive'] },
-  { title: 'Status', tokens: ['--status-success', '--status-warning', '--status-error', '--status-success-subtle', '--status-warning-subtle', '--status-error-subtle'] },
-  { title: 'Surface', tokens: ['--surface-background-primary', '--surface-background-secondary', '--surface-background-tertiary', '--surface-brand', '--surface-brand-subtle', '--surface-brand-bold', '--surface-sunken'] },
   { title: 'Interactive / button (hover lighter, pressed darker)', tokens: ['--interactive-button-primary-background', '--interactive-button-primary-background-hover', '--interactive-button-primary-background-pressed', '--interactive-button-secondary-background', '--interactive-button-secondary-background-hover', '--interactive-button-secondary-background-pressed', '--interactive-button-ghost-background-hover', '--interactive-button-ghost-background-pressed', '--interactive-button-inverse-background', '--interactive-button-destructive-background', '--interactive-button-destructive-background-hover', '--interactive-button-destructive-background-pressed'] },
   { title: 'Interactive / selected & unselected', tokens: ['--interactive-selected-primary-background', '--interactive-selected-secondary-background', '--interactive-selected-ghost-border', '--interactive-unselected-ghost-background', '--interactive-unselected-ghost-border', '--interactive-unselected-ghost-text'] },
-  { title: 'Illustration', tokens: ['--illustration-primary', '--illustration-secondary', '--illustration-accent', '--illustration-accent-subtle', '--illustration-accent-bold', '--illustration-border', '--illustration-warm', '--illustration-warm-bold'] },
-  { title: 'Border', tokens: ['--border-subtle', '--border-bold', '--border-accent', '--border-focus', '--input-field-border'] },
+  { title: 'Input and overlay', tokens: ['--input-field-background', '--input-field-border', '--input-field-border-selected', '--overlay-scrim', '--overlay-image'] },
 ];
 
 // One row per Figma text style. Sizes are phone → 744px and up.
@@ -60,7 +67,23 @@ export function DesignSystem() {
     <>
       <div className={s.page}>
         <PageHeader title="Design system" action={{ icon: 'pencil', label: 'Example header button', onClick: () => {} }} subtitle="Primitives → semantic tokens → components. One brand colour (emerald), light and dark mode. Every text pairing meets WCAG 2.2 AA." />
-        <Section title="Colour" footer="Semantic tokens from src/design/tokens/semantic.css. Switch light/dark mode in Profile → Appearance.">
+        <Section title="Colour" footer="Semantic tokens from src/design/tokens/semantic.css, organised by the surface they sit on. Switch light/dark mode in Profile → Appearance.">
+          {surfaceSets.map((set) => (
+            <div key={set.name} className={s.surfaceSet} style={{ background: `var(--${set.name}-surface-primary)`, color: `var(--${set.name}-text-primary)` }}>
+              <div className="t-heading-4">{set.title}</div>
+              <p className="t-body-small" style={{ color: `var(--${set.name}-text-secondary)` }}>
+                {set.note} <span style={{ color: `var(--${set.name}-link-default)`, textDecoration: 'underline' }}>A link</span>
+              </p>
+              <div className={s.swatches}>
+                {SET_TOKENS.filter((t) => !(isAccent(set.name) && t.startsWith('status-'))).map((t) => (
+                  <div key={t} className={s.swatch}>
+                    <div className={s.chip} style={{ background: `var(--${set.name}-${t})`, boxShadow: `inset 0 0 0 1px var(--${set.name}-border-subtle)` }} />
+                    <code className={s.code} style={{ color: `var(--${set.name}-text-secondary)` }}>{set.name}-{t}</code>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
           {colorGroups.map((g) => (
             <Card key={g.title}>
               <div className="t-heading-4" style={{ marginBottom: 'var(--space-inline-s)' }}>{g.title}</div>

@@ -5,13 +5,13 @@
   display: flex; flex-direction: column; align-items: center; gap: var(--space-inline-m); text-align: center;
   padding: var(--space-inline-xl);
   border-radius: var(--radius-xl);
-  background: var(--surface-background-tertiary);
+  background: var(--on-light-surface-primary);
   box-shadow: var(--shadow-overlay);
   animation: pop var(--motion-sheet) both;
 }
 .text { display: flex; flex-direction: column; gap: var(--space-inline-xxs); }
-.title { margin: 0; font: var(--type-heading-2); letter-spacing: -0.02em; color: var(--text-primary); } /* Heading 2 */
-.body { font: var(--type-body-small); color: var(--text-subtle); } /* Body small */
+.title { margin: 0; font: var(--type-heading-2); letter-spacing: -0.02em; color: var(--on-light-text-primary); } /* Heading 2 */
+.body { font: var(--type-body-small); color: var(--on-light-text-secondary); } /* Body small */
 .buttons { align-self: stretch; display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-inline-xs); }
 @media (min-width: 744px) {
   .text { gap: var(--space-inline-xs); }
