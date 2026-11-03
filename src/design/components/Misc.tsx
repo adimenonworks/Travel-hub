@@ -13,7 +13,7 @@ function initials(name: string) {
 export function Avatar({ name, photo, size = 32 }: { name: string; photo?: string | null; size?: number; seed?: string }) {
   const style = { '--avatar-size': `${Math.min(size, 32)}px` } as CSSProperties; // Figma Avatar up to Medium (32); Large and Extra large are archived
   if (photo) return <img className={s.avatar} style={style} src={photo} alt={name} title={name} referrerPolicy="no-referrer" />;
-  return <span className={[s.avatar, size <= 24 && s.tiny].filter(Boolean).join(' ')} style={style} title={name} role="img" aria-label={name}>{initials(name)}</span>;
+  return <span className={s.avatar} style={style} title={name} role="img" aria-label={name}>{initials(name)}</span>;
 }
 
 export function AvatarStack({ people, max = 4, size = 28 }: { people: { id: string; name: string; photo?: string | null }[]; max?: number; size?: number }) {
