@@ -4,16 +4,16 @@
  */
 :root {
   --type-display: var(--weight-black) var(--size-display)/1 var(--font-display);
-  --type-display-small: var(--weight-black) 56px/1 var(--font-display);
+  --type-display-small: var(--weight-black) calc(56rem / 17)/1 var(--font-display);
   --type-display-secondary: var(--weight-black) var(--size-display-secondary)/1 var(--font-display);
-  --type-display-tiny: var(--weight-black) 32px/1 var(--font-display);
+  --type-display-tiny: var(--weight-black) calc(32rem / 17)/1 var(--font-display);
   --type-heading-1: var(--weight-bold) var(--size-heading-1)/1 var(--font-family);
   --type-heading-2: var(--weight-semibold) var(--size-heading-2)/1 var(--font-family);
   --type-heading-3: var(--weight-semibold) var(--size-heading-3)/1 var(--font-family);
-  --type-heading-4: var(--weight-bold) 18px/1 var(--font-family);
+  --type-heading-4: var(--weight-bold) calc(18rem / 17)/1 var(--font-family);
   --type-body: var(--weight-regular) var(--size-body)/1.5 var(--font-family);
   --type-body-small: var(--weight-regular) var(--size-body-small)/1.5 var(--font-family);
-  --type-label: var(--weight-medium) 14px/1.5 var(--font-family);
+  --type-label: var(--weight-medium) calc(14rem / 17)/1.5 var(--font-family);
   --type-label-small: var(--weight-medium) var(--size-body-small)/1.5 var(--font-family);
   --type-link: var(--weight-medium) var(--size-body)/1 var(--font-family);
   --type-link-small: var(--weight-medium) var(--size-body-small)/1 var(--font-family);
@@ -33,11 +33,11 @@
 .t-link { font: var(--type-link); }
 .t-link-small { font: var(--type-link-small); }
 
-.t-display, .t-display-small, .t-display-secondary, .t-display-tiny { color: var(--text-brand); }
-.t-heading-1, .t-heading-2, .t-heading-3, .t-heading-4 { color: var(--text-primary); }
+.t-display, .t-display-small, .t-display-secondary, .t-display-tiny { color: var(--on-light-text-brand); }
+.t-heading-1, .t-heading-2, .t-heading-3, .t-heading-4 { color: var(--on-light-text-primary); }
 
 /* Helpers */
-.t-secondary { color: var(--text-subtle); }
-.t-danger { color: var(--status-error); }
+.t-secondary { color: var(--on-light-text-secondary); }
+.t-danger { color: var(--on-light-status-error); }
 .t-bold { font-weight: var(--weight-semibold); }
 .t-num { font-variant-numeric: tabular-nums; }

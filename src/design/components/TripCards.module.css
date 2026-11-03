@@ -54,7 +54,7 @@
   .flag { width: 24px; height: 24px; }
   .count { width: 160px; height: 126px; padding-left: var(--space-inline-xl); border-bottom-left-radius: var(--radius-xxxxxl); } /* Large: 160×126, radius 80; text sits 12 right of centre, clear of the curve */
   .countValue { font-size: var(--size-display); } /* Display */
-  .countLabel { font-size: 14px; } /* Label */
+  .countLabel { font-size: calc(14rem / 17); } /* Label */
 }
 
 /* ---------- Content Card ---------- */
@@ -156,6 +156,6 @@
 }
 .timelineLine { flex: 1; height: 1px; background: repeating-linear-gradient(90deg, var(--on-light-border-brand) 0 6px, transparent 6px 12px); }
 @media (min-width: 744px) {
-  .timelineTab { font-size: 14px; }
+  .timelineTab { font-size: calc(14rem / 17); }
   .timelineLine { height: 2px; }
 }

@@ -2,7 +2,7 @@
   position: relative;
   display: inline-grid;
   grid-auto-flow: column;
-  grid-auto-columns: 1fr;
+  grid-auto-columns: minmax(0, 1fr); /* equal columns that may shrink, so big text wraps instead of scrolling sideways */
   padding: var(--space-inline-xxs);
   gap: var(--space-inline-xxs);
   background: transparent;
@@ -19,7 +19,7 @@
   background: transparent;
   font: var(--type-label); /* Label */
   color: var(--interactive-selected-ghost-text);
-  white-space: nowrap;
+  overflow-wrap: anywhere; text-align: center;
   position: relative; z-index: 1;
   transition: background var(--motion-fast), color var(--motion-fluid), transform var(--motion-release);
 }

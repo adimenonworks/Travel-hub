@@ -1,12 +1,16 @@
 import { initializeApp, type FirebaseOptions } from 'firebase/app';
-import { GoogleAuthProvider, getAuth, getRedirectResult, onAuthStateChanged, signInWithPopup, signInWithRedirect, signOut } from 'firebase/auth';
+import {
+  GoogleAuthProvider, browserLocalPersistence, getAuth, getRedirectResult, indexedDBLocalPersistence, initializeAuth, onAuthStateChanged,
+  signInWithCredential, signInWithPopup, signInWithRedirect, signOut,
+} from 'firebase/auth';
 import {
   Timestamp, addDoc, arrayRemove, arrayUnion, collection, deleteDoc, deleteField, doc, getDoc, getDocs,
-  getFirestore, onSnapshot, query, setDoc, updateDoc, where, writeBatch, type DocumentData,
+  initializeFirestore, onSnapshot, persistentLocalCache, persistentMultipleTabManager, query, setDoc, updateDoc, where, writeBatch, type DocumentData,
 } from 'firebase/firestore';
 import type { Store } from './store';
 import type { Invite, Profile, SubName, Trip } from './types';
 import { randomCode } from './util';
+import { googleIosClientId, isNativeApp } from '../lib/native';
 
 const SUBS: SubName[] = ['activities', 'ideas', 'expenses', 'comments', 'albums'];
 // Profile fields only their owner may read; they live in users/{uid}/private/places.
@@ -23,11 +27,15 @@ export function createFirebaseStore(config: FirebaseOptions): Store {
   const host = location.hostname;
   const sameSiteAuth = host.endsWith('.web.app') || host.endsWith('.firebaseapp.com');
   const app = initializeApp(sameSiteAuth ? { ...config, authDomain: host } : config);
-  const auth = getAuth(app);
-  // Surfaces errors from a redirect sign-in that just completed.
+  // In the iPhone app there are no pop-ups or redirects: sign-in happens natively (see signIn) and the session is
+  // kept on the device. getAuth() would try to load the web pop-up helper, which never loads inside the app.
+  const auth = isNativeApp ? initializeAuth(app, { persistence: [indexedDBLocalPersistence, browserLocalPersistence] }) : getAuth(app);
+  // Surfaces errors from a redirect sign-in that just completed (web only).
   let lastAuthError: unknown = null;
-  const redirectResult = getRedirectResult(auth).catch((e) => { lastAuthError = e; return null; });
-  const db = getFirestore(app);
+  const redirectResult = isNativeApp ? Promise.resolve(null) : getRedirectResult(auth).catch((e) => { lastAuthError = e; return null; });
+  // Offline: keep a copy of everything you've opened on the device, and queue changes made without signal.
+  // They show straight away and save when the connection comes back.
+  const db = initializeFirestore(app, { localCache: persistentLocalCache({ tabManager: persistentMultipleTabManager() }) });
 
   const withId = <T,>(id: string, data: DocumentData) => ({ ...data, id }) as T;
 
@@ -50,6 +58,17 @@ export function createFirebaseStore(config: FirebaseOptions): Store {
       });
     },
     async signIn() {
+      if (isNativeApp) {
+        // Google's own sign-in sheet on the iPhone, then hand its ID token to Firebase.
+        if (!googleIosClientId) throw Object.assign(new Error('iPhone sign-in is not set up yet.'), { code: 'app/ios-client-missing' });
+        const { SocialLogin } = await import('@capgo/capacitor-social-login');
+        await SocialLogin.initialize({ google: { iOSClientId: googleIosClientId } });
+        const res = await SocialLogin.login({ provider: 'google', options: { scopes: ['email', 'profile'] } });
+        const idToken = 'idToken' in res.result ? res.result.idToken : null;
+        if (!idToken) throw Object.assign(new Error('Google did not return a sign-in token.'), { code: 'app/no-id-token' });
+        await signInWithCredential(auth, GoogleAuthProvider.credential(idToken));
+        return;
+      }
       await redirectResult;
       const provider = new GoogleAuthProvider();
       try {
@@ -67,6 +86,10 @@ export function createFirebaseStore(config: FirebaseOptions): Store {
       return e;
     },
     async signOut() {
+      if (isNativeApp) {
+        const { SocialLogin } = await import('@capgo/capacitor-social-login');
+        await SocialLogin.logout({ provider: 'google' }).catch(() => {});
+      }
       await signOut(auth);
     },
 
