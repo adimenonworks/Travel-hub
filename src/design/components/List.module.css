@@ -33,7 +33,7 @@
   width: 40px; height: 40px; border-radius: var(--radius-round);
   color: var(--on-light-icon-brand); background: var(--on-light-surface-brand);
 }
-.content { flex: 1 1 calc(40rem / 17); /* the name keeps at least 40px (at the default text size) before the trailing part wraps under it */ min-width: 0; display: flex; flex-direction: column; }
+.content { flex: 1 1 calc(100rem / 17); /* the name keeps 100px (at the default text size); with less room the trailing part (role, buttons) moves under it */ min-width: 0; display: flex; flex-direction: column; }
 .title { overflow: hidden; text-overflow: ellipsis; font: var(--type-body); /* Body */ color: var(--on-light-text-primary); }
 .subtitle { font: var(--type-body-small); /* Body small */ color: var(--on-light-text-secondary); overflow: hidden; text-overflow: ellipsis; }
 .trailing { flex: 0 1 auto; max-width: 100%; display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-inline-xs); font: var(--type-body-small); color: var(--on-light-text-secondary); } /* Body small */
