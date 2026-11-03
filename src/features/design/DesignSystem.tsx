@@ -24,20 +24,20 @@ const colorGroups: { title: string; tokens: string[] }[] = [
   { title: 'Input and overlay', tokens: ['--input-field-background', '--input-field-border', '--input-field-border-selected', '--overlay-scrim', '--overlay-image'] },
 ];
 
-// One row per Figma text style. Sizes are phone → 744px and up.
+// One row per Figma text style, at the default iPhone text size.
 const typeStyles = [
-  ['t-display', 'Display', '48 → 64 · Poppins Black · 100%'],
+  ['t-display', 'Display', '48 · Poppins Black · 100%'],
   ['t-display-small', 'Display small', '56 · Poppins Black · 100%'],
-  ['t-display-secondary', 'Display secondary', '40 → 48 · Poppins Black · 100%'],
-  ['t-heading-1', 'Heading 1', '28 → 32 · Manrope Bold · 100%'],
-  ['t-heading-2', 'Heading 2', '20 → 24 · Semibold · 100%'],
-  ['t-heading-3', 'Heading 3', '18 → 20 · Semibold · 100%'],
+  ['t-display-secondary', 'Display secondary', '40 · Poppins Black · 100%'],
+  ['t-heading-1', 'Heading 1', '28 · Manrope Bold · 100%'],
+  ['t-heading-2', 'Heading 2', '20 · Semibold · 100%'],
+  ['t-heading-3', 'Heading 3', '18 · Semibold · 100%'],
   ['t-heading-4', 'Heading 4', '18 · Bold · 100%'],
-  ['t-body', 'Body', '14 → 16 · Regular · 150%'],
-  ['t-body-small', 'Body small', '12 → 14 · Regular · 150%'],
+  ['t-body', 'Body', '14 · Regular · 150%'],
+  ['t-body-small', 'Body small', '12 · Regular · 150%'],
   ['t-label', 'Label', '14 · Medium · 150%'],
-  ['t-label-small', 'Label small', '12 → 14 · Medium · 150%'],
-  ['t-link', 'Link', '14 → 16 · Medium'],
+  ['t-label-small', 'Label small', '12 · Medium · 150%'],
+  ['t-link', 'Link', '14 · Medium'],
 ];
 
 const spaces = ['--space-inline-xxs', '--space-inline-xs', '--space-inline-s', '--space-inline-m', '--space-inline-l', '--space-inline-xl', '--space-inline-xxl', '--space-inline-max'];
@@ -121,7 +121,7 @@ export function DesignSystem() {
           ))}
         </Section>
 
-        <Section title="Typography" footer="Same names as the Figma text styles. Poppins Black for display titles and big numbers; Manrope for everything else. Headings are one line (100% line height). Nothing is under 14px from 744px up.">
+        <Section title="Typography" footer="Same names as the Figma text styles. Poppins Black for display titles and big numbers; Manrope for everything else. Headings are one line (100% line height). Sizes follow the iPhone text setting (shown here at the default).">
           <Card className={s.stack}>
             {typeStyles.map(([cls, name, spec]) => (
               <div key={cls} className={s.typeRow}>
@@ -219,7 +219,7 @@ export function DesignSystem() {
           <HeroCard image={<Illustration name={COVER_ILLUSTRATIONS[0]} />} title="Summer in Lisbon" subtitle="Jul 3 – 9 · 7 days"
             countries={[{ code: 'pt', name: 'Portugal', flag: flagUrl('pt') }, { code: 'es', name: 'Spain', flag: flagUrl('es') }]}
             people={['Ana', 'Ben', 'Cy'].map((n) => ({ id: n, name: n }))} count={{ value: 28, label: 'Days to go' }}
-            actions={(size) => <><Button size={size} icon="calendar">Itinerary</Button><Button size={size} variant="secondary" icon="wallet">Budget</Button><Button size={size} variant="secondary" icon="lightbulb">Ideas</Button></>} />
+            actions={<><Button size="small" icon="calendar">Itinerary</Button><Button size="small" variant="secondary" icon="lightbulb">Ideas</Button><Button size="small" variant="secondary" icon="people">People</Button></>} />
           <BudgetCard amount="€120" label="Left today" total="€2,000" level="ok" action={<Button variant="secondary" icon="pencil">Edit budgets</Button>} />
           <BudgetCard amount="€0" label="Planned so far" total="No total set" level="ok" action={<Button variant="secondary" icon="pencil">Add budget</Button>} />
           <BudgetCard amount="€35" label="Left today" total="€2,000" level="low" />
@@ -260,10 +260,10 @@ export function DesignSystem() {
         <Section title="Feedback & identity">
           <Card className={s.stack}>
             <div className={s.row}>
-              <Badge>Neutral</Badge><Badge tone="tint">Tint</Badge><Badge tone="success" icon="check">Success</Badge><Badge tone="warning">Warning</Badge><Badge tone="danger">Danger</Badge><Badge tone="category" icon="camera">Category</Badge><Badge tone="inverse">Inverse</Badge><Badge size="large" icon="star" iconState="filled">Large</Badge>
+              <Badge>Neutral</Badge><Badge tone="tint">Tint</Badge><Badge tone="success" icon="check">Success</Badge><Badge tone="warning">Warning</Badge><Badge tone="danger">Danger</Badge><Badge tone="category" icon="camera">Category</Badge><Badge tone="inverse">Inverse</Badge><Badge icon="star" iconState="filled">With icon</Badge>
             </div>
             <div className={s.row}>
-              <Avatar name="Alex Kim" size={44} /><Avatar name="Jo" size={32} />
+              <Avatar name="Alex Kim" size={32} /><Avatar name="Jo" size={32} />
               <AvatarStack people={['Ana', 'Ben', 'Cy', 'Dee', 'Eli', 'Fay'].map((n) => ({ id: n, name: n }))} />
               <Spinner />
             </div>

@@ -1,10 +1,10 @@
 .shell { min-height: 100dvh; }
 
 /* Your profile picture, at the right of each Page Header */
-.me { display: grid; place-items: center; border-radius: 50%; transition: transform var(--motion-release); }
+.me { display: grid; place-items: center; min-width: var(--size-tap); min-height: var(--size-tap); border-radius: 50%; transition: transform var(--motion-release); } /* 32px avatar, 44px tap area */
 .me:hover { filter: brightness(1.06); }
 .me:active { transform: scale(0.96); transition: transform var(--motion-press); }
-.me[aria-current='page'] { box-shadow: 0 0 0 2px var(--on-light-surface-secondary), 0 0 0 4px var(--interactive-selected-ghost-border); }
+.me[aria-current='page'] > * { box-shadow: 0 0 0 2px var(--on-light-surface-secondary), 0 0 0 4px var(--interactive-selected-ghost-border); }
 
 .main { min-width: 0; padding-top: env(safe-area-inset-top); }
 .content {

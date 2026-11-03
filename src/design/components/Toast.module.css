@@ -11,7 +11,6 @@
 }
 .icon { color: var(--on-light-icon-secondary); flex: none; }
 .small { font: var(--type-label-small); } /* Label small */
-.large { font: var(--type-label); } /* Label */
 .error { background: var(--on-light-status-error-subtle); color: var(--on-light-status-error); } /* Tone=Error */
 .error .icon { color: var(--on-light-status-error); }
 .leaving { animation: toastOut var(--motion-sheet-out) both; }

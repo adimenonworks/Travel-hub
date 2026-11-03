@@ -32,8 +32,8 @@
   --interactive-selected-primary-background: var(--color-emerald-700);
   --interactive-selected-primary-background-hover: var(--color-emerald-600);
   --interactive-selected-primary-background-pressed: var(--color-emerald-800);
-  --interactive-selected-primary-text: var(--color-emerald-0);
-  --interactive-selected-primary-icon: var(--color-emerald-0);
+  --interactive-selected-primary-text: var(--color-neutral-0);
+  --interactive-selected-primary-icon: var(--color-neutral-0);
   --interactive-selected-secondary-background: var(--color-emerald-800);
   --interactive-selected-secondary-background-hover: var(--color-emerald-700);
   --interactive-selected-secondary-background-pressed: var(--color-emerald-900);
@@ -150,7 +150,7 @@
   --on-mid-text-brand: var(--color-emerald-800);
   --on-mid-link-default: var(--color-emerald-800);
   --on-mid-link-hover: var(--color-emerald-900);
-  --on-mid-link-pressed: var(--color-emerald-1000);
+  --on-mid-link-pressed: var(--color-neutral-1000);
   --on-mid-icon-primary: var(--color-emerald-900);
   --on-mid-icon-secondary: var(--color-emerald-800);
   --on-mid-icon-brand: var(--color-emerald-800);
@@ -257,11 +257,12 @@
   --space-stack: var(--space-page-s);      /* gap between sections */
   --space-page-top: var(--space-page-l);   /* space above the page title */
 
-  /* Typography (Figma "Typography" collection; "Small" mode below 744px) */
+  /* Typography (Figma "Typography" collection, its one mode). Sizes follow the iPhone text setting (see base.css).
+     Titles and headings grow up to 1.4x their Figma size, like iOS large titles; body and label text keep growing. */
   --font-family: var(--font-manrope);
   --font-display: var(--font-poppins);
   --weight-regular: 400; --weight-medium: 500; --weight-semibold: 600; --weight-bold: 700; --weight-black: 900;
-  --size-display: calc(48rem / 17); --size-display-secondary: calc(40rem / 17); --size-heading-1: calc(28rem / 17); --size-heading-2: calc(20rem / 17); --size-heading-3: calc(18rem / 17);
+  --size-display: min(calc(48rem / 17), 67px); --size-display-secondary: min(calc(40rem / 17), 56px); --size-heading-1: min(calc(28rem / 17), 39px); --size-heading-2: min(calc(20rem / 17), 28px); --size-heading-3: min(calc(18rem / 17), 25px);
   --size-body: calc(14rem / 17); --size-body-small: calc(12rem / 17);
 
   /* Effects (Figma effect styles) */
@@ -271,7 +272,7 @@
   --blur-overlay: 20px;
 
   /* Sizing and motion (code only) */
-  --size-tap: 44px; --size-control: 48px; --size-control-sm: 40px; --size-content-max: 1200px;
+  --size-tap: 44px; --size-control: 48px; --size-control-sm: 40px; --size-content-max: 480px; /* phone width: on a computer the test site shows a centred phone column */
   --motion-fast: var(--duration-fast) var(--ease-standard);
   --motion-base: var(--duration-base) var(--ease-standard);
   --motion-sheet: var(--duration-sheet) var(--ease-spring);
@@ -281,17 +282,6 @@
   --motion-release: var(--duration-slow) var(--ease-bounce);
 }
 
-/* Figma Typography "Regular+" mode: 744px and wider. Nothing on these screens is smaller than 14px. */
-@media (min-width: 744px) {
-  :root {
-    --size-display: calc(64rem / 17); --size-display-secondary: calc(48rem / 17); --size-heading-1: calc(32rem / 17); --size-heading-2: calc(24rem / 17); --size-heading-3: calc(20rem / 17);
-    --size-body: calc(16rem / 17); --size-body-small: calc(14rem / 17);
-    --space-gutter: var(--space-page-s); --space-inset: var(--space-inline-xl); --space-stack: var(--space-page-l); --space-page-top: var(--space-page-xl);
-  }
-}
-@media (min-width: 1068px) {
-  :root { --space-gutter: var(--space-page-l); }
-}
 
 /* Dark mode: follows the OS unless the person forces light */
 @media (prefers-color-scheme: dark) {

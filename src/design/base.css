@@ -58,5 +58,5 @@ button { cursor: pointer; }
   *, *::before, *::after { animation-duration: 1ms !important; transition-duration: 1ms !important; }
 }
 
-/* Map attribution follows the small text size (14px from 744px up). */
+/* Map attribution follows the small text size. */
 .leaflet-container, .leaflet-container .leaflet-control-attribution { font-size: var(--size-body-small); }

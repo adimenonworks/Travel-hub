@@ -83,10 +83,10 @@ function Hero({ trip }: { trip: Trip }) {
       countries={tripCountries(trip, activities ?? []).map((code) => ({ code, name: countryName(code), flag: flagUrl(code) }))}
       people={trip.memberIds.map((id) => ({ id, name: personName(profiles, id), photo: profiles[id]?.photo }))}
       count={countdown(trip.startDate, trip.endDate)}
-      actions={(size) => <>
-        <LinkButton to={base} size={size} icon="calendar">Itinerary</LinkButton>
-        <LinkButton to={`${base}/ideas`} variant="secondary" size={size} icon="lightbulb">Ideas</LinkButton>
-        <LinkButton to={`${base}/people`} variant="secondary" size={size} icon="people">People</LinkButton>
+      actions={<>
+        <LinkButton to={base} size="small" icon="calendar">Itinerary</LinkButton>
+        <LinkButton to={`${base}/ideas`} variant="secondary" size="small" icon="lightbulb">Ideas</LinkButton>
+        <LinkButton to={`${base}/people`} variant="secondary" size="small" icon="people">People</LinkButton>
       </>}
     />
   );
@@ -146,7 +146,7 @@ function PlanTile({ wide }: { wide?: boolean }) {
   }, [leaving, word]);
 
   return (
-    <Card type={wide ? 'large' : 'small'} className={s.plan}
+    <Card className={s.plan}
       media={<Illustration name="globe" size={64} square />}
       title={<h2 className={s.planTitle}>
         <span className="visually-hidden">Plan a new trip</span>

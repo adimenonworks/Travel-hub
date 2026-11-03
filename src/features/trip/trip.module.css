@@ -28,9 +28,9 @@
 }
 .days::-webkit-scrollbar { display: none; }
 .day {
-  --day-open: 178px;
+  --day-open: calc(178rem / 17);
   position: relative; flex: none; scroll-snap-align: start; overflow: hidden;
-  width: 74px; height: 139px; padding: 0;
+  width: calc(74rem / 17); height: calc(139rem / 17); padding: 0; /* 74×139 at the default text size, growing with it */
   border-radius: var(--radius-xl); border: 1px solid var(--interactive-unselected-ghost-border); text-align: left;
   background: var(--interactive-unselected-ghost-background); color: var(--interactive-unselected-ghost-text);
   transition: width var(--day-move), height var(--day-move), background-color var(--day-move), color var(--day-move), border-color var(--day-move);
@@ -66,16 +66,6 @@
 .dayBadges { display: flex; gap: var(--space-inline-xxs); white-space: nowrap; }
 
 .itinLayout { display: flex; flex-direction: column; gap: calc(var(--space-inline-xxl) - var(--space-inline-xxs)); } /* 32 from the day cards to the day's plan (the strip keeps 4 below the cards for focus rings) */
-@media (min-width: 1068px) {
-  .itinLayout { display: grid; grid-template-columns: 240px minmax(0, 1fr); gap: var(--space-inline-xxl); align-items: start; }
-  .days { flex-direction: column; overflow: visible; margin: 0; padding: 0; position: sticky; top: 92px; }
-  .day, .day[aria-pressed='true'] { --day-open: 100%; width: 100%; height: 58px; }
-  .day[aria-pressed='true'] { height: 131px; }
-  /* List, not selected: padding 16/20, number (24) beside the word, gap 12 */
-  .dayCompact { flex-direction: row; justify-content: flex-start; gap: var(--space-inline-s); padding: var(--space-inline-m) var(--space-inline-l); }
-  .dayCompact .dayNum { font-size: calc(24rem / 17); } /* List layout: Display tiny at 24 (Figma overrides the size here) */
-  .dayOpen { height: 131px; padding: var(--space-inline-m) var(--space-inline-l); }
-}
 
 /* The day's plan */
 .timeline { display: flex; flex-direction: column; gap: var(--space-inline-m); }
@@ -113,7 +103,6 @@
 .planMeta { display: flex; flex-wrap: wrap; gap: var(--space-inline-xs); }
 .planGrid { display: grid; gap: var(--space-stack); }
 .planCol { display: flex; flex-direction: column; gap: var(--space-stack); min-width: 0; }
-@media (min-width: 1068px) { .planGrid { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: start; } }
 .planLocation { display: flex; flex-direction: column; gap: var(--space-inline-m); }
 .planAddress { font-weight: var(--weight-semibold); color: var(--on-light-text-primary); }
 .planButtons { display: flex; flex-wrap: wrap; gap: var(--space-inline-xs); }

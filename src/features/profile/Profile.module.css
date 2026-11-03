@@ -2,8 +2,8 @@
 .who { display: flex; gap: var(--space-inline-l); align-items: center; }
 .whoText { min-width: 0; overflow-wrap: anywhere; }
 .photoButtons { display: flex; flex-wrap: wrap; gap: var(--space-inline-s); }
-.nameRow { display: flex; gap: var(--space-inline-s); align-items: flex-end; margin-bottom: calc(var(--space-inline-s) * -1); }
+.nameRow { display: flex; flex-wrap: wrap; gap: var(--space-inline-s); align-items: flex-end; margin-bottom: calc(var(--space-inline-s) * -1); }
 .add { display: flex; gap: var(--space-inline-s); align-items: flex-end; }
-.addField { flex: 1; min-width: 0; }
+.addField { flex: 1 1 calc(160rem / 17); min-width: 0; }
 .appearance { display: flex; flex-direction: column; gap: var(--space-inline-xl); }
 .appearanceRow { display: flex; flex-direction: column; gap: var(--space-inline-s); }

@@ -1,6 +1,5 @@
 /* Your travels */
-.stats { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-inline-s); }
-@media (min-width: 744px) { .stats { grid-template-columns: repeat(5, 1fr); } }
+.stats { display: grid; grid-template-columns: repeat(auto-fill, minmax(calc(130rem / 17), 1fr)); gap: var(--space-inline-s); }
 .stat { display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-inline-xxs); padding: var(--space-inline-m); border-radius: var(--radius-xl); background: var(--on-light-surface-primary); border: 1px solid var(--on-light-border-subtle); }
 .statIcon { display: grid; place-items: center; width: 32px; height: 32px; border-radius: 50%; background: var(--on-light-surface-brand); color: var(--on-light-icon-brand); margin-bottom: var(--space-inline-xs); }
 /* Heading 1 */

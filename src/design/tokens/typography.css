@@ -4,13 +4,13 @@
  */
 :root {
   --type-display: var(--weight-black) var(--size-display)/1 var(--font-display);
-  --type-display-small: var(--weight-black) calc(56rem / 17)/1 var(--font-display);
+  --type-display-small: var(--weight-black) min(calc(56rem / 17), 78px)/1 var(--font-display);
   --type-display-secondary: var(--weight-black) var(--size-display-secondary)/1 var(--font-display);
-  --type-display-tiny: var(--weight-black) calc(32rem / 17)/1 var(--font-display);
+  --type-display-tiny: var(--weight-black) min(calc(32rem / 17), 45px)/1 var(--font-display);
   --type-heading-1: var(--weight-bold) var(--size-heading-1)/1 var(--font-family);
   --type-heading-2: var(--weight-semibold) var(--size-heading-2)/1 var(--font-family);
   --type-heading-3: var(--weight-semibold) var(--size-heading-3)/1 var(--font-family);
-  --type-heading-4: var(--weight-bold) calc(18rem / 17)/1 var(--font-family);
+  --type-heading-4: var(--weight-bold) min(calc(18rem / 17), 25px)/1 var(--font-family);
   --type-body: var(--weight-regular) var(--size-body)/1.5 var(--font-family);
   --type-body-small: var(--weight-regular) var(--size-body-small)/1.5 var(--font-family);
   --type-label: var(--weight-medium) calc(14rem / 17)/1.5 var(--font-family);

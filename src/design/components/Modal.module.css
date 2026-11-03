@@ -13,9 +13,5 @@
 .title { margin: 0; font: var(--type-heading-2); letter-spacing: -0.02em; color: var(--on-light-text-primary); } /* Heading 2 */
 .body { font: var(--type-body-small); color: var(--on-light-text-secondary); } /* Body small */
 .buttons { align-self: stretch; display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-inline-xs); }
-@media (min-width: 744px) {
-  .text { gap: var(--space-inline-xs); }
-  .body { font: var(--type-body); } /* Body */
-}
 @keyframes fadeIn { from { opacity: 0; } }
 @keyframes pop { from { opacity: 0; transform: scale(0.96); } }
