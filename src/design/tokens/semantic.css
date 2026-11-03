@@ -248,6 +248,7 @@
   --space-inline-xxl: var(--space-32); --space-inline-xxxl: var(--space-40); --space-inline-max: var(--space-48);
   --space-page-xxs: var(--space-16); --space-page-xs: var(--space-24); --space-page-s: var(--space-32); --space-page-m: var(--space-40);
   --space-page-l: var(--space-48); --space-page-xl: var(--space-96); --space-page-max: var(--space-120);
+  --space-overlap-avatar: calc(-1 * var(--space-6)); /* Figma Layout space/overlap/avatar (−6): how far each avatar in a stack tucks under the one before */
   --radius-xxs: var(--radius-2); --radius-xs: var(--radius-4); --radius-s: var(--radius-8); --radius-m: var(--radius-12); --radius-l: var(--radius-16);
   --radius-xl: var(--radius-24); --radius-xxl: var(--radius-32); --radius-xxxl: var(--radius-48); --radius-xxxxl: var(--radius-64); --radius-xxxxxl: var(--radius-80); --radius-round: var(--radius-999);
 

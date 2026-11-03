@@ -6,12 +6,12 @@
   background: var(--on-light-surface-brand);
   color: var(--on-light-text-brand);
   font: var(--type-label-small); line-height: 1; /* Label small */
-  font-size: min(var(--size-body-small), calc(var(--avatar-size, 32px) * 0.5)); /* 12px at the default text size (as in Figma); grows with it, but never past half the circle */
+  font-size: min(var(--size-body-small), calc(var(--avatar-size, 32px) * 0.5)); /* Label small (12) at the default text size; grows with it, never past half the circle */
   overflow: hidden;
   object-fit: cover;
 }
 .stack { display: inline-flex; align-items: center; }
-.stack > * + * { margin-left: -8px; }
+.stack > * + * { margin-left: var(--space-overlap-avatar); }
 .stack > * { box-shadow: 0 0 0 2px var(--on-light-surface-primary); }
 .more { background: var(--on-light-surface-secondary); color: var(--on-light-text-primary); }
 

@@ -30,7 +30,7 @@
 .day {
   --day-open: calc(178rem / 17);
   position: relative; flex: none; scroll-snap-align: start; overflow: hidden;
-  width: calc(74rem / 17); height: calc(139rem / 17); padding: 0; /* 74×139 at the default text size, growing with it */
+  width: calc(74rem / 17); height: calc(138rem / 17); padding: 0; /* Figma Day Card hugs to 136, plus the 1px border top and bottom; grows with the text size */
   border-radius: var(--radius-xl); border: 1px solid var(--interactive-unselected-ghost-border); text-align: left;
   background: var(--interactive-unselected-ghost-background); color: var(--interactive-unselected-ghost-text);
   transition: width var(--day-move), height var(--day-move), background-color var(--day-move), color var(--day-move), border-color var(--day-move);
