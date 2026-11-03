@@ -4,6 +4,14 @@
 
 *, *::before, *::after { box-sizing: border-box; }
 
+/* Text size follows the person's iPhone text setting (Dynamic Type). -apple-system-body sets the root to iOS's
+   body size: 17px at the default setting, larger or smaller as they choose. Every type token is Figma px ÷ 17 in rem,
+   so at the default setting text is exactly the Figma size and it scales from there. Elsewhere the root is a fixed 17px.
+   (The touch-callout check keeps this to iPhone and iPad: on a Mac, -apple-system-body is 13px.) */
+html { font-size: 106.25%; }
+@supports (font: -apple-system-body) and (-webkit-touch-callout: none) {
+  html { font: -apple-system-body; }
+}
 html {
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;

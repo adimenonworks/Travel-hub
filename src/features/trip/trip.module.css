@@ -73,7 +73,7 @@
   .day[aria-pressed='true'] { height: 131px; }
   /* List, not selected: padding 16/20, number (24) beside the word, gap 12 */
   .dayCompact { flex-direction: row; justify-content: flex-start; gap: var(--space-inline-s); padding: var(--space-inline-m) var(--space-inline-l); }
-  .dayCompact .dayNum { font-size: 24px; } /* List layout: Display tiny at 24 (Figma overrides the size here) */
+  .dayCompact .dayNum { font-size: calc(24rem / 17); } /* List layout: Display tiny at 24 (Figma overrides the size here) */
   .dayOpen { height: 131px; padding: var(--space-inline-m) var(--space-inline-l); }
 }
 

@@ -8,6 +8,8 @@ export function describeAuthError(e: unknown): string | null {
   const code = (e as { code?: string } | null)?.code ?? '';
   switch (code) {
     case '':
+      // The iPhone sign-in sheet reports a cancel as a plain error; closing it yourself needs no explanation.
+      if (e instanceof Error && /cancel/i.test(e.message)) return null;
       return e instanceof Error ? e.message : null;
     case 'auth/popup-closed-by-user':
     case 'auth/cancelled-popup-request':
@@ -21,6 +23,10 @@ export function describeAuthError(e: unknown): string | null {
     case 'auth/missing-initial-state':
     case 'auth/internal-error':
       return "Your browser blocked the sign-in step. Open this page directly in Safari or Chrome (not inside another app), make sure you're not in private browsing, and try again.";
+    case 'app/ios-client-missing':
+      return "Sign-in isn't set up in this version of the app yet.";
+    case 'app/no-id-token':
+      return "Google didn't finish signing you in. Try again.";
     case 'auth/too-many-requests':
       return 'Too many attempts. Wait a minute and try again.';
     default:
