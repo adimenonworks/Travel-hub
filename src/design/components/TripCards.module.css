@@ -1,4 +1,4 @@
-/* ---------- Hero Card (Figma: Size=Small below 744px, Size=Large from 744px) ---------- */
+/* ---------- Hero Card ---------- */
 /* Small: brand frame, padding 16, gap 16; photo 231 tall with the corner on it; panel padding 20, hugging its content (32 above the buttons). */
 .hero {
   display: flex; flex-direction: column; gap: var(--space-inline-m);
@@ -32,7 +32,7 @@
 /* The corner: a brand-coloured tab with the big number and a rounded inner corner. Small: 130×120 on the photo, radius 64. */
 .count {
   position: absolute; top: 0; right: 0; z-index: 1;
-  width: 130px; height: 120px;
+  min-width: 130px; min-height: 120px; padding: var(--space-inline-xs) var(--space-inline-m); /* 130×120 at the default text size; grows with the text */
   display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--space-inline-xxs);
   text-align: center;
   background: var(--on-mid-surface-primary); color: var(--on-mid-text-brand);
@@ -40,22 +40,6 @@
 }
 .countValue { font: var(--type-display-small); letter-spacing: -0.01em; font-variant-numeric: tabular-nums; } /* Display small */
 .countLabel { font: var(--type-label-small); white-space: nowrap; } /* Label small */
-@media (min-width: 744px) {
-  /* Large: padding 24/32, gap 32; photo 400 wide filling the height; panel padding 48, gap 40, hugging its content. */
-  .hero { flex-direction: row; gap: var(--space-inline-xxl); padding: var(--space-inline-xl) var(--space-inline-xxl); }
-  /* The photo is 400 wide, shrinking to 35% of the card on narrower screens (744–1067px) so the panel keeps room */
-  .heroImage { flex: 0 0 min(400px, 35%); height: auto; min-width: 0; }
-  .heroPanel { flex: 1; min-width: 0; gap: var(--space-inline-xxxl); padding: var(--space-inline-max); }
-  .heroPanelCorner { border-top-right-radius: 0; }
-  .heroPanelCorner .heroText { padding-right: 140px; }
-  .heroActions { gap: var(--space-inline-xs); }
-  .heroText { gap: var(--space-inline-m); }
-  .heroTitle { gap: var(--space-inline-xs); }
-  .flag { width: 24px; height: 24px; }
-  .count { width: 160px; height: 126px; padding-left: var(--space-inline-xl); border-bottom-left-radius: var(--radius-xxxxxl); } /* Large: 160×126, radius 80; text sits 12 right of centre, clear of the curve */
-  .countValue { font-size: var(--size-display); } /* Display */
-  .countLabel { font-size: calc(14rem / 17); } /* Label */
-}
 
 /* ---------- Content Card ---------- */
 .content {
@@ -81,7 +65,7 @@
 .contentDates { font: var(--type-label-small); color: var(--on-light-text-secondary); } /* Label small */
 .contentAccent .contentPlace, .contentAccent .contentDates { color: var(--on-mid-text-secondary); }
 
-/* ---------- Event row (Figma: Size=Small below 744px, Size=Large from 744px) ---------- */
+/* ---------- Event row ---------- */
 /* The whole row opens the event (the title's link stretches over it); the location and the buttons sit above that.
    Small: padding 24, gap 16; title over location + time (gap 4 / 8), small badges (gap 4), avatars and price (gap 16), then Maps | Uber */
 .event {
@@ -103,7 +87,7 @@
 .eventLink { color: inherit; outline: none; }
 .eventLink::after { content: ''; position: absolute; inset: 0; border-radius: inherit; }
 .eventMeta { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-inline-xs); }
-/* The location: a Link small (Link from 744px), underlined; tapping copies it */
+/* The location: a Link small, underlined; tapping copies it */
 .eventPlace {
   position: relative; z-index: 1;
   padding: 0; border: 0; background: none; cursor: pointer; text-align: left;
@@ -117,35 +101,23 @@
 .eventBadges { display: flex; flex-wrap: wrap; gap: var(--space-inline-xxs); }
 .eventBottom { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-inline-m); }
 .eventButtons { position: relative; z-index: 1; display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-inline-xs); }
-@media (min-width: 744px) {
-  /* Large: padding 24, content and a 120-wide button column (gap 24); location + time gap 12 (Link, Body), badges gap 12, gap 20 between groups */
-  .event { flex-direction: row; align-items: center; gap: var(--space-inline-xl); }
-  .eventMain { gap: var(--space-inline-l); }
-  .eventTitle { gap: var(--space-inline-xs); }
-  .eventMeta { gap: var(--space-inline-s); }
-  .eventPlace { font-size: var(--size-body); }
-  .eventTime { font-size: var(--size-body); }
-  .eventBadges { gap: var(--space-inline-s); }
-  .eventButtons { display: flex; flex-direction: column; justify-content: center; gap: var(--space-inline-m); width: 120px; flex: none; }
-}
 
 /* ---------- Budget card ---------- */
 .budget {
-  display: flex; align-items: center; gap: var(--space-inline-xs);
+  display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-inline-xs);
   padding: var(--space-inline-m);
   border: 1px solid var(--on-light-border-subtle); border-radius: var(--radius-xl);
   background: var(--on-light-surface-primary);
 }
-.budgetText { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: var(--space-inline-xxs); }
+.budgetText { flex: 1 1 calc(140rem / 17); min-width: 0; display: flex; flex-direction: column; gap: var(--space-inline-xxs); }
 .budgetDaily { display: flex; align-items: center; gap: var(--space-inline-xxs); flex-wrap: wrap; }
 .budgetAmount { font: var(--type-heading-1); letter-spacing: -0.02em; color: var(--on-light-text-brand); font-variant-numeric: tabular-nums; } /* Heading 1 */
 .budget-low { color: var(--on-light-status-warning); }
 .budget-over { color: var(--on-light-status-error); }
 .budgetLabel { font: var(--type-label-small); color: var(--on-light-text-primary); }
 .budgetTotal { font: var(--type-label-small); color: var(--on-light-text-secondary); font-variant-numeric: tabular-nums; }
-@media (min-width: 744px) { .budget { padding: var(--space-inline-m) var(--space-inline-xl); } }
 
-/* ---------- Timeline (Figma: Size=Small below 744px, Size=Large from 744px) ---------- */
+/* ---------- Timeline ---------- */
 /* A deep emerald pill (surface/brand-bold) with the clock and time in text/on-brand-bold (Label small / Label), then a dashed accent line (1px / 2px, dashes 6/6). */
 .timeline { display: flex; align-items: center; gap: var(--space-inline-xxs); }
 .timelineTab {
@@ -155,7 +127,3 @@
   font: var(--type-label-small); font-variant-numeric: tabular-nums;
 }
 .timelineLine { flex: 1; height: 1px; background: repeating-linear-gradient(90deg, var(--on-light-border-brand) 0 6px, transparent 6px 12px); }
-@media (min-width: 744px) {
-  .timelineTab { font-size: calc(14rem / 17); }
-  .timelineLine { height: 2px; }
-}

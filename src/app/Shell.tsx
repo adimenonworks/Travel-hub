@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, type ReactNode } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
-import { Avatar, HeaderProfileContext, Notification, ToastProvider, useLarge } from '../design/components';
+import { Avatar, HeaderProfileContext, Notification, ToastProvider } from '../design/components';
 import { store } from '../data';
 import { useMe, useProfile } from '../data/hooks';
 import { TripForm } from '../features/trip/TripForm';
@@ -23,14 +23,12 @@ export function Shell({ children }: { children: ReactNode }) {
   const name = profile?.name || me.name;
   const photo = profile ? profile.photo : me.photo;
   const newTrip = () => setCreating(true);
-  // Figma Page Header: Extra large avatar (72) from 744px, Large (48) on phones.
-  const large = useLarge();
 
   return (
     <NewTripContext.Provider value={newTrip}>
       <HeaderProfileContext.Provider value={
         <NavLink to="/profile" className={s.me} aria-label={`Your profile and settings (${name})`}>
-          <Avatar name={name} photo={photo} seed={me.uid} size={large ? 72 : 48} />
+          <Avatar name={name} photo={photo} seed={me.uid} size={32} />
         </NavLink>
       }>
       <ToastProvider>

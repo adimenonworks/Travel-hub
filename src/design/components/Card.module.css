@@ -8,23 +8,17 @@
 }
 .flush { padding: 0; overflow: hidden; }
 
-/* Type=Large: media · text · buttons in a row (buttons drop below on phones) */
-.large { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-inline-s); padding: var(--space-inline-xl); } /* padding 24, gap 12 */
-.large .content { flex: 1 1 220px; }
-.large .title { font: var(--type-heading-3); letter-spacing: -0.02em; }
-.large .body { font: var(--type-label); }
-@media (max-width: 743px) { .large .buttons { flex-basis: 100%; } }
-/* Type=Small: everything stacked */
-.small { display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-inline-m); padding: var(--space-inline-m); }
-.small .title { font: var(--type-heading-4); letter-spacing: -0.01em; }
-.small .body { font: var(--type-label-small); }
-.small .buttons { flex-direction: column; align-self: stretch; margin-top: var(--space-inline-xxs); } /* 20 below the text */
-.small .buttons > * { width: 100%; }
+/* Media, text and buttons stacked (Figma's Small card; the Large row layout is archived) */
+.structured { display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-inline-m); padding: var(--space-inline-m); }
+.structured .title { font: var(--type-heading-4); letter-spacing: -0.01em; }
+.structured .body { font: var(--type-label-small); }
+.structured .buttons { flex-direction: column; align-self: stretch; margin-top: var(--space-inline-xxs); } /* 20 below the text */
+.structured .buttons > * { width: 100%; }
 
 .media { flex: none; display: grid; place-items: center; color: var(--on-light-icon-brand); }
 /* The Media slot's default: an icon on the light emerald tile */
 .mediaTile { display: grid; place-items: center; padding: var(--space-inline-xs); border-radius: var(--radius-s); background: var(--on-light-surface-brand); color: var(--on-light-icon-brand); }
-.small .mediaTile { padding: var(--space-inline-xxs); border-radius: var(--radius-xs); }
+.structured .mediaTile { padding: var(--space-inline-xxs); border-radius: var(--radius-xs); }
 .content { min-width: 0; display: flex; flex-direction: column; gap: var(--space-inline-xs); }
 .title { color: var(--on-light-text-primary); }
 .body { color: var(--on-light-text-secondary); }

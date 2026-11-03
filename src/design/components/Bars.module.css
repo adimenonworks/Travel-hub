@@ -1,4 +1,4 @@
-/* Figma "Page Header": page-top space (48 on phones, 96 from 744px), back button, then the title row:
+/* Figma "Page Header": page-top space (48), back button, then the title row:
    Display title + Body subtitle on the left; the optional button and your profile picture on the right, centred on the title. */
 .header { display: flex; flex-direction: column; gap: var(--space-inline-s); padding-top: var(--space-page-top); }
 .back { margin-left: calc(-1 * var(--space-inline-s)); }
@@ -12,12 +12,6 @@
 .subtitle { color: var(--on-light-text-secondary); font: var(--type-body-small); } /* Body small */
 .actions { flex: none; display: flex; align-items: center; gap: var(--space-inline-s); }
 /* Large: Body subtitle; Regular button and 72 avatar (gap 24) */
-@media (min-width: 744px) {
-  .back { margin-left: calc(-1 * var(--space-inline-m)); }
-  .title { font-size: var(--size-display); } /* Large: Display (64) */
-  .subtitle { font-size: var(--size-body); }
-  .actions { gap: var(--space-inline-xl); }
-}
 
 /* Tabs: text tabs on a hairline; the current one is underlined in emerald and darker.
    Scrolls sideways inside itself if it can't fit. */

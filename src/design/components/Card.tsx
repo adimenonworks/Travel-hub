@@ -6,8 +6,6 @@ import s from './Card.module.css';
 type CardProps = Omit<HTMLAttributes<HTMLDivElement>, 'title'> & {
   /** Figma Card "Tone": Default (white, subtle border) or Accent (bright emerald). */
   tone?: 'default' | 'accent';
-  /** Figma Card "Type": Large is a row (media · text · buttons); Small stacks them. */
-  type?: 'large' | 'small';
   /** No padding (content such as a photo runs to the edges). */
   flush?: boolean;
   /** The Media slot: an icon on the light emerald tile, or any node (an illustration, an avatar). */
@@ -25,12 +23,12 @@ type CardProps = Omit<HTMLAttributes<HTMLDivElement>, 'title'> & {
  * Figma "Card": the surface for most things — banners, stat tiles, notes, empty states, albums.
  * With no title/body it is just the surface around its children.
  */
-export function Card({ tone = 'default', type = 'large', flush, icon, media, title, body, actions, action, className, children, ...rest }: CardProps) {
+export function Card({ tone = 'default', flush, icon, media, title, body, actions, action, className, children, ...rest }: CardProps) {
   const btns = actions ?? action;
   const structured = title !== undefined || body !== undefined || icon || media || btns;
-  const cls = [s.card, tone === 'accent' && s.accent, flush && s.flush, structured && s[type], className].filter(Boolean).join(' ');
+  const cls = [s.card, tone === 'accent' && s.accent, flush && s.flush, structured && s.structured, className].filter(Boolean).join(' ');
   if (!structured) return <div className={cls} {...rest}>{children}</div>;
-  const mediaNode = media ?? (icon && <span className={s.mediaTile}><Icon name={icon} size={type === 'small' ? 16 : 24} /></span>);
+  const mediaNode = media ?? (icon && <span className={s.mediaTile}><Icon name={icon} size={16} /></span>);
   return (
     <div className={cls} {...rest}>
       {mediaNode && <div className={s.media} aria-hidden="true">{mediaNode}</div>}

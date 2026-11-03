@@ -5,7 +5,8 @@
   border-radius: 50%;
   background: var(--on-light-surface-brand);
   color: var(--on-light-text-brand);
-  font: var(--type-label-small); line-height: 1; /* Small and Medium: Label small; Large and Extra large set their size (Avatar.tsx) */
+  font: var(--type-label-small); line-height: 1; /* Label small */
+  font-size: min(var(--size-body-small), calc(var(--avatar-size, 32px) * 0.5)); /* 12px at the default text size (as in Figma); grows with it, but never past half the circle */
   overflow: hidden;
   object-fit: cover;
 }
@@ -22,7 +23,6 @@
   font: var(--type-label-small);
   white-space: nowrap;
 }
-.badgeLarge { font: var(--type-label); padding-top: var(--space-inline-xxs); }
 .badge-neutral { background: var(--tag-neutral-background); color: var(--tag-neutral-text); box-shadow: var(--shadow-subtle); }
 .badge-tint { background: var(--tag-brand-bold-background); color: var(--tag-brand-bold-text); }
 .badge-category { background: var(--tag-brand-subtle-background); color: var(--tag-brand-subtle-text); }

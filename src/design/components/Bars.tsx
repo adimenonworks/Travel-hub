@@ -2,14 +2,13 @@ import { createContext, useContext, useLayoutEffect, useRef, useState, type CSSP
 import { NavLink, Link, useLocation } from 'react-router-dom';
 import { Icon, type IconName } from './Icon';
 import { IconButton, LinkButton } from './Button';
-import { useLarge } from './TripCards';
 import s from './Bars.module.css';
 
 /** What sits at the right end of every page header: your profile picture (the app shell provides it). */
 export const HeaderProfileContext = createContext<ReactNode>(null);
 
 /**
- * Figma "Page Header" (Small below 744px, Large from 744px): space above, an optional ghost back button, the Display title (and Body subtitle) on the left,
+ * Figma "Page Header": space above, an optional ghost back button, the Display title (and Body subtitle) on the left,
  * then an optional secondary icon button and your profile picture on the right, level with the title.
  */
 export function PageHeader({ title, subtitle, back, action, fit }: {
@@ -22,7 +21,6 @@ export function PageHeader({ title, subtitle, back, action, fit }: {
   fit?: boolean;
 }) {
   const profile = useContext(HeaderProfileContext);
-  const large = useLarge();
   const titleRef = useRef<HTMLHeadingElement>(null);
   const [smaller, setSmaller] = useState(false);
   useLayoutEffect(() => {
@@ -37,7 +35,7 @@ export function PageHeader({ title, subtitle, back, action, fit }: {
   }, [fit, title]);
   return (
     <header className={s.header}>
-      {back && <div className={s.back}><LinkButton to={back.to} variant="ghost" size={large ? 'regular' : 'small'} icon="chevron-left">{back.label}</LinkButton></div>}
+      {back && <div className={s.back}><LinkButton to={back.to} variant="ghost" size="small" icon="chevron-left">{back.label}</LinkButton></div>}
       <div className={s.titleRow}>
         <div className={s.titleText}>
           <h1 ref={titleRef} className={[s.title, fit && s.fit, fit && smaller && s.fitSmaller].filter(Boolean).join(' ')}>{title}</h1>
@@ -45,7 +43,7 @@ export function PageHeader({ title, subtitle, back, action, fit }: {
         </div>
         {(action || profile) && (
           <div className={s.actions}>
-            {action && <IconButton icon={action.icon} label={action.label} variant="secondary" size={large ? 'regular' : 'small'} onClick={action.onClick} />}
+            {action && <IconButton icon={action.icon} label={action.label} variant="secondary" size="small" onClick={action.onClick} />}
             {profile}
           </div>
         )}

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { BudgetCard, Button, IconButton, useLarge, useToast, FieldRow, List, ListRow, Section, Select, Sheet, TextField } from '../../design/components';
+import { BudgetCard, Button, IconButton, useToast, FieldRow, List, ListRow, Section, Select, Sheet, TextField } from '../../design/components';
 import { store } from '../../data';
 import { personName, useMe } from '../../data/hooks';
 import type { Category, Expense } from '../../data/types';
@@ -21,23 +21,21 @@ export function TripBudget({ ctx, day, onSetBudget }: { ctx: TripCtx; day: strin
   const [dayEdit, setDayEdit] = useState<string | null>(null);
   const toast = useToast();
   const [amount, setAmount] = useState('');
-  const large = useLarge();
   const b = tripBudget(ctx);
   const fmt = (n: number) => money(n, trip.currency);
   const t = today();
   const word = (d: string) => dayWord(d, trip.startDate, t);
   const lower = (w: string) => (w === 'Today' || w === 'Tomorrow' || w === 'Yesterday' ? w.toLowerCase() : w);
-  const size = large ? 'regular' : 'small';
   const d = b.forDay(day);
 
   const card = b.total > 0 ? (() => {
     const w = word(day);
     const when = day === t ? 'today' : w === 'Tomorrow' || w === 'Yesterday' ? w.toLowerCase() : `on ${w}`;
     return <BudgetCard amount={fmt(Math.abs(d.left))} label={d.left < 0 ? `Over ${when}` : `Left ${when}`} total={fmt(b.total)} level={d.level}
-      action={canManage && <Button variant="secondary" size={size} icon="pencil" onClick={() => setOpen(true)}>Edit budgets</Button>} />;
+      action={canManage && <Button variant="secondary" size="small" icon="pencil" onClick={() => setOpen(true)}>Edit budgets</Button>} />;
   })() : (
     <BudgetCard amount={fmt(b.planned)} label="Planned so far" total="No total set" level="ok"
-      action={onSetBudget && <Button variant="secondary" size={size} icon="pencil" onClick={onSetBudget}>Add budget</Button>} />
+      action={onSetBudget && <Button variant="secondary" size="small" icon="pencil" onClick={onSetBudget}>Add budget</Button>} />
   );
 
   // One day's editor: a past day corrects what was spent; today and later set the day's own budget.

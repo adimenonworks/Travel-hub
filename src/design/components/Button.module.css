@@ -3,7 +3,7 @@
   position: relative;
   display: inline-flex; align-items: center; justify-content: center;
   border: 0; border-radius: var(--radius-round);
-  white-space: nowrap; text-decoration: none; user-select: none;
+  max-width: 100%; text-align: center; text-decoration: none; user-select: none; /* a long label wraps at large text sizes instead of running off the screen */
   transition: background var(--motion-fast), color var(--motion-fast), transform var(--motion-release);
 }
 .button:active:not(:disabled) { transform: scale(0.96); transition: background var(--motion-fast), color var(--motion-fast), transform var(--motion-press); }

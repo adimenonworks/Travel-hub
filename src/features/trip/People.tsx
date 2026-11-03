@@ -48,7 +48,7 @@ export function People({ trip, profiles, canManage, isOwner }: TripCtx) {
             const editable = isOwner && id !== me.uid;
             return (
               <ListRow key={id}
-                leading={<Avatar name={name} photo={profiles[id]?.photo} seed={id} size={36} />}
+                leading={<Avatar name={name} photo={profiles[id]?.photo} seed={id} size={32} />}
                 title={<>{name}{id === me.uid && <span className="t-secondary"> (you)</span>}</>}
                 trailing={
                   editable ? (

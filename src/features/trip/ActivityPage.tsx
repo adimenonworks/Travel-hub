@@ -82,7 +82,7 @@ export function ActivityPage(ctx: TripCtx) {
             {a.attendeeIds.length ? (
               <List>
                 {a.attendeeIds.map((id) => (
-                  <ListRow key={id} leading={<Avatar name={personName(profiles, id)} photo={profiles[id]?.photo} seed={id} size={36} />}
+                  <ListRow key={id} leading={<Avatar name={personName(profiles, id)} photo={profiles[id]?.photo} seed={id} size={32} />}
                     title={id === me.uid ? `${personName(profiles, id)} (you)` : personName(profiles, id)} />
                 ))}
               </List>

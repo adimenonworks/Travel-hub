@@ -130,7 +130,7 @@ function ProfileCard({ uid, name, photo, email }: { uid: string; name: string; p
   return (
     <Card className={s.head}>
       <div className={s.who}>
-        <Avatar name={name} photo={photo} seed={uid} size={72} />
+        <Avatar name={name} photo={photo} seed={uid} size={32} />
         <div className={s.whoText}>
           <h2 className="t-heading-2">{name}</h2>
           {email && <div className="t-body-small t-secondary">{email}</div>}
