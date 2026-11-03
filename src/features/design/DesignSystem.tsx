@@ -14,12 +14,10 @@ const surfaceSets: { name: string; title: string; note: string }[] = [
   { name: 'on-light', title: 'On light', note: 'White and light grey: the canvas, cards and sheets.' },
   { name: 'on-mid', title: 'On mid', note: 'Bright emerald: the Hero Card frame and accent cards.' },
   { name: 'on-dark', title: 'On dark', note: 'Deep emerald: the Hero Card panel.' },
-  { name: 'on-yellow', title: 'Accent: yellow', note: 'Sparingly, for stand-out cards.' },
-  { name: 'on-orange', title: 'Accent: orange', note: 'Sparingly, for stand-out cards.' },
-  { name: 'on-green', title: 'Accent: green', note: 'Sparingly, for stand-out cards.' },
-  { name: 'on-pink', title: 'Accent: pink', note: 'Sparingly, for stand-out cards.' },
 ];
-const isAccent = (name: string) => !['on-light', 'on-mid', 'on-dark'].includes(name);
+// On accent: one set shared by every accent surface (they share one tone), so only the surface changes.
+const ACCENTS = ['yellow', 'orange', 'green', 'pink'];
+const ACCENT_TOKENS = ["surface-sunken", "text-primary", "text-secondary", "text-brand", "link-default", "link-hover", "link-pressed", "icon-primary", "icon-secondary", "icon-brand", "border-subtle", "border-bold", "border-focus", "border-brand", "divider-default", "illustration-primary", "illustration-secondary", "illustration-accent", "illustration-accent-bold", "illustration-accent-subtle", "illustration-warm", "illustration-warm-bold", "illustration-border"];
 const colorGroups: { title: string; tokens: string[] }[] = [
   { title: 'Interactive / button (hover lighter, pressed darker)', tokens: ['--interactive-button-primary-background', '--interactive-button-primary-background-hover', '--interactive-button-primary-background-pressed', '--interactive-button-secondary-background', '--interactive-button-secondary-background-hover', '--interactive-button-secondary-background-pressed', '--interactive-button-ghost-background-hover', '--interactive-button-ghost-background-pressed', '--interactive-button-inverse-background', '--interactive-button-destructive-background', '--interactive-button-destructive-background-hover', '--interactive-button-destructive-background-pressed'] },
   { title: 'Interactive / selected & unselected', tokens: ['--interactive-selected-primary-background', '--interactive-selected-secondary-background', '--interactive-selected-ghost-border', '--interactive-unselected-ghost-background', '--interactive-unselected-ghost-border', '--interactive-unselected-ghost-text'] },
@@ -75,7 +73,7 @@ export function DesignSystem() {
                 {set.note} <span style={{ color: `var(--${set.name}-link-default)`, textDecoration: 'underline' }}>A link</span>
               </p>
               <div className={s.swatches}>
-                {SET_TOKENS.filter((t) => !(isAccent(set.name) && t.startsWith('status-'))).map((t) => (
+                {SET_TOKENS.map((t) => (
                   <div key={t} className={s.swatch}>
                     <div className={s.chip} style={{ background: `var(--${set.name}-${t})`, boxShadow: `inset 0 0 0 1px var(--${set.name}-border-subtle)` }} />
                     <code className={s.code} style={{ color: `var(--${set.name}-text-secondary)` }}>{set.name}-{t}</code>
@@ -84,6 +82,30 @@ export function DesignSystem() {
               </div>
             </div>
           ))}
+          <Card>
+            <div className="t-heading-4">On accent</div>
+            <p className="t-body-small">Sparingly, for stand-out cards. Every accent shares the tokens on top; only the surface changes.</p>
+            <div className={s.accents}>
+              {ACCENTS.map((a) => (
+                <div key={a} className={s.surfaceSet} style={{ background: `var(--on-accent-surface-${a})`, color: 'var(--on-accent-text-primary)' }}>
+                  <div className="t-heading-4">{a[0].toUpperCase() + a.slice(1)}</div>
+                  <p className="t-body-small" style={{ color: 'var(--on-accent-text-secondary)' }}>
+                    on-accent-surface-{a} <span style={{ color: 'var(--on-accent-link-default)', textDecoration: 'underline' }}>A link</span>
+                  </p>
+                </div>
+              ))}
+            </div>
+            <div className={s.surfaceSet} style={{ background: 'var(--on-accent-surface-yellow)', color: 'var(--on-accent-text-primary)' }}>
+              <div className={s.swatches}>
+                {ACCENT_TOKENS.map((t) => (
+                  <div key={t} className={s.swatch}>
+                    <div className={s.chip} style={{ background: `var(--on-accent-${t})`, boxShadow: 'inset 0 0 0 1px var(--on-accent-border-subtle)' }} />
+                    <code className={s.code} style={{ color: 'var(--on-accent-text-secondary)' }}>on-accent-{t}</code>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </Card>
           {colorGroups.map((g) => (
             <Card key={g.title}>
               <div className="t-heading-4" style={{ marginBottom: 'var(--space-inline-s)' }}>{g.title}</div>
