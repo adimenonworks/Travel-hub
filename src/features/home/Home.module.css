@@ -14,11 +14,9 @@
 
 /* Past trips: smaller cards in a row that scrolls sideways inside itself. */
 .pastRow {
-  display: grid; grid-auto-flow: column; grid-auto-columns: 220px; gap: var(--space-inline-m);
+  display: grid; grid-auto-flow: column; grid-auto-columns: min(300px, 85%); gap: var(--space-inline-m);
   overflow-x: auto; scroll-snap-type: x proximity; scroll-padding-inline: var(--space-gutter); scrollbar-width: thin;
   margin: 0 calc(-1 * var(--space-gutter)); padding: 0 var(--space-gutter) var(--space-inline-xs);
 }
-.past { scroll-snap-align: start; border: 1px solid var(--on-light-border-subtle); }
-.pastCover { height: 100px; }
-.pastBody { padding: var(--space-inline-s) var(--space-inline-m) var(--space-inline-m); display: flex; flex-direction: column; gap: var(--space-inline-xxs); }
+.past { scroll-snap-align: start; display: grid; }
 
