@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Button, Card, CardLink, ContentCard, HeroCard, Illustration, LinkButton, PageHeader, Section, Spinner } from '../../design/components';
+import { Button, Card, CardLink, ContentCard, HeroCard, Illustration, LinkButton, PageHeader, Section, PageSkeleton } from '../../design/components';
 import { personName, useMe, useMyTrips, useProfile, useProfiles, useSub } from '../../data/hooks';
 import type { Trip } from '../../data/types';
 import { countdown, daysBetween, formatRange, today, tripPhase } from '../../lib/dates';
@@ -7,6 +7,7 @@ import { countryName, flagUrl, tripCountries } from '../../lib/countries';
 import { Content, useNewTrip } from '../../app/Shell';
 import { TripCover } from '../shared/TripCover';
 import s from './Home.module.css';
+import { featuredTrip } from '../../lib/trips';
 
 /**
  * Home: a greeting with your numbers, the trip that matters now as a big card, your other trips
@@ -27,7 +28,7 @@ export function Home() {
     .map((p) => p.name.split(',')[0].trim().toLowerCase())).size;
 
   // The trip that matters now: one you're on, else the next one.
-  const featured = current[0] ?? upcoming[0];
+  const featured = featuredTrip(trips);
   const others = [...current, ...upcoming].filter((t) => t !== featured);
   const newTrip = useNewTrip();
   const plural = (n: number, word: string) => `${n} ${word}${n === 1 ? '' : 's'}`;
@@ -38,7 +39,7 @@ export function Home() {
         subtitle={`${plural(all.length, 'trip')} · ${plural(daysAway, 'day')} away · ${plural(places, 'place')}`}
         action={{ icon: 'plus', label: 'New trip', onClick: newTrip }} />
 
-      {trips === null ? <Spinner center /> : (
+      {trips === null ? <PageSkeleton /> : (
         <>
           {featured && <Hero trip={featured} />}
           {others.length > 0 ? (

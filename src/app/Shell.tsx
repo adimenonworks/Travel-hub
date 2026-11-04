@@ -1,8 +1,10 @@
 import { createContext, useContext, useState, type ReactNode } from 'react';
-import { NavLink, useNavigate } from 'react-router-dom';
-import { Avatar, HeaderProfileContext, Notification, ToastProvider } from '../design/components';
+import { NavLink, useLocation, useNavigate } from 'react-router-dom';
+import { Avatar, BottomNav, HeaderProfileContext, Notification, ToastProvider, type NavTab } from '../design/components';
 import { store } from '../data';
-import { useMe, useProfile } from '../data/hooks';
+import { useMe, useMyTrips, useProfile } from '../data/hooks';
+import { featuredTrip } from '../lib/trips';
+import { screenKey, useScreenTransition } from './navigation';
 import { TripForm } from '../features/trip/TripForm';
 import s from './Shell.module.css';
 
@@ -23,6 +25,16 @@ export function Shell({ children }: { children: ReactNode }) {
   const name = profile?.name || me.name;
   const photo = profile ? profile.photo : me.photo;
   const newTrip = () => setCreating(true);
+  // Bottom Nav: Home, Trip (the trip you're on, else the next one; hidden when there's none) and You.
+  const { pathname } = useLocation();
+  const trip = featuredTrip(useMyTrips());
+  const tabs: NavTab[] = [
+    { to: '/', label: 'Home', icon: 'home', active: (p) => p === '/' },
+    ...(trip ? [{ to: `/trip/${trip.id}`, label: 'Trip', icon: 'plane' as const, active: (p: string) => p.startsWith('/trip/') }] : []),
+    { to: '/profile', label: 'You', icon: 'person', active: (p) => p.startsWith('/profile') },
+  ];
+  const showNav = !pathname.startsWith('/join/') && pathname !== '/design';
+  const transition = useScreenTransition();
 
   return (
     <NewTripContext.Provider value={newTrip}>
@@ -33,14 +45,15 @@ export function Shell({ children }: { children: ReactNode }) {
       }>
       <ToastProvider>
       <div className={s.shell}>
-        <main id="main" className={s.main}>
+        <main id="main" className={[s.main, showNav && s.withNav].filter(Boolean).join(' ')}>
           {store.mode === 'demo' && (
             <div className={s.demo}>
               <Notification state="warning">Demo mode: data is saved only in this browser. Connect Firebase to share trips with friends (see README).</Notification>
             </div>
           )}
-          {children}
+          <div key={screenKey(pathname)} className={transition === 'none' ? undefined : s[transition]}>{children}</div>
         </main>
+        {showNav && <BottomNav tabs={tabs} />}
         <TripForm open={creating} onClose={() => setCreating(false)} onSaved={(id) => navigate(`/trip/${id}`)} />
       </div>
       </ToastProvider>

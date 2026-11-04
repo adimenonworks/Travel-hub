@@ -1,6 +1,6 @@
 import { lazy, Suspense } from 'react';
 import { HashRouter, Navigate, Route, Routes, useLocation } from 'react-router-dom';
-import { Spinner } from '../design/components';
+import { PageSkeleton } from '../design/components';
 import { AuthProvider, useAuth } from '../data/hooks';
 import { SignIn } from '../features/auth/SignIn';
 import { Home } from '../features/home/Home';
@@ -16,7 +16,7 @@ const DesignSystem = lazy(() => import('../features/design/DesignSystem').then((
 function Routed() {
   const { user, loading } = useAuth();
   const { pathname } = useLocation();
-  if (loading) return <Spinner center />;
+  if (loading) return <PageSkeleton />;
   if (pathname === '/design' && !user) return <DesignSystem />;
   if (!user) {
     const joining = pathname.startsWith('/join/');

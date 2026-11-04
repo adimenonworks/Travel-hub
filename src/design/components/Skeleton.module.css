@@ -1,0 +1,18 @@
+/* Figma "Skeleton": surface/sunken shapes; a soft highlight sweeps across while loading. */
+.sk {
+  display: block; flex: none;
+  background: var(--on-light-surface-sunken) linear-gradient(90deg, transparent 0, color-mix(in srgb, var(--on-light-surface-primary) 50%, transparent) 50%, transparent 100%) no-repeat;
+  background-size: 50% 100%; background-position: -100% 0;
+  animation: shimmer 1.4s var(--ease-standard) infinite;
+}
+.text { width: 100%; height: calc(14rem / 17); border-radius: var(--radius-xs); }
+.block { width: 100%; height: 120px; border-radius: var(--radius-xl); }
+.circle { width: 32px; height: 32px; border-radius: var(--radius-round); }
+@keyframes shimmer { to { background-position: 200% 0; } }
+@media (prefers-reduced-motion: reduce) { .sk { animation: none; } }
+
+.page {
+  max-width: calc(var(--size-content-max) + 2 * var(--space-gutter)); margin: 0 auto;
+  padding: var(--space-page-top) var(--space-gutter) 0; display: flex; flex-direction: column; gap: var(--space-stack);
+}
+.header { display: flex; align-items: center; justify-content: space-between; gap: var(--space-inline-m); }

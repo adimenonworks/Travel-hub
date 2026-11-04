@@ -6,7 +6,13 @@
 .me:active { transform: scale(0.96); transition: transform var(--motion-press); }
 .me[aria-current='page'] > * { box-shadow: 0 0 0 2px var(--on-light-surface-secondary), 0 0 0 4px var(--interactive-selected-ghost-border); }
 
-.main { min-width: 0; padding-top: env(safe-area-inset-top); }
+.main { min-width: 0; padding-top: env(safe-area-inset-top); overflow-x: clip; /* a screen sliding in never makes the page scroll sideways */ }
+/* Room for the Bottom Nav (its height, the 8px gap and the home indicator) under every page */
+.push { animation: pushIn var(--motion-screen); }
+.back { animation: backIn var(--motion-screen); }
+@keyframes pushIn { from { transform: translateX(100%); } }
+@keyframes backIn { from { transform: translateX(-30%); opacity: 0.6; } }
+.withNav { padding-bottom: calc(var(--size-tab-bar) + var(--space-inline-xs) + env(safe-area-inset-bottom)); }
 .content {
   max-width: calc(var(--size-content-max) + 2 * var(--space-gutter));
   margin: 0 auto;

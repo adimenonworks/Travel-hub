@@ -2,7 +2,7 @@ import { useState, type CSSProperties } from 'react';
 import {
   Avatar, AvatarStack, Badge, BudgetCard, Notification, Button, Card, ContentCard, EmptyState, EventRow, FieldRow, HeroCard, Icon, IconButton,
   LinkButton, List, ListRow, PageHeader, SegmentedControl, Section, Select, Sheet, Spinner, Tabs, TextArea, TextField, Timeline, Illustration,
-  type IllustrationName, COVER_ILLUSTRATIONS, ICON_NAMES, useToast, Modal,
+  type IllustrationName, COVER_ILLUSTRATIONS, ICON_NAMES, useToast, Modal, BottomNav, Skeleton,
 } from '../../design/components';
 import { flagUrl } from '../../lib/countries';
 import s from './DesignSystem.module.css';
@@ -172,6 +172,23 @@ export function DesignSystem() {
         <Section title="Icons" footer="Uicons Rounded. Each icon has State=Default (line) and State=Filled (solid, in the brand colour), like the Figma set.">
           <Card className={s.icons}>
             {icons.map((n) => <span key={n} className={s.icon} title={n}><span><Icon name={n} /> <Icon name={n} state="filled" /></span><code className={s.code}>{n}</code></span>)}
+          </Card>
+        </Section>
+
+        <Section title="Bottom Nav and Skeleton" footer="Figma Bottom Nav (Nav Item ×3: Home, Trip, You), floating on the frosted bar; hidden while typing. Figma Skeleton (Text, Block, Circle) replaces spinners while a page loads.">
+          <Card>
+            <BottomNav inline tabs={[
+              { to: '/design', label: 'Home', icon: 'home', active: () => true },
+              { to: '/design', label: 'Trip', icon: 'plane', active: () => false },
+              { to: '/design', label: 'You', icon: 'person', active: () => false },
+            ]} />
+          </Card>
+          <Card>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-inline-s)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-inline-s)' }}><Skeleton shape="circle" /><Skeleton width="60%" /></div>
+              <Skeleton width="85%" />
+              <Skeleton shape="block" />
+            </div>
           </Card>
         </Section>
 

@@ -1,5 +1,6 @@
 import { createContext, useContext, useLayoutEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react';
-import { NavLink, Link, useLocation } from 'react-router-dom';
+import { NavLink, Link, useLocation, useNavigate } from 'react-router-dom';
+import { goBack } from '../../app/navigation';
 import { Icon, type IconName } from './Icon';
 import { IconButton, LinkButton } from './Button';
 import s from './Bars.module.css';
@@ -21,6 +22,7 @@ export function PageHeader({ title, subtitle, back, action, fit }: {
   fit?: boolean;
 }) {
   const profile = useContext(HeaderProfileContext);
+  const navigate = useNavigate();
   const titleRef = useRef<HTMLHeadingElement>(null);
   const [smaller, setSmaller] = useState(false);
   useLayoutEffect(() => {
@@ -35,7 +37,7 @@ export function PageHeader({ title, subtitle, back, action, fit }: {
   }, [fit, title]);
   return (
     <header className={s.header}>
-      {back && <div className={s.back}><LinkButton to={back.to} variant="ghost" size="small" icon="chevron-left">{back.label}</LinkButton></div>}
+      {back && <div className={s.back}><LinkButton to={back.to} variant="ghost" size="small" icon="chevron-left" onClick={(e) => { e.preventDefault(); goBack(navigate, back.to); }}>{back.label}</LinkButton></div>}
       <div className={s.titleRow}>
         <div className={s.titleText}>
           <h1 ref={titleRef} className={[s.title, fit && s.fit, fit && smaller && s.fitSmaller].filter(Boolean).join(' ')}>{title}</h1>

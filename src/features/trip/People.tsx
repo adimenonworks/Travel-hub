@@ -5,6 +5,7 @@ import { store } from '../../data';
 import { personName, useMe } from '../../data/hooks';
 import type { TripCtx } from './TripPage';
 import s from './trip.module.css';
+import { isNativeApp, PUBLIC_SITE, shareLink } from '../../lib/native';
 
 export function People({ trip, profiles, canManage, isOwner }: TripCtx) {
   const me = useMe();
@@ -18,7 +19,9 @@ export function People({ trip, profiles, canManage, isOwner }: TripCtx) {
     setBusy(true);
     try {
       const code = await store.createInvite(trip);
-      const url = `${location.origin}${location.pathname}#/join/${code}`;
+      // Inside the iPhone app the page address is capacitor://localhost, which nobody else can open, so invite links
+      // point at the public site; in a browser they point at wherever this copy of the site is running.
+      const url = `${isNativeApp ? PUBLIC_SITE : location.origin + location.pathname}#/join/${code}`;
       setLink(url);
       return url;
     } finally {
@@ -26,9 +29,7 @@ export function People({ trip, profiles, canManage, isOwner }: TripCtx) {
     }
   };
   const share = async (url = link) => {
-    if (navigator.share) {
-      try { await navigator.share({ title: `Join ${trip.name}`, text: `Join our trip "${trip.name}" on Rove`, url }); return; } catch { /* cancelled */ }
-    }
+    if (await shareLink({ title: `Join ${trip.name}`, text: `Join our trip "${trip.name}" on Rove`, url })) return;
     try { await navigator.clipboard.writeText(url); toast({ icon: 'copy', label: 'Invite link copied' }); } catch { /* the link is on screen to copy by hand */ }
   };
   const invite = async () => {

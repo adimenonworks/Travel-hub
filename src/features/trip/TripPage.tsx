@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Navigate, Route, Routes, useLocation, useMatch, useNavigate, useParams, useSearchParams } from 'react-router-dom';
-import { EmptyState, HeroCard, LinkButton, PageHeader, Spinner, Tabs, type TabItem } from '../../design/components';
+import { EmptyState, HeroCard, LinkButton, PageHeader, PageSkeleton, Tabs, type TabItem } from '../../design/components';
 import { personName, useProfiles, useRole, useSub, useTrip } from '../../data/hooks';
 import type { Activity, Album, Comment, Expense, Idea, Profile, Trip } from '../../data/types';
 import { countdown, daysBetween, formatRange, today, tripDays } from '../../lib/dates';
@@ -31,7 +31,7 @@ export type TripCtx = {
 export function TripPage() {
   const { tripId = '' } = useParams();
   const trip = useTrip(tripId);
-  if (trip === undefined) return <Spinner center />;
+  if (trip === undefined) return <PageSkeleton />;
   if (trip === null)
     return (
       <Content>
@@ -56,7 +56,7 @@ function TripLoaded({ trip }: { trip: Trip }) {
   const planPage = useMatch('/trip/:tripId/plan/:activityId');
   const [params] = useSearchParams();
 
-  if (!activities || !ideas || !expenses || !comments || !albums) return <Spinner center />;
+  if (!activities || !ideas || !expenses || !comments || !albums) return <PageSkeleton />;
   const ctx: TripCtx = { trip, activities, ideas, expenses, comments, albums, profiles, canManage, isOwner };
   const nDays = daysBetween(trip.startDate, trip.endDate) + 1;
   const t = today();

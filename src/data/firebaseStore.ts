@@ -4,7 +4,7 @@ import {
   signInWithCredential, signInWithPopup, signInWithRedirect, signOut,
 } from 'firebase/auth';
 import {
-  Timestamp, addDoc, arrayRemove, arrayUnion, collection, deleteDoc, deleteField, doc, getDoc, getDocs,
+  Timestamp, addDoc, arrayRemove, arrayUnion, collection, deleteDoc, deleteField, doc, getDoc, getDocFromCache, getDocs,
   initializeFirestore, onSnapshot, persistentLocalCache, persistentMultipleTabManager, query, setDoc, updateDoc, where, writeBatch, type DocumentData,
 } from 'firebase/firestore';
 import type { Store } from './store';
@@ -49,6 +49,9 @@ export function createFirebaseStore(config: FirebaseOptions): Store {
         // The saved profile wins once it exists, so a nickname or photo chosen in Profile
         // isn't replaced by the Google account's on the next sign-in. Google's fill the gaps.
         const ref = doc(db, 'users', u.uid);
+        // Open straight away from what's saved on the phone; the server's copy (if newer) follows a moment later.
+        const cached = await getDocFromCache(ref).catch(() => null);
+        if (cached?.exists()) { const c = cached.data(); cb({ ...google, name: (typeof c.name === 'string' && c.name) || google.name, photo: 'photo' in c ? (c.photo as string | null) : google.photo }); }
         const snap = await getDoc(ref).catch(() => null);
         const saved = snap?.exists() ? snap.data() : null;
         const name = (typeof saved?.name === 'string' && saved.name) || google.name;
