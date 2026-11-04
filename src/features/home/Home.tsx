@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Button, Card, CardLink, ContentCard, HeroCard, Illustration, LinkButton, PageHeader, Section, PageSkeleton } from '../../design/components';
+import { Button, Card, ContentCard, HeroCard, Illustration, LinkButton, PageHeader, Section, PageSkeleton } from '../../design/components';
 import { personName, useMe, useMyTrips, useProfile, useProfiles, useSub } from '../../data/hooks';
 import type { Trip } from '../../data/types';
 import { countdown, daysBetween, formatRange, today, tripPhase } from '../../lib/dates';
@@ -54,7 +54,7 @@ export function Home() {
           )}
           <Section title="Past trips">
             {past.length > 0 ? (
-              <div className={s.pastRow}>{past.map((t) => <PastCard key={t.id} trip={t} />)}</div>
+              <div className={s.pastRow}>{past.map((t) => <div key={t.id} className={s.past}><PastCard trip={t} /></div>)}</div>
             ) : (
               <Card media={<Illustration name="memories" size={64} square />} title="Looks a little empty…"
                 body="Let’s make some memories. Trips you’ve finished will show up here." />
@@ -108,16 +108,14 @@ function TripCard({ trip }: { trip: Trip }) {
   );
 }
 
-/** A finished trip, smaller, in a row that scrolls sideways. */
+/** A finished trip (Figma "Content Card", in a row that scrolls sideways): how long it was and who went. */
 function PastCard({ trip }: { trip: Trip }) {
+  const n = daysBetween(trip.startDate, trip.endDate) + 1;
+  const profiles = useProfiles(trip.memberIds);
   return (
-    <CardLink to={`/trip/${trip.id}`} flush className={s.past}>
-      <TripCover trip={trip} className={s.pastCover} />
-      <div className={s.pastBody}>
-        <div className="t-heading-4">{trip.name}</div>
-        <div className="t-label-small t-secondary">{formatRange(trip.startDate, trip.endDate)}</div>
-      </div>
-    </CardLink>
+    <ContentCard to={`/trip/${trip.id}`} cover={<TripCover trip={trip} />} when={`${n} day${n === 1 ? '' : 's'}`}
+      people={trip.memberIds.map((id) => ({ id, name: personName(profiles, id), photo: profiles[id]?.photo }))}
+      name={trip.name} place={place(trip)} dates={formatRange(trip.startDate, trip.endDate)} />
   );
 }
 
