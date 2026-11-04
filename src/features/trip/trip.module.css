@@ -83,7 +83,7 @@
 .actTop { display: flex; justify-content: space-between; align-items: flex-start; gap: var(--space-inline-s); }
 .actMeta { display: flex; flex-wrap: wrap; gap: var(--space-inline-xs); align-items: center; margin-top: var(--space-inline-xs); }
 
-.actNotes { white-space: pre-wrap; color: var(--on-light-text-secondary); font-size: var(--size-body-small); line-height: 1.5; }
+.actNotes { -webkit-user-select: text; user-select: text; -webkit-touch-callout: default; white-space: pre-wrap; color: var(--on-light-text-secondary); font-size: var(--size-body-small); line-height: 1.5; }
 
 /* Ideas */
 .ideaGrid { display: grid; gap: var(--space-inline-m); grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); }
@@ -104,9 +104,9 @@
 .planGrid { display: grid; gap: var(--space-stack); }
 .planCol { display: flex; flex-direction: column; gap: var(--space-stack); min-width: 0; }
 .planLocation { display: flex; flex-direction: column; gap: var(--space-inline-m); }
-.planAddress { font-weight: var(--weight-semibold); color: var(--on-light-text-primary); }
+.planAddress { -webkit-user-select: text; user-select: text; -webkit-touch-callout: default; font-weight: var(--weight-semibold); color: var(--on-light-text-primary); }
 .planButtons { display: flex; flex-wrap: wrap; gap: var(--space-inline-xs); }
-a.docLink { color: var(--on-light-link-default); text-decoration: underline; text-underline-offset: 3px; overflow-wrap: anywhere; }
+a.docLink { -webkit-user-select: text; user-select: text; -webkit-touch-callout: default; color: var(--on-light-link-default); text-decoration: underline; text-underline-offset: 3px; overflow-wrap: anywhere; }
 a.docLink:hover { text-decoration-thickness: 2px; color: var(--on-light-link-hover); }
 .docActions { display: inline-flex; align-items: center; gap: var(--space-inline-xxs); }
 .emptyNote { padding: var(--space-inline-l) var(--space-inset); border-radius: var(--radius-xl); border: 1px solid var(--on-light-border-subtle); color: var(--on-light-text-secondary); font-size: var(--size-body-small); }
@@ -114,7 +114,7 @@ a.docLink:hover { text-decoration-thickness: 2px; color: var(--on-light-link-hov
 /* People */
 .inviteActions { display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-inline-s); margin-top: var(--space-inline-s); }
 .inviteRow { display: flex; gap: var(--space-inline-xs); align-items: center; align-self: stretch; }
-.inviteUrl { flex: 1; min-width: 0; font-family: var(--font-mono); font-size: var(--size-body-small); min-height: var(--size-control); line-height: var(--size-control); padding: 0 var(--space-inline-l); background: var(--on-light-surface-primary); border: 1px solid var(--on-light-border-bold); border-radius: var(--radius-round); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.inviteUrl { -webkit-user-select: text; user-select: text; -webkit-touch-callout: default; flex: 1; min-width: 0; font-family: var(--font-mono); font-size: var(--size-body-small); min-height: var(--size-control); line-height: var(--size-control); padding: 0 var(--space-inline-l); background: var(--on-light-surface-primary); border: 1px solid var(--on-light-border-bold); border-radius: var(--radius-round); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .dangerZone { display: flex; gap: var(--space-inline-s); flex-wrap: wrap; }
 
 /* Photos */

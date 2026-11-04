@@ -1,5 +1,5 @@
 import { useParams } from 'react-router-dom';
-import { Badge, Card, EmptyState, LinkButton, List, ListRow, PageHeader, Section, Spinner, type IconName } from '../../design/components';
+import { Badge, Card, EmptyState, LinkButton, List, ListRow, PageHeader, Section, PageSkeleton, type IconName } from '../../design/components';
 import { useActivitiesFor, useMe, useMyTrips } from '../../data/hooks';
 import type { Activity, Category, Trip } from '../../data/types';
 import { formatDay, today } from '../../lib/dates';
@@ -35,7 +35,7 @@ export function CollectionPage() {
   const byTrip = useActivitiesFor((trips ?? []).map((t) => t.id));
   const c = COLLECTIONS.find((x) => x.key === key);
   if (!c) return <Content><EmptyState illustration="compass" title="Collection not found" action={<LinkButton to="/profile" variant="secondary">Back to profile</LinkButton>} /></Content>;
-  if (!trips) return <Spinner center />;
+  if (!trips) return <PageSkeleton />;
 
   const tripOf: Record<string, Trip> = {};
   const all = trips.flatMap((t) => (byTrip[t.id] ?? []).map((a) => { tripOf[a.id] = t; return a; }));

@@ -45,6 +45,16 @@ firestore.rules + tests/rules/   security rules and their emulator tests
 - **Security:** a new Firestore collection or field rule needs a matching change in `firestore.rules`, plus tests in `tests/rules/rules.test.mjs`. If the rules changed, the owner must re-publish them in the Firebase console. The owner isn't technical: never ask them to edit or add to anything. Paste the **entire** `firestore.rules` file in your reply as one code block, with numbered click-by-click steps (console.firebase.google.com → project travel-hub-a1aa2 → Firestore Database → Rules tab → select all and delete → paste → Publish). Make app code work with both the old and new rules, since they may publish later.
 - Watch for `fn?.(await x())`: if `fn` is undefined, `x()` never runs. Await into a variable first.
 
+## Feels like an iPhone app
+
+- **Touch:** no zoom (viewport `user-scalable=no`; text still follows the iPhone text setting), no tap highlight or double-tap delay (`touch-action: manipulation`), presses respond on touch-down (a `touchstart` listener in `main.tsx` turns on `:active`), no page bounce (`overscroll-behavior: none`). Text isn't selectable and has no long-press menu, except fields and things people copy (addresses, notes, booking links, invite links: `user-select: text`). Menus and choices use native pickers (`<select>`, date and time inputs open iOS wheels); add `@capacitor/action-sheet` before building any custom menu.
+- **Bottom Nav** (Figma "Bottom Nav" + "Nav Item"; `BottomNav` in `src/design/components`): Home, Trip (`featuredTrip()` in `src/lib/trips.ts`: the trip you're on, else the next; hidden when none) and You. Shown on every signed-in page except Join and Design; hidden while the keyboard is open; pages get `--size-tab-bar` + safe area of bottom padding.
+- **Navigation** (`src/app/navigation.ts`): links slide the new screen in from the right; back buttons (`PageHeader` back) step back through history (`goBack`) and slide the previous screen in from the left; tab bar taps and the phone's own edge swipe-back switch without our animation. A trip's tabs are one screen (no slide). Each screen's scroll position is restored on back.
+- **Sheets** slide up and close by dragging their top bar down.
+- **Loading:** `PageSkeleton` / `Skeleton` (Figma "Skeleton"), never a spinner. The app opens from the on-device cache (Firestore offline cache, cached profile) before the server answers.
+- **Native (iPhone app):** `RoveViewController` (in `ios/App/App/AppDelegate.swift`, set in `Main.storyboard`) turns on swipe-back and sets the light/dark canvas colour so nothing flashes white; the launch screen has a dark version. `setupNative()` in `src/lib/native.ts` keeps the status bar and keyboard in the app's theme and hides the tab bar while typing. `@capacitor/keyboard` resizes the app above the keyboard (`resize: 'native'`). Sharing uses `shareLink()` (native share sheet). Invite links use `PUBLIC_SITE` in the app (the app's own address is `capacitor://localhost`).
+- **Later:** push notifications (APNs, needs the Apple Developer Program), a Wise-style fourth tab once its page exists.
+
 ## Before pushing
 
 1. `npm run build` (type-checks and builds).

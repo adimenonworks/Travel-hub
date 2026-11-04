@@ -273,10 +273,11 @@
   --blur-overlay: 20px;
 
   /* Sizing and motion (code only) */
-  --size-tap: 44px; --size-control: 48px; --size-control-sm: 40px; --size-content-max: 480px; /* phone width: on a computer the test site shows a centred phone column */
+  --size-tap: 44px; --size-control: 48px; --size-control-sm: 40px; --size-tab-bar: calc(64rem / 17); /* Bottom Nav height, growing with text size */ --size-content-max: 480px; /* phone width: on a computer the test site shows a centred phone column */
   --motion-fast: var(--duration-fast) var(--ease-standard);
   --motion-base: var(--duration-base) var(--ease-standard);
   --motion-sheet: var(--duration-sheet) var(--ease-spring);
+  --motion-screen: var(--duration-slow) var(--ease-spring); /* a screen sliding in, like an iPhone push */
   --motion-sheet-out: var(--duration-base) var(--ease-exit);
   --motion-fluid: var(--duration-fluid) var(--ease-fluid);
   --motion-press: var(--duration-fast) var(--ease-standard);

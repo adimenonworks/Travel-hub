@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Button, Card, EmptyState, LinkButton, Spinner } from '../../design/components';
+import { Button, Card, EmptyState, LinkButton, PageSkeleton } from '../../design/components';
 import { store } from '../../data';
 import { useMyTrips } from '../../data/hooks';
 import type { Invite } from '../../data/types';
@@ -23,7 +23,7 @@ export function Join() {
     if (alreadyIn && invite) navigate(`/trip/${invite.tripId}`, { replace: true });
   }, [alreadyIn, invite, navigate]);
 
-  if (invite === undefined || trips === null) return <Spinner center />;
+  if (invite === undefined || trips === null) return <PageSkeleton />;
 
   const expired = invite && invite.expiresAt < Date.now();
   if (!invite || expired)

@@ -12,9 +12,11 @@
   border-radius: var(--radius-xl) var(--radius-xl) 0 0;
   box-shadow: var(--shadow-overlay);
   animation: rise var(--motion-sheet);
+  transition: transform var(--motion-sheet); /* springs back after a short drag */
   padding-bottom: env(safe-area-inset-bottom);
 }
 .header {
+  touch-action: none; /* the top bar is the drag handle for swipe-down-to-close */
   display: grid; grid-template-columns: 1fr auto 1fr; align-items: center;
   min-height: 64px; padding: var(--space-inline-xs) var(--space-inline-m); gap: var(--space-inline-xs);
 }

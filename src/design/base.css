@@ -13,6 +13,9 @@ html { font-size: 106.25%; }
   html { font: -apple-system-body; }
 }
 html {
+  /* App feel: no double-tap zoom or tap delay, no page bounce (scrolling inside the page still works). */
+  touch-action: manipulation;
+  overscroll-behavior: none;
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
   -webkit-tap-highlight-color: transparent;
@@ -20,6 +23,11 @@ html {
 
 body {
   margin: 0;
+  overscroll-behavior: none;
+  /* Apps don't let you select button or card text, or long-press it for a menu.
+     Fields stay selectable, and so does text people copy: addresses, notes, booking links, invite links (.selectable). */
+  -webkit-user-select: none; user-select: none;
+  -webkit-touch-callout: none;
   min-height: 100dvh;
   background: var(--on-light-surface-secondary);
   color: var(--on-light-text-primary);
@@ -60,3 +68,5 @@ button { cursor: pointer; }
 
 /* Map attribution follows the small text size. */
 .leaflet-container, .leaflet-container .leaflet-control-attribution { font-size: var(--size-body-small); }
+
+input, textarea, [contenteditable], .selectable { -webkit-user-select: text; user-select: text; -webkit-touch-callout: default; }

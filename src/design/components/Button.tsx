@@ -1,3 +1,4 @@
+import type React from 'react';
 import type { ButtonHTMLAttributes, ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import { Icon, type IconName } from './Icon';
@@ -36,14 +37,15 @@ export function Button({ variant, size, block, icon, iconEnd, children, classNam
  * A link that looks like a button (never wrap a Button in a Link: nested controls confuse screen readers).
  * `to` is an in-app route; `href` is an external site, opened in a new tab.
  */
-export function LinkButton({ to, href, variant, size, block, icon, iconEnd, label, children }: Look & {
+export function LinkButton({ to, href, variant, size, block, icon, iconEnd, label, onClick, children }: Look & {
+  /** Runs before the link is followed (call e.preventDefault() to handle the navigation yourself). */ onClick?: (e: React.MouseEvent<HTMLAnchorElement>) => void;
   /** Fuller name for screen readers when the visible text is short (e.g. "Email" on a list row). */ label?: string;
   /** Leave out for an icon-only link (then `icon` and `label` are required). */ children?: ReactNode;
 } & ({ to: string; href?: never } | { href: string; to?: never })) {
   const c = cls({ variant, size, block }, !children);
   const body = <Body icon={icon} iconEnd={iconEnd} size={size}>{children}</Body>;
   if (href) return <a href={href} target="_blank" rel="noreferrer" className={c} aria-label={label && `${label} (opens in a new tab)`}>{body}<span className="visually-hidden"> (opens in a new tab)</span></a>;
-  return <Link to={to!} className={c} aria-label={label}>{body}</Link>;
+  return <Link to={to!} className={c} aria-label={label} onClick={onClick}>{body}</Link>;
 }
 
 /** Icon-only Button (Figma Button with "Show text" off). `label` is required so screen readers can announce it. */

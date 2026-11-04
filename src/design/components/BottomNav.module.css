@@ -1,0 +1,27 @@
+/* Figma "Bottom Nav": a frosted pill (overlay/bar + Blur/Overlay) floating 8px above the home indicator. */
+.nav {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 40;
+  display: flex; justify-content: center; pointer-events: none;
+  padding: 0 max(var(--space-inline-m), env(safe-area-inset-left)) calc(env(safe-area-inset-bottom) + var(--space-inline-xs)) max(var(--space-inline-m), env(safe-area-inset-right));
+}
+.bar {
+  pointer-events: auto;
+  width: 100%; max-width: var(--size-content-max);
+  display: flex; gap: var(--space-inline-xxs); padding: var(--space-inline-xxs);
+  border-radius: var(--radius-round); border: 1px solid var(--on-light-border-subtle);
+  background: var(--overlay-bar); box-shadow: var(--shadow-raised);
+  -webkit-backdrop-filter: blur(var(--blur-overlay)); backdrop-filter: blur(var(--blur-overlay));
+}
+/* Figma "Nav Item": icon over a Label small label */
+.item {
+  flex: 1 1 0; min-width: 0; min-height: calc(52rem / 17);
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--space-inline-xxxs);
+  border-radius: var(--radius-round); color: var(--on-light-text-primary); font: var(--type-label-small);
+  transition: background var(--motion-fast), transform var(--motion-release);
+}
+.item:active { transform: scale(0.96); transition: background var(--motion-fast), transform var(--motion-press); }
+.item[aria-current='page'] { background: var(--on-light-surface-sunken); }
+.item span { overflow-wrap: anywhere; text-align: center; }
+/* Out of the way while typing (the app shrinks above the keyboard) */
+:global(.keyboard-open) .nav { display: none; }
+.inline { position: static; padding: 0; }
