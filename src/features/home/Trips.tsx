@@ -1,4 +1,4 @@
-import { Button, Card, ContentCard, HeroCard, Illustration, PageHeader, PageSkeleton, Section } from '../../design/components';
+import { Button, Card, ContentCard, Divider, HeroCard, Illustration, PageHeader, PageSkeleton, Section } from '../../design/components';
 import { personName, useMyTrips, useProfiles, useSub } from '../../data/hooks';
 import type { Trip } from '../../data/types';
 import { countdown, daysBetween, formatRange, today, tripPhase } from '../../lib/dates';
@@ -29,7 +29,7 @@ export function Trips() {
           actions={<Button block onClick={newTrip}>Plan a trip</Button>} />
       ) : (
         <>
-          {featured && <FeaturedTrip trip={featured} />}
+          {featured && <><FeaturedTrip trip={featured} /><Divider /></>}
           {coming.length > 0 && (
             <Section title="Coming up">
               <div className={s.list}>{coming.map((t) => <TripCard key={t.id} trip={t} />)}</div>

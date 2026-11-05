@@ -1,8 +1,11 @@
 import { useEffect, useState } from 'react';
-import { Banner, Button, Card, HeroCard, Illustration, PageHeader } from '../../design/components';
+import { Banner, Button, Card, Divider, HeroCard, Illustration, LinkButton, PageHeader, type IconName } from '../../design/components';
 import { personName, useMe, useMyTrips, useProfile, useProfiles, useSub } from '../../data/hooks';
-import type { Trip } from '../../data/types';
-import { daysBetween, formatRange } from '../../lib/dates';
+import type { Place, Trip } from '../../data/types';
+import p1 from '../../assets/people/p1.webp';
+import p2 from '../../assets/people/p2.webp';
+import p3 from '../../assets/people/p3.webp';
+import { daysBetween, formatRange, today } from '../../lib/dates';
 import { countryName, flagUrl, tripCountries } from '../../lib/countries';
 import { Content, useNewTrip } from '../../app/Shell';
 import s from './Home.module.css';
@@ -30,7 +33,7 @@ export function Home() {
               <h2 className={s.bigTitle}>Upcoming</h2>
               <UpcomingTrip trip={featured} />
             </section>
-            <hr className={s.divider} />
+            <Divider />
           </>
         )}
         <h2 className={s.bigTitle}>What’s next?</h2>
@@ -42,10 +45,37 @@ export function Home() {
           media={['jp', 'it', 'mx'].map((c) => <span key={c} className={s.flagDisc}><img src={flagUrl(c)} alt="" /></span>)}
           action={<Button variant="tertiary" onClick={newTrip}>Plan your next holiday</Button>} />
         <Banner tone="green" label="Travel with us… or friends" subtext="Whether you’re heading off on your own or rallying the crew, we’re here to help."
-          media={<Illustration name="people" size={96} />}
+          media={[p1, p2, p3].map((src, i) => <span key={i} className={s.photoDisc}><img src={src} alt="" /></span>)}
           action={<Button variant="tertiary" onClick={newTrip}>Plan your upcoming holiday</Button>} />
+        <Divider />
+        <QuickProfile trips={trips ?? []} visited={profile?.visited ?? []} />
       </div>
     </Content>
+  );
+}
+
+/** Figma "Quick profile view": three of your travel numbers as stat Cards, then a link to your profile. */
+function QuickProfile({ trips, visited }: { trips: Trip[]; visited: Place[] }) {
+  const t0 = today();
+  const past = trips.filter((t) => t.endDate < t0);
+  const places = [...trips.filter((t) => t.startDate <= t0).flatMap((t) => (t.destination ? [t.destination] : [])), ...visited];
+  const countries = new Set(places.map((p) => p.country ?? p.name.split(',').pop()!.trim())).size;
+  const days = past.reduce((n, t) => n + daysBetween(t.startDate, t.endDate) + 1, 0);
+  const stats: { icon: IconName; value: number; one: string; many: string }[] = [
+    { icon: 'plane', value: past.length, one: 'Trip taken', many: 'Trips taken' },
+    { icon: 'globe', value: countries, one: 'Country', many: 'Countries' },
+    { icon: 'calendar', value: days, one: 'Day away', many: 'Days away' },
+  ];
+  return (
+    <section className={s.block}>
+      <h2 className={s.bigTitle}>Your travels</h2>
+      <div className={s.quick}>
+        <div className={s.quickStats}>
+          {stats.map((st) => <Card key={st.one} icon={st.icon} title={<span className="t-num">{st.value}</span>} body={st.value === 1 ? st.one : st.many} />)}
+        </div>
+        <LinkButton to="/profile" size="regular" iconEnd="chevron-right">See profile</LinkButton>
+      </div>
+    </section>
   );
 }
 

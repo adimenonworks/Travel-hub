@@ -48,13 +48,16 @@ export function Badge({ tone = 'neutral', icon, iconState, flag, children }: {
 }
 
 /** Figma Chip (Type=Action): a country or filter with a flag or icon. Active is filled deep emerald. */
-export function Chip({ active, icon, flag, children }: { active?: boolean; icon?: IconName; /** Image URL of a country flag */ flag?: string; children: ReactNode }) {
-  return (
-    <span className={[s.chip, active ? s['chip-active'] : s['chip-inactive']].join(' ')}>
-      {flag ? <img src={flag} alt="" className={s.chipFlag} /> : icon && <Icon name={icon} size={16} />}
-      {children}
-    </span>
-  );
+export function Chip({ active, icon, flag, onClick, label, children }: {
+  active?: boolean; icon?: IconName; /** Image URL of a country flag */ flag?: string;
+  /** Makes the chip a button (e.g. a country chip opens its quick-info modal) */ onClick?: () => void; /** Fuller name for screen readers */ label?: string;
+  children: ReactNode;
+}) {
+  const cls = [s.chip, active ? s['chip-active'] : s['chip-inactive'], onClick && s.chipButton].filter(Boolean).join(' ');
+  const body = <>{flag ? <img src={flag} alt="" className={s.chipFlag} /> : icon && <Icon name={icon} size={16} />}{children}</>;
+  return onClick
+    ? <button type="button" className={cls} onClick={onClick} aria-label={label}>{body}</button>
+    : <span className={cls}>{body}</span>;
 }
 
 /** An empty list or missing record: a Card with an illustration, a title, a line of help and an optional action. */

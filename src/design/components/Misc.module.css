@@ -66,3 +66,8 @@
 .chip-active { background: var(--interactive-selected-secondary-background); color: var(--interactive-selected-secondary-text); }
 .chip-inactive { background: var(--interactive-unselected-primary-background); color: var(--interactive-unselected-primary-text); border-color: var(--interactive-unselected-primary-border); }
 .chipFlag { width: 16px; height: 16px; border-radius: 50%; flex: none; }
+.chipButton { position: relative; z-index: 2; cursor: pointer; transition: background var(--motion-fast), transform var(--motion-release); }
+.chipButton::after { content: ''; position: absolute; inset: -8px -2px; } /* 44px tap area */
+.chip-inactive.chipButton:hover { background: var(--interactive-unselected-primary-background-hover); }
+.chipButton:active { transform: scale(0.96); transition: transform var(--motion-press); }
+.chip-inactive.chipButton:active { background: var(--interactive-unselected-primary-background-pressed); }

@@ -6,7 +6,6 @@ import type { Activity } from '../../data/types';
 import { dayWord, formatDay, formatTime, parseDay, today, tripDays } from '../../lib/dates';
 import { money } from '../../lib/format';
 import { categoryInfo } from '../../lib/categories';
-import { mapsUrl, uberUrl } from '../../lib/geocode';
 import { defaultUnit, describeWeather, tripWeather, type DayWeather } from '../../lib/weather';
 import { ActivityForm } from './ActivityForm';
 import type { TripCtx } from './TripPage';
@@ -140,8 +139,6 @@ function ActivityRow({ a, ctx }: { a: Activity; ctx: TripCtx }) {
       going={a.attendeeIds.includes(me.uid)}
       people={a.attendeeIds.map((id) => ({ id, name: personName(ctx.profiles, id), photo: ctx.profiles[id]?.photo }))}
       price={a.cost > 0 ? `${money(a.cost, ctx.trip.currency)} pp` : undefined}
-      mapsHref={where ? mapsUrl(where, a.location) : undefined}
-      uberHref={where ? uberUrl(where, a.location) : undefined}
     />
   );
 }

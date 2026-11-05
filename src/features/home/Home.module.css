@@ -3,10 +3,14 @@
 .sections { display: flex; flex-direction: column; gap: var(--space-default-700); }
 .block { display: flex; flex-direction: column; gap: var(--space-default-700); }
 .bigTitle { margin: 0; font: var(--type-heading-1); letter-spacing: -0.02em; color: var(--on-light-text-primary); } /* Heading 1 */
-.divider { margin: 0; border: 0; border-top: 1px solid var(--on-light-divider-default); }
 /* Banner media: the walker on a 96 disc; flags in 88 discs */
 .logo { width: 96px; height: 96px; border-radius: var(--radius-1000); display: grid; place-items: center; background: var(--on-light-surface-brand); color: var(--on-light-icon-brand); }
 .flagDisc { width: 88px; height: 88px; padding: 10px; border-radius: var(--radius-1000); background: var(--on-mid-surface-sunken); display: grid; place-items: center; flex: none; }
+.photoDisc { width: 88px; height: 88px; border-radius: var(--radius-1000); overflow: hidden; flex: none; }
+.photoDisc img { width: 100%; height: 100%; object-fit: cover; display: block; }
+/* Quick profile view: three stat Cards side by side (8 apart), then See profile on the right (16 below) */
+.quick { display: flex; flex-direction: column; align-items: flex-end; gap: var(--space-default-500); }
+.quickStats { align-self: stretch; display: grid; grid-template-columns: repeat(auto-fit, minmax(calc(96rem / 17), 1fr)); gap: var(--space-default-300); }
 .flagDisc img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
 
 /* Trips tab: trips coming up, one under another (16 apart) */
@@ -33,4 +37,5 @@
   margin: 0 calc(-1 * var(--space-gutter)); padding: 0 var(--space-gutter) var(--space-default-300);
 }
 .past { scroll-snap-align: start; display: grid; }
+.pastRow:has(> :only-child) { grid-auto-columns: 100%; } /* one past trip fills the width */
 

@@ -1,8 +1,8 @@
-import type { ReactNode } from 'react';
+import { useState, type ReactNode } from 'react';
+import { CountryModal } from './CountryModal';
 import { Link } from 'react-router-dom';
 import { Icon, type IconName } from './Icon';
 import { AvatarStack, Badge, Chip } from './Misc';
-import { LinkButton } from './Button';
 import { useToast } from './Toast';
 import s from './TripCards.module.css';
 
@@ -10,7 +10,8 @@ type Person = { id: string; name: string; photo?: string | null };
 
 /**
  * Figma "Hero Card": the trip's photo (or illustrated cover) with the "days to go / days left" corner, then a separate
- * panel with the name, dates, country chips, who's going and a chevron. The whole panel opens the trip.
+ * panel with the name, dates, country chips, who's going and a chevron. The whole panel opens the trip (the title's link
+ * stretches over it); each country chip sits above that and opens the country's quick-info modal.
  * Tone Brand: deep panel; Tone White: light grey panel with a subtle border. `cover` off shows only the panel.
  */
 export function HeroCard({ image, title, subtitle, countries, people, count, to, tone = 'white', cover = true }: {
@@ -31,14 +32,15 @@ export function HeroCard({ image, title, subtitle, countries, people, count, to,
       <span className={s.countLabel}>{count.label}</span>
     </div>
   );
+  const [country, setCountry] = useState<string | null>(null);
   const panel = (
     <>
       <div className={s.heroText}>
-        <h2 className={s.heroName}>{title}</h2>
+        <h2 className={s.heroName}>{to ? <Link to={to} className={s.heroLink}>{title}</Link> : title}</h2>
         <div className={s.heroSub}>{subtitle}</div>
         {countries.length > 0 && (
           <ul className={s.countries} aria-label="Countries">
-            {countries.map((c) => <li key={c.code}><Chip flag={c.flag}>{c.name}</Chip></li>)}
+            {countries.map((c) => <li key={c.code}><Chip flag={c.flag} onClick={() => setCountry(c.code)} label={`About ${c.name}: emergency numbers and entry requirements`}>{c.name}</Chip></li>)}
           </ul>
         )}
         {people.length > 0 && <AvatarStack people={people} />}
@@ -49,7 +51,8 @@ export function HeroCard({ image, title, subtitle, countries, people, count, to,
   return (
     <section className={[s.hero, s[`hero-${tone}`]].join(' ')} aria-label="Trip">
       {cover && image && <div className={s.heroImage}>{image}{corner}</div>}
-      {to ? <Link to={to} className={s.heroPanel}>{panel}</Link> : <div className={s.heroPanel}>{panel}</div>}
+      <div className={[s.heroPanel, to && s.heroPanelLink].filter(Boolean).join(' ')}>{panel}</div>
+      <CountryModal code={country} onClose={() => setCountry(null)} />
     </section>
   );
 }
@@ -78,13 +81,12 @@ export function ContentCard({ to, cover, when, people, name, place, dates, tone 
 
 /**
  * Figma "Event row": one event in the day plan, with what was entered in the sheet. The whole row opens the event;
- * the location copies itself to the clipboard; Maps and Uber take you there.
+ * the location copies itself to the clipboard. (Maps / Uber buttons are off while event types are redesigned.)
  */
-export function EventRow({ to, title, location, time, category, going, people, price, mapsHref, uberHref }: {
+export function EventRow({ to, title, location, time, category, going, people, price }: {
   to: string; title: string; location?: string; time?: string;
   category: { icon: IconName; label: string };
   going: boolean; people: Person[]; price?: string;
-  mapsHref?: string; uberHref?: string;
 }) {
   const toast = useToast();
   const copy = async () => {
@@ -117,12 +119,6 @@ export function EventRow({ to, title, location, time, category, going, people, p
         )}
       </div>
       </div>
-      {(mapsHref || uberHref) && (
-        <div className={s.eventButtons}>
-          {mapsHref && <LinkButton href={mapsHref} size="regular" iconEnd="pin" label={`Directions to ${title}`}>Maps</LinkButton>}
-          {uberHref && <LinkButton href={uberHref} size="regular" variant="secondary" iconEnd="car" label={`Uber to ${title}`}>Uber</LinkButton>}
-        </div>
-      )}
     </article>
   );
 }
