@@ -1,6 +1,6 @@
 import { useState, type CSSProperties } from 'react';
 import {
-  Avatar, AvatarStack, Badge, BudgetCard, Notification, Button, Card, ContentCard, EmptyState, EventRow, FieldRow, HeroCard, Icon, IconButton,
+  Avatar, AvatarStack, Badge, Banner, BudgetCard, Chip, Divider, Notification, Button, Card, ContentCard, EmptyState, EventRow, FieldRow, HeroCard, Icon, IconButton,
   LinkButton, List, ListRow, PageHeader, SegmentedControl, Section, Select, Sheet, Spinner, Tabs, TextArea, TextField, Timeline, Illustration,
   type IllustrationName, COVER_ILLUSTRATIONS, ICON_NAMES, useToast, Modal, BottomNav, Skeleton,
 } from '../../design/components';
@@ -51,7 +51,7 @@ const motions: [string, string][] = [
   ['--motion-sheet', 'Sheets gliding up (or popping in on wider screens)'],
   ['--motion-sheet-out', 'Sheets sliding away on Cancel, Save or close: quicker, speeding up as they leave'],
 ];
-const spotNames: IllustrationName[] = ['memories', 'ideas', 'calendar', 'map', 'ticket', 'suitcase', 'compass', 'globe', 'people'];
+const spotNames: IllustrationName[] = ['memories', 'ideas', 'calendar', 'map', 'ticket', 'suitcase', 'compass', 'globe', 'friends'];
 const icons = ICON_NAMES;
 
 /** Living reference for tokens and components, at /#/design. */
@@ -232,6 +232,16 @@ export function DesignSystem() {
           </div>
         </Section>
 
+        <Section title="Banners, chips and dividers" footer="Banner (Home promo cards: Brand, Orange, Yellow, Green, Pink), Chip (country pills; tap opens the Country Modal), Divider.">
+          <Banner tone="brand" label="Welcome to Rove" subtext="Have a holiday coming up?" action={<Button variant="inverse">Plan your upcoming holiday</Button>} />
+          <Banner tone="pink" label="Pink banner" subtext="Accent banners use the Tertiary button." action={<Button variant="tertiary">Tertiary button</Button>} />
+          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+            <Chip flag={flagUrl('pt')} onClick={() => {}} label="About Portugal">Portugal</Chip>
+            <Chip active flag={flagUrl('es')}>Spain</Chip>
+          </div>
+          <Divider />
+        </Section>
+
         <Section title="Trip components" footer="Hero Card, Content Card, Event row, Budget card and Timeline: built from the components above, as in Figma.">
           <HeroCard image={<Illustration name={COVER_ILLUSTRATIONS[0]} />} title="Summer in Lisbon" subtitle="Jul 3 – 9 · 7 days"
             countries={[{ code: 'pt', name: 'Portugal', flag: flagUrl('pt') }, { code: 'es', name: 'Spain', flag: flagUrl('es') }]}
@@ -244,7 +254,7 @@ export function DesignSystem() {
           <BudgetCard amount="€20" label="Over today" total="€2,000" level="over" />
           <Timeline time="2:30 PM" />
           <EventRow to="/design" title="Sunset at Miradouro" location="Miradouro da Graça" time="7:30 PM" category={{ icon: 'camera', label: 'Sightseeing' }}
-            going people={['Ana', 'Ben'].map((n) => ({ id: n, name: n }))} price="€12 pp" mapsHref="https://maps.google.com" uberHref="https://m.uber.com" />
+            going people={['Ana', 'Ben'].map((n) => ({ id: n, name: n }))} price="€12 pp" />
           <div className={s.cards}>
             <ContentCard to="/design" cover={<Illustration name={COVER_ILLUSTRATIONS[1]} />} when="in 12 days" people={['Ana', 'Ben'].map((n) => ({ id: n, name: n }))}
               name="Tokyo trip" place="Tokyo, Japan" dates="Nov 12 – 20" />

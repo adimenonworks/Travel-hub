@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react';
-import { Avatar, Button, Card, IconButton, List, ListRow, PageHeader, SegmentedControl, Section, TextField } from '../../design/components';
+import { Avatar, Button, Card, Divider, IconButton, List, ListRow, PageHeader, SegmentedControl, Section, TextField } from '../../design/components';
 import { store } from '../../data';
 import { useMe, useMyTrips, useProfile } from '../../data/hooks';
 import type { Place } from '../../data/types';
@@ -36,6 +36,7 @@ export function ProfilePage() {
       <Content>
         <PageHeader title="Profile" back={{ to: '/trips', label: 'Trips' }} />
         <ProfileCard uid={me.uid} name={profile?.name || me.name} photo={profile ? profile.photo : me.photo} email={me.email} />
+        <Divider />
 
         {trips && <TravelStats trips={trips.filter((t) => tripPhase(t.startDate, t.endDate) !== 'upcoming')} home={profile?.home ?? null} visited={visited} meId={me.uid} />}
 
@@ -149,7 +150,7 @@ function ProfileCard({ uid, name, photo, email }: { uid: string; name: string; p
           <TextField label="Nickname" value={draft} maxLength={40} autoComplete="nickname" aria-describedby="nickname-hint"
             onChange={(e) => { setDraft(e.target.value); setSaved(false); }} />
         </div>
-        <Button type="submit" disabled={!trimmed || trimmed === name}>Save</Button>
+        <Button type="submit" iconEnd="check" aria-label="Save nickname" title="Save nickname" disabled={!trimmed || trimmed === name} />
       </form>
       <p id="nickname-hint" className="t-label-small t-secondary" role="status">{saved && draft === name ? 'Saved.' : 'What people on your trips see.'}</p>
     </Card>

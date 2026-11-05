@@ -414,8 +414,8 @@
     /* Surface sets (Figma "Color" collection, groups on-light/ on-mid/ on-dark/ on-<accent>/).
        Every set has the same token names, so a component can move between surfaces by swapping the set. */
     /* On light: white and light grey surfaces */
-    --on-light-surface-primary: var(--color-neutral-800);
-    --on-light-surface-secondary: var(--color-neutral-1000);
+    --on-light-surface-primary: var(--color-neutral-1000);
+    --on-light-surface-secondary: var(--color-neutral-900);
     --on-light-surface-brand: var(--color-emerald-800);
     --on-light-surface-sunken: color-mix(in srgb, var(--color-neutral-0) 10%, transparent);
     --on-light-text-primary: var(--color-neutral-100);
@@ -662,8 +662,8 @@
   /* Surface sets (Figma "Color" collection, groups on-light/ on-mid/ on-dark/ on-<accent>/).
      Every set has the same token names, so a component can move between surfaces by swapping the set. */
   /* On light: white and light grey surfaces */
-  --on-light-surface-primary: var(--color-neutral-800);
-  --on-light-surface-secondary: var(--color-neutral-1000);
+  --on-light-surface-primary: var(--color-neutral-1000);
+  --on-light-surface-secondary: var(--color-neutral-900);
   --on-light-surface-brand: var(--color-emerald-800);
   --on-light-surface-sunken: color-mix(in srgb, var(--color-neutral-0) 10%, transparent);
   --on-light-text-primary: var(--color-neutral-100);

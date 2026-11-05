@@ -47,12 +47,12 @@ export async function shareLink(opts: { title: string; text: string; url: string
 }
 
 /**
- * A very light "tick" (the iOS selection haptic, as when a picker wheel clicks), e.g. when switching tabs.
+ * A light tap (the iOS "light impact" haptic) when switching tabs: a little firmer than the picker-wheel tick.
  * Does nothing in a browser.
  */
 export function selectionTick() {
   if (!isNativeApp) return;
-  import('@capacitor/haptics').then(async ({ Haptics }) => {
-    try { await Haptics.selectionStart(); await Haptics.selectionChanged(); await Haptics.selectionEnd(); } catch { /* no haptics on this device */ }
+  import('@capacitor/haptics').then(async ({ Haptics, ImpactStyle }) => {
+    try { await Haptics.impact({ style: ImpactStyle.Light }); } catch { /* no haptics on this device */ }
   });
 }

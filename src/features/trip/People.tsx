@@ -71,7 +71,7 @@ export function People({ trip, profiles, canManage, isOwner }: TripCtx) {
       </Section>
 
       {canManage && (
-        <Card media={<Illustration name="people" size={120} />}>
+        <Card media={<Illustration name="friends" size={120} />}>
           <h2 className="t-heading-4">The more the merrier</h2>
           <p className="t-body-small t-secondary">Invite friends to plan this trip with you. Anyone with the link can join for the next 14 days after signing in.</p>
           <div className={s.inviteActions}>
