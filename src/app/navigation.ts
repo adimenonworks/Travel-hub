@@ -5,10 +5,11 @@ import { useLocation, useNavigationType, type NavigateFunction } from 'react-rou
  * How screens change, like an iPhone app:
  * - opening something (a link, a card) slides the new screen in from the right;
  * - a back button slides the previous screen back in from the left;
- * - the Bottom Nav switches instantly, and so does the phone's own swipe-back (iOS animates that itself).
+ * - the Bottom Nav cross-fades quickly between tabs (with a light haptic tick), and each tab keeps its own scroll position;
+ * - the phone's own swipe-back switches instantly (iOS animates that itself).
  * Each screen also remembers its scroll position, and going back returns you there.
  */
-type Kind = 'push' | 'back' | 'none';
+type Kind = 'push' | 'back' | 'tab' | 'none';
 let pending: Kind | null = null;
 /** Say how the next screen change should look (call just before navigating). */
 export const nextTransition = (k: Kind) => { pending = k; };
@@ -24,6 +25,8 @@ export function goBack(navigate: NavigateFunction, parent: string) {
 export const screenKey = (path: string) => path.replace(/^(\/trip\/[^/]+)\/(ideas|photos|people|budget|info)$/, '$1');
 
 const scrolls = new Map<string, number>();
+/** Where each tab's screen was scrolled to (by path), so coming back to a tab returns you there. */
+const tabScrolls = new Map<string, number>();
 if (typeof window !== 'undefined' && 'scrollRestoration' in window.history) window.history.scrollRestoration = 'manual';
 
 /** Returns the class for the incoming screen's slide, and handles scroll memory. */
@@ -36,10 +39,10 @@ export function useScreenTransition(): Kind {
   // Remember where each history entry was scrolled to
   useLayoutEffect(() => {
     // Saved while scrolling, not on leaving: by then the next screen has replaced this one and the position is cut short.
-    const save = () => scrolls.set(location.key, window.scrollY);
+    const save = () => { scrolls.set(location.key, window.scrollY); tabScrolls.set(location.pathname, window.scrollY); };
     window.addEventListener('scroll', save, { passive: true });
     return () => window.removeEventListener('scroll', save);
-  }, [location.key]);
+  }, [location.key, location.pathname]);
   useLayoutEffect(() => {
     if (prev.current.locKey === location.key) return;
     const sameScreen = prev.current.key === key;
@@ -48,7 +51,7 @@ export function useScreenTransition(): Kind {
     pending = null;
     setKind(k);
     if (sameScreen) return; // a tab inside the same screen keeps its scroll
-    const y = navType === 'POP' ? scrolls.get(location.key) ?? 0 : 0;
+    const y = k === 'tab' ? tabScrolls.get(location.pathname) ?? 0 : navType === 'POP' ? scrolls.get(location.key) ?? 0 : 0;
     window.scrollTo(0, y);
     if (y <= 0) return;
     // The screen may still be loading (a short skeleton). Keep trying for up to a second, until it's tall enough,
@@ -62,6 +65,6 @@ export function useScreenTransition(): Kind {
       if (Math.abs(window.scrollY - y) > 1 && performance.now() < end) requestAnimationFrame(tick);
     };
     requestAnimationFrame(tick);
-  }, [location.key, key, navType]);
+  }, [location.key, location.pathname, key, navType]);
   return kind;
 }

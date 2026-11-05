@@ -36,7 +36,7 @@ export function TripPage() {
     return (
       <Content>
         <EmptyState illustration="compass" title="Trip not found" message="It may have been deleted, or you're not a member yet. Ask the organizer for an invite link."
-          action={<LinkButton to="/" variant="secondary">Back to trips</LinkButton>} />
+          action={<LinkButton to="/trips" variant="secondary">Back to trips</LinkButton>} />
       </Content>
     );
   return <TripLoaded trip={trip} />;
@@ -72,8 +72,8 @@ function TripLoaded({ trip }: { trip: Trip }) {
   const section = pathname.slice(base.length + 1).split('/')[0];
   const tabs: TabItem[] = [
     { to: base, label: 'Itinerary', icon: 'calendar', active: section === '' },
-    { to: `${base}/ideas`, label: 'Ideas', icon: 'lightbulb', count: ideas.filter((i) => i.status === 'open').length, active: section === 'ideas' },
-    { to: `${base}/photos`, label: 'Photos', icon: 'photo', count: albums.length, active: section === 'photos' },
+    { to: `${base}/ideas`, label: 'Ideas', icon: 'lightbulb', active: section === 'ideas' },
+    { to: `${base}/photos`, label: 'Photos', icon: 'photo', active: section === 'photos' },
     { to: `${base}/people`, label: 'People', icon: 'people', active: section === 'people' },
   ];
 
@@ -90,12 +90,12 @@ function TripLoaded({ trip }: { trip: Trip }) {
       <Content>
         <PageHeader
           title={trip.name}
-          fit
-          back={{ to: '/', label: 'Trips' }}
+          size="small"
           action={canManage ? { icon: 'pencil', label: 'Edit trip', onClick: () => setEditing(true) } : undefined}
         />
-        {/* Figma "Hero Card": cover, name, dates, the countries it visits and who's going. No shortcut buttons inside the trip. */}
+        {/* Figma "Hero Card" (Tone=White): cover with the countdown, then name, dates, countries and who's going. */}
         <HeroCard
+          tone="white"
           image={<TripCover trip={trip} />}
           title={trip.name}
           subtitle={`${formatRange(trip.startDate, trip.endDate)} • ${nDays} day${nDays === 1 ? '' : 's'}`}
@@ -119,7 +119,7 @@ function TripLoaded({ trip }: { trip: Trip }) {
         </Routes>
         </div>
       </Content>
-      <TripForm open={editing} trip={trip} onClose={() => setEditing(false)} onDeleted={isOwner ? () => navigate('/') : undefined} />
+      <TripForm open={editing} trip={trip} onClose={() => setEditing(false)} onDeleted={isOwner ? () => navigate('/trips') : undefined} />
     </>
   );
 }

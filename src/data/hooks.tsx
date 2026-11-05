@@ -20,24 +20,36 @@ export function useMe(): User {
   return user;
 }
 
+/*
+ * Last-known values, kept for the whole session. A screen that opens again (switching tabs, going back) starts from
+ * what it showed before instead of a blank skeleton, then the live listener updates it. This stops the flash on tab changes.
+ */
+const memo = new Map<string, unknown>();
+function useCached<T>(key: string, fallback: T): [T, (v: T) => void] {
+  const [v, setV] = useState<T>(() => (memo.has(key) ? (memo.get(key) as T) : fallback));
+  const [k, setK] = useState(key);
+  if (k !== key) { setK(key); setV(memo.has(key) ? (memo.get(key) as T) : fallback); }
+  return [v, (next: T) => { memo.set(key, next); setV(next); }];
+}
+
 export function useMyTrips() {
   const me = useMe();
-  const [trips, setTrips] = useState<Trip[] | null>(null);
+  const [trips, setTrips] = useCached<Trip[] | null>(`trips:${me.uid}`, null);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => store.watchMyTrips(me.uid, setTrips), [me.uid]);
   return trips;
 }
 
 export function useTrip(id: string) {
-  const [trip, setTrip] = useState<Trip | null | undefined>(undefined);
-  useEffect(() => {
-    setTrip(undefined);
-    return store.watchTrip(id, setTrip, () => setTrip(null));
-  }, [id]);
+  const [trip, setTrip] = useCached<Trip | null | undefined>(`trip:${id}`, undefined);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => store.watchTrip(id, setTrip, () => setTrip(null)), [id]);
   return trip; // undefined = loading, null = missing or no access
 }
 
 export function useSub<K extends SubName>(tripId: string, name: K) {
-  const [items, setItems] = useState<SubCollections[K][] | null>(null);
+  const [items, setItems] = useCached<SubCollections[K][] | null>(`sub:${tripId}:${name}`, null);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => store.watchSub(tripId, name, setItems), [tripId, name]);
   return items;
 }
@@ -45,9 +57,10 @@ export function useSub<K extends SubName>(tripId: string, name: K) {
 /** Activities for several trips, keyed by trip id (used for the travel metrics on Home). */
 export function useActivitiesFor(tripIds: string[]) {
   const key = tripIds.join(',');
-  const [byTrip, setByTrip] = useState<Record<string, Activity[]>>({});
+  const [byTrip, setByTrip] = useState<Record<string, Activity[]>>(() =>
+    Object.fromEntries(tripIds.flatMap((id) => (memo.has(`sub:${id}:activities`) ? [[id, memo.get(`sub:${id}:activities`) as Activity[]]] : []))));
   useEffect(() => {
-    const offs = tripIds.map((id) => store.watchSub(id, 'activities', (items) => setByTrip((m) => ({ ...m, [id]: items }))));
+    const offs = tripIds.map((id) => store.watchSub(id, 'activities', (items) => { memo.set(`sub:${id}:activities`, items); setByTrip((m) => ({ ...m, [id]: items })); }));
     return () => offs.forEach((off) => off());
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [key]);
@@ -55,7 +68,8 @@ export function useActivitiesFor(tripIds: string[]) {
 }
 
 export function useProfile(uid: string) {
-  const [p, setP] = useState<Profile | null>(null);
+  const [p, setP] = useCached<Profile | null>(`profile:${uid}`, null);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => store.watchProfile(uid, setP), [uid]);
   return p;
 }
@@ -63,7 +77,7 @@ export function useProfile(uid: string) {
 /** Profiles for a set of user ids, refetched when the set changes. */
 export function useProfiles(ids: string[]) {
   const key = [...ids].sort().join(',');
-  const [profiles, setProfiles] = useState<Record<string, Profile>>({});
+  const [profiles, setProfiles] = useCached<Record<string, Profile>>(`profiles:${key}`, {});
   useEffect(() => {
     let live = true;
     store.getProfiles(key ? key.split(',') : []).then((p) => live && setProfiles(p));

@@ -29,7 +29,7 @@ body {
   -webkit-user-select: none; user-select: none;
   -webkit-touch-callout: none;
   min-height: 100dvh;
-  background: var(--on-light-surface-secondary);
+  background: var(--on-light-surface-primary);
   color: var(--on-light-text-primary);
   font: var(--type-body);
   letter-spacing: 0;

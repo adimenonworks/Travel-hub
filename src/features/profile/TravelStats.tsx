@@ -1,4 +1,4 @@
-import { CardLink, Icon, Section, type IconName } from '../../design/components';
+import { Card, Section, type IconName } from '../../design/components';
 import { useActivitiesFor } from '../../data/hooks';
 import type { Activity, Category, Place, Trip } from '../../data/types';
 import { daysBetween, today } from '../../lib/dates';
@@ -42,15 +42,9 @@ export function TravelStats({ trips, home, visited, meId }: { trips: Trip[]; hom
   ];
   return (
     <Section title="Your travels" footer={travelled === null ? 'Add your home city below to count miles travelled.' : 'Miles are there and back from your home city.'}>
+      {/* Figma: each stat is a Card (icon, the number as the title, the label as the body) */}
       <div className={s.stats}>
-        {stats.map((st) => {
-          const body = <>
-            <span className={s.statIcon}><Icon name={st.icon} size={18} /></span>
-            <span className={s.statValue}>{st.value}</span>
-            <span className="t-label-small t-secondary">{st.label}</span>
-          </>;
-          return st.to ? <CardLink key={st.label} to={st.to} className={s.stat}>{body}</CardLink> : <div key={st.label} className={s.stat}>{body}</div>;
-        })}
+        {stats.map((st) => <Card key={st.label} icon={st.icon} title={<span className="t-num">{st.value}</span>} body={st.label} to={st.to} />)}
       </div>
     </Section>
   );

@@ -5,14 +5,15 @@
   background-size: 50% 100%; background-position: -100% 0;
   animation: shimmer 1.4s var(--ease-standard) infinite;
 }
-.text { width: 100%; height: calc(14rem / 17); border-radius: var(--radius-xs); }
-.block { width: 100%; height: 120px; border-radius: var(--radius-xl); }
-.circle { width: 32px; height: 32px; border-radius: var(--radius-round); }
+.text { width: 100%; height: calc(14rem / 17); border-radius: var(--radius-200); }
+.block { width: 100%; height: 120px; border-radius: var(--radius-600); }
+.circle { width: 32px; height: 32px; border-radius: var(--radius-1000); }
 @keyframes shimmer { to { background-position: 200% 0; } }
 @media (prefers-reduced-motion: reduce) { .sk { animation: none; } }
 
 .page {
-  max-width: calc(var(--size-content-max) + 2 * var(--space-gutter)); margin: 0 auto;
+  width: 100%; /* a full-width column even inside a flex page (auto margins alone would shrink it to nothing) */
+  max-width: calc(var(--size-content-max) + 2 * var(--space-gutter)); margin: 0 auto; box-sizing: border-box;
   padding: var(--space-page-top) var(--space-gutter) 0; display: flex; flex-direction: column; gap: var(--space-stack);
 }
-.header { display: flex; align-items: center; justify-content: space-between; gap: var(--space-inline-m); }
+.bare { padding: 0; max-width: none; }

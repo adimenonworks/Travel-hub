@@ -32,10 +32,10 @@ export function TripBudget({ ctx, day, onSetBudget }: { ctx: TripCtx; day: strin
     const w = word(day);
     const when = day === t ? 'today' : w === 'Tomorrow' || w === 'Yesterday' ? w.toLowerCase() : `on ${w}`;
     return <BudgetCard amount={fmt(Math.abs(d.left))} label={d.left < 0 ? `Over ${when}` : `Left ${when}`} total={fmt(b.total)} level={d.level}
-      action={canManage && <Button variant="secondary" size="small" icon="pencil" onClick={() => setOpen(true)}>Edit budgets</Button>} />;
+      action={canManage && <Button variant="secondary" size="regular" icon="pencil" onClick={() => setOpen(true)}>Edit budgets</Button>} />;
   })() : (
     <BudgetCard amount={fmt(b.planned)} label="Planned so far" total="No total set" level="ok"
-      action={onSetBudget && <Button variant="secondary" size="small" icon="pencil" onClick={onSetBudget}>Add budget</Button>} />
+      action={onSetBudget && <Button variant="secondary" size="regular" icon="pencil" onClick={onSetBudget}>Add budget</Button>} />
   );
 
   // One day's editor: a past day corrects what was spent; today and later set the day's own budget.
@@ -75,12 +75,12 @@ export function TripBudget({ ctx, day, onSetBudget }: { ctx: TripCtx; day: strin
                   trailing={<span className={['t-num', !isPast && f.left < 0 && b.total > 0 ? 't-danger' : ''].join(' ')}>
                     {isPast ? `${fmt(f.spent)} used` : b.total > 0 ? (f.left < 0 ? `${fmt(-f.left)} over` : `${fmt(f.left)} left`) : fmt(f.spent)}
                   </span>}
-                  actions={canManage && <IconButton icon="pencil" size="small" label={isPast ? `Edit what was spent ${lower(word(x))}` : `Edit ${lower(word(x))}’s budget`} onClick={() => editDay(x)} />} />
+                  actions={canManage && <IconButton icon="pencil" size="regular" label={isPast ? `Edit what was spent ${lower(word(x))}` : `Edit ${lower(word(x))}’s budget`} onClick={() => editDay(x)} />} />
               );
             })}
           </List>
         </Section>
-        <Section title="Other expenses" action={<Button size="small" icon="plus" onClick={() => { setOpen(false); setEditing('new'); }}>Add expense</Button>}
+        <Section title="Other expenses" action={<Button size="regular" icon="plus" onClick={() => { setOpen(false); setEditing('new'); }}>Add expense</Button>}
           footer="Event prices come from the itinerary. Add flights, hotels, car hire and anything else here.">
           {expenses.length === 0 ? <p className="t-body-small t-secondary">No expenses yet.</p> : (
             <List>

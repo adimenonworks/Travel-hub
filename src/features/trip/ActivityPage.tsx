@@ -77,12 +77,12 @@ export function ActivityPage(ctx: TripCtx) {
           </Section>
 
           <Section title="Who’s going"
-            action={<Button size="small" variant={going ? 'primary' : 'secondary'} icon={going ? 'check' : 'plus'}
+            action={<Button size="regular" variant={going ? 'primary' : 'secondary'} icon={going ? 'check' : 'plus'}
               onClick={() => store.toggleInArray(trip.id, 'activities', a.id, 'attendeeIds', me.uid, !going)}>{going ? "I'm in" : 'Join'}</Button>}>
             {a.attendeeIds.length ? (
               <List>
                 {a.attendeeIds.map((id) => (
-                  <ListRow key={id} leading={<Avatar name={personName(profiles, id)} photo={profiles[id]?.photo} seed={id} size={32} />}
+                  <ListRow key={id} leading={<Avatar name={personName(profiles, id)} photo={profiles[id]?.photo} seed={id} size={40} />}
                     title={id === me.uid ? `${personName(profiles, id)} (you)` : personName(profiles, id)} />
                 ))}
               </List>
@@ -93,7 +93,7 @@ export function ActivityPage(ctx: TripCtx) {
         </div>
 
         <div className={s.planCol}>
-          <Section title="Documents" action={<Button size="small" variant="secondary" icon="plus" onClick={() => setAddingDoc(true)}>Add</Button>}
+          <Section title="Documents" action={<Button size="regular" variant="secondary" icon="plus" onClick={() => setAddingDoc(true)}>Add</Button>}
             footer="Tickets, bookings and PDFs. Add the email it came from to find it again quickly.">
             {a.links.length ? (
               <List>
@@ -105,8 +105,8 @@ export function ActivityPage(ctx: TripCtx) {
                       subtitle={`${isPdf(l.url) ? 'PDF · ' : ''}${hostOf(l.url)}${l.emailUrl ? ' · from email' : ''}`}
                       trailing={
                         <span className={s.docActions}>
-                          {l.emailUrl && <LinkButton href={l.emailUrl} size="small" variant="ghost" icon="mail" label={`Open the email for ${name}`} />}
-                          <IconButton icon="trash" size="small" label={`Remove ${name}`} onClick={() => removeDoc(i)} />
+                          {l.emailUrl && <LinkButton href={l.emailUrl} size="regular" variant="ghost" icon="mail" label={`Open the email for ${name}`} />}
+                          <IconButton icon="trash" size="regular" label={`Remove ${name}`} onClick={() => removeDoc(i)} />
                         </span>
                       } />
                   );

@@ -5,7 +5,7 @@ export { Card, CardLink, Section } from './Card';
 export { List, ListRow } from './List';
 export { SegmentedControl } from './SegmentedControl';
 export { Sheet } from './Sheet';
-export { Avatar, AvatarStack, Badge, EmptyState, Spinner, Notification, type BadgeTone, type NotificationState } from './Misc';
+export { Avatar, AvatarStack, Badge, Chip, EmptyState, Spinner, Notification, type BadgeTone, type NotificationState } from './Misc';
 export { Skeleton, PageSkeleton } from './Skeleton';
 export { BottomNav, type NavTab } from './BottomNav';
 export { PageHeader, HeaderProfileContext, Tabs, type TabItem } from './Bars';
@@ -13,3 +13,4 @@ export { Illustration, COVER_ILLUSTRATIONS, type IllustrationName } from './Illu
 export { HeroCard, ContentCard, EventRow, BudgetCard, Timeline } from './TripCards';
 export { ToastProvider, useToast } from './Toast';
 export { Modal } from './Modal';
+export { Banner, type BannerTone } from './Banner';

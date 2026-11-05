@@ -52,11 +52,11 @@
   --interactive-button-primary-icon: var(--color-emerald-800);
   --interactive-button-primary-disabled-background: color-mix(in srgb, var(--color-neutral-1000) 5%, transparent);
   --interactive-button-primary-disabled-foreground: color-mix(in srgb, var(--color-neutral-1000) 30%, transparent);
-  --interactive-button-secondary-background: var(--color-emerald-100);
-  --interactive-button-secondary-background-hover: var(--color-emerald-50);
-  --interactive-button-secondary-background-pressed: var(--color-emerald-200);
-  --interactive-button-secondary-text: var(--color-emerald-700);
-  --interactive-button-secondary-icon: var(--color-emerald-700);
+  --interactive-button-secondary-background: var(--color-neutral-100);
+  --interactive-button-secondary-background-hover: var(--color-neutral-50);
+  --interactive-button-secondary-background-pressed: var(--color-neutral-300);
+  --interactive-button-secondary-text: var(--color-neutral-800);
+  --interactive-button-secondary-icon: var(--color-neutral-800);
   --interactive-button-secondary-disabled-background: color-mix(in srgb, var(--color-neutral-1000) 5%, transparent);
   --interactive-button-secondary-disabled-foreground: color-mix(in srgb, var(--color-neutral-1000) 30%, transparent);
   --interactive-button-ghost-background: transparent;
@@ -66,13 +66,8 @@
   --interactive-button-ghost-icon: var(--color-neutral-800);
   --interactive-button-ghost-disabled-background: transparent;
   --interactive-button-ghost-disabled-foreground: color-mix(in srgb, var(--color-neutral-1000) 30%, transparent);
-  --interactive-button-inverse-background: var(--color-emerald-800);
-  --interactive-button-inverse-background-hover: var(--color-emerald-700);
-  --interactive-button-inverse-background-pressed: var(--color-emerald-900);
-  --interactive-button-inverse-text: var(--color-emerald-200);
-  --interactive-button-inverse-icon: var(--color-emerald-200);
-  --interactive-button-inverse-disabled-background: color-mix(in srgb, var(--color-neutral-1000) 5%, transparent);
-  --interactive-button-inverse-disabled-foreground: color-mix(in srgb, var(--color-neutral-1000) 30%, transparent);
+  --interactive-button-ghost-text-inverse: var(--color-neutral-50);
+  --interactive-button-ghost-icon-inverse: var(--color-neutral-50);
   --interactive-button-destructive-background: var(--color-red-100);
   --interactive-button-destructive-background-hover: var(--color-red-50);
   --interactive-button-destructive-background-pressed: var(--color-red-200);
@@ -83,7 +78,29 @@
   --interactive-button-destructive-icon: var(--color-red-700);
   --interactive-button-destructive-disabled-background: color-mix(in srgb, var(--color-neutral-1000) 5%, transparent);
   --interactive-button-destructive-disabled-foreground: color-mix(in srgb, var(--color-neutral-1000) 30%, transparent);
-  --tag-neutral-background: var(--color-neutral-0);
+  --interactive-button-tertiary-background: transparent;
+  --interactive-button-tertiary-background-hover: color-mix(in srgb, var(--color-neutral-1000) 5%, transparent);
+  --interactive-button-tertiary-background-pressed: color-mix(in srgb, var(--color-neutral-1000) 10%, transparent);
+  --interactive-button-tertiary-text: var(--color-neutral-900);
+  --interactive-button-tertiary-icon: var(--color-neutral-900);
+  --interactive-button-tertiary-border: var(--color-neutral-900);
+  --interactive-button-tertiary-disabled-background: color-mix(in srgb, var(--color-neutral-1000) 5%, transparent);
+  --interactive-button-tertiary-disabled-foreground: color-mix(in srgb, var(--color-neutral-1000) 30%, transparent);
+  --interactive-button-inverse-neutral-background: var(--color-neutral-800);
+  --interactive-button-inverse-neutral-background-hover: var(--color-neutral-700);
+  --interactive-button-inverse-neutral-background-pressed: var(--color-neutral-900);
+  --interactive-button-inverse-neutral-text: var(--color-neutral-50);
+  --interactive-button-inverse-neutral-icon: var(--color-neutral-50);
+  --interactive-button-inverse-neutral-disabled-background: color-mix(in srgb, var(--color-neutral-1000) 5%, transparent);
+  --interactive-button-inverse-neutral-disabled-foreground: color-mix(in srgb, var(--color-neutral-1000) 30%, transparent);
+  --interactive-button-inverse-brand-background: var(--color-emerald-800);
+  --interactive-button-inverse-brand-background-hover: var(--color-emerald-700);
+  --interactive-button-inverse-brand-background-pressed: var(--color-emerald-900);
+  --interactive-button-inverse-brand-text: var(--color-emerald-200);
+  --interactive-button-inverse-brand-icon: var(--color-emerald-200);
+  --interactive-button-inverse-brand-disabled-background: color-mix(in srgb, var(--color-neutral-1000) 5%, transparent);
+  --interactive-button-inverse-brand-disabled-foreground: color-mix(in srgb, var(--color-neutral-1000) 30%, transparent);
+  --tag-neutral-background: var(--color-neutral-50);
   --tag-neutral-text: var(--color-neutral-1000);
   --tag-neutral-icon: var(--color-neutral-1000);
   --tag-brand-bold-background: var(--color-emerald-300);
@@ -109,7 +126,7 @@
      Every set has the same token names, so a component can move between surfaces by swapping the set. */
   /* On light: white and light grey surfaces */
   --on-light-surface-primary: var(--color-neutral-0);
-  --on-light-surface-secondary: var(--color-neutral-50);
+  --on-light-surface-secondary: var(--color-neutral-100);
   --on-light-surface-brand: var(--color-emerald-100);
   --on-light-surface-sunken: color-mix(in srgb, var(--color-neutral-1000) 10%, transparent);
   --on-light-text-primary: var(--color-neutral-900);
@@ -144,7 +161,7 @@
   --on-mid-surface-primary: var(--color-emerald-300);
   --on-mid-surface-secondary: var(--color-emerald-200);
   --on-mid-surface-brand: var(--color-emerald-100);
-  --on-mid-surface-sunken: color-mix(in srgb, var(--color-emerald-900) 12%, transparent);
+  --on-mid-surface-sunken: color-mix(in srgb, var(--color-neutral-1000) 10%, transparent);
   --on-mid-text-primary: var(--color-emerald-900);
   --on-mid-text-secondary: var(--color-emerald-800);
   --on-mid-text-brand: var(--color-emerald-800);
@@ -174,8 +191,8 @@
   --on-mid-status-error: var(--color-red-800);
   --on-mid-status-error-subtle: var(--color-red-100);
   /* On dark: the deep brand surface (Hero Card panel) */
-  --on-dark-surface-primary: var(--color-emerald-700);
-  --on-dark-surface-secondary: var(--color-emerald-800);
+  --on-dark-surface-primary: var(--color-neutral-900);
+  --on-dark-surface-secondary: var(--color-emerald-600);
   --on-dark-surface-brand: var(--color-emerald-800);
   --on-dark-surface-sunken: color-mix(in srgb, var(--color-neutral-0) 10%, transparent);
   --on-dark-text-primary: var(--color-neutral-0);
@@ -233,30 +250,21 @@
   --on-accent-border-focus: var(--color-neutral-1000);
   --on-accent-border-brand: var(--color-emerald-800);
   --on-accent-divider-default: color-mix(in srgb, var(--color-neutral-1000) 15%, transparent);
-  --on-accent-illustration-primary: var(--color-neutral-0);
-  --on-accent-illustration-secondary: color-mix(in srgb, var(--color-neutral-1000) 10%, transparent);
-  --on-accent-illustration-accent: color-mix(in srgb, var(--color-neutral-0) 60%, transparent);
-  --on-accent-illustration-accent-bold: color-mix(in srgb, var(--color-neutral-1000) 60%, transparent);
-  --on-accent-illustration-accent-subtle: color-mix(in srgb, var(--color-neutral-0) 40%, transparent);
-  --on-accent-illustration-warm: var(--color-orange-500);
-  --on-accent-illustration-warm-bold: var(--color-orange-700);
-  --on-accent-illustration-border: color-mix(in srgb, var(--color-neutral-1000) 60%, transparent);
 
   /* Layout (Figma "Layout" collection) */
-  --space-inline-zero: var(--space-0); --space-inline-xxxs: var(--space-2); --space-inline-xxs: var(--space-4); --space-inline-xs: var(--space-8);
-  --space-inline-s: var(--space-12); --space-inline-m: var(--space-16); --space-inline-l: var(--space-20); --space-inline-xl: var(--space-24);
-  --space-inline-xxl: var(--space-32); --space-inline-xxxl: var(--space-40); --space-inline-max: var(--space-48);
-  --space-page-xxs: var(--space-16); --space-page-xs: var(--space-24); --space-page-s: var(--space-32); --space-page-m: var(--space-40);
-  --space-page-l: var(--space-48); --space-page-xl: var(--space-96); --space-page-max: var(--space-120);
-  --space-overlap-avatar: calc(-1 * var(--space-6)); /* Figma Layout space/overlap/avatar (−6): how far each avatar in a stack tucks under the one before */
-  --radius-xxs: var(--radius-2); --radius-xs: var(--radius-4); --radius-s: var(--radius-8); --radius-m: var(--radius-12); --radius-l: var(--radius-16);
-  --radius-xl: var(--radius-24); --radius-xxl: var(--radius-32); --radius-xxxl: var(--radius-48); --radius-xxxxl: var(--radius-64); --radius-xxxxxl: var(--radius-80); --radius-round: var(--radius-999);
+  /* Figma Layout collection (space/default/500 → --space-default-500, radius/600 → --radius-600) */
+  --space-default-0: var(--space-0); --space-default-100: var(--space-2); --space-default-200: var(--space-4); --space-default-250: var(--space-6);
+  --space-default-300: var(--space-8); --space-default-400: var(--space-12); --space-default-500: var(--space-16); --space-default-600: var(--space-20);
+  --space-default-700: var(--space-24); --space-default-800: var(--space-32); --space-default-900: var(--space-40); --space-default-950: var(--space-48); --space-default-1000: var(--space-96);
+  --space-negative-200: var(--space--6); /* how far each avatar in a stack tucks under the one before */
+  --radius-100: var(--radius-2); --radius-200: var(--radius-4); --radius-300: var(--radius-8); --radius-400: var(--radius-12); --radius-500: var(--radius-16);
+  --radius-600: var(--radius-24); --radius-700: var(--radius-32); --radius-800: var(--radius-48); --radius-900: var(--radius-64); --radius-1000: var(--radius-999);
 
   /* Page layout (code only: how the Layout tokens are used for the page frame, by screen width) */
-  --space-gutter: var(--space-inline-l);   /* page side margin */
-  --space-inset: var(--space-inline-l);    /* padding inside cards and rows */
-  --space-stack: var(--space-page-s);      /* gap between sections */
-  --space-page-top: var(--space-page-l);   /* space above the page title */
+  --space-gutter: var(--space-default-700);   /* page side margin (24) */
+  --space-inset: var(--space-default-600);    /* padding inside cards and rows */
+  --space-stack: var(--space-default-800);      /* gap between sections */
+  --space-page-top: var(--space-default-950);   /* space above the page title */
 
   /* Typography (Figma "Typography" collection, its one mode). Sizes follow the iPhone text setting (see base.css).
      Titles and headings grow up to 1.4x their Figma size, like iOS large titles; body and label text keep growing. */
@@ -347,13 +355,8 @@
     --interactive-button-ghost-icon: var(--color-neutral-100);
     --interactive-button-ghost-disabled-background: transparent;
     --interactive-button-ghost-disabled-foreground: color-mix(in srgb, var(--color-neutral-0) 30%, transparent);
-    --interactive-button-inverse-background: var(--color-emerald-800);
-    --interactive-button-inverse-background-hover: var(--color-emerald-700);
-    --interactive-button-inverse-background-pressed: var(--color-emerald-900);
-    --interactive-button-inverse-text: var(--color-emerald-200);
-    --interactive-button-inverse-icon: var(--color-emerald-200);
-    --interactive-button-inverse-disabled-background: color-mix(in srgb, var(--color-neutral-0) 5%, transparent);
-    --interactive-button-inverse-disabled-foreground: color-mix(in srgb, var(--color-neutral-0) 30%, transparent);
+    --interactive-button-ghost-text-inverse: var(--color-neutral-100);
+    --interactive-button-ghost-icon-inverse: var(--color-neutral-100);
     --interactive-button-destructive-background: var(--color-red-800);
     --interactive-button-destructive-background-hover: var(--color-red-700);
     --interactive-button-destructive-background-pressed: var(--color-red-900);
@@ -364,6 +367,28 @@
     --interactive-button-destructive-icon: var(--color-red-200);
     --interactive-button-destructive-disabled-background: color-mix(in srgb, var(--color-neutral-0) 5%, transparent);
     --interactive-button-destructive-disabled-foreground: color-mix(in srgb, var(--color-neutral-0) 30%, transparent);
+    --interactive-button-tertiary-background: var(--color-emerald-800);
+    --interactive-button-tertiary-background-hover: var(--color-emerald-700);
+    --interactive-button-tertiary-background-pressed: var(--color-emerald-900);
+    --interactive-button-tertiary-text: var(--color-emerald-100);
+    --interactive-button-tertiary-icon: var(--color-emerald-100);
+    --interactive-button-tertiary-border: var(--color-emerald-100);
+    --interactive-button-tertiary-disabled-background: color-mix(in srgb, var(--color-neutral-0) 5%, transparent);
+    --interactive-button-tertiary-disabled-foreground: color-mix(in srgb, var(--color-neutral-0) 30%, transparent);
+    --interactive-button-inverse-neutral-background: var(--color-emerald-800);
+    --interactive-button-inverse-neutral-background-hover: var(--color-emerald-700);
+    --interactive-button-inverse-neutral-background-pressed: var(--color-emerald-900);
+    --interactive-button-inverse-neutral-text: var(--color-emerald-100);
+    --interactive-button-inverse-neutral-icon: var(--color-emerald-100);
+    --interactive-button-inverse-neutral-disabled-background: color-mix(in srgb, var(--color-neutral-0) 5%, transparent);
+    --interactive-button-inverse-neutral-disabled-foreground: color-mix(in srgb, var(--color-neutral-0) 30%, transparent);
+    --interactive-button-inverse-brand-background: var(--color-emerald-800);
+    --interactive-button-inverse-brand-background-hover: var(--color-emerald-700);
+    --interactive-button-inverse-brand-background-pressed: var(--color-emerald-900);
+    --interactive-button-inverse-brand-text: var(--color-emerald-200);
+    --interactive-button-inverse-brand-icon: var(--color-emerald-200);
+    --interactive-button-inverse-brand-disabled-background: color-mix(in srgb, var(--color-neutral-0) 5%, transparent);
+    --interactive-button-inverse-brand-disabled-foreground: color-mix(in srgb, var(--color-neutral-0) 30%, transparent);
     --tag-neutral-background: var(--color-neutral-800);
     --tag-neutral-text: var(--color-neutral-0);
     --tag-neutral-icon: var(--color-neutral-0);
@@ -389,7 +414,7 @@
     /* Surface sets (Figma "Color" collection, groups on-light/ on-mid/ on-dark/ on-<accent>/).
        Every set has the same token names, so a component can move between surfaces by swapping the set. */
     /* On light: white and light grey surfaces */
-    --on-light-surface-primary: var(--color-neutral-900);
+    --on-light-surface-primary: var(--color-neutral-800);
     --on-light-surface-secondary: var(--color-neutral-1000);
     --on-light-surface-brand: var(--color-emerald-800);
     --on-light-surface-sunken: color-mix(in srgb, var(--color-neutral-0) 10%, transparent);
@@ -455,9 +480,9 @@
     --on-mid-status-error: var(--color-red-300);
     --on-mid-status-error-subtle: var(--color-red-900);
     /* On dark: the deep brand surface (Hero Card panel) */
-    --on-dark-surface-primary: var(--color-emerald-900);
-    --on-dark-surface-secondary: var(--color-emerald-800);
-    --on-dark-surface-brand: var(--color-emerald-700);
+    --on-dark-surface-primary: var(--color-neutral-900);
+    --on-dark-surface-secondary: var(--color-emerald-600);
+    --on-dark-surface-brand: var(--color-emerald-800);
     --on-dark-surface-sunken: color-mix(in srgb, var(--color-neutral-0) 10%, transparent);
     --on-dark-text-primary: var(--color-emerald-50);
     --on-dark-text-secondary: var(--color-emerald-100);
@@ -514,14 +539,6 @@
     --on-accent-border-focus: var(--color-neutral-0);
     --on-accent-border-brand: var(--color-emerald-300);
     --on-accent-divider-default: color-mix(in srgb, var(--color-neutral-0) 15%, transparent);
-    --on-accent-illustration-primary: var(--color-neutral-900);
-    --on-accent-illustration-secondary: color-mix(in srgb, var(--color-neutral-0) 10%, transparent);
-    --on-accent-illustration-accent: color-mix(in srgb, var(--color-neutral-0) 30%, transparent);
-    --on-accent-illustration-accent-bold: color-mix(in srgb, var(--color-neutral-0) 70%, transparent);
-    --on-accent-illustration-accent-subtle: color-mix(in srgb, var(--color-neutral-0) 15%, transparent);
-    --on-accent-illustration-warm: var(--color-orange-400);
-    --on-accent-illustration-warm-bold: var(--color-orange-300);
-    --on-accent-illustration-border: color-mix(in srgb, var(--color-neutral-0) 50%, transparent);
   }
 }
 
@@ -586,13 +603,8 @@
   --interactive-button-ghost-icon: var(--color-neutral-100);
   --interactive-button-ghost-disabled-background: transparent;
   --interactive-button-ghost-disabled-foreground: color-mix(in srgb, var(--color-neutral-0) 30%, transparent);
-  --interactive-button-inverse-background: var(--color-emerald-800);
-  --interactive-button-inverse-background-hover: var(--color-emerald-700);
-  --interactive-button-inverse-background-pressed: var(--color-emerald-900);
-  --interactive-button-inverse-text: var(--color-emerald-200);
-  --interactive-button-inverse-icon: var(--color-emerald-200);
-  --interactive-button-inverse-disabled-background: color-mix(in srgb, var(--color-neutral-0) 5%, transparent);
-  --interactive-button-inverse-disabled-foreground: color-mix(in srgb, var(--color-neutral-0) 30%, transparent);
+  --interactive-button-ghost-text-inverse: var(--color-neutral-100);
+  --interactive-button-ghost-icon-inverse: var(--color-neutral-100);
   --interactive-button-destructive-background: var(--color-red-800);
   --interactive-button-destructive-background-hover: var(--color-red-700);
   --interactive-button-destructive-background-pressed: var(--color-red-900);
@@ -603,6 +615,28 @@
   --interactive-button-destructive-icon: var(--color-red-200);
   --interactive-button-destructive-disabled-background: color-mix(in srgb, var(--color-neutral-0) 5%, transparent);
   --interactive-button-destructive-disabled-foreground: color-mix(in srgb, var(--color-neutral-0) 30%, transparent);
+  --interactive-button-tertiary-background: var(--color-emerald-800);
+  --interactive-button-tertiary-background-hover: var(--color-emerald-700);
+  --interactive-button-tertiary-background-pressed: var(--color-emerald-900);
+  --interactive-button-tertiary-text: var(--color-emerald-100);
+  --interactive-button-tertiary-icon: var(--color-emerald-100);
+  --interactive-button-tertiary-border: var(--color-emerald-100);
+  --interactive-button-tertiary-disabled-background: color-mix(in srgb, var(--color-neutral-0) 5%, transparent);
+  --interactive-button-tertiary-disabled-foreground: color-mix(in srgb, var(--color-neutral-0) 30%, transparent);
+  --interactive-button-inverse-neutral-background: var(--color-emerald-800);
+  --interactive-button-inverse-neutral-background-hover: var(--color-emerald-700);
+  --interactive-button-inverse-neutral-background-pressed: var(--color-emerald-900);
+  --interactive-button-inverse-neutral-text: var(--color-emerald-100);
+  --interactive-button-inverse-neutral-icon: var(--color-emerald-100);
+  --interactive-button-inverse-neutral-disabled-background: color-mix(in srgb, var(--color-neutral-0) 5%, transparent);
+  --interactive-button-inverse-neutral-disabled-foreground: color-mix(in srgb, var(--color-neutral-0) 30%, transparent);
+  --interactive-button-inverse-brand-background: var(--color-emerald-800);
+  --interactive-button-inverse-brand-background-hover: var(--color-emerald-700);
+  --interactive-button-inverse-brand-background-pressed: var(--color-emerald-900);
+  --interactive-button-inverse-brand-text: var(--color-emerald-200);
+  --interactive-button-inverse-brand-icon: var(--color-emerald-200);
+  --interactive-button-inverse-brand-disabled-background: color-mix(in srgb, var(--color-neutral-0) 5%, transparent);
+  --interactive-button-inverse-brand-disabled-foreground: color-mix(in srgb, var(--color-neutral-0) 30%, transparent);
   --tag-neutral-background: var(--color-neutral-800);
   --tag-neutral-text: var(--color-neutral-0);
   --tag-neutral-icon: var(--color-neutral-0);
@@ -628,7 +662,7 @@
   /* Surface sets (Figma "Color" collection, groups on-light/ on-mid/ on-dark/ on-<accent>/).
      Every set has the same token names, so a component can move between surfaces by swapping the set. */
   /* On light: white and light grey surfaces */
-  --on-light-surface-primary: var(--color-neutral-900);
+  --on-light-surface-primary: var(--color-neutral-800);
   --on-light-surface-secondary: var(--color-neutral-1000);
   --on-light-surface-brand: var(--color-emerald-800);
   --on-light-surface-sunken: color-mix(in srgb, var(--color-neutral-0) 10%, transparent);
@@ -694,9 +728,9 @@
   --on-mid-status-error: var(--color-red-300);
   --on-mid-status-error-subtle: var(--color-red-900);
   /* On dark: the deep brand surface (Hero Card panel) */
-  --on-dark-surface-primary: var(--color-emerald-900);
-  --on-dark-surface-secondary: var(--color-emerald-800);
-  --on-dark-surface-brand: var(--color-emerald-700);
+  --on-dark-surface-primary: var(--color-neutral-900);
+  --on-dark-surface-secondary: var(--color-emerald-600);
+  --on-dark-surface-brand: var(--color-emerald-800);
   --on-dark-surface-sunken: color-mix(in srgb, var(--color-neutral-0) 10%, transparent);
   --on-dark-text-primary: var(--color-emerald-50);
   --on-dark-text-secondary: var(--color-emerald-100);
@@ -753,12 +787,4 @@
   --on-accent-border-focus: var(--color-neutral-0);
   --on-accent-border-brand: var(--color-emerald-300);
   --on-accent-divider-default: color-mix(in srgb, var(--color-neutral-0) 15%, transparent);
-  --on-accent-illustration-primary: var(--color-neutral-900);
-  --on-accent-illustration-secondary: color-mix(in srgb, var(--color-neutral-0) 10%, transparent);
-  --on-accent-illustration-accent: color-mix(in srgb, var(--color-neutral-0) 30%, transparent);
-  --on-accent-illustration-accent-bold: color-mix(in srgb, var(--color-neutral-0) 70%, transparent);
-  --on-accent-illustration-accent-subtle: color-mix(in srgb, var(--color-neutral-0) 15%, transparent);
-  --on-accent-illustration-warm: var(--color-orange-400);
-  --on-accent-illustration-warm-bold: var(--color-orange-300);
-  --on-accent-illustration-border: color-mix(in srgb, var(--color-neutral-0) 50%, transparent);
 }

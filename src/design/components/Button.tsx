@@ -4,18 +4,18 @@ import { Link } from 'react-router-dom';
 import { Icon, type IconName } from './Icon';
 import s from './Button.module.css';
 
-/** Figma Button "Variant". Inverse is the dark button that sits on a brand (emerald) surface. */
-export type ButtonVariant = 'primary' | 'secondary' | 'destructive' | 'inverse' | 'ghost';
-/** Figma Button "Size": Regular is 48px tall, Small 40px (both keep a 44px tap area). */
-export type ButtonSize = 'small' | 'regular';
+/** Figma Button "Variant". Inverse is the deep emerald button for brand surfaces; Neutral the dark grey one; Tertiary is outlined. */
+export type ButtonVariant = 'primary' | 'secondary' | 'destructive' | 'inverse' | 'neutral' | 'tertiary' | 'ghost';
+/** Figma Button "Size": Large is 48px tall (Label, 24px icons), Regular 32px (Label small, 16px icons, still a 44px tap area). */
+export type ButtonSize = 'regular' | 'large';
 
 type Look = { variant?: ButtonVariant; size?: ButtonSize; block?: boolean; /** Leading icon */ icon?: IconName; /** Trailing icon */ iconEnd?: IconName };
 
-const cls = ({ variant = 'primary', size = 'regular', block }: Look, iconOnly: boolean, extra?: string) =>
+const cls = ({ variant = 'primary', size = 'large', block }: Look, iconOnly: boolean, extra?: string) =>
   [s.button, s[variant], s[size], block && s.block, iconOnly && s.iconOnly, extra].filter(Boolean).join(' ');
 
-function Body({ icon, iconEnd, size = 'regular', children }: Look & { children?: ReactNode }) {
-  const px = size === 'small' ? 16 : 24;
+function Body({ icon, iconEnd, size = 'large', children }: Look & { children?: ReactNode }) {
+  const px = size === 'regular' ? 16 : 24;
   return (
     <>
       {icon && <Icon name={icon} size={px} className={s.glyph} />}
@@ -49,12 +49,12 @@ export function LinkButton({ to, href, variant, size, block, icon, iconEnd, labe
 }
 
 /** Icon-only Button (Figma Button with "Show text" off). `label` is required so screen readers can announce it. */
-export function IconButton({ icon, label, variant = 'ghost', size = 'regular', state, className, type = 'button', ...rest }: ButtonHTMLAttributes<HTMLButtonElement> & {
+export function IconButton({ icon, label, variant = 'ghost', size = 'large', state, className, type = 'button', ...rest }: ButtonHTMLAttributes<HTMLButtonElement> & {
   icon: IconName; label: string; variant?: ButtonVariant; size?: ButtonSize; /** Show the filled icon (e.g. a starred event) */ state?: 'default' | 'filled';
 }) {
   return (
     <button type={type} className={cls({ variant, size }, true, className)} aria-label={label} title={label} {...rest}>
-      <Icon name={icon} size={24} state={state} className={s.glyph} />
+      <Icon name={icon} size={size === 'regular' ? 16 : 24} state={state} className={s.glyph} />
     </button>
   );
 }

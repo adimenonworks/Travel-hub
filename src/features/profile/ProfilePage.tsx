@@ -34,7 +34,7 @@ export function ProfilePage() {
   return (
     <>
       <Content>
-        <PageHeader title="Profile" back={{ to: '/', label: 'Trips' }} />
+        <PageHeader title="Profile" back={{ to: '/trips', label: 'Trips' }} />
         <ProfileCard uid={me.uid} name={profile?.name || me.name} photo={profile ? profile.photo : me.photo} email={me.email} />
 
         {trips && <TravelStats trips={trips.filter((t) => tripPhase(t.startDate, t.endDate) !== 'upcoming')} home={profile?.home ?? null} visited={visited} meId={me.uid} />}
@@ -63,7 +63,7 @@ export function ProfilePage() {
             <List>
               {visited.map((v) => (
                 <ListRow key={v.name} icon="pin" title={v.name}
-                  trailing={<IconButton icon="trash" size="small" label={`Remove ${v.name}`} onClick={() => store.saveProfile(me.uid, { visited: visited.filter((x) => x.name !== v.name) })} />} />
+                  trailing={<IconButton icon="trash" size="regular" label={`Remove ${v.name}`} onClick={() => store.saveProfile(me.uid, { visited: visited.filter((x) => x.name !== v.name) })} />} />
               ))}
             </List>
           )}
@@ -94,7 +94,7 @@ export function ProfilePage() {
   );
 }
 
-/** Your photo and nickname. They're what other people on your trips see. */
+/** Figma "Profile Card": your picture (tap it to change it), name, email and how you signed in, then your nickname. */
 function ProfileCard({ uid, name, photo, email }: { uid: string; name: string; photo: string | null; email?: string | null }) {
   const input = useRef<HTMLInputElement>(null);
   const [draft, setDraft] = useState(name);
@@ -130,18 +130,16 @@ function ProfileCard({ uid, name, photo, email }: { uid: string; name: string; p
   return (
     <Card className={s.head}>
       <div className={s.who}>
-        <Avatar name={name} photo={photo} seed={uid} size={32} />
+        {/* Tap your picture to add or change it */}
+        <button type="button" className={s.avatarButton} onClick={() => input.current?.click()} disabled={busy}
+          aria-label={busy ? 'Preparing photo…' : photo ? 'Change your photo' : 'Add a photo'}>
+          <Avatar name={name} photo={photo} seed={uid} size={40} />
+        </button>
         <div className={s.whoText}>
           <h2 className="t-heading-2">{name}</h2>
           {email && <div className="t-body-small t-secondary">{email}</div>}
           <div className="t-body-small t-secondary">{store.mode === 'demo' ? 'Demo account' : 'Signed in with Google'}</div>
         </div>
-      </div>
-      <div className={s.photoButtons}>
-        <Button variant="secondary" size="small" icon="photo" onClick={() => input.current?.click()} disabled={busy}>
-          {busy ? 'Preparing photo…' : photo ? 'Change photo' : 'Add photo'}
-        </Button>
-        {photo && <Button variant="ghost" size="small" onClick={() => store.saveProfile(uid, { photo: null })}>Remove photo</Button>}
       </div>
       <input ref={input} type="file" accept="image/*" className="visually-hidden" tabIndex={-1} aria-hidden="true"
         onChange={(e) => pick(e.target.files?.[0])} />

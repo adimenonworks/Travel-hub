@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import { Icon, type IconName } from './Icon';
-import { AvatarStack, Badge } from './Misc';
+import { AvatarStack, Badge, Chip } from './Misc';
 import { LinkButton } from './Button';
 import { useToast } from './Toast';
 import s from './TripCards.module.css';
@@ -9,20 +9,21 @@ import s from './TripCards.module.css';
 type Person = { id: string; name: string; photo?: string | null };
 
 /**
- * Figma "Hero Card": the photo (or illustrated cover) beside a deep emerald panel with the trip's name, dates,
- * countries, who's going and shortcut buttons, plus the "days to go / days left" corner.
- * Photo on top with the corner on it, then the panel. (The Large layout is archived in Figma.)
+ * Figma "Hero Card": the trip's photo (or illustrated cover) with the "days to go / days left" corner, then a separate
+ * panel with the name, dates, country chips, who's going and a chevron. The whole panel opens the trip.
+ * Tone Brand: deep panel; Tone White: light grey panel with a subtle border. `cover` off shows only the panel.
  */
-export function HeroCard({ image, title, subtitle, countries, people, count, actions, to }: {
-  image: ReactNode; title: ReactNode; subtitle: ReactNode;
-  /** On phones, the whole card opens this page */
+export function HeroCard({ image, title, subtitle, countries, people, count, to, tone = 'white', cover = true }: {
+  image?: ReactNode; title: ReactNode; subtitle: ReactNode;
+  /** The panel opens this page */
   to?: string;
   countries: { code: string; name: string; flag?: string }[];
   people: Person[];
   /** The corner, e.g. { value: 28, label: 'Days to go' } */
   count?: { value: number | string; label: string };
-  /** Shortcut buttons (Small buttons) */
-  actions?: ReactNode;
+  tone?: 'brand' | 'white';
+  /** Figma "Show cover" */
+  cover?: boolean;
 }) {
   const corner = count && (
     <div className={s.count} role="img" aria-label={`${count.value} ${count.label.toLowerCase()}`}>
@@ -30,26 +31,25 @@ export function HeroCard({ image, title, subtitle, countries, people, count, act
       <span className={s.countLabel}>{count.label}</span>
     </div>
   );
-  return (
-    <section className={s.hero} aria-label="Trip">
-      <div className={s.heroImage}>{image}{corner}</div>
-      <div className={s.heroPanel}>
-        <div className={s.heroText}>
-          <div className={s.heroTitle}>
-            <h2 className={s.heroName}>{to ? <Link to={to} className={s.heroLink}>{title}</Link> : title}</h2>
-            <div className={s.heroSub}>{subtitle}</div>
-          </div>
-          {countries.length > 0 && (
-            <ul className={s.countries} aria-label="Countries">
-              {countries.map((c) => (
-                <li key={c.code}><Badge tone="inverse" flag={c.flag && <img src={c.flag} alt="" className={s.flag} />}>{c.name}</Badge></li>
-              ))}
-            </ul>
-          )}
-          {people.length > 0 && <AvatarStack people={people} size={24} />}
-        </div>
-        {actions && <div className={s.heroActions}>{actions}</div>}
+  const panel = (
+    <>
+      <div className={s.heroText}>
+        <h2 className={s.heroName}>{title}</h2>
+        <div className={s.heroSub}>{subtitle}</div>
+        {countries.length > 0 && (
+          <ul className={s.countries} aria-label="Countries">
+            {countries.map((c) => <li key={c.code}><Chip flag={c.flag}>{c.name}</Chip></li>)}
+          </ul>
+        )}
+        {people.length > 0 && <AvatarStack people={people} />}
       </div>
+      {to && <Icon name="chevron-right" size={24} className={s.heroChevron} />}
+    </>
+  );
+  return (
+    <section className={[s.hero, s[`hero-${tone}`]].join(' ')} aria-label="Trip">
+      {cover && image && <div className={s.heroImage}>{image}{corner}</div>}
+      {to ? <Link to={to} className={s.heroPanel}>{panel}</Link> : <div className={s.heroPanel}>{panel}</div>}
     </section>
   );
 }
@@ -93,6 +93,8 @@ export function EventRow({ to, title, location, time, category, going, people, p
   };
   return (
     <article className={s.event}>
+      <div className={s.eventLead}>
+      <Icon name={category.icon} size={40} className={s.eventIcon} />
       <div className={s.eventMain}>
         <div className={s.eventTitle}>
           <h3><Link to={to} className={s.eventLink}>{title}</Link></h3>
@@ -114,10 +116,11 @@ export function EventRow({ to, title, location, time, category, going, people, p
           </div>
         )}
       </div>
+      </div>
       {(mapsHref || uberHref) && (
         <div className={s.eventButtons}>
-          {mapsHref && <LinkButton href={mapsHref} size="small" iconEnd="pin" label={`Directions to ${title}`}>Maps</LinkButton>}
-          {uberHref && <LinkButton href={uberHref} size="small" variant="secondary" iconEnd="car" label={`Uber to ${title}`}>Uber</LinkButton>}
+          {mapsHref && <LinkButton href={mapsHref} size="regular" iconEnd="pin" label={`Directions to ${title}`}>Maps</LinkButton>}
+          {uberHref && <LinkButton href={uberHref} size="regular" variant="secondary" iconEnd="car" label={`Uber to ${title}`}>Uber</LinkButton>}
         </div>
       )}
     </article>

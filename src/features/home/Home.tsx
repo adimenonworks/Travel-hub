@@ -1,121 +1,76 @@
 import { useEffect, useState } from 'react';
-import { Button, Card, ContentCard, HeroCard, Illustration, LinkButton, PageHeader, Section, PageSkeleton } from '../../design/components';
+import { Banner, Button, Card, HeroCard, Illustration, PageHeader } from '../../design/components';
 import { personName, useMe, useMyTrips, useProfile, useProfiles, useSub } from '../../data/hooks';
 import type { Trip } from '../../data/types';
-import { countdown, daysBetween, formatRange, today, tripPhase } from '../../lib/dates';
+import { daysBetween, formatRange } from '../../lib/dates';
 import { countryName, flagUrl, tripCountries } from '../../lib/countries';
 import { Content, useNewTrip } from '../../app/Shell';
-import { TripCover } from '../shared/TripCover';
 import s from './Home.module.css';
 import { featuredTrip } from '../../lib/trips';
 
 /**
- * Home: a greeting with your numbers, the trip that matters now as a big card, your other trips
- * (each with a cover), a tile that invites you to plan the next one, and a row of past trips.
+ * Home (Figma "Home tab"): a greeting; the trip you're on or the next one (Hero Card, White, no cover);
+ * then "What's next?": the plan tile and three Banners that invite you to plan. Your trips list lives on the Trips tab.
  */
 export function Home() {
   const me = useMe();
   const trips = useMyTrips();
   const profile = useProfile(me.uid);
   const name = profile?.name || me.name;
-
-  const all = (trips ?? []).slice().sort((a, b) => a.startDate.localeCompare(b.startDate));
-  const current = all.filter((t) => tripPhase(t.startDate, t.endDate) === 'current');
-  const upcoming = all.filter((t) => tripPhase(t.startDate, t.endDate) === 'upcoming');
-  const past = all.filter((t) => tripPhase(t.startDate, t.endDate) === 'past').reverse();
-  const daysAway = past.reduce((n, t) => n + daysBetween(t.startDate, t.endDate) + 1, 0);
-  const places = new Set([...past.flatMap((t) => (t.destination ? [t.destination] : [])), ...(profile?.visited ?? [])]
-    .map((p) => p.name.split(',')[0].trim().toLowerCase())).size;
-
-  // The trip that matters now: one you're on, else the next one.
   const featured = featuredTrip(trips);
-  const others = [...current, ...upcoming].filter((t) => t !== featured);
   const newTrip = useNewTrip();
-  const plural = (n: number, word: string) => `${n} ${word}${n === 1 ? '' : 's'}`;
 
   return (
-    <Content>
-      <PageHeader title={`Hi, ${name.split(' ')[0]}`} fit
-        subtitle={`${plural(all.length, 'trip')} · ${plural(daysAway, 'day')} away · ${plural(places, 'place')}`}
-        action={{ icon: 'plus', label: 'New trip', onClick: newTrip }} />
-
-      {trips === null ? <PageSkeleton /> : (
-        <>
-          {featured && <Hero trip={featured} />}
-          {others.length > 0 ? (
-            <Section title="Coming up">
-              <div className={s.grid}>
-                {others.map((t) => <TripCard key={t.id} trip={t} />)}
-                <PlanTile />
-              </div>
-            </Section>
-          ) : (
-            <PlanTile wide />
-          )}
-          <Section title="Past trips">
-            {past.length > 0 ? (
-              <div className={s.pastRow}>{past.map((t) => <div key={t.id} className={s.past}><PastCard trip={t} /></div>)}</div>
-            ) : (
-              <Card media={<Illustration name="memories" size={64} square />} title="Looks a little empty…"
-                body="Let’s make some memories. Trips you’ve finished will show up here." />
-            )}
-          </Section>
-        </>
-      )}
+    <Content className={s.home}>
+      <PageHeader title={`Hi, ${name.split(' ')[0]}`} fit />
+      <div className={s.sections}>
+        {featured && (
+          <>
+            <section className={s.block}>
+              <h2 className={s.bigTitle}>Upcoming</h2>
+              <UpcomingTrip trip={featured} />
+            </section>
+            <hr className={s.divider} />
+          </>
+        )}
+        <h2 className={s.bigTitle}>What’s next?</h2>
+        <PlanTile />
+        <Banner tone="brand" label="Welcome to Rove" subtext="Have a holiday coming up? Add all your plans, let us handle the day to day."
+          media={<span className={s.logo}><BrandMark /></span>}
+          action={<Button variant="inverse" onClick={newTrip}>Plan your upcoming holiday</Button>} />
+        <Banner tone="orange" label="Craft your dream getaway" subtext="Dream destination? Keep your top links, posts, and places saved, accessible anytime, anywhere."
+          media={['jp', 'it', 'mx'].map((c) => <span key={c} className={s.flagDisc}><img src={flagUrl(c)} alt="" /></span>)}
+          action={<Button variant="tertiary" onClick={newTrip}>Plan your next holiday</Button>} />
+        <Banner tone="green" label="Travel with us… or friends" subtext="Whether you’re heading off on your own or rallying the crew, we’re here to help."
+          media={<Illustration name="people" size={96} />}
+          action={<Button variant="tertiary" onClick={newTrip}>Plan your upcoming holiday</Button>} />
+      </div>
     </Content>
   );
 }
 
-
-const place = (t: Trip) => t.destination?.name.split(',').slice(0, 2).join(',') ?? 'No destination yet';
-
-/** The trip you're on, or the next one, as the Figma Hero Card: shortcuts into its itinerary, ideas and people. */
-function Hero({ trip }: { trip: Trip }) {
+/** The trip you're on, or the next one: the Hero Card panel only (Tone=White, no cover). Tapping it opens the trip. */
+function UpcomingTrip({ trip }: { trip: Trip }) {
   const profiles = useProfiles(trip.memberIds);
   const activities = useSub(trip.id, 'activities');
   const n = daysBetween(trip.startDate, trip.endDate) + 1;
-  const base = `/trip/${trip.id}`;
   return (
-    <HeroCard
-      image={<TripCover trip={trip} />}
-      to={base}
+    <HeroCard tone="white" cover={false} to={`/trip/${trip.id}`}
       title={trip.name}
       subtitle={`${formatRange(trip.startDate, trip.endDate)} • ${n} day${n === 1 ? '' : 's'}`}
       countries={tripCountries(trip, activities ?? []).map((code) => ({ code, name: countryName(code), flag: flagUrl(code) }))}
-      people={trip.memberIds.map((id) => ({ id, name: personName(profiles, id), photo: profiles[id]?.photo }))}
-      count={countdown(trip.startDate, trip.endDate)}
-      actions={<>
-        <LinkButton to={base} size="small" icon="calendar">Itinerary</LinkButton>
-        <LinkButton to={`${base}/ideas`} variant="secondary" size="small" icon="lightbulb">Ideas</LinkButton>
-        <LinkButton to={`${base}/people`} variant="secondary" size="small" icon="people">People</LinkButton>
-      </>}
-    />
+      people={trip.memberIds.map((id) => ({ id, name: personName(profiles, id), photo: profiles[id]?.photo }))} />
   );
 }
 
-const whenLabel = (until: number, n: number) => (until > 0 ? `in ${until} day${until === 1 ? '' : 's'}` : until === 0 ? 'Today' : `${n} day${n === 1 ? '' : 's'}`);
-
-/** A trip in the grid (Figma "Content Card"): cover with when it is and who's going, then name, place and dates. */
-function TripCard({ trip }: { trip: Trip }) {
-  const n = daysBetween(trip.startDate, trip.endDate) + 1;
-  const until = daysBetween(today(), trip.startDate);
-  const profiles = useProfiles(trip.memberIds);
+/** Rove's walker R (the app icon's figure), in the brand text colour. */
+function BrandMark() {
   return (
-    <ContentCard to={`/trip/${trip.id}`} cover={<TripCover trip={trip} />}
-      when={tripPhase(trip.startDate, trip.endDate) === 'current' ? 'Happening now' : whenLabel(until, n)}
-      people={trip.memberIds.map((id) => ({ id, name: personName(profiles, id), photo: profiles[id]?.photo }))}
-      name={trip.name} place={place(trip)} dates={formatRange(trip.startDate, trip.endDate)} />
-  );
-}
-
-/** A finished trip (Figma "Content Card", in a row that scrolls sideways): how long it was and who went. */
-function PastCard({ trip }: { trip: Trip }) {
-  const n = daysBetween(trip.startDate, trip.endDate) + 1;
-  const profiles = useProfiles(trip.memberIds);
-  return (
-    <ContentCard to={`/trip/${trip.id}`} cover={<TripCover trip={trip} />} when={`${n} day${n === 1 ? '' : 's'}`}
-      people={trip.memberIds.map((id) => ({ id, name: personName(profiles, id), photo: profiles[id]?.photo }))}
-      name={trip.name} place={place(trip)} dates={formatRange(trip.startDate, trip.endDate)} />
+    <svg viewBox="50 24 108 144" width="44" height="58" aria-hidden="true" fill="currentColor">
+      <path d="M84.4232 59.0739C92.9967 59.0739 99.9468 52.2745 99.9468 43.8871C99.9468 35.4996 92.9967 28.7002 84.4232 28.7002C75.8498 28.7002 68.8996 35.4996 68.8996 43.8871C68.8996 52.2745 75.8498 59.0739 84.4232 59.0739Z" />
+      <path d="M80.3356 69.9116C81.4545 64.0216 87.2419 60.1337 93.2625 61.2281C99.2832 62.3228 103.257 67.9856 102.139 73.8757L96.4341 103.905C96.3784 104.198 96.3097 104.489 96.2295 104.777L94.485 111.034L126.524 146.236C130.596 150.71 130.19 157.567 125.617 161.551C121.043 165.535 114.033 165.137 109.961 160.663L86.3702 134.744L78.2359 157.089C76.1812 162.733 69.8391 165.679 64.0702 163.668C58.3015 161.658 55.2911 155.454 57.3458 149.81L71.6176 110.608L74.7113 99.5067L80.3356 69.9116Z" />
+      <path d="M106.046 69.7758C106.266 68.6035 107.311 67.7521 108.529 67.7521H119.594C150.869 67.7521 154.161 111.143 119.594 111.143H101.314C99.7368 111.143 98.546 109.745 98.8307 108.228L106.046 69.7758Z" />
+    </svg>
   );
 }
 
@@ -129,7 +84,7 @@ const CYCLE = 5.6;          // seconds from one place appearing to the next (in,
  * Invites you to plan the next trip. The destination changes letter by letter:
  * each letter slides up just after the one before, like a quick wave.
  */
-function PlanTile({ wide }: { wide?: boolean }) {
+function PlanTile() {
   const newTrip = useNewTrip();
   const [i, setI] = useState(() => Math.floor(Math.random() * DESTINATIONS.length));
   const [leaving, setLeaving] = useState(false);
@@ -158,6 +113,6 @@ function PlanTile({ wide }: { wide?: boolean }) {
         </span>
       </h2>}
       body="There’s so much to see and do. Let’s plan it right."
-      actions={<Button icon="plus" size={wide ? 'regular' : 'small'} onClick={newTrip}>Add a trip</Button>} />
+      actions={<Button block onClick={newTrip}>Plan your next holiday</Button>} />
   );
 }

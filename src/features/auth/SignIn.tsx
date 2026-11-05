@@ -39,12 +39,12 @@ export function SignIn({ message }: { message?: string }) {
           <Notification state="warning">You're in an app's built-in browser, where Google sign-in is blocked. Tap the menu (⋯ or ↗) and choose <b>Open in Safari</b> or <b>Open in Chrome</b>.</Notification>
         )}
         {store.mode === 'firebase' ? (
-          <Button size="regular" block onClick={go} disabled={busy}>Continue with Google</Button>
+          <Button size="large" block onClick={go} disabled={busy}>Continue with Google</Button>
         ) : (
           <form onSubmit={(e) => { e.preventDefault(); go(); }} className={s.form}>
             <TextField label="Your name" placeholder="Alex" value={name} onChange={(e) => setName(e.target.value)} autoFocus
               hint="Demo mode: no account needed. Open another tab with a different name to try collaborating." />
-            <Button size="regular" block type="submit" disabled={busy || !name.trim()}>Start planning</Button>
+            <Button size="large" block type="submit" disabled={busy || !name.trim()}>Start planning</Button>
           </form>
         )}
         {error && <p className="t-label-small t-danger">{error}</p>}

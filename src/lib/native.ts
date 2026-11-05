@@ -45,3 +45,14 @@ export async function shareLink(opts: { title: string; text: string; url: string
   }
   return false;
 }
+
+/**
+ * A very light "tick" (the iOS selection haptic, as when a picker wheel clicks), e.g. when switching tabs.
+ * Does nothing in a browser.
+ */
+export function selectionTick() {
+  if (!isNativeApp) return;
+  import('@capacitor/haptics').then(async ({ Haptics }) => {
+    try { await Haptics.selectionStart(); await Haptics.selectionChanged(); await Haptics.selectionEnd(); } catch { /* no haptics on this device */ }
+  });
+}
