@@ -9,14 +9,18 @@ function initials(name: string) {
   return ((parts[0]?.[0] ?? '?') + (parts.length > 1 ? parts[parts.length - 1][0] : '')).toUpperCase();
 }
 
-/** Initials on the light emerald wash. `seed` is accepted for older callers; every avatar now shares one colour. */
-export function Avatar({ name, photo, size = 32 }: { name: string; photo?: string | null; size?: number; seed?: string }) {
-  const style = { '--avatar-size': `${Math.min(size, 32)}px` } as CSSProperties; // Figma Avatar up to Medium (32); Large and Extra large are archived
+/**
+ * Figma Avatar: initials on the light emerald wash. Sizes: 24 (in an Avatar Stack), Small 28 (Label small), Medium 40 (15px initials).
+ * `seed` is accepted for older callers; every avatar shares one colour.
+ */
+export function Avatar({ name, photo, size = 28 }: { name: string; photo?: string | null; size?: number; seed?: string }) {
+  const px = Math.min(size, 40);
+  const style = { '--avatar-size': `${px}px`, ...(px >= 40 ? { '--avatar-font': 'calc(15rem / 17)' } : {}) } as CSSProperties;
   if (photo) return <img className={s.avatar} style={style} src={photo} alt={name} title={name} referrerPolicy="no-referrer" />;
   return <span className={s.avatar} style={style} title={name} role="img" aria-label={name}>{initials(name)}</span>;
 }
 
-export function AvatarStack({ people, max = 4, size = 28 }: { people: { id: string; name: string; photo?: string | null }[]; max?: number; size?: number }) {
+export function AvatarStack({ people, max = 3, size = 24 }: { people: { id: string; name: string; photo?: string | null }[]; max?: number; size?: number }) {
   const shown = people.slice(0, max);
   const extra = people.length - shown.length;
   return (
@@ -38,6 +42,16 @@ export function Badge({ tone = 'neutral', icon, iconState, flag, children }: {
     <span className={[s.badge, s[`badge-${tone}`]].join(' ')}>
       {flag}
       {!flag && icon && <Icon name={icon} size={16} state={iconState} style={{ color: 'inherit' }} />}
+      {children}
+    </span>
+  );
+}
+
+/** Figma Chip (Type=Action): a country or filter with a flag or icon. Active is filled deep emerald. */
+export function Chip({ active, icon, flag, children }: { active?: boolean; icon?: IconName; /** Image URL of a country flag */ flag?: string; children: ReactNode }) {
+  return (
+    <span className={[s.chip, active ? s['chip-active'] : s['chip-inactive']].join(' ')}>
+      {flag ? <img src={flag} alt="" className={s.chipFlag} /> : icon && <Icon name={icon} size={16} />}
       {children}
     </span>
   );

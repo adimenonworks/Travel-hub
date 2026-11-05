@@ -2,27 +2,27 @@
 .card {
   background: var(--on-light-surface-primary);
   border: 1px solid var(--on-light-border-subtle);
-  border-radius: var(--radius-xl);
+  border-radius: var(--radius-600);
   padding: var(--space-inset);
   color: var(--on-light-text-primary);
 }
 .flush { padding: 0; overflow: hidden; }
 
 /* Media, text and buttons stacked (Figma's Small card; the Large row layout is archived) */
-.structured { display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-inline-m); padding: var(--space-inline-m); }
-.structured .title { font: var(--type-heading-4); letter-spacing: -0.01em; }
+.structured { display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-default-500); padding: var(--space-default-500); }
+.structured .title { font: var(--type-heading-2); letter-spacing: -0.02em; } /* Heading 2 */
 .structured .body { font: var(--type-label-small); }
-.structured .buttons { flex-direction: column; align-self: stretch; margin-top: var(--space-inline-xxs); } /* 20 below the text */
+.structured .buttons { flex-direction: column; align-self: stretch; margin-top: var(--space-default-200); } /* 20 below the text */
 .structured .buttons > * { width: 100%; }
 
 .media { flex: none; display: grid; place-items: center; color: var(--on-light-icon-brand); }
 /* The Media slot's default: an icon on the light emerald tile */
-.mediaTile { display: grid; place-items: center; padding: var(--space-inline-xs); border-radius: var(--radius-s); background: var(--on-light-surface-brand); color: var(--on-light-icon-brand); }
-.structured .mediaTile { padding: var(--space-inline-xxs); border-radius: var(--radius-xs); }
-.content { min-width: 0; display: flex; flex-direction: column; gap: var(--space-inline-xs); }
+.mediaTile { display: grid; place-items: center; padding: var(--space-default-300); border-radius: var(--radius-300); background: var(--on-light-surface-brand); color: var(--on-light-icon-brand); }
+.structured .mediaTile { padding: 0; border-radius: var(--radius-200); background: none; color: var(--on-light-icon-primary); } /* Figma Card Media: a plain 16px icon */
+.content { min-width: 0; display: flex; flex-direction: column; gap: var(--space-default-300); }
 .title { color: var(--on-light-text-primary); }
 .body { color: var(--on-light-text-secondary); }
-.buttons { display: flex; flex-wrap: wrap; gap: var(--space-inline-xs); }
+.buttons { display: flex; flex-wrap: wrap; gap: var(--space-default-300); }
 
 /* Tone=Accent: the card is an on-mid (emerald) surface. Everything inside it that asks for an on-light token
    gets the on-mid token of the same name instead: the two sets match 1:1, so this is a straight swap. */
@@ -65,12 +65,13 @@
 }
 
 .interactive { position: relative; isolation: isolate; cursor: pointer; transition: transform var(--motion-fast), background var(--motion-fast); text-align: left; width: 100%; color: inherit; display: block; }
+.interactive.structured { display: flex; } /* a structured Card that is a link keeps its column layout */
 .interactive::after { content: ''; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; transition: background var(--motion-fast); }
 .interactive:hover::after { background: var(--interactive-button-ghost-background-hover); }
 .interactive:active::after { background: var(--interactive-button-ghost-background-pressed); }
 .interactive:active { transform: scale(0.99); }
 
-.section { display: flex; flex-direction: column; gap: var(--space-inline-s); }
-.sectionHeader { display: flex; align-items: center; justify-content: space-between; gap: var(--space-inline-s); min-height: var(--size-tap); flex-wrap: wrap; }
+.section { display: flex; flex-direction: column; gap: var(--space-default-400); }
+.sectionHeader { display: flex; align-items: center; justify-content: space-between; gap: var(--space-default-400); min-height: var(--size-tap); flex-wrap: wrap; }
 .sectionTitle { font: var(--type-heading-2); letter-spacing: -0.02em; color: var(--on-light-text-primary); }
-.sectionFooter { font: var(--type-label-small); color: var(--on-light-text-secondary); padding: 0 var(--space-inline-xs); }
+.sectionFooter { font: var(--type-label-small); color: var(--on-light-text-secondary); padding: 0 var(--space-default-300); }

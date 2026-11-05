@@ -100,7 +100,7 @@ export function Itinerary(ctx: TripCtx) {
               {weather && <WeatherChip w={weather.day} typical={weather.typical} />}
             </div>
           </div>
-          <Button icon="plus" onClick={() => setAdding(true)}>Add event</Button>
+          <Button size="regular" icon="plus" onClick={() => setAdding(true)}>Add event</Button>
         </div>
 
         {list.length === 0 ? (

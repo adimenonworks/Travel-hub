@@ -1,9 +1,9 @@
 /* Figma "Toast": surface/background-tertiary pill, padding 4/16/4/12, gap 4, Shadow/Overlay; icon and text subtle. */
-.region { position: fixed; top: 0; left: 0; right: 0; z-index: 200; display: flex; justify-content: center; pointer-events: none; padding-top: calc(env(safe-area-inset-top) + var(--space-inline-m)); }
+.region { position: fixed; top: 0; left: 0; right: 0; z-index: 200; display: flex; justify-content: center; pointer-events: none; padding-top: calc(env(safe-area-inset-top) + var(--space-default-500)); }
 .toast {
-  display: inline-flex; align-items: center; gap: var(--space-inline-xxs);
-  padding: var(--space-inline-xxs) var(--space-inline-m) var(--space-inline-xxs) var(--space-inline-s);
-  border-radius: var(--radius-round);
+  display: inline-flex; align-items: center; gap: var(--space-default-200);
+  padding: var(--space-default-200) var(--space-default-500) var(--space-default-200) var(--space-default-400);
+  border-radius: var(--radius-1000);
   background: var(--on-light-surface-primary);
   box-shadow: var(--shadow-overlay);
   color: var(--on-light-text-secondary);

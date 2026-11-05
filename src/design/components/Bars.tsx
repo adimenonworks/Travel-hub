@@ -5,48 +5,49 @@ import { Icon, type IconName } from './Icon';
 import { IconButton, LinkButton } from './Button';
 import s from './Bars.module.css';
 
-/** What sits at the right end of every page header: your profile picture (the app shell provides it). */
+/** Kept for older callers; the Figma Page Header no longer shows your profile picture (the You tab does). */
 export const HeaderProfileContext = createContext<ReactNode>(null);
 
 /**
- * Figma "Page Header": space above, an optional ghost back button, the Display title (and Body subtitle) on the left,
- * then an optional secondary icon button and your profile picture on the right, level with the title.
+ * Figma "Page Header": an optional ghost back button, then the title row: the title (Type=Title Large: Display 48;
+ * Title small: Heading 1, both in the brand text colour) with an optional Label subtitle, and one optional secondary icon button.
  */
-export function PageHeader({ title, subtitle, back, action, fit }: {
+export function PageHeader({ title, subtitle, back, action, fit, size = 'large' }: {
   title: ReactNode;
   subtitle?: ReactNode;
   back?: { to: string; label: string };
-  /** The one optional button, e.g. edit the trip or add a new trip */
+  /** The one optional button, e.g. edit the trip */
   action?: { icon: IconName; label: string; onClick: () => void };
   /** Keep the title on one line: if it doesn't fit, it steps down to the Heading 1 size */
   fit?: boolean;
+  /** Figma "Type": large = Title Large (tabs), small = Title small (a trip's pages) */
+  size?: 'large' | 'small';
 }) {
-  const profile = useContext(HeaderProfileContext);
+  useContext(HeaderProfileContext);
   const navigate = useNavigate();
   const titleRef = useRef<HTMLHeadingElement>(null);
   const [smaller, setSmaller] = useState(false);
   useLayoutEffect(() => {
     const el = titleRef.current;
-    if (!fit || !el) return;
+    if (!fit || !el || size === 'small') return;
     const check = () => { setSmaller(false); requestAnimationFrame(() => setSmaller(el.scrollWidth > el.clientWidth)); };
     check();
     document.fonts?.ready.then(check); // measure again once the display font has loaded
     const ro = new ResizeObserver(check);
     ro.observe(el.parentElement!);
     return () => ro.disconnect();
-  }, [fit, title]);
+  }, [fit, title, size]);
   return (
     <header className={s.header}>
-      {back && <div className={s.back}><LinkButton to={back.to} variant="ghost" size="small" icon="chevron-left" onClick={(e) => { e.preventDefault(); goBack(navigate, back.to); }}>{back.label}</LinkButton></div>}
+      {back && <div className={s.back}><LinkButton to={back.to} variant="ghost" size="regular" icon="chevron-left" onClick={(e) => { e.preventDefault(); goBack(navigate, back.to); }}>{back.label}</LinkButton></div>}
       <div className={s.titleRow}>
         <div className={s.titleText}>
-          <h1 ref={titleRef} className={[s.title, fit && s.fit, fit && smaller && s.fitSmaller].filter(Boolean).join(' ')}>{title}</h1>
+          <h1 ref={titleRef} className={[s.title, size === 'small' && s.titleSmall, fit && s.fit, fit && smaller && s.fitSmaller].filter(Boolean).join(' ')}>{title}</h1>
           {subtitle && <div className={s.subtitle}>{subtitle}</div>}
         </div>
-        {(action || profile) && (
+        {action && (
           <div className={s.actions}>
-            {action && <IconButton icon={action.icon} label={action.label} variant="secondary" size="small" onClick={action.onClick} />}
-            {profile}
+            <IconButton icon={action.icon} label={action.label} variant="secondary" size="regular" onClick={action.onClick} />
           </div>
         )}
       </div>

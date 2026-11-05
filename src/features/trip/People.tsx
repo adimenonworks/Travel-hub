@@ -49,7 +49,7 @@ export function People({ trip, profiles, canManage, isOwner }: TripCtx) {
             const editable = isOwner && id !== me.uid;
             return (
               <ListRow key={id}
-                leading={<Avatar name={name} photo={profiles[id]?.photo} seed={id} size={32} />}
+                leading={<Avatar name={name} photo={profiles[id]?.photo} seed={id} size={40} />}
                 title={<>{name}{id === me.uid && <span className="t-secondary"> (you)</span>}</>}
                 trailing={
                   editable ? (
@@ -81,10 +81,10 @@ export function People({ trip, profiles, canManage, isOwner }: TripCtx) {
                   <div className={s.inviteUrl} title={link}>{link}</div>
                   <Button icon="share" onClick={() => share()}>Share</Button>
                 </div>
-                <Button variant="ghost" size="small" onClick={makeLink} disabled={busy}>Make a new link</Button>
+                <Button variant="ghost" size="regular" onClick={makeLink} disabled={busy}>Make a new link</Button>
               </>
             ) : (
-              <Button icon="plus" onClick={invite} disabled={busy}>Invite to trip</Button>
+              <Button size="regular" icon="plus" onClick={invite} disabled={busy}>Invite to trip</Button>
             )}
           </div>
         </Card>

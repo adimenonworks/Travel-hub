@@ -2,18 +2,18 @@
 .button {
   position: relative;
   display: inline-flex; align-items: center; justify-content: center;
-  border: 0; border-radius: var(--radius-round);
+  border: 0; border-radius: var(--radius-1000);
   max-width: 100%; text-align: center; text-decoration: none; user-select: none; /* a long label wraps at large text sizes instead of running off the screen */
   transition: background var(--motion-fast), color var(--motion-fast), transform var(--motion-release);
 }
 .button:active:not(:disabled) { transform: scale(0.96); transition: background var(--motion-fast), color var(--motion-fast), transform var(--motion-press); }
 .glyph { flex: none; }
 
-/* Size=Regular: 48px, padding 12/16, gap 4, Label */
-.regular { min-height: var(--size-control); padding: var(--space-inline-s) var(--space-inline-m); gap: var(--space-inline-xxs); font: var(--type-label); }
-/* Size=Small: 40px, padding 8/12, gap 2, Label small; still a 44px tap area */
-.small { min-height: var(--size-control-sm); padding: var(--space-inline-xs) var(--space-inline-s); gap: var(--space-inline-xxxs); font: var(--type-label-small); }
-.small::after { content: ''; position: absolute; inset: calc((var(--size-control-sm) - var(--size-tap)) / 2) 0; }
+/* Size=Large: 48px, padding 12 / 16 right / 20 left, gap 2, Label, 24px icons */
+.large { min-height: var(--size-control); padding: var(--space-default-400) var(--space-default-500) var(--space-default-400) var(--space-default-600); gap: var(--space-default-100); font: var(--type-label); }
+/* Size=Regular: 32px, padding 8/12, gap 2, Label small, 16px icons; still a 44px tap area */
+.regular { min-height: var(--size-control-sm); padding: var(--space-default-300) var(--space-default-400); gap: var(--space-default-100); font: var(--type-label-small); }
+.regular::after { content: ''; position: absolute; inset: calc((var(--size-control-sm) - var(--size-tap)) / 2) 0; }
 
 .primary { background: var(--interactive-button-primary-background); color: var(--interactive-button-primary-text); }
 .primary:hover:not(:disabled) { background: var(--interactive-button-primary-background-hover); }
@@ -30,10 +30,24 @@
 .destructive:active:not(:disabled) { background: var(--interactive-button-destructive-background-pressed); }
 .destructive:disabled { background: var(--interactive-button-destructive-disabled-background); color: var(--interactive-button-destructive-disabled-foreground); }
 
-.inverse { background: var(--interactive-button-inverse-background); color: var(--interactive-button-inverse-text); }
-.inverse:hover:not(:disabled) { background: var(--interactive-button-inverse-background-hover); }
-.inverse:active:not(:disabled) { background: var(--interactive-button-inverse-background-pressed); }
-.inverse:disabled { background: var(--interactive-button-inverse-disabled-background); color: var(--interactive-button-inverse-disabled-foreground); }
+/* Inverse: the deep emerald button that sits on a brand (emerald) surface */
+.inverse { background: var(--interactive-button-inverse-brand-background); color: var(--interactive-button-inverse-brand-text); }
+.inverse:hover:not(:disabled) { background: var(--interactive-button-inverse-brand-background-hover); }
+.inverse:active:not(:disabled) { background: var(--interactive-button-inverse-brand-background-pressed); }
+.inverse:disabled { background: var(--interactive-button-inverse-brand-disabled-background); color: var(--interactive-button-inverse-brand-disabled-foreground); }
+
+/* Neutral: the dark grey button */
+.neutral { background: var(--interactive-button-inverse-neutral-background); color: var(--interactive-button-inverse-neutral-text); }
+.neutral:hover:not(:disabled) { background: var(--interactive-button-inverse-neutral-background-hover); }
+.neutral:active:not(:disabled) { background: var(--interactive-button-inverse-neutral-background-pressed); }
+.neutral:disabled { background: var(--interactive-button-inverse-neutral-disabled-background); color: var(--interactive-button-inverse-neutral-disabled-foreground); }
+
+/* Tertiary: outlined (1.5px on Regular, 2px on Large), used on accent surfaces */
+.tertiary { background: var(--interactive-button-tertiary-background); color: var(--interactive-button-tertiary-text); box-shadow: inset 0 0 0 1.5px var(--interactive-button-tertiary-border); }
+.tertiary.large { box-shadow: inset 0 0 0 2px var(--interactive-button-tertiary-border); }
+.tertiary:hover:not(:disabled) { background: var(--interactive-button-tertiary-background-hover); }
+.tertiary:active:not(:disabled) { background: var(--interactive-button-tertiary-background-pressed); }
+.tertiary:disabled { background: var(--interactive-button-tertiary-disabled-background); color: var(--interactive-button-tertiary-disabled-foreground); box-shadow: inset 0 0 0 1.5px var(--interactive-button-tertiary-disabled-foreground); }
 
 .ghost { background: var(--interactive-button-ghost-background); color: var(--interactive-button-ghost-text); }
 .ghost:hover:not(:disabled) { background: var(--interactive-button-ghost-background-hover); }
@@ -42,5 +56,5 @@
 
 .button:disabled { cursor: default; }
 .block { width: 100%; }
-/* Icon only ("Show text" off), as in Figma: Regular is a 56×48 pill (padding 12/16, 24 icon); Small a 48×40 pill (padding 8/12, 24 icon) */
-.iconOnly.small::after { inset: calc((var(--size-control-sm) - var(--size-tap)) / 2) 0; }
+/* Icon only ("Show text" off): the same pill with just the icon (Large 24px icon, Regular 16px) */
+.iconOnly.large { padding: var(--space-default-400) var(--space-default-500); }

@@ -17,20 +17,22 @@ type CardProps = Omit<HTMLAttributes<HTMLDivElement>, 'title'> & {
   actions?: ReactNode;
   /** @deprecated use actions */
   action?: ReactNode;
+  /** The whole card opens this page (hover and pressed tint it). */
+  to?: string;
 };
 
 /**
  * Figma "Card": the surface for most things — banners, stat tiles, notes, empty states, albums.
  * With no title/body it is just the surface around its children.
  */
-export function Card({ tone = 'default', flush, icon, media, title, body, actions, action, className, children, ...rest }: CardProps) {
+export function Card({ tone = 'default', flush, icon, media, title, body, actions, action, to, className, children, ...rest }: CardProps) {
   const btns = actions ?? action;
   const structured = title !== undefined || body !== undefined || icon || media || btns;
-  const cls = [s.card, tone === 'accent' && s.accent, flush && s.flush, structured && s.structured, className].filter(Boolean).join(' ');
+  const cls = [s.card, tone === 'accent' && s.accent, flush && s.flush, structured && s.structured, to && s.interactive, className].filter(Boolean).join(' ');
   if (!structured) return <div className={cls} {...rest}>{children}</div>;
   const mediaNode = media ?? (icon && <span className={s.mediaTile}><Icon name={icon} size={16} /></span>);
-  return (
-    <div className={cls} {...rest}>
+  const inner = (
+    <>
       {mediaNode && <div className={s.media} aria-hidden="true">{mediaNode}</div>}
       <div className={s.content}>
         {title !== undefined && <div className={s.title}>{title}</div>}
@@ -38,8 +40,9 @@ export function Card({ tone = 'default', flush, icon, media, title, body, action
         {children}
       </div>
       {btns && <div className={s.buttons}>{btns}</div>}
-    </div>
+    </>
   );
+  return to ? <Link to={to} className={cls}>{inner}</Link> : <div className={cls} {...rest}>{inner}</div>;
 }
 
 /** A whole Card that is a link (hover and pressed tint the surface). */

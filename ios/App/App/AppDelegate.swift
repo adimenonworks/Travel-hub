@@ -51,11 +51,11 @@ class RoveViewController: CAPBridgeViewController {
         guard let webView = webView else { return }
         // Swipe from the left edge to go back (and from the right to go forward), like any iPhone app.
         webView.allowsBackForwardNavigationGestures = true
-        // The page canvas colour in light and dark mode (neutral 50 / neutral 1000), so nothing flashes white before the app draws.
+        // The page canvas colour in light and dark mode (on-light/surface/primary: neutral 0 / neutral 800), so nothing flashes white before the app draws.
         let canvas = UIColor { traits in
             traits.userInterfaceStyle == .dark
-                ? UIColor(red: 0x1c / 255.0, green: 0x1c / 255.0, blue: 0x1c / 255.0, alpha: 1)
-                : UIColor(red: 0xfa / 255.0, green: 0xfa / 255.0, blue: 0xfa / 255.0, alpha: 1)
+                ? UIColor(red: 0x43 / 255.0, green: 0x43 / 255.0, blue: 0x43 / 255.0, alpha: 1)
+                : UIColor(red: 0xff / 255.0, green: 0xff / 255.0, blue: 0xff / 255.0, alpha: 1)
         }
         view.backgroundColor = canvas
         webView.isOpaque = false

@@ -1,10 +1,5 @@
 .shell { min-height: 100dvh; }
 
-/* Your profile picture, at the right of each Page Header */
-.me { display: grid; place-items: center; min-width: var(--size-tap); min-height: var(--size-tap); border-radius: 50%; transition: transform var(--motion-release); } /* 32px avatar, 44px tap area */
-.me:hover { filter: brightness(1.06); }
-.me:active { transform: scale(0.96); transition: transform var(--motion-press); }
-.me[aria-current='page'] > * { box-shadow: 0 0 0 2px var(--on-light-surface-secondary), 0 0 0 4px var(--interactive-selected-ghost-border); }
 
 .main { min-width: 0; padding-top: env(safe-area-inset-top); overflow-x: clip; /* a screen sliding in never makes the page scroll sideways */ }
 /* Room for the Bottom Nav (its height, the 8px gap and the home indicator) under every page */
@@ -12,12 +7,16 @@
 .back { animation: backIn var(--motion-screen); }
 @keyframes pushIn { from { transform: translateX(100%); } }
 @keyframes backIn { from { transform: translateX(-30%); opacity: 0.6; } }
-.withNav { padding-bottom: calc(var(--size-tab-bar) + var(--space-inline-xs) + env(safe-area-inset-bottom)); }
+/* Switching tabs: a quick cross-fade with a slight rise, like iOS tab bars */
+.tab { animation: tabIn var(--duration-base) var(--ease-fluid); }
+@keyframes tabIn { from { opacity: 0; transform: translateY(6px); } }
+@media (prefers-reduced-motion: reduce) { .push, .back, .tab { animation: none; } }
+.withNav { padding-bottom: calc(var(--size-tab-bar) + var(--space-default-300) + env(safe-area-inset-bottom)); }
 .content {
   max-width: calc(var(--size-content-max) + 2 * var(--space-gutter));
   margin: 0 auto;
-  padding: 0 var(--space-gutter) var(--space-page-xl); /* 96px below every page */
+  padding: 0 var(--space-gutter) var(--space-default-1000); /* 96px below every page */
   display: flex; flex-direction: column; gap: var(--space-stack);
 }
 
-.demo { max-width: calc(var(--size-content-max) + 2 * var(--space-gutter)); margin: var(--space-inline-m) auto 0; padding: 0 var(--space-gutter); }
+.demo { max-width: calc(var(--size-content-max) + 2 * var(--space-gutter)); margin: var(--space-default-500) auto 0; padding: 0 var(--space-gutter); }

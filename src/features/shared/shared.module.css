@@ -1,4 +1,4 @@
-.map { width: 100%; border-radius: var(--radius-xl); overflow: hidden; background: var(--on-light-surface-sunken); z-index: 0; }
+.map { width: 100%; border-radius: var(--radius-600); overflow: hidden; background: var(--on-light-surface-sunken); z-index: 0; }
 :global([data-theme='dark']) .map :global(.leaflet-tile-pane) { filter: invert(1) hue-rotate(180deg) brightness(0.9) contrast(0.9); }
 @media (prefers-color-scheme: dark) {
   :global(:root:not([data-theme='light'])) .map :global(.leaflet-tile-pane) { filter: invert(1) hue-rotate(180deg) brightness(0.9) contrast(0.9); }
@@ -6,11 +6,11 @@
 
 .homePin { display: grid !important; place-items: center; border-radius: 50%; background: var(--on-mid-surface-primary); color: var(--on-mid-icon-primary); box-shadow: 0 0 0 3px var(--on-mid-icon-primary); }
 
-.links { display: flex; flex-wrap: wrap; gap: var(--space-inline-xs); }
+.links { display: flex; flex-wrap: wrap; gap: var(--space-default-300); }
 .chip {
   display: inline-flex; align-items: center; gap: 6px;
-  min-height: var(--size-tap); padding: 0 var(--space-inline-m);
-  border-radius: var(--radius-round);
+  min-height: var(--size-tap); padding: 0 var(--space-default-500);
+  border-radius: var(--radius-1000);
   background: var(--interactive-button-secondary-background);
   color: var(--interactive-button-secondary-text);
   font-size: var(--size-body-small); font-weight: var(--weight-semibold);
@@ -19,34 +19,34 @@
 }
 .chip span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
-.linkEditor { display: flex; flex-direction: column; gap: var(--space-inline-xs); }
-.linkRow { display: grid; grid-template-columns: 1fr 1.6fr auto; gap: var(--space-inline-s); align-items: end; }
+.linkEditor { display: flex; flex-direction: column; gap: var(--space-default-300); }
+.linkRow { display: grid; grid-template-columns: 1fr 1.6fr auto; gap: var(--space-default-400); align-items: end; }
 @media (max-width: 480px) { .linkRow { grid-template-columns: 1fr auto; } .linkRow > :first-child { grid-column: 1 / -1; } }
 
 .suggest { position: relative; }
 .suggestList {
   position: absolute; left: 0; right: 0; top: calc(100% + 4px); z-index: 10;
-  background: var(--on-light-surface-primary); box-shadow: var(--shadow-raised); border-radius: var(--radius-xl);
-  box-shadow: var(--shadow-raised); overflow: hidden; padding: var(--space-inline-xs);
+  background: var(--on-light-surface-primary); box-shadow: var(--shadow-raised); border-radius: var(--radius-600);
+  box-shadow: var(--shadow-raised); overflow: hidden; padding: var(--space-default-300);
 }
-.suggestItem { display: block; width: 100%; text-align: left; padding: var(--space-inline-s) var(--space-inline-m); background: none; border: 0; border-radius: var(--radius-round); min-height: var(--size-tap); }
+.suggestItem { display: block; width: 100%; text-align: left; padding: var(--space-default-400) var(--space-default-500); background: none; border: 0; border-radius: var(--radius-1000); min-height: var(--size-tap); }
 .suggestItem:hover, .suggestItem[aria-selected='true'] { background: var(--interactive-button-ghost-background-hover); }
 
-.comments { display: flex; flex-direction: column; gap: var(--space-inline-s); padding-top: var(--space-inline-xs); border-top: 1px solid var(--on-light-divider-default); }
-.comment { display: flex; gap: var(--space-inline-xs); align-items: flex-start; }
-.bubble { background: var(--on-light-surface-secondary); border-radius: var(--radius-xl); padding: var(--space-inline-xs) var(--space-inline-m); font-size: var(--size-body-small); line-height: 1.5; min-width: 0; overflow-wrap: anywhere; }
+.comments { display: flex; flex-direction: column; gap: var(--space-default-400); padding-top: var(--space-default-300); border-top: 1px solid var(--on-light-divider-default); }
+.comment { display: flex; gap: var(--space-default-300); align-items: flex-start; }
+.bubble { background: var(--on-light-surface-secondary); border-radius: var(--radius-600); padding: var(--space-default-300) var(--space-default-500); font-size: var(--size-body-small); line-height: 1.5; min-width: 0; overflow-wrap: anywhere; }
 .bubbleMeta { font-size: var(--size-body-small); color: var(--on-light-text-secondary); }
-.commentForm { display: flex; gap: var(--space-inline-xs); align-items: center; }
-.commentInput { flex: 1; min-height: var(--size-tap); border-radius: var(--radius-round); border: 1px solid var(--on-light-border-bold); background: var(--on-light-surface-primary); padding: 0 var(--space-inline-m); font-size: var(--size-body-small); outline: none; min-width: 0; }
+.commentForm { display: flex; gap: var(--space-default-300); align-items: center; }
+.commentInput { flex: 1; min-height: var(--size-tap); border-radius: var(--radius-1000); border: 1px solid var(--on-light-border-bold); background: var(--on-light-surface-primary); padding: 0 var(--space-default-500); font-size: var(--size-body-small); outline: none; min-width: 0; }
 .commentInput::placeholder { color: var(--input-field-placeholder); opacity: 1; }
 .commentInput:hover { border-color: var(--on-light-border-bold); }
 .commentInput:focus { border-color: var(--on-light-border-focus); box-shadow: inset 0 0 0 1px var(--on-light-border-focus); }
 
 /* Leaflet controls, rounded to match */
-.map :global(.leaflet-bar) { border: 0; border-radius: var(--radius-round); overflow: hidden; box-shadow: var(--shadow-raised); }
+.map :global(.leaflet-bar) { border: 0; border-radius: var(--radius-1000); overflow: hidden; box-shadow: var(--shadow-raised); }
 .map :global(.leaflet-bar a) { width: 40px; height: 40px; line-height: 40px; background: var(--on-light-surface-primary); color: var(--on-light-icon-primary); }
-.map :global(.leaflet-control-attribution) { border-top-left-radius: var(--radius-l); padding: 0 var(--space-inline-xs); background: var(--on-light-surface-primary); color: var(--on-light-text-secondary); }
+.map :global(.leaflet-control-attribution) { border-top-left-radius: var(--radius-500); padding: 0 var(--space-default-300); background: var(--on-light-surface-primary); color: var(--on-light-text-secondary); }
 .map :global(.leaflet-control-attribution a) { color: var(--on-light-link-default); }
-.map :global(.leaflet-tooltip) { border: 0; border-radius: var(--radius-round); padding: var(--space-inline-xxs) var(--space-inline-s); font: var(--weight-semibold) var(--size-body-small)/1.4 var(--font-family); box-shadow: var(--shadow-raised); }
+.map :global(.leaflet-tooltip) { border: 0; border-radius: var(--radius-1000); padding: var(--space-default-200) var(--space-default-400); font: var(--weight-semibold) var(--size-body-small)/1.4 var(--font-family); box-shadow: var(--shadow-raised); }
 /* The map's space while it loads */
-.mapLoading { border-radius: var(--radius-xl); background: var(--on-light-surface-sunken); }
+.mapLoading { border-radius: var(--radius-600); background: var(--on-light-surface-sunken); }

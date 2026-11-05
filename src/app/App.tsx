@@ -4,6 +4,7 @@ import { PageSkeleton } from '../design/components';
 import { AuthProvider, useAuth } from '../data/hooks';
 import { SignIn } from '../features/auth/SignIn';
 import { Home } from '../features/home/Home';
+import { Trips } from '../features/home/Trips';
 import { Join } from '../features/trip/Join';
 import { TripPage } from '../features/trip/TripPage';
 import { CollectionPage } from '../features/profile/Collections';
@@ -26,6 +27,7 @@ function Routed() {
     <Shell>
       <Routes>
         <Route path="/" element={<Home />} />
+        <Route path="/trips" element={<Trips />} />
         <Route path="/trip/:tripId/*" element={<TripPage />} />
         <Route path="/join/:code" element={<Join />} />
         <Route path="/profile" element={<ProfilePage />} />

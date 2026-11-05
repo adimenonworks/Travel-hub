@@ -10,15 +10,15 @@ export function Skeleton({ shape = 'text', width, height }: { shape?: 'text' | '
   return <span className={[s.sk, s[shape]].join(' ')} style={style} aria-hidden="true" />;
 }
 
-/** A whole page loading: header, a big card and a few lines. Used instead of a spinner. */
-export function PageSkeleton({ label = 'Loading' }: { label?: string }) {
+/**
+ * A page loading: a title, a big card and a few lines, used instead of a spinner.
+ * `bare` is for inside a page that already shows its own header: just the content shapes, full width.
+ */
+export function PageSkeleton({ label = 'Loading', bare }: { label?: string; bare?: boolean }) {
   return (
-    <div className={s.page} role="status" aria-label={label}>
-      <div className={s.header}>
-        <Skeleton width="55%" height="calc(40rem / 17)" />
-        <Skeleton shape="circle" />
-      </div>
-      <Skeleton shape="block" height={340} />
+    <div className={[s.page, bare && s.bare].filter(Boolean).join(' ')} role="status" aria-label={label}>
+      {!bare && <Skeleton width="55%" height="calc(48rem / 17)" />}
+      <Skeleton shape="block" height={bare ? 231 : 340} />
       <Skeleton width="40%" height="calc(20rem / 17)" />
       <Skeleton shape="block" height={180} />
       <Skeleton shape="block" height={120} />

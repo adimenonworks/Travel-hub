@@ -2,25 +2,35 @@
 .nav {
   position: fixed; left: 0; right: 0; bottom: 0; z-index: 40;
   display: flex; justify-content: center; pointer-events: none;
-  padding: 0 max(var(--space-inline-m), env(safe-area-inset-left)) calc(env(safe-area-inset-bottom) + var(--space-inline-xs)) max(var(--space-inline-m), env(safe-area-inset-right));
+  padding: 0 max(var(--space-default-500), env(safe-area-inset-left)) calc(env(safe-area-inset-bottom) + var(--space-default-300)) max(var(--space-default-500), env(safe-area-inset-right));
 }
 .bar {
+  position: relative;
   pointer-events: auto;
   width: 100%; max-width: var(--size-content-max);
-  display: flex; gap: var(--space-inline-xxs); padding: var(--space-inline-xxs);
-  border-radius: var(--radius-round); border: 1px solid var(--on-light-border-subtle);
+  display: flex; gap: 0; padding: var(--space-default-200);
+  border-radius: var(--radius-1000); border: 1px solid var(--on-light-border-subtle);
   background: var(--overlay-bar); box-shadow: var(--shadow-raised);
   -webkit-backdrop-filter: blur(var(--blur-overlay)); backdrop-filter: blur(var(--blur-overlay));
 }
 /* Figma "Nav Item": icon over a Label small label */
 .item {
   flex: 1 1 0; min-width: 0; min-height: calc(52rem / 17);
-  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--space-inline-xxxs);
-  border-radius: var(--radius-round); color: var(--on-light-text-primary); font: var(--type-label-small);
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--space-default-100);
+  border-radius: var(--radius-1000); color: var(--on-light-text-primary); font: var(--type-label-small);
   transition: background var(--motion-fast), transform var(--motion-release);
 }
 .item:active { transform: scale(0.96); transition: background var(--motion-fast), transform var(--motion-press); }
-.item[aria-current='page'] { background: var(--on-light-surface-sunken); }
+.item { position: relative; z-index: 1; }
+/* The selected pill: one shape that slides to the current tab (equal-width tabs, so it moves by whole tab widths) */
+.indicator {
+  position: absolute; top: var(--space-default-200); bottom: var(--space-default-200); left: var(--space-default-200);
+  width: calc((100% - 2 * var(--space-default-200)) / var(--n));
+  transform: translateX(calc(100% * var(--i)));
+  border-radius: var(--radius-1000); background: var(--on-light-surface-sunken);
+  transition: transform var(--duration-slow) var(--ease-spring);
+}
+@media (prefers-reduced-motion: reduce) { .indicator { transition: none; } }
 .item span { overflow-wrap: anywhere; text-align: center; }
 /* Out of the way while typing (the app shrinks above the keyboard) */
 :global(.keyboard-open) .nav { display: none; }

@@ -29,8 +29,8 @@ export function Modal({ open, title, body, badge, cancelLabel = 'Cancel', confir
         </div>
         {badge}
         <div className={s.buttons}>
-          <Button variant="ghost" size="small" block onClick={onCancel}>{cancelLabel}</Button>
-          <Button size="small" block onClick={onConfirm}>{confirmLabel}</Button>
+          <Button variant="ghost" size="regular" block onClick={onCancel}>{cancelLabel}</Button>
+          <Button size="regular" block onClick={onConfirm}>{confirmLabel}</Button>
         </div>
       </div>
     </div>,

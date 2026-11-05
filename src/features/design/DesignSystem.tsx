@@ -19,7 +19,7 @@ const surfaceSets: { name: string; title: string; note: string }[] = [
 const ACCENTS = ['yellow', 'orange', 'green', 'pink'];
 const ACCENT_TOKENS = ["surface-sunken", "text-primary", "text-secondary", "text-brand-yellow", "text-brand-orange", "text-brand-green", "text-brand-pink", "link-default", "link-hover", "link-pressed", "icon-primary", "icon-secondary", "icon-brand-yellow", "icon-brand-orange", "icon-brand-green", "icon-brand-pink", "border-subtle", "border-bold", "border-focus", "border-brand", "divider-default", "illustration-primary", "illustration-secondary", "illustration-accent", "illustration-accent-bold", "illustration-accent-subtle", "illustration-warm", "illustration-warm-bold", "illustration-border"];
 const colorGroups: { title: string; tokens: string[] }[] = [
-  { title: 'Interactive / button (hover lighter, pressed darker)', tokens: ['--interactive-button-primary-background', '--interactive-button-primary-background-hover', '--interactive-button-primary-background-pressed', '--interactive-button-secondary-background', '--interactive-button-secondary-background-hover', '--interactive-button-secondary-background-pressed', '--interactive-button-ghost-background-hover', '--interactive-button-ghost-background-pressed', '--interactive-button-inverse-background', '--interactive-button-destructive-background', '--interactive-button-destructive-background-hover', '--interactive-button-destructive-background-pressed'] },
+  { title: 'Interactive / button (hover lighter, pressed darker)', tokens: ['--interactive-button-primary-background', '--interactive-button-primary-background-hover', '--interactive-button-primary-background-pressed', '--interactive-button-secondary-background', '--interactive-button-secondary-background-hover', '--interactive-button-secondary-background-pressed', '--interactive-button-ghost-background-hover', '--interactive-button-ghost-background-pressed', '--interactive-button-inverse-neutral-background', '--interactive-button-inverse-brand-background', '--interactive-button-tertiary-background', '--interactive-button-destructive-background', '--interactive-button-destructive-background-hover', '--interactive-button-destructive-background-pressed'] },
   { title: 'Interactive / selected & unselected', tokens: ['--interactive-selected-primary-background', '--interactive-selected-secondary-background', '--interactive-selected-ghost-border', '--interactive-unselected-ghost-background', '--interactive-unselected-ghost-border', '--interactive-unselected-ghost-text'] },
   { title: 'Input and overlay', tokens: ['--input-field-background', '--input-field-border', '--input-field-border-selected', '--overlay-scrim', '--overlay-image'] },
 ];
@@ -40,8 +40,8 @@ const typeStyles = [
   ['t-link', 'Link', '14 · Medium'],
 ];
 
-const spaces = ['--space-inline-xxs', '--space-inline-xs', '--space-inline-s', '--space-inline-m', '--space-inline-l', '--space-inline-xl', '--space-inline-xxl', '--space-inline-max'];
-const radii = ['--radius-l', '--radius-xl', '--radius-xxxl', '--radius-round'];
+const spaces = ['--space-default-200', '--space-default-300', '--space-default-400', '--space-default-500', '--space-default-600', '--space-default-700', '--space-default-800', '--space-default-950', '--space-default-1000'];
+const radii = ['--radius-500', '--radius-600', '--radius-800', '--radius-1000'];
 const controlSizes = ['--size-control-sm', '--size-tap', '--size-control'];
 const motions: [string, string][] = [
   ['--motion-fast', 'Colour and background changes (hover, press colours)'],
@@ -108,7 +108,7 @@ export function DesignSystem() {
           </Card>
           {colorGroups.map((g) => (
             <Card key={g.title}>
-              <div className="t-heading-4" style={{ marginBottom: 'var(--space-inline-s)' }}>{g.title}</div>
+              <div className="t-heading-4" style={{ marginBottom: 'var(--space-default-400)' }}>{g.title}</div>
               <div className={s.swatches}>
                 {g.tokens.map((t) => (
                   <div key={t} className={s.swatch}>
@@ -184,8 +184,8 @@ export function DesignSystem() {
             ]} />
           </Card>
           <Card>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-inline-s)' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-inline-s)' }}><Skeleton shape="circle" /><Skeleton width="60%" /></div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-default-400)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-default-400)' }}><Skeleton shape="circle" /><Skeleton width="60%" /></div>
               <Skeleton width="85%" />
               <Skeleton shape="block" />
             </div>
@@ -200,7 +200,7 @@ export function DesignSystem() {
             <Button variant="destructive">Destructive</Button>
             <Button icon="plus">Leading icon</Button>
             <Button variant="secondary" iconEnd="arrow-up-right">Trailing icon</Button>
-            <Button size="small" icon="plus">Small</Button>
+            <Button size="regular" icon="plus">Small</Button>
             <Button disabled>Disabled</Button>
             <LinkButton to="/" variant="secondary">Link button</LinkButton>
             <IconButton icon="comment" label="Comments" />
@@ -235,8 +235,9 @@ export function DesignSystem() {
         <Section title="Trip components" footer="Hero Card, Content Card, Event row, Budget card and Timeline: built from the components above, as in Figma.">
           <HeroCard image={<Illustration name={COVER_ILLUSTRATIONS[0]} />} title="Summer in Lisbon" subtitle="Jul 3 – 9 · 7 days"
             countries={[{ code: 'pt', name: 'Portugal', flag: flagUrl('pt') }, { code: 'es', name: 'Spain', flag: flagUrl('es') }]}
-            people={['Ana', 'Ben', 'Cy'].map((n) => ({ id: n, name: n }))} count={{ value: 28, label: 'Days to go' }}
-            actions={<><Button size="small" icon="calendar">Itinerary</Button><Button size="small" variant="secondary" icon="lightbulb">Ideas</Button><Button size="small" variant="secondary" icon="people">People</Button></>} />
+            people={['Ana', 'Ben', 'Cy'].map((n) => ({ id: n, name: n }))} count={{ value: 28, label: 'Days to go' }} to="/design" />
+          <HeroCard tone="brand" image={<Illustration name={COVER_ILLUSTRATIONS[1]} />} title="Tokyo trip" subtitle="Nov 12 – 20 · 9 days"
+            countries={[{ code: 'jp', name: 'Japan', flag: flagUrl('jp') }]} people={['Ana', 'Ben'].map((n) => ({ id: n, name: n }))} count={{ value: 9, label: 'Days left' }} to="/design" />
           <BudgetCard amount="€120" label="Left today" total="€2,000" level="ok" action={<Button variant="secondary" icon="pencil">Edit budgets</Button>} />
           <BudgetCard amount="€0" label="Planned so far" total="No total set" level="ok" action={<Button variant="secondary" icon="pencil">Add budget</Button>} />
           <BudgetCard amount="€35" label="Left today" total="€2,000" level="low" />
@@ -269,8 +270,8 @@ export function DesignSystem() {
           <List>
             <ListRow icon="calendar" title="With icon" subtitle="And a subtitle" chevron onClick={() => {}} />
             <ListRow icon="wallet" title="Trailing value" trailing="$120" />
-            <ListRow title="With an action" subtitle="Figma “Show actions”" trailing="$80 used" actions={<IconButton icon="pencil" size="small" label="Edit" />} />
-            <ListRow leading={<Avatar name="Sam Rivera" size={32} />} title="With avatar" trailing={<Badge tone="tint">Owner</Badge>} />
+            <ListRow title="With an action" subtitle="Figma “Show actions”" trailing="$80 used" actions={<IconButton icon="pencil" size="regular" label="Edit" />} />
+            <ListRow leading={<Avatar name="Sam Rivera" size={40} />} title="With avatar" trailing={<Badge tone="tint">Owner</Badge>} />
           </List>
         </Section>
 
@@ -280,7 +281,7 @@ export function DesignSystem() {
               <Badge>Neutral</Badge><Badge tone="tint">Tint</Badge><Badge tone="success" icon="check">Success</Badge><Badge tone="warning">Warning</Badge><Badge tone="danger">Danger</Badge><Badge tone="category" icon="camera">Category</Badge><Badge tone="inverse">Inverse</Badge><Badge icon="star" iconState="filled">With icon</Badge>
             </div>
             <div className={s.row}>
-              <Avatar name="Alex Kim" size={32} /><Avatar name="Jo" size={32} />
+              <Avatar name="Alex Kim" size={40} /><Avatar name="Jo" size={32} />
               <AvatarStack people={['Ana', 'Ben', 'Cy', 'Dee', 'Eli', 'Fay'].map((n) => ({ id: n, name: n }))} />
               <Spinner />
             </div>

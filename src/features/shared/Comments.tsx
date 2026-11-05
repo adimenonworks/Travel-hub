@@ -26,7 +26,7 @@ export function Comments({ tripId, targetId, comments, profiles }: { tripId: str
             <div className={s.bubbleMeta}>{personName(profiles, c.authorId)} · {new Date(c.createdAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}</div>
             {c.text}
           </div>
-          {c.authorId === me.uid && <IconButton icon="x" size="small" label="Delete comment" onClick={() => store.deleteSub(tripId, 'comments', c.id)} />}
+          {c.authorId === me.uid && <IconButton icon="x" size="regular" label="Delete comment" onClick={() => store.deleteSub(tripId, 'comments', c.id)} />}
         </div>
       ))}
       <div className={s.commentForm}>
@@ -38,7 +38,7 @@ export function Comments({ tripId, targetId, comments, profiles }: { tripId: str
           onChange={(e) => setText(e.target.value)}
           onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); send(); } }}
         />
-        <IconButton icon="chat" label="Send comment" variant="secondary" size="small" onClick={send} disabled={!text.trim()} />
+        <IconButton icon="chat" label="Send comment" variant="secondary" size="regular" onClick={send} disabled={!text.trim()} />
       </div>
     </div>
   );

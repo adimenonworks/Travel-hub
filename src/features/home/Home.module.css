@@ -1,5 +1,19 @@
+/* Home (Figma "Home tab"): 48 between the header and the rest; 24 between everything below it. */
+.home { gap: var(--space-default-950); }
+.sections { display: flex; flex-direction: column; gap: var(--space-default-700); }
+.block { display: flex; flex-direction: column; gap: var(--space-default-700); }
+.bigTitle { margin: 0; font: var(--type-heading-1); letter-spacing: -0.02em; color: var(--on-light-text-primary); } /* Heading 1 */
+.divider { margin: 0; border: 0; border-top: 1px solid var(--on-light-divider-default); }
+/* Banner media: the walker on a 96 disc; flags in 88 discs */
+.logo { width: 96px; height: 96px; border-radius: var(--radius-1000); display: grid; place-items: center; background: var(--on-light-surface-brand); color: var(--on-light-icon-brand); }
+.flagDisc { width: 88px; height: 88px; padding: 10px; border-radius: var(--radius-1000); background: var(--on-mid-surface-sunken); display: grid; place-items: center; flex: none; }
+.flagDisc img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
+
+/* Trips tab: trips coming up, one under another (16 apart) */
+.list { display: flex; flex-direction: column; gap: var(--space-default-500); }
+
 /* Trip cards: every card has a cover on top (photo or illustrated scene), then the details on white. */
-.grid { display: grid; gap: var(--space-inline-m); grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); }
+.grid { display: grid; gap: var(--space-default-500); grid-template-columns: minmax(0, 1fr); }
 
 /* Plan tile: a Card (Small in the grid, Large on its own); its title is the destination that changes letter by letter. */
 .plan { height: 100%; }
@@ -14,9 +28,9 @@
 
 /* Past trips: smaller cards in a row that scrolls sideways inside itself. */
 .pastRow {
-  display: grid; grid-auto-flow: column; grid-auto-columns: min(300px, 85%); gap: var(--space-inline-m);
+  display: grid; grid-auto-flow: column; grid-auto-columns: min(300px, 85%); gap: var(--space-default-500);
   overflow-x: auto; scroll-snap-type: x proximity; scroll-padding-inline: var(--space-gutter); scrollbar-width: thin;
-  margin: 0 calc(-1 * var(--space-gutter)); padding: 0 var(--space-gutter) var(--space-inline-xs);
+  margin: 0 calc(-1 * var(--space-gutter)); padding: 0 var(--space-gutter) var(--space-default-300);
 }
 .past { scroll-snap-align: start; display: grid; }
 

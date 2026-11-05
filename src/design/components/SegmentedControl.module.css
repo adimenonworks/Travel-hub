@@ -2,24 +2,24 @@
   position: relative;
   display: inline-grid;
   grid-auto-flow: column;
-  grid-auto-columns: minmax(0, 1fr); /* equal columns that may shrink, so big text wraps instead of scrolling sideways */
-  padding: var(--space-inline-xxs);
-  gap: var(--space-inline-xxs);
+  grid-auto-columns: minmax(0, auto); /* columns fit their labels and share the spare room; big text wraps between words */
+  padding: var(--space-default-200);
+  gap: var(--space-default-200);
   background: transparent;
   border: 1px solid var(--interactive-unselected-ghost-border);
-  border-radius: var(--radius-round);
+  border-radius: var(--radius-500); /* 16 */
   max-width: 100%;
 }
 .block { display: grid; width: 100%; }
 .option {
-  min-height: 45px;
-  padding: var(--space-inline-s) var(--space-inline-m);
+  min-height: 34px;
+  padding: var(--space-default-400) var(--space-default-500);
   border: 0;
-  border-radius: var(--radius-round);
+  border-radius: var(--radius-500);
   background: transparent;
   font: var(--type-label); /* Label */
   color: var(--interactive-selected-ghost-text);
-  overflow-wrap: anywhere; text-align: center;
+  overflow-wrap: break-word; text-align: center;
   position: relative; z-index: 1;
   transition: background var(--motion-fast), color var(--motion-fluid), transform var(--motion-release);
 }
@@ -30,9 +30,9 @@
 
 /* The sliding pill: placed on the chosen option (position and width measured in SegmentedControl.tsx). */
 .thumb {
-  position: absolute; top: var(--space-inline-xxs); bottom: var(--space-inline-xxs); left: 0;
+  position: absolute; top: var(--space-default-200); bottom: var(--space-default-200); left: 0;
   width: var(--w); transform: translateX(var(--x));
-  border-radius: var(--radius-round);
+  border-radius: var(--radius-500);
   background: var(--interactive-selected-primary-background);
   transition: background var(--motion-fast);
 }

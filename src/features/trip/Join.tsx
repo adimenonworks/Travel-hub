@@ -53,7 +53,7 @@ export function Join() {
       <div />
       <Card>
         <EmptyState illustration="suitcase" title={`Join “${invite.tripName}”`} message="You've been invited to plan this trip together."
-          action={<Button size="regular" onClick={join} disabled={busy}>Join trip</Button>} />
+          action={<Button size="large" onClick={join} disabled={busy}>Join trip</Button>} />
         {error && <p className="t-label-small t-danger" style={{ textAlign: 'center' }}>{error}</p>}
       </Card>
     </Content>

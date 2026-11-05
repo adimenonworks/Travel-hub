@@ -1,7 +1,2 @@
-/* Your travels */
-.stats { display: grid; grid-template-columns: repeat(auto-fill, minmax(calc(130rem / 17), 1fr)); gap: var(--space-inline-s); }
-.stat { display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-inline-xxs); padding: var(--space-inline-m); border-radius: var(--radius-xl); background: var(--on-light-surface-primary); border: 1px solid var(--on-light-border-subtle); }
-.statIcon { display: grid; place-items: center; width: 32px; height: 32px; border-radius: 50%; background: var(--on-light-surface-brand); color: var(--on-light-icon-brand); margin-bottom: var(--space-inline-xs); }
-/* Heading 1 */
-.statValue { font: var(--type-heading-1); letter-spacing: -0.02em; font-variant-numeric: tabular-nums; color: var(--on-light-text-primary); }
-
+/* Your travels: two columns of stat Cards (gap 8), reflowing to one column when text is large */
+.stats { display: grid; grid-template-columns: repeat(auto-fill, minmax(calc(130rem / 17), 1fr)); gap: var(--space-default-300); }

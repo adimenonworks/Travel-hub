@@ -9,7 +9,7 @@
   max-height: calc(100% - 40px); /* of the visible area, so it shrinks when the keyboard is up */
   display: flex; flex-direction: column;
   background: var(--on-light-surface-primary);
-  border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+  border-radius: var(--radius-600) var(--radius-600) 0 0;
   box-shadow: var(--shadow-overlay);
   animation: rise var(--motion-sheet);
   transition: transform var(--motion-sheet); /* springs back after a short drag */
@@ -18,12 +18,12 @@
 .header {
   touch-action: none; /* the top bar is the drag handle for swipe-down-to-close */
   display: grid; grid-template-columns: 1fr auto 1fr; align-items: center;
-  min-height: 64px; padding: var(--space-inline-xs) var(--space-inline-m); gap: var(--space-inline-xs);
+  min-height: 64px; padding: var(--space-default-300) var(--space-default-500); gap: var(--space-default-300);
 }
 .header > :first-child { justify-self: start; }
 .header > :last-child { justify-self: end; }
 .title { font: var(--type-heading-4); /* Heading 4 */ letter-spacing: -0.01em; text-align: center; color: var(--on-light-text-primary); } /* Heading 4 */
-.body { overflow-y: auto; padding: var(--space-inline-xs) var(--space-inline-l) var(--space-inline-xxl); display: flex; flex-direction: column; gap: var(--space-inline-l); }
+.body { overflow-y: auto; padding: var(--space-default-300) var(--space-default-600) var(--space-default-800); display: flex; flex-direction: column; gap: var(--space-default-600); }
 
 
 /* Closing: the sheet slides back down and the scrim fades, faster than it came in. */

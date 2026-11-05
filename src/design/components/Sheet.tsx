@@ -107,9 +107,9 @@ export function Sheet({ open, title, onClose, onSubmit, submitLabel = 'Done', su
         onAnimationEnd={(e) => closing && e.target === e.currentTarget && setMounted(false)}>
         <form onSubmit={submit} style={{ display: 'contents' }}>
           <div className={s.header} onPointerDown={onDown} onPointerMove={onMove} onPointerUp={onUp} onPointerCancel={onUp}>
-            <Button variant="ghost" size="small" onClick={onClose}>{onSubmit ? 'Cancel' : 'Close'}</Button>
+            <Button variant="ghost" size="regular" onClick={onClose}>{onSubmit ? 'Cancel' : 'Close'}</Button>
             <div className={s.title}>{shown.current.title}</div>
-            {onSubmit ? <Button size="small" type="submit" disabled={submitDisabled}>{submitLabel}</Button> : <span />}
+            {onSubmit ? <Button size="regular" type="submit" disabled={submitDisabled}>{submitLabel}</Button> : <span />}
           </div>
           <div className={s.body}>{shown.current.children}</div>
         </form>
