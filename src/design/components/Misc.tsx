@@ -10,31 +10,34 @@ function initials(name: string) {
 }
 
 /**
- * Figma Avatar: initials on the light emerald wash. Sizes: 24 (in an Avatar Stack), Small 28 (Label small), Medium 40 (15px initials).
- * `seed` is accepted for older callers; every avatar shares one colour.
+ * Figma "Avatar": initials on the light emerald wash with a 2px ring in the surface colour. Sizes 24, 32 and 40
+ * (24 and 32 use Label small, 40 uses Label); any other size snaps to the nearest. Kind=More is the grey "+2" disc.
  */
-export function Avatar({ name, photo, size = 28 }: { name: string; photo?: string | null; size?: number; seed?: string }) {
-  const px = Math.min(size, 40);
-  const style = { '--avatar-size': `${px}px`, ...(px >= 40 ? { '--avatar-font': 'calc(15rem / 17)' } : {}) } as CSSProperties;
-  if (photo) return <img className={s.avatar} style={style} src={photo} alt={name} title={name} referrerPolicy="no-referrer" />;
-  return <span className={s.avatar} style={style} title={name} role="img" aria-label={name}>{initials(name)}</span>;
+export function Avatar({ name, photo, size = 32 }: { name: string; photo?: string | null; size?: number; seed?: string }) {
+  const px = size <= 28 ? 24 : size < 40 ? 32 : 40;
+  const cls = [s.avatar, px === 40 && s.avatarLarge].filter(Boolean).join(' ');
+  const style = { '--avatar-size': `${px}px` } as CSSProperties;
+  if (photo) return <img className={cls} style={style} src={photo} alt={name} title={name} referrerPolicy="no-referrer" />;
+  return <span className={cls} style={style} title={name} role="img" aria-label={name}>{initials(name)}</span>;
 }
 
-export function AvatarStack({ people, max = 3, size = 24 }: { people: { id: string; name: string; photo?: string | null }[]; max?: number; size?: number }) {
+/** Figma "Avatar Stack": up to three 32px avatars overlapping by 6px, then a "+n" More avatar. */
+export function AvatarStack({ people, max = 3, size = 32 }: { people: { id: string; name: string; photo?: string | null }[]; max?: number; size?: number }) {
   const shown = people.slice(0, max);
   const extra = people.length - shown.length;
+  const px = size <= 28 ? 24 : size < 40 ? 32 : 40;
   return (
-    <span className={s.stack}>
-      {shown.map((p) => <Avatar key={p.id} name={p.name} photo={p.photo} seed={p.id} size={size} />)}
-      {extra > 0 && <span className={`${s.avatar} ${s.more}`} style={{ '--avatar-size': `${size}px` } as CSSProperties}>+{extra}</span>}
+    <span className={s.stack} role="group" aria-label={`${people.length} ${people.length === 1 ? 'person' : 'people'}: ${people.map((p) => p.name).join(', ')}`}>
+      {shown.map((p) => <span key={p.id} aria-hidden="true" style={{ display: 'contents' }}><Avatar name={p.name} photo={p.photo} size={px} /></span>)}
+      {extra > 0 && <span aria-hidden="true" className={`${s.avatar} ${s.more}`} style={{ '--avatar-size': `${px}px` } as CSSProperties}>+{extra}</span>}
     </span>
   );
 }
 
-/** Figma Badge "Tone". Neutral is a white pill with a soft shadow (for sitting on photos and covers). */
-export type BadgeTone = 'neutral' | 'tint' | 'success' | 'warning' | 'danger' | 'category' | 'inverse';
+/** Figma "Tags" Tone: Neutral, Tint, Category, Success, Warning, Danger. */
+export type BadgeTone = 'neutral' | 'tint' | 'success' | 'warning' | 'danger' | 'category';
 
-/** Figma Badge: Label small with a 16px icon. Categories always carry their icon. */
+/** Figma "Tags": a pill with an optional 16px icon and a Label small label. */
 export function Badge({ tone = 'neutral', icon, iconState, flag, children }: {
   tone?: BadgeTone; icon?: IconName; iconState?: 'default' | 'filled'; /** A country flag instead of an icon */ flag?: ReactNode; children: ReactNode;
 }) {
@@ -65,11 +68,6 @@ export function EmptyState({ illustration, title, message, action }: { illustrat
   return (
     <Card className={s.empty} media={<Illustration name={illustration} size={120} />} title={title} body={message} actions={action} />
   );
-}
-
-export function Spinner({ center }: { center?: boolean }) {
-  const el = <div className={s.spinner} role="status" aria-label="Loading" />;
-  return center ? <div className={s.center}>{el}</div> : el;
 }
 
 export type NotificationState = 'warning' | 'success' | 'error' | 'neutral' | 'brand';

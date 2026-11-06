@@ -1,2 +1,0 @@
-/* Your travels: two columns of stat Cards (gap 8), reflowing to one column when text is large */
-.stats { display: grid; grid-template-columns: repeat(auto-fill, minmax(calc(130rem / 17), 1fr)); gap: var(--space-default-300); }

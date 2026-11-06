@@ -1,14 +1,14 @@
 import { useState } from 'react';
-import { Navigate, Route, Routes, useLocation, useMatch, useNavigate, useParams, useSearchParams } from 'react-router-dom';
-import { EmptyState, HeroCard, LinkButton, PageHeader, PageSkeleton, Tabs, type TabItem } from '../../design/components';
-import { personName, useProfiles, useRole, useSub, useTrip } from '../../data/hooks';
+import { Navigate, Route, Routes, useLocation, useMatch, useNavigate, useParams } from 'react-router-dom';
+import { EmptyState, LinkButton, PageSkeleton, Tabs, TripHeader, type TabItem } from '../../design/components';
+import { useProfiles, useRole, useSub, useTrip } from '../../data/hooks';
 import type { Activity, Album, Comment, Expense, Idea, Profile, Trip } from '../../data/types';
-import { countdown, daysBetween, formatRange, today, tripDays } from '../../lib/dates';
+import { daysBetween, formatRange, today } from '../../lib/dates';
 import { countryName, flagUrl, tripCountries } from '../../lib/countries';
 import { Content } from '../../app/Shell';
-import { TripCover } from '../shared/TripCover';
 import { ActivityPage } from './ActivityPage';
-import { TripBudget } from './Budget';
+import { Bookings } from './Bookings';
+import { Overview } from './Overview';
 import { Ideas } from './Ideas';
 import { Itinerary } from './Itinerary';
 import { People } from './People';
@@ -54,63 +54,57 @@ function TripLoaded({ trip }: { trip: Trip }) {
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const planPage = useMatch('/trip/:tripId/plan/:activityId');
-  const [params] = useSearchParams();
 
   if (!activities || !ideas || !expenses || !comments || !albums) return <PageSkeleton />;
   const ctx: TripCtx = { trip, activities, ideas, expenses, comments, albums, profiles, canManage, isOwner };
   const nDays = daysBetween(trip.startDate, trip.endDate) + 1;
   const t = today();
-  const days = tripDays(trip.startDate, trip.endDate);
-  // The budget card follows the day picked in the itinerary; otherwise today (during the trip) or the first day.
-  const fromUrl = params.get('day') ?? '';
-  const budgetDay = days.includes(fromUrl) ? fromUrl : days.includes(t) ? t : days[0];
-  const count = countdown(trip.startDate, trip.endDate, t);
-  const people = trip.memberIds.map((id) => ({ id, name: personName(profiles, id), photo: profiles[id]?.photo }));
+  const until = daysBetween(t, trip.startDate);
+  const when = t < trip.startDate ? (until === 1 ? 'tomorrow' : `in ${until} days`) : t <= trip.endDate ? `day ${daysBetween(trip.startDate, t) + 1}` : 'done';
   const countries = tripCountries(trip, activities).map((code) => ({ code, name: countryName(code), flag: flagUrl(code) }));
 
   const base = `/trip/${trip.id}`;
   const section = pathname.slice(base.length + 1).split('/')[0];
+  // Figma "Tab Bar": Overview, Itinerary, Ideas, Photos, People (labels only; it scrolls sideways on narrow phones).
   const tabs: TabItem[] = [
-    { to: base, label: 'Itinerary', icon: 'calendar', active: section === '' },
-    { to: `${base}/ideas`, label: 'Ideas', icon: 'lightbulb', active: section === 'ideas' },
-    { to: `${base}/photos`, label: 'Photos', icon: 'photo', active: section === 'photos' },
-    { to: `${base}/people`, label: 'People', icon: 'people', active: section === 'people' },
+    { to: base, label: 'Overview', active: section === '' },
+    { to: `${base}/itinerary`, label: 'Itinerary', active: section === 'itinerary' },
+    { to: `${base}/ideas`, label: 'Ideas', active: section === 'ideas' },
+    { to: `${base}/photos`, label: 'Photos', active: section === 'photos' },
+    { to: `${base}/people`, label: 'People', active: section === 'people' },
   ];
 
-  // A plan's own page replaces the trip header and tabs.
-  if (planPage)
+  // An event's own page and the bookings lists replace the trip header and tabs.
+  if (planPage || section === 'bookings')
     return (
       <Content>
-        <Routes><Route path="plan/:activityId" element={<ActivityPage {...ctx} />} /></Routes>
+        <Routes>
+          <Route path="plan/:activityId" element={<ActivityPage {...ctx} />} />
+          <Route path="bookings/:group" element={<Bookings {...ctx} />} />
+        </Routes>
       </Content>
     );
 
   return (
     <>
       <Content>
-        <PageHeader
+        {/* Figma "Trip header": back to Trips, the name (Title small) with Edit, the meta line, country chips and who's going */}
+        <TripHeader
           title={trip.name}
-          size="small"
+          back={{ to: '/trips', label: 'Trips' }}
           action={canManage ? { icon: 'pencil', label: 'Edit trip', onClick: () => setEditing(true) } : undefined}
-        />
-        {/* Figma "Hero Card" (Tone=White): cover with the countdown, then name, dates, countries and who's going. */}
-        <HeroCard
-          tone="white"
-          image={<TripCover trip={trip} />}
-          title={trip.name}
-          subtitle={`${formatRange(trip.startDate, trip.endDate)} • ${nDays} day${nDays === 1 ? '' : 's'}`}
+          meta={`${formatRange(trip.startDate, trip.endDate)} · ${nDays} day${nDays === 1 ? '' : 's'} · ${when}`}
           countries={countries}
-          people={people}
-          count={count}
+          going={{ label: `${trip.memberIds.length} going`, to: `${base}/people` }}
         />
-        <TripBudget ctx={ctx} day={budgetDay} onSetBudget={canManage ? () => setEditing(true) : undefined} />
         <div className={s.sectionNav}>
           <Tabs items={tabs} label="Trip sections" />
         </div>
         {/* At least a screen tall, so switching to a shorter tab never pulls the page (and the tabs) up. */}
         <div className={s.tabPanel}>
         <Routes>
-          <Route index element={<Itinerary {...ctx} />} />
+          <Route index element={<Overview {...ctx} onSetBudget={canManage ? () => setEditing(true) : undefined} />} />
+          <Route path="itinerary" element={<Itinerary {...ctx} />} />
           <Route path="ideas" element={<Ideas {...ctx} />} />
           <Route path="budget" element={<Navigate to={base} replace />} />
           <Route path="photos" element={<Photos {...ctx} />} />

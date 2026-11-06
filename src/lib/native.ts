@@ -15,7 +15,7 @@ export const isDark = () => {
   return t ? t === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
 };
 
-/** Native extras for the iPhone app: status bar and keyboard follow the theme; the tab bar hides while typing. No-ops in a browser. */
+/** Native extras for the iPhone app: status bar and keyboard follow the theme; the keyboard's height reaches CSS; the tab bar hides while typing. No-ops in a browser. */
 export async function setupNative() {
   if (!isNativeApp) return;
   const [{ StatusBar, Style }, { Keyboard, KeyboardStyle }] = await Promise.all([import('@capacitor/status-bar'), import('@capacitor/keyboard')]);
@@ -28,8 +28,17 @@ export async function setupNative() {
   sync();
   window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', sync);
   new MutationObserver(sync).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
-  Keyboard.addListener('keyboardWillShow', () => document.documentElement.classList.add('keyboard-open'));
-  Keyboard.addListener('keyboardWillHide', () => document.documentElement.classList.remove('keyboard-open'));
+  // The web view keeps its size while the keyboard is up (resize: 'none'), so the keyboard's height goes to CSS:
+  // sheets move up by it with the keyboard's own timing (see Sheet.module.css), and pages get room to scroll past it.
+  const root = document.documentElement;
+  Keyboard.addListener('keyboardWillShow', ({ keyboardHeight }) => {
+    root.style.setProperty('--keyboard-height', `${keyboardHeight}px`);
+    root.classList.add('keyboard-open');
+  });
+  Keyboard.addListener('keyboardWillHide', () => {
+    root.style.setProperty('--keyboard-height', '0px');
+    root.classList.remove('keyboard-open');
+  });
 }
 
 /** The phone's own share sheet in the app; the browser's where it has one. Returns false when there's no share sheet (copy instead). */
@@ -46,13 +55,20 @@ export async function shareLink(opts: { title: string; text: string; url: string
   return false;
 }
 
+export type Haptic = 'selection' | 'light' | 'medium' | 'success' | 'warning' | 'error';
+
 /**
- * A light tap (the iOS "light impact" haptic) when switching tabs: a little firmer than the picker-wheel tick.
- * Does nothing in a browser.
+ * The Figma "Haptics map": Selection for the day strip, tabs, chips, calendar days and picking a destination;
+ * light/medium impact for votes and Option cards; success / warning / error for outcomes (saved, trip created, failed).
+ * Never for list taps, page changes or the Bottom Nav. Does nothing in a browser.
  */
-export function selectionTick() {
+export function haptic(kind: Haptic) {
   if (!isNativeApp) return;
-  import('@capacitor/haptics').then(async ({ Haptics, ImpactStyle }) => {
-    try { await Haptics.impact({ style: ImpactStyle.Light }); } catch { /* no haptics on this device */ }
+  import('@capacitor/haptics').then(async ({ Haptics, ImpactStyle, NotificationType }) => {
+    try {
+      if (kind === 'selection') { await Haptics.selectionStart(); await Haptics.selectionChanged(); await Haptics.selectionEnd(); }
+      else if (kind === 'light' || kind === 'medium') await Haptics.impact({ style: kind === 'light' ? ImpactStyle.Light : ImpactStyle.Medium });
+      else await Haptics.notification({ type: kind === 'success' ? NotificationType.Success : kind === 'warning' ? NotificationType.Warning : NotificationType.Error });
+    } catch { /* no haptics on this device */ }
   });
 }

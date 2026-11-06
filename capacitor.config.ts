@@ -12,8 +12,9 @@ const config: CapacitorConfig = {
     scrollEnabled: true,
   },
   plugins: {
-    // When the keyboard opens, the app shrinks to the space above it instead of the page jumping to the field.
-    Keyboard: { resize: 'native', resizeOnFullScreen: true },
+    // The app doesn't resize when the keyboard opens (that made sheets jump twice). Instead src/lib/native.ts
+    // hands the keyboard's height to the page (--keyboard-height) and sheets rise with the keyboard, as one.
+    Keyboard: { resize: 'none', resizeOnFullScreen: true },
   },
 };
 

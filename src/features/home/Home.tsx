@@ -1,19 +1,14 @@
-import { useEffect, useState } from 'react';
-import { Banner, Button, Card, Divider, HeroCard, Illustration, LinkButton, PageHeader, type IconName } from '../../design/components';
-import { personName, useMe, useMyTrips, useProfile, useProfiles, useSub } from '../../data/hooks';
-import type { Place, Trip } from '../../data/types';
-import p1 from '../../assets/people/p1.webp';
-import p2 from '../../assets/people/p2.webp';
-import p3 from '../../assets/people/p3.webp';
-import { daysBetween, formatRange, today } from '../../lib/dates';
-import { countryName, flagUrl, tripCountries } from '../../lib/countries';
-import { Content, useNewTrip } from '../../app/Shell';
-import s from './Home.module.css';
+import { Button, Card, Illustration, LinkButton, PageHeader, PageSection, PageSkeleton, QuickAction } from '../../design/components';
+import { useMe, useMyTrips, useProfile } from '../../data/hooks';
 import { featuredTrip } from '../../lib/trips';
+import { Content, useNewTrip } from '../../app/Shell';
+import { TripHero } from '../shared/TripHero';
+import s from './Home.module.css';
 
 /**
- * Home (Figma "Home tab"): a greeting; the trip you're on or the next one (Hero Card, White, no cover);
- * then "What's next?": the plan tile and three Banners that invite you to plan. Your trips list lives on the Trips tab.
+ * Home (Figma "Home — v2"): what's happening now. The greeting, your trip as the phase-aware Hero Card (before: the
+ * countdown and the next thing planned; during: today's next event; after: add photos), then quick actions.
+ * Saving places ("Saved for later", "Recently saved", Save a link, Add a place) arrives with the saves feature.
  */
 export function Home() {
   const me = useMe();
@@ -24,125 +19,21 @@ export function Home() {
   const newTrip = useNewTrip();
 
   return (
-    <Content className={s.home}>
+    <Content>
       <PageHeader title={`Hi, ${name.split(' ')[0]}`} fit />
-      <div className={s.sections}>
-        {featured && (
-          <>
-            <section className={s.block}>
-              <h2 className={s.bigTitle}>Upcoming</h2>
-              <UpcomingTrip trip={featured} />
-            </section>
-            <Divider />
-          </>
-        )}
-        <h2 className={s.bigTitle}>What’s next?</h2>
-        <PlanTile />
-        <Banner tone="brand" label="Welcome to Rove" subtext="Have a holiday coming up? Add all your plans, let us handle the day to day."
-          media={<span className={s.logo}><BrandMark /></span>}
-          action={<Button variant="inverse" onClick={newTrip}>Plan your upcoming holiday</Button>} />
-        <Banner tone="orange" label="Craft your dream getaway" subtext="Dream destination? Keep your top links, posts, and places saved, accessible anytime, anywhere."
-          media={['jp', 'it', 'mx'].map((c) => <span key={c} className={s.flagDisc}><img src={flagUrl(c)} alt="" /></span>)}
-          action={<Button variant="tertiary" onClick={newTrip}>Plan your next holiday</Button>} />
-        <Banner tone="green" label="Travel with us… or friends" subtext="Whether you’re heading off on your own or rallying the crew, we’re here to help."
-          media={[p1, p2, p3].map((src, i) => <span key={i} className={s.photoDisc}><img src={src} alt="" /></span>)}
-          action={<Button variant="tertiary" onClick={newTrip}>Plan your upcoming holiday</Button>} />
-        <Divider />
-        <QuickProfile trips={trips ?? []} visited={profile?.visited ?? []} />
-      </div>
+      {trips === null ? <PageSkeleton bare /> : featured ? (
+        <PageSection title="Upcoming trip" action={<LinkButton to="/trips" variant="ghost" size="regular" iconEnd="chevron-right">All trips</LinkButton>}>
+          <TripHero trip={featured} />
+        </PageSection>
+      ) : (
+        <Card media={<Illustration name="suitcase" size={120} />} title="Where to next?"
+          body="Plan a trip: pick where you’re going and when, then invite the people coming with you."
+          actions={<Button block icon="plus" onClick={newTrip}>Plan a new trip</Button>} />
+      )}
+      <nav className={s.quickActions} aria-label="Quick actions">
+        <QuickAction icon="calendar" label="Plan a trip" onClick={newTrip} />
+        {featured && <QuickAction icon="people" label="Invite" to={`/trip/${featured.id}/people`} />}
+      </nav>
     </Content>
-  );
-}
-
-/** Figma "Quick profile view": three of your travel numbers as stat Cards, then a link to your profile. */
-function QuickProfile({ trips, visited }: { trips: Trip[]; visited: Place[] }) {
-  const t0 = today();
-  const past = trips.filter((t) => t.endDate < t0);
-  const places = [...trips.filter((t) => t.startDate <= t0).flatMap((t) => (t.destination ? [t.destination] : [])), ...visited];
-  const countries = new Set(places.map((p) => p.country ?? p.name.split(',').pop()!.trim())).size;
-  const days = past.reduce((n, t) => n + daysBetween(t.startDate, t.endDate) + 1, 0);
-  const stats: { icon: IconName; value: number; one: string; many: string }[] = [
-    { icon: 'plane', value: past.length, one: 'Trip taken', many: 'Trips taken' },
-    { icon: 'globe', value: countries, one: 'Country', many: 'Countries' },
-    { icon: 'calendar', value: days, one: 'Day away', many: 'Days away' },
-  ];
-  return (
-    <section className={s.block}>
-      <h2 className={s.bigTitle}>Your travels</h2>
-      <div className={s.quick}>
-        <div className={s.quickStats}>
-          {stats.map((st) => <Card key={st.one} icon={st.icon} title={<span className="t-num">{st.value}</span>} body={st.value === 1 ? st.one : st.many} />)}
-        </div>
-        <LinkButton to="/profile" size="regular" iconEnd="chevron-right">See profile</LinkButton>
-      </div>
-    </section>
-  );
-}
-
-/** The trip you're on, or the next one: the Hero Card panel only (Tone=White, no cover). Tapping it opens the trip. */
-function UpcomingTrip({ trip }: { trip: Trip }) {
-  const profiles = useProfiles(trip.memberIds);
-  const activities = useSub(trip.id, 'activities');
-  const n = daysBetween(trip.startDate, trip.endDate) + 1;
-  return (
-    <HeroCard tone="white" cover={false} to={`/trip/${trip.id}`}
-      title={trip.name}
-      subtitle={`${formatRange(trip.startDate, trip.endDate)} • ${n} day${n === 1 ? '' : 's'}`}
-      countries={tripCountries(trip, activities ?? []).map((code) => ({ code, name: countryName(code), flag: flagUrl(code) }))}
-      people={trip.memberIds.map((id) => ({ id, name: personName(profiles, id), photo: profiles[id]?.photo }))} />
-  );
-}
-
-/** Rove's walker R (the app icon's figure), in the brand text colour. */
-function BrandMark() {
-  return (
-    <svg viewBox="50 24 108 144" width="44" height="58" aria-hidden="true" fill="currentColor">
-      <path d="M84.4232 59.0739C92.9967 59.0739 99.9468 52.2745 99.9468 43.8871C99.9468 35.4996 92.9967 28.7002 84.4232 28.7002C75.8498 28.7002 68.8996 35.4996 68.8996 43.8871C68.8996 52.2745 75.8498 59.0739 84.4232 59.0739Z" />
-      <path d="M80.3356 69.9116C81.4545 64.0216 87.2419 60.1337 93.2625 61.2281C99.2832 62.3228 103.257 67.9856 102.139 73.8757L96.4341 103.905C96.3784 104.198 96.3097 104.489 96.2295 104.777L94.485 111.034L126.524 146.236C130.596 150.71 130.19 157.567 125.617 161.551C121.043 165.535 114.033 165.137 109.961 160.663L86.3702 134.744L78.2359 157.089C76.1812 162.733 69.8391 165.679 64.0702 163.668C58.3015 161.658 55.2911 155.454 57.3458 149.81L71.6176 110.608L74.7113 99.5067L80.3356 69.9116Z" />
-      <path d="M106.046 69.7758C106.266 68.6035 107.311 67.7521 108.529 67.7521H119.594C150.869 67.7521 154.161 111.143 119.594 111.143H101.314C99.7368 111.143 98.546 109.745 98.8307 108.228L106.046 69.7758Z" />
-    </svg>
-  );
-}
-
-// Cities and countries the plan tile cycles through.
-const DESTINATIONS = ['Tokyo', 'Lisbon', 'Mexico City', 'Iceland', 'Marrakech', 'Kyoto', 'Cape Town', 'Peru', 'Seoul', 'Istanbul', 'New Zealand', 'Hanoi', 'Buenos Aires', 'Greece', 'Bali', 'Copenhagen'];
-const LETTER_DELAY = 0.035; // seconds between letters in the wave
-const LETTER_MOVE = 0.35;   // how long one letter takes to slide
-const CYCLE = 5.6;          // seconds from one place appearing to the next (in, hold, out)
-
-/**
- * Invites you to plan the next trip. The destination changes letter by letter:
- * each letter slides up just after the one before, like a quick wave.
- */
-function PlanTile() {
-  const newTrip = useNewTrip();
-  const [i, setI] = useState(() => Math.floor(Math.random() * DESTINATIONS.length));
-  const [leaving, setLeaving] = useState(false);
-  const word = `${DESTINATIONS[i]}?`;
-  useEffect(() => {
-    // Respect "reduce motion": keep one destination instead of cycling.
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-    const wave = (word.length - 1) * LETTER_DELAY + LETTER_MOVE;
-    const t = leaving
-      ? setTimeout(() => { setLeaving(false); setI((n) => (n + 1) % DESTINATIONS.length); }, wave * 1000)
-      : setTimeout(() => setLeaving(true), (CYCLE - wave) * 1000);
-    return () => clearTimeout(t);
-  }, [leaving, word]);
-
-  return (
-    <Card className={s.plan}
-      media={<Illustration name="globe" size={64} square />}
-      title={<h2 className={s.planTitle}>
-        <span className="visually-hidden">Plan a new trip</span>
-        <span key={`${i}-${leaving}`} className={[s.planWord, leaving && s.leaving].filter(Boolean).join(' ')} aria-hidden="true">
-          {[...word].map((ch, n) => (
-            <span key={n} className={s.letter} style={{ animationDelay: `${n * LETTER_DELAY}s`, animationDuration: `${LETTER_MOVE}s` }}>
-              {ch === ' ' ? '\u00a0' : ch}
-            </span>
-          ))}
-        </span>
-      </h2>}
-      body="There’s so much to see and do. Let’s plan it right."
-      actions={<Button block onClick={newTrip}>Plan your next holiday</Button>} />
   );
 }

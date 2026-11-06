@@ -44,7 +44,7 @@ export type Trip = {
 /** A link, PDF or booking. `emailUrl` optionally points at the email it came from (e.g. a Gmail message link). */
 export type LinkItem = { label: string; url: string; emailUrl?: string };
 
-export type Category = 'activity' | 'food' | 'drinks' | 'cafe' | 'sight' | 'transport' | 'stay' | 'other';
+export type Category = 'activity' | 'food' | 'drinks' | 'cafe' | 'sight' | 'flight' | 'transport' | 'stay' | 'other';
 
 export type Activity = {
   id: string;

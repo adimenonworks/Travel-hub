@@ -48,13 +48,24 @@ export function LinkButton({ to, href, variant, size, block, icon, iconEnd, labe
   return <Link to={to!} className={c} aria-label={label} onClick={onClick}>{body}</Link>;
 }
 
-/** Icon-only Button (Figma Button with "Show text" off). `label` is required so screen readers can announce it. */
-export function IconButton({ icon, label, variant = 'ghost', size = 'large', state, className, type = 'button', ...rest }: ButtonHTMLAttributes<HTMLButtonElement> & {
-  icon: IconName; label: string; variant?: ButtonVariant; size?: ButtonSize; /** Show the filled icon (e.g. a starred event) */ state?: 'default' | 'filled';
+export type IconButtonTone = 'secondary' | 'ghost' | 'on-brand';
+
+/**
+ * Figma "Icon button" (Tone Secondary / Ghost / On brand): a 40px circle with a 24px icon, inside a 44px tap area.
+ * Secondary and Ghost share the Button's colour tokens; On brand sits on the bright emerald flow screens.
+ * `label` is required: it's what screen readers announce.
+ */
+export function IconButton({ icon, label, tone, variant, state, className, type = 'button', ...rest }: Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'size'> & {
+  icon: IconName; label: string; tone?: IconButtonTone;
+  /** @deprecated use tone */ variant?: 'secondary' | 'ghost';
+  /** @deprecated Figma has one size (40px); ignored */ size?: ButtonSize;
+  /** Show the filled icon (e.g. a starred event) */ state?: 'default' | 'filled';
 }) {
+  const t = tone ?? variant ?? 'ghost';
+  delete (rest as { size?: unknown }).size;
   return (
-    <button type={type} className={cls({ variant, size }, true, className)} aria-label={label} title={label} {...rest}>
-      <Icon name={icon} size={size === 'regular' ? 16 : 24} state={state} className={s.glyph} />
+    <button type={type} className={[s.iconButton, s[`icon-${t}`], className].filter(Boolean).join(' ')} aria-label={label} title={label} {...rest}>
+      <Icon name={icon} size={24} state={state} className={s.glyph} />
     </button>
   );
 }

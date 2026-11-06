@@ -1,8 +1,8 @@
-/* Figma "Bottom Nav": a frosted pill (overlay/bar + Blur/Overlay) floating 8px above the home indicator. */
+/* Figma "Bottom Nav": a frosted pill (overlay/bar + Elevation/Floating bar) floating 16px from the sides and the bottom, above the home indicator. */
 .nav {
   position: fixed; left: 0; right: 0; bottom: 0; z-index: 40;
   display: flex; justify-content: center; pointer-events: none;
-  padding: 0 max(var(--space-default-500), env(safe-area-inset-left)) calc(env(safe-area-inset-bottom) + var(--space-default-300)) max(var(--space-default-500), env(safe-area-inset-right));
+  padding: 0 max(var(--space-default-500), env(safe-area-inset-left)) calc(env(safe-area-inset-bottom) + var(--space-default-500)) max(var(--space-default-500), env(safe-area-inset-right));
 }
 .bar {
   position: relative;
@@ -10,7 +10,7 @@
   width: 100%; max-width: var(--size-content-max);
   display: flex; gap: 0; padding: var(--space-default-200);
   border-radius: var(--radius-1000); border: 1px solid var(--on-light-border-subtle);
-  background: var(--overlay-bar); box-shadow: var(--shadow-raised);
+  background: var(--overlay-bar); box-shadow: var(--elevation-floating-bar);
   -webkit-backdrop-filter: blur(var(--blur-overlay)); backdrop-filter: blur(var(--blur-overlay));
 }
 /* Figma "Nav Item": icon over a Label small label */

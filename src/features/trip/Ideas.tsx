@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
-import { Avatar, Badge, Button, Card, EmptyState, FieldRow, Icon, IconButton, SegmentedControl, Select, Sheet, TextArea, TextField } from '../../design/components';
+import { Button, EmptyState, FieldRow, IdeaRow, ListGroup, SectionHeader, SegmentedControl, Select, Sheet, TextArea, TextField, useToast } from '../../design/components';
 import { store } from '../../data';
 import { personName, useMe } from '../../data/hooks';
-import type { Category, Idea, LinkItem, Vote } from '../../data/types';
+import type { Category, Idea, LinkItem } from '../../data/types';
+import { haptic } from '../../lib/native';
 import { CATEGORIES, categoryInfo } from '../../lib/categories';
 import { money } from '../../lib/format';
 import { Comments } from '../shared/Comments';
@@ -14,45 +15,63 @@ import s from './trip.module.css';
 type Filter = 'open' | 'approved' | 'rejected';
 
 const ups = (i: Idea) => Object.keys(i.votes ?? {}).length;
-const downs = (i: Idea) => Object.keys(i.downvotes ?? {}).length;
-/** Ideas are ranked by thumbs up minus thumbs down. */
-const score = (i: Idea) => ups(i) - downs(i);
 
+/**
+ * Trip "Ideas" tab (Figma "Trip — Ideas"): things the group might do. A Section header, the To decide · Planned ·
+ * Passed segments, then a List group of Idea rows sorted by votes (the leader gets a "Most votes" tag). Tapping a
+ * row opens the idea: its notes, links and comments, and (for organizers) "Add to a day" or "Pass".
+ */
 export function Ideas(ctx: TripCtx) {
   const { trip, ideas } = ctx;
+  const me = useMe();
   const [filter, setFilter] = useState<Filter>('open');
   const [editing, setEditing] = useState<Idea | 'new' | null>(null);
+  const [viewing, setViewing] = useState<Idea | null>(null);
   const [scheduling, setScheduling] = useState<Idea | null>(null);
+  const toast = useToast();
 
   const shown = ideas
     .filter((i) => i.status === filter)
-    .sort((a, b) => score(b) - score(a) || b.createdAt - a.createdAt);
+    .sort((a, b) => ups(b) - ups(a) || b.createdAt - a.createdAt);
   const count = (f: Filter) => ideas.filter((i) => i.status === f).length;
+  const top = shown[0] && ups(shown[0]) > 0 && (shown.length === 1 || ups(shown[0]) > ups(shown[1])) ? shown[0].id : null;
+  const vote = async (i: Idea) => {
+    const mine = !!i.votes?.[me.uid];
+    haptic('light');
+    try { await store.setVote(trip.id, i.id, me.uid, mine ? 0 : 1); }
+    catch { toast({ tone: 'error', label: "Couldn't save your vote. Check your connection" }); }
+  };
+  const live = viewing ? ideas.find((i) => i.id === viewing.id) ?? null : null;
 
   return (
     <>
-      <div className={s.dayHead}>
-        <div>
-          <h2 className="t-heading-1">Ideas board</h2>
-          <div className={s.dayBudget}>Drop ideas, vote, and {ctx.canManage ? 'approve the winners into the itinerary' : 'organizers will schedule the winners'}.</div>
-        </div>
-        <Button icon="plus" onClick={() => setEditing('new')}>Add idea</Button>
-      </div>
-      <SegmentedControl label="Filter ideas" value={filter} onChange={setFilter} options={[
-        { value: 'open', label: `Open (${count('open')})` },
-        { value: 'approved', label: `Approved (${count('approved')})` },
-        { value: 'rejected', label: `Passed (${count('rejected')})` },
+      <SectionHeader title="Ideas board" meta={ctx.canManage ? 'Vote, then add the winners to a day' : 'Vote for the ones you like; organizers add the winners to a day'}
+        action={<Button variant="ghost" size="regular" iconEnd="chevron-right" onClick={() => setEditing('new')}>Add idea</Button>} />
+      <SegmentedControl label="Show ideas" block value={filter} onChange={setFilter} options={[
+        { value: 'open', label: `To decide · ${count('open')}` },
+        { value: 'approved', label: `Planned · ${count('approved')}` },
+        { value: 'rejected', label: `Passed · ${count('rejected')}` },
       ]} />
       {shown.length === 0 ? (
-        <Card>
-          <EmptyState illustration="ideas" title={filter === 'open' ? 'No open ideas' : 'Nothing here yet'}
-            message={filter === 'open' ? 'Saw a great restaurant or tour? Add it so everyone can vote.' : undefined} />
-        </Card>
+        <EmptyState illustration="ideas" title={filter === 'open' ? 'No ideas to decide on' : 'Nothing here yet'}
+          message={filter === 'open' ? 'Saw a great restaurant or tour? Add it so everyone can vote.' : undefined} />
       ) : (
-        <div className={s.ideaGrid}>
-          {shown.map((i) => <IdeaCard key={i.id} idea={i} ctx={ctx} onEdit={() => setEditing(i)} onApprove={() => setScheduling(i)} />)}
-        </div>
+        <ListGroup label="Ideas">
+          {shown.map((i) => {
+            const cat = categoryInfo(i.category);
+            const meta = [cat.label, i.cost > 0 ? `~${money(i.cost, trip.currency)}` : '', i.createdBy === me.uid ? 'you' : personName(ctx.profiles, i.createdBy).split(' ')[0]].filter(Boolean).join(' · ');
+            return (
+              <IdeaRow key={i.id} title={i.title} meta={meta} icon={cat.icon}
+                tag={i.id === top ? { icon: 'star', label: 'Most votes' } : undefined}
+                vote={{ count: ups(i), voted: !!i.votes?.[me.uid], onClick: () => vote(i) }}
+                onClick={() => setViewing(i)} />
+            );
+          })}
+        </ListGroup>
       )}
+      <IdeaSheet idea={live} ctx={ctx} onClose={() => setViewing(null)}
+        onEdit={() => { setEditing(live); setViewing(null); }}
+        onSchedule={() => { setScheduling(live); setViewing(null); }} />
       <IdeaForm open={!!editing} tripId={trip.id} currency={trip.currency} idea={editing === 'new' ? undefined : editing ?? undefined} onClose={() => setEditing(null)} />
       <ActivityForm
         open={!!scheduling}
@@ -66,59 +85,31 @@ export function Ideas(ctx: TripCtx) {
   );
 }
 
-function IdeaCard({ idea, ctx, onEdit, onApprove }: { idea: Idea; ctx: TripCtx; onEdit: () => void; onApprove: () => void }) {
+/** One idea opened: what it is, links, who added it, comments; organizers add it to a day or pass on it. */
+function IdeaSheet({ idea, ctx, onClose, onEdit, onSchedule }: { idea: Idea | null; ctx: TripCtx; onClose: () => void; onEdit: () => void; onSchedule: () => void }) {
   const me = useMe();
-  const [showComments, setShowComments] = useState(false);
+  const toast = useToast();
+  if (!idea) return <Sheet open={false} title="" onClose={onClose}>{null}</Sheet>;
   const cat = categoryInfo(idea.category);
-  const mine: Vote = idea.votes?.[me.uid] ? 1 : idea.downvotes?.[me.uid] ? -1 : 0;
-  const vote = (v: 1 | -1) => store.setVote(ctx.trip.id, idea.id, me.uid, mine === v ? 0 : v);
-  const nComments = ctx.comments.filter((c) => c.targetId === idea.id).length;
   const canEdit = ctx.canManage || idea.createdBy === me.uid;
-  const author = personName(ctx.profiles, idea.createdBy);
-
+  const setStatus = async (status: Idea['status'], label: string) => {
+    try { await store.updateSub(ctx.trip.id, 'ideas', idea.id, { status }); toast({ icon: 'check', label }); onClose(); }
+    catch { toast({ tone: 'error', label: "Couldn't save. Check your connection" }); }
+  };
   return (
-    <Card className={s.idea}>
-      <div className={s.actTop}>
-        <div className={s.actMeta}>
-          <Badge tone="category" icon={cat.icon}>{cat.label}</Badge>
-          {idea.cost > 0 && <Badge icon="wallet">~{money(idea.cost, ctx.trip.currency)}</Badge>}
-          {idea.status === 'approved' && <Badge tone="success" icon="check">Scheduled</Badge>}
-        </div>
-        {canEdit && <IconButton icon="pencil" size="regular" label={`Edit ${idea.title}`} onClick={onEdit} />}
-      </div>
-      <h3 className="t-heading-3">{idea.title}</h3>
-      {idea.notes && <div className={s.actNotes}>{idea.notes}</div>}
+    <Sheet open title={idea.title} subtitle={[cat.label, idea.cost > 0 ? `~${money(idea.cost, ctx.trip.currency)} per person` : '', `added by ${idea.createdBy === me.uid ? 'you' : personName(ctx.profiles, idea.createdBy)}`].filter(Boolean).join(' · ')} onClose={onClose}>
+      {idea.notes && <p className="t-body">{idea.notes}</p>}
       <LinkChips links={idea.links} />
-      <div className={s.ideaFoot}>
-        <div className={s.votes} role="group" aria-label="Votes">
-          <button type="button" className={s.vote} aria-pressed={mine === 1} onClick={() => vote(1)}
-            aria-label={`Thumbs up, ${ups(idea)} ${ups(idea) === 1 ? 'vote' : 'votes'}`}>
-            <Icon name="thumbs-up" size={16} />{ups(idea)}
-          </button>
-          <button type="button" className={s.vote} aria-pressed={mine === -1} onClick={() => vote(-1)}
-            aria-label={`Thumbs down, ${downs(idea)} ${downs(idea) === 1 ? 'vote' : 'votes'}`}>
-            <Icon name="thumbs-down" size={16} />{downs(idea)}
-          </button>
-        </div>
-        <IconButton icon="comment" state={showComments ? 'filled' : 'default'} label={`Comments (${nComments})`} onClick={() => setShowComments((v) => !v)} aria-expanded={showComments} />
-        {nComments > 0 && <span className="t-label-small t-secondary t-num" aria-hidden="true">{nComments}</span>}
-        <span className={s.spacer} />
-        <Avatar name={author} photo={ctx.profiles[idea.createdBy]?.photo} seed={idea.createdBy} size={24} />
-      </div>
-      {/* Figma Idea Card "Show approve": Deny | Approve, each half the width */}
       {ctx.canManage && idea.status === 'open' && (
         <div className={s.ideaButtons}>
-          <Button variant="secondary" iconEnd="x" onClick={() => store.updateSub(ctx.trip.id, 'ideas', idea.id, { status: 'rejected' })}>Deny</Button>
-          <Button iconEnd="check" onClick={onApprove}>Approve</Button>
+          <Button variant="secondary" onClick={() => setStatus('rejected', 'Idea passed')}>Pass</Button>
+          <Button icon="calendar" onClick={onSchedule}>Add to a day</Button>
         </div>
       )}
-      {ctx.canManage && idea.status === 'rejected' && (
-        <div className={s.ideaButtons}>
-          <Button variant="secondary" onClick={() => store.updateSub(ctx.trip.id, 'ideas', idea.id, { status: 'open' })}>Reopen</Button>
-        </div>
-      )}
-      {showComments && <Comments tripId={ctx.trip.id} targetId={idea.id} comments={ctx.comments} profiles={ctx.profiles} />}
-    </Card>
+      {ctx.canManage && idea.status === 'rejected' && <Button variant="secondary" block onClick={() => setStatus('open', 'Idea back to decide')}>Back to “To decide”</Button>}
+      {canEdit && <Button variant="ghost" icon="pencil" onClick={onEdit}>Edit idea</Button>}
+      <Comments tripId={ctx.trip.id} targetId={idea.id} comments={ctx.comments} profiles={ctx.profiles} />
+    </Sheet>
   );
 }
 
@@ -131,17 +122,21 @@ function IdeaForm({ open, tripId, currency, idea, onClose }: { open: boolean; tr
     if (open) setF(idea ? { title: idea.title, category: idea.category, notes: idea.notes, cost: idea.cost ? String(idea.cost) : '', links: idea.links } : blank);
   }, [open, idea]);
   const set = (p: Partial<Form>) => setF((x) => ({ ...x, ...p }));
+  const toast = useToast();
 
   const submit = async () => {
     const data = { title: f.title.trim(), category: f.category, notes: f.notes.trim(), cost: Number(f.cost) || 0, links: cleanLinks(f.links) };
-    if (idea) await store.updateSub(tripId, 'ideas', idea.id, data);
-    else await store.addSub(tripId, 'ideas', { ...data, votes: {}, status: 'open' });
-    onClose();
+    try {
+      if (idea) await store.updateSub(tripId, 'ideas', idea.id, data);
+      else await store.addSub(tripId, 'ideas', { ...data, votes: {}, status: 'open' });
+      toast({ icon: 'check', label: idea ? 'Idea saved' : 'Idea added' });
+      onClose();
+    } catch { toast({ tone: 'error', label: "Couldn't save. Check your connection" }); }
   };
   const remove = async () => {
     if (!idea || !confirm(`Delete "${idea.title}"?`)) return;
-    await store.deleteSub(tripId, 'ideas', idea.id);
-    onClose();
+    try { await store.deleteSub(tripId, 'ideas', idea.id); toast({ icon: 'trash', label: 'Idea deleted' }); onClose(); }
+    catch { toast({ tone: 'error', label: "Couldn't delete. Check your connection" }); }
   };
 
   return (

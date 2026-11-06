@@ -3,14 +3,14 @@
 .cover { display: block; width: 100%; height: 100%; object-fit: cover; }
 
 /* One shared palette: the Figma Illustration tokens (illustration/*), so every scene follows light and dark mode */
-.frame { fill: var(--on-light-illustration-primary); stroke: var(--on-light-illustration-border); stroke-width: 1.5; stroke-linejoin: round; }
-.photo { fill: var(--on-light-illustration-accent-subtle); }
-.hill { fill: var(--on-light-illustration-accent); }
-.hillDeep { fill: var(--on-light-illustration-accent-bold); }
-.sun { fill: var(--on-light-illustration-warm-bold); }
-.line { fill: var(--on-light-illustration-secondary); }
-.needle { fill: var(--on-light-illustration-border); }
-.smile { fill: none; stroke: var(--on-light-illustration-border); stroke-width: 1.5; stroke-linecap: round; }
-.strap { fill: none; stroke: var(--on-light-illustration-border); stroke-width: 4; stroke-linecap: round; }
-.route { fill: none; stroke: var(--on-light-illustration-accent-bold); stroke-width: 2; stroke-linecap: round; stroke-dasharray: 2 5; }
-.spark { fill: none; stroke: var(--on-light-illustration-accent-bold); stroke-width: 2; stroke-linecap: round; }
+.frame { fill: var(--illustration-primary); stroke: var(--illustration-border); stroke-width: 1.5; stroke-linejoin: round; }
+.photo { fill: var(--illustration-accent-subtle); }
+.hill { fill: var(--illustration-accent); }
+.hillDeep { fill: var(--illustration-accent-bold); }
+.sun { fill: var(--illustration-warm-bold); }
+.line { fill: var(--illustration-secondary); }
+.needle { fill: var(--illustration-border); }
+.smile { fill: none; stroke: var(--illustration-border); stroke-width: 1.5; stroke-linecap: round; }
+.strap { fill: none; stroke: var(--illustration-border); stroke-width: 4; stroke-linecap: round; }
+.route { fill: none; stroke: var(--illustration-accent-bold); stroke-width: 2; stroke-linecap: round; stroke-dasharray: 2 5; }
+.spark { fill: none; stroke: var(--illustration-accent-bold); stroke-width: 2; stroke-linecap: round; }

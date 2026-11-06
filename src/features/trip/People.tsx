@@ -1,12 +1,13 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Avatar, Badge, Button, Card, Illustration, List, ListRow, Section, Select, useToast } from '../../design/components';
+import { Avatar, Button, Card, Illustration, ListGroup, ListItem, SectionHeader, SegmentedControl, Sheet, useToast } from '../../design/components';
 import { store } from '../../data';
 import { personName, useMe } from '../../data/hooks';
 import type { TripCtx } from './TripPage';
 import s from './trip.module.css';
 import { isNativeApp, PUBLIC_SITE, shareLink } from '../../lib/native';
 
+/** Trip "People" tab (Figma "Trip — People"): the travellers as a List group (the owner can tap someone to change their role or remove them), then the invite card. */
 export function People({ trip, profiles, canManage, isOwner }: TripCtx) {
   const me = useMe();
   const navigate = useNavigate();
@@ -38,41 +39,35 @@ export function People({ trip, profiles, canManage, isOwner }: TripCtx) {
   };
 
   const members = trip.memberIds.slice().sort((a, b) => (trip.roles[a] === 'owner' ? -1 : trip.roles[b] === 'owner' ? 1 : 0));
+  const roleName = (id: string) => { const r = trip.roles[id] ?? 'member'; return r === 'owner' ? 'Owner' : r === 'editor' ? 'Organiser' : 'Member'; };
+  const [person, setPerson] = useState<string | null>(null);
+  const [role, setRoleDraft] = useState<'editor' | 'member'>('member');
+  const open = (id: string) => { setRoleDraft(trip.roles[id] === 'editor' ? 'editor' : 'member'); setPerson(id); };
+  const saveRole = async () => {
+    if (!person) return;
+    try { await store.setRole(trip, person, role); toast({ icon: 'check', label: 'Role updated' }); setPerson(null); }
+    catch { toast({ tone: 'error', label: "Couldn't save. Check your connection" }); }
+  };
 
   return (
     <>
-      <Section title={`Travelers (${members.length})`}>
-        <List>
-          {members.map((id) => {
-            const role = trip.roles[id] ?? 'member';
-            const name = personName(profiles, id);
-            const editable = isOwner && id !== me.uid;
-            return (
-              <ListRow key={id}
-                leading={<Avatar name={name} photo={profiles[id]?.photo} seed={id} size={40} />}
-                title={<>{name}{id === me.uid && <span className="t-secondary"> (you)</span>}</>}
-                trailing={
-                  editable ? (
-                    <span style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-                      <Select compact aria-label={`Role for ${name}`} value={role} onChange={(e) => store.setRole(trip, id, e.target.value as 'editor' | 'member')}>
-                        <option value="member">Member</option>
-                        <option value="editor">Organizer</option>
-                      </Select>
-                      <Button size="regular" variant="destructive" onClick={() => confirm(`Remove ${name} from this trip?`) && store.removeMember(trip, id)}>Remove</Button>
-                    </span>
-                  ) : (
-                    <Badge tone={role === 'owner' ? 'tint' : role === 'editor' ? 'success' : 'neutral'}>{role === 'owner' ? 'Owner' : role === 'editor' ? 'Organizer' : 'Member'}</Badge>
-                  )
-                }
-              />
-            );
-          })}
-        </List>
-      </Section>
+      <SectionHeader title="Travellers" meta={`${members.length} ${members.length === 1 ? 'person' : 'people'}${isOwner && members.length > 1 ? ' · tap someone to change their role' : ''}`}
+        action={canManage ? <Button variant="ghost" size="regular" iconEnd="chevron-right" onClick={invite} disabled={busy}>Invite</Button> : undefined} />
+      <ListGroup label="Travellers">
+        {members.map((id) => {
+          const name = personName(profiles, id);
+          const editable = isOwner && id !== me.uid;
+          return (
+            <ListItem key={id} media={<Avatar name={name} photo={profiles[id]?.photo} size={40} />} round
+              title={name} meta={`${roleName(id)}${id === me.uid ? ' · you' : ''}`}
+              onClick={editable ? () => open(id) : undefined} label={editable ? `${name}, ${roleName(id)}: change role` : undefined} />
+          );
+        })}
+      </ListGroup>
 
       {canManage && (
         <Card media={<Illustration name="friends" size={120} />}>
-          <h2 className="t-heading-4">The more the merrier</h2>
+          <h2 className="t-heading-2">The more the merrier</h2>
           <p className="t-body-small t-secondary">Invite friends to plan this trip with you. Anyone with the link can join for the next 14 days after signing in.</p>
           <div className={s.inviteActions}>
             {link ? (
@@ -92,16 +87,25 @@ export function People({ trip, profiles, canManage, isOwner }: TripCtx) {
 
       {/* Deleting the trip lives in Edit trip; here members other than the owner can leave. */}
       {!isOwner && (
-        <Section title="Trip">
-          <div className={s.dangerZone}>
-            <Button variant="destructive" icon="signout" onClick={async () => {
-              if (!confirm(`Leave "${trip.name}"?`)) return;
-              await store.leaveTrip(trip.id, me.uid);
-              navigate('/');
-            }}>Leave trip</Button>
-          </div>
-        </Section>
+        <Button variant="destructive" icon="signout" onClick={async () => {
+          if (!confirm(`Leave "${trip.name}"?`)) return;
+          await store.leaveTrip(trip.id, me.uid);
+          navigate('/');
+        }}>Leave trip</Button>
       )}
+
+      <Sheet open={!!person} title={person ? personName(profiles, person) : ''} subtitle="What they can do on this trip" onClose={() => setPerson(null)} onSubmit={saveRole} submitLabel="Save">
+        <SegmentedControl label="Role" block value={role} onChange={setRoleDraft} options={[{ value: 'member', label: 'Member' }, { value: 'editor', label: 'Organiser' }]} />
+        <p className="t-body-small t-secondary">Organisers can edit the trip, its budget and the itinerary, and add ideas to days.</p>
+        {person && (
+          <Button variant="destructive" icon="trash" onClick={async () => {
+            const name = personName(profiles, person);
+            if (!confirm(`Remove ${name} from this trip?`)) return;
+            try { await store.removeMember(trip, person); toast({ icon: 'trash', label: `${name} removed` }); setPerson(null); }
+            catch { toast({ tone: 'error', label: "Couldn't remove. Check your connection" }); }
+          }}>Remove from trip</Button>
+        )}
+      </Sheet>
     </>
   );
 }
