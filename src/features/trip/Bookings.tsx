@@ -2,9 +2,9 @@ import { useParams } from 'react-router-dom';
 import { EventCard, ListGroup, ListItem, PageHeader, PageSection, SectionHeader, EmptyState } from '../../design/components';
 import { formatDay } from '../../lib/dates';
 import { hostOf, isPdf } from '../../lib/format';
-import { BOOKING_GROUPS } from '../../lib/categories';
+import { BOOKING_GROUPS, eventType } from '../../lib/categories';
 import { byTime } from './Itinerary';
-import { eventCardProps } from './Overview';
+import { eventCardProps } from './events';
 import type { TripCtx } from './TripPage';
 import s from './trip.module.css';
 
@@ -37,7 +37,7 @@ export function Bookings(ctx: TripCtx) {
   }
 
   const g = BOOKING_GROUPS.find((x) => x.key === group) ?? BOOKING_GROUPS[0];
-  const list = activities.filter((a) => g.categories.includes(a.category)).sort((a, b) => a.date.localeCompare(b.date) || byTime(a, b));
+  const list = activities.filter((a) => eventType(a.category) === g.type).sort((a, b) => a.date.localeCompare(b.date) || byTime(a, b));
   const days = [...new Set(list.map((a) => a.date))];
   return (
     <>

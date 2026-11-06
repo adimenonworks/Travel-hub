@@ -1,4 +1,5 @@
 import { tripDays } from '../../lib/dates';
+import { eventType, type EventType } from '../../lib/categories';
 import type { TripCtx } from './TripPage';
 
 /**
@@ -40,10 +41,10 @@ export function tripBudget({ trip, activities, expenses }: Pick<TripCtx, 'trip' 
   // The Budget card's breakdown (Figma "Budget card"): flights and stays are bookings; everything else is planned spend.
   // Rove isn't an expense tracker: these are what's planned (event prices, and bookings added as costs).
   const per = (a: { cost: number; attendeeIds: string[] }) => a.cost * Math.max(1, a.attendeeIds.length);
-  const sum = (cats: string[]) => activities.filter((a) => cats.includes(a.category)).reduce((n, a) => n + per(a), 0)
-    + expenses.filter((e) => cats.includes(e.category)).reduce((n, e) => n + e.amount, 0);
-  const flights = sum(['flight']);
-  const stays = sum(['stay']);
+  const sum = (t: EventType) => activities.filter((a) => eventType(a.category) === t).reduce((n, a) => n + per(a), 0)
+    + expenses.filter((e) => eventType(e.category) === t).reduce((n, e) => n + e.amount, 0);
+  const flights = sum('flight');
+  const stays = sum('stay');
   const plans = Math.max(0, planned - flights - stays);
   return { total, planned, tripWide, forDay, fixed, flights, stays, plans };
 }

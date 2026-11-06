@@ -1,30 +1,14 @@
 import { useState } from 'react';
 import { CountryModal, EventCard, LinkButton, ListGroup, ListItem, PageSection, Tile } from '../../design/components';
-import type { Activity } from '../../data/types';
-import { formatDay, formatTime, today } from '../../lib/dates';
-import { money } from '../../lib/format';
-import { BOOKING_GROUPS, categoryInfo } from '../../lib/categories';
+import { today } from '../../lib/dates';
+import { BOOKING_GROUPS, eventType } from '../../lib/categories';
 import { countryName, flagUrl, tripCountries } from '../../lib/countries';
 import { emergencyFor } from '../../lib/emergency';
 import { nextEvent } from '../../lib/trips';
 import { TripBudget } from './Budget';
+import { eventCardProps } from './events';
 import type { TripCtx } from './TripPage';
 import s from './trip.module.css';
-
-/** An event as a Figma "Event card" (Standard layout), used on the Overview and in the bookings lists. */
-export function eventCardProps(a: Activity, ctx: TripCtx, showDay = false) {
-  const time = a.startTime ? `${formatTime(a.startTime)}${a.endTime ? ` – ${formatTime(a.endTime)}` : ''}` : undefined;
-  const place = a.locationText || a.location?.name?.split(',')[0];
-  const cost = a.cost * Math.max(1, a.attendeeIds.length);
-  return {
-    title: a.title,
-    time: showDay ? [a.date === today() ? 'Today' : formatDay(a.date), time].filter(Boolean).join(', ') : time,
-    place,
-    amount: cost > 0 ? money(cost, ctx.trip.currency) : undefined,
-    icon: categoryInfo(a.category).icon,
-    to: `/trip/${ctx.trip.id}/plan/${a.id}`,
-  };
-}
 
 /**
  * Trip "Overview" tab (Figma "Trip — Overview"): the hub. Budget card → Next up → Bookings tiles (a plain count of
@@ -54,7 +38,7 @@ export function Overview(ctx: TripCtx & { onSetBudget?: () => void }) {
       <PageSection title="Bookings" meta="Your plans, by type">
         <div className={s.tiles}>
           {BOOKING_GROUPS.map((g) => {
-            const n = activities.filter((a) => g.categories.includes(a.category)).length;
+            const n = activities.filter((a) => eventType(a.category) === g.type).length;
             return <Tile key={g.key} icon={g.icon} title={g.title} meta={`${n} ${n === 1 ? g.one : g.many}`} to={`${base}/bookings/${g.key}`} />;
           })}
           <Tile icon="doc" title="Documents" meta={`${docs} ${docs === 1 ? 'file or link' : 'files and links'}`} to={`${base}/bookings/documents`} />

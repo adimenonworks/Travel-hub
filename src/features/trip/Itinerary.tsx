@@ -8,7 +8,7 @@ import { money } from '../../lib/format';
 import { haptic } from '../../lib/native';
 import { travelEstimate } from '../../lib/trips';
 import { ActivityForm } from './ActivityForm';
-import { eventCardProps } from './Overview';
+import { entryEnd, entryTime, eventCardProps, eventsOn, type DayEntry } from './events';
 import type { TripCtx } from './TripPage';
 import s from './trip.module.css';
 
@@ -41,30 +41,26 @@ export function Itinerary(ctx: TripCtx) {
 
   const [adding, setAdding] = useState(false);
 
-  const counts = useMemo(() => {
-    const m: Record<string, number> = {};
-    activities.forEach((a) => (m[a.date] = (m[a.date] ?? 0) + 1));
-    return m;
-  }, [activities]);
+  // What's on each day (a Stay counts on its check-in and check-out days).
+  const byDay = useMemo(() => Object.fromEntries(days.map((d) => [d, eventsOn(activities, d)])), [activities, trip.startDate, trip.endDate]); // eslint-disable-line react-hooks/exhaustive-deps
   const now = useNow();
   const word = (d: string) => dayWord(d, trip.startDate, t);
   // Events still to come: all of a future day's, none of a past day's, and today's that haven't finished.
-  // An event with no time, or one that runs past midnight (ends "earlier" than it starts), counts until the day is over.
-  const finishesAt = (a: Activity) => (a.endTime && a.endTime >= a.startTime ? a.endTime : a.endTime ? '99:99' : a.startTime || '99:99');
   const eventsLeft = (d: string) =>
-    d > t ? counts[d] ?? 0 : d < t ? 0 : activities.filter((a) => a.date === d && finishesAt(a) > now).length;
-  const list = activities.filter((a) => a.date === day).sort(byTime);
+    d > t ? byDay[d]?.length ?? 0 : d < t ? 0 : (byDay[d] ?? []).filter((e) => entryEnd(e) > now).length;
+  const list: DayEntry[] = byDay[day] ?? [];
   const me = useMe();
-  const planned = list.reduce((n, a) => n + a.cost * Math.max(1, a.attendeeIds.length), 0);
+  const planned = list.filter((e) => e.part !== 'out').reduce((n, { a }) => n + a.cost * Math.max(1, a.attendeeIds.length), 0);
 
   // On today's plan, the "now" line (Figma Timeline) sits before the next plan. The page doesn't scroll to it.
   const showNow = day === t && list.length > 1;
-  const nextIndex = day === t ? list.findIndex((a) => finishesAt(a) > now) : -1;
+  const nextIndex = day === t ? list.findIndex((e) => entryEnd(e) > now) : -1;
   const nowLine = <Timeline time={formatTime(now)} />;
-  const stateOf = (i: number): EventState => day < t || (day === t && finishesAt(list[i]) <= now) ? 'done' : i === nextIndex ? 'next' : 'default';
-  const startsIn = (a: Activity) => {
-    if (!a.startTime || a.startTime <= now) return 'Now';
-    const [h1, m1] = now.split(':').map(Number), [h2, m2] = a.startTime.split(':').map(Number);
+  const stateOf = (i: number): EventState => day < t || (day === t && entryEnd(list[i]) <= now) ? 'done' : i === nextIndex ? 'next' : 'default';
+  const startsIn = (e: DayEntry) => {
+    const at = entryTime(e);
+    if (!at || at <= now) return 'Now';
+    const [h1, m1] = now.split(':').map(Number), [h2, m2] = at.split(':').map(Number);
     const min = h2 * 60 + m2 - (h1 * 60 + m1);
     return min < 60 ? `in ${min} min` : `in ${Math.round(min / 60)} hr`;
   };
@@ -74,7 +70,7 @@ export function Itinerary(ctx: TripCtx) {
       <div ref={stripRef} className={s.days} role="group" aria-label="Trip days">
         {days.map((d) => {
           // Today counts the events still to come; any other day shows its total.
-          const n = d === t ? eventsLeft(d) : counts[d] ?? 0;
+          const n = d === t ? eventsLeft(d) : byDay[d]?.length ?? 0;
           return (
             <DayCard key={d} dataDay={d} day={parseDay(d).getDate()} month={formatDay(d, { month: 'short' })} word={word(d)} selected={d === day}
               onClick={() => { haptic('selection'); setDay(d); }}
@@ -93,16 +89,17 @@ export function Itinerary(ctx: TripCtx) {
             action={<Button variant="secondary" icon="plus" onClick={() => setAdding(true)}>Add event</Button>} />
         ) : (
           <div className={s.eventList}>
-            {list.map((a, n) => {
+            {list.map((e, n) => {
+              const a = e.a;
               const state = stateOf(n);
-              const trip2 = n > 0 ? travelEstimate(list[n - 1], a) : null;
+              const trip2 = n > 0 ? travelEstimate(list[n - 1].a, a) : null;
               return (
-                <div key={a.id} className={s.timelineItem}>
+                <div key={`${a.id}-${e.part ?? ''}`} className={s.timelineItem}>
                   {trip2 && <TravelConnector label={trip2.label} icon={trip2.icon} />}
                   {showNow && n === nextIndex && nowLine}
-                  <EventCard {...eventCardProps(a, ctx)} state={state}
+                  <EventCard {...eventCardProps(e, ctx)} state={state}
                     extras={state === 'next' ? [
-                      { icon: 'info', label: `Next · ${startsIn(a)}` },
+                      { icon: 'info', label: `Next · ${startsIn(e)}` },
                       ...(a.attendeeIds.length > 0 ? [{ icon: 'people' as const, label: a.attendeeIds.includes(me.uid) && a.attendeeIds.length === 1 ? 'You’re going' : `${a.attendeeIds.length} of ${trip.memberIds.length} going` }] : []),
                     ] : undefined} />
                 </div>

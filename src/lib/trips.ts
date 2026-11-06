@@ -40,8 +40,11 @@ export function distanceKm(a: { lat: number; lng: number }, b: { lat: number; ln
  * streets, 1.3× the straight line), otherwise by car (about 25 km/h in town). Only an estimate; null without both places.
  */
 export function travelEstimate(from: Activity, to: Activity): { label: string; icon: 'pin' | 'car' } | null {
-  if (!from.location || !to.location) return null;
-  const km = distanceKm(from.location, to.location) * 1.3;
+  // From where the first one ends (a flight's or transfer's destination) to where the next one starts.
+  const a = from.to ?? from.location, b = to.location;
+  if (!a || !b || from.category === 'note' || to.category === 'note') return null;
+  const km = distanceKm(a, b) * 1.3;
+  if (km > 300) return null; // a flight or a long journey: no walk or drive to estimate
   if (km < 0.05) return null;
   const walk = km < 2;
   const min = Math.max(1, Math.round((km / (walk ? 5 : 25)) * 60));

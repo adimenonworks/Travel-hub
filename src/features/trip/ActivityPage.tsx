@@ -8,11 +8,12 @@ import { formatDay, formatTime } from '../../lib/dates';
 import { hostOf, isPdf, money, normalizeUrl } from '../../lib/format';
 import { mapsUrl } from '../../lib/geocode';
 import { haptic } from '../../lib/native';
+import { eventType } from '../../lib/categories';
 import { getMapsApp, mapsAppLabel } from '../../lib/prefs';
 import { Comments } from '../shared/Comments';
 import { MapView } from '../shared/Map';
 import { ActivityForm } from './ActivityForm';
-import { eventCardProps } from './Overview';
+import { eventCardProps } from './events';
 import type { TripCtx } from './TripPage';
 import s from './trip.module.css';
 
@@ -39,6 +40,7 @@ export function ActivityPage(ctx: TripCtx) {
   const starred = !!a.starredBy?.includes(me.uid);
   const app = getMapsApp();
   const where = a.locationText || a.location?.name;
+  const type = eventType(a.category);
   const removeDoc = async (i: number) => {
     const doc = a.links[i];
     if (!confirm(`Remove "${doc.label || hostOf(doc.url)}"?`)) return;
@@ -58,7 +60,7 @@ export function ActivityPage(ctx: TripCtx) {
         action={{ icon: 'pencil', label: 'Edit event', onClick: () => setEditing(true) }} />
 
       {/* Figma "Event detail": one template for every event type. Event card, then only the rows that have something. */}
-      <EventCard {...eventCardProps(a, ctx)} to={undefined} time={[formatDay(a.date, { weekday: 'short', day: 'numeric', month: 'short' }), a.startTime ? `${formatTime(a.startTime)}${a.endTime ? ` – ${formatTime(a.endTime)}` : ''}` : ''].filter(Boolean).join(', ')}
+      <EventCard {...eventCardProps(a, ctx, true)} to={undefined}
         extras={starred ? [{ icon: 'star', label: 'Favourite' }] : undefined} />
 
       <div className={s.planButtons}>
@@ -68,12 +70,16 @@ export function ActivityPage(ctx: TripCtx) {
 
       <PageSection title="Details">
         <ListGroup label="Details">
-          {where && <ListItem icon="pin" title="Address" meta={where} href={mapsUrl(where, a.location, app)} label={`${where}: open in ${mapsAppLabel(app)}`} trailing={mapsAppLabel(app)} />}
+          {type === 'flight' && a.ref && <ListItem icon="plane" title="Flight number" meta={<span className={s.selectable}>{a.ref}</span>} />}
+          {a.fromText && a.toText && <ListItem icon="pin" title={type === 'flight' ? 'Departs' : 'From'} meta={`${a.fromText}${a.startTime ? ` · ${formatDay(a.date)}, ${formatTime(a.startTime)}` : ''}`} href={mapsUrl(a.fromText, a.location, app)} label={`From ${a.fromText}: open in ${mapsAppLabel(app)}`} />}
+          {a.fromText && a.toText && <ListItem icon="pin" title={type === 'flight' ? 'Arrives' : 'To'} meta={`${a.toText}${a.endTime ? ` · ${formatDay(a.endDate || a.date)}, ${formatTime(a.endTime)}` : ''}`} href={mapsUrl(a.toText, a.to ?? null, app)} label={`To ${a.toText}: open in ${mapsAppLabel(app)}`} />}
+          {type === 'stay' && a.endDate && <ListItem icon="calendar" title="Check-in and check-out" meta={`${formatDay(a.date)}${a.startTime ? `, ${formatTime(a.startTime)}` : ''} → ${formatDay(a.endDate)}${a.endTime ? `, ${formatTime(a.endTime)}` : ''}`} />}
+          {where && !(a.fromText && a.toText) && <ListItem icon="pin" title="Address" meta={where} href={mapsUrl(where, a.location, app)} label={`${where}: open in ${mapsAppLabel(app)}`} trailing={mapsAppLabel(app)} />}
           <ListItem icon="people" title="Who’s going" meta={a.attendeeIds.length ? `${a.attendeeIds.length} of ${trip.memberIds.length}: ${goingNames.join(', ')}` : 'No one has said yet'} />
           {a.cost > 0 && <ListItem icon="wallet" title="Cost" meta={`${money(a.cost, trip.currency)} per person · ${money(a.cost * Math.max(1, a.attendeeIds.length), trip.currency)} in all`} />}
-          {a.notes && <ListItem icon="pencil" title="Notes" meta={<span className={s.selectable}>{a.notes}</span>} />}
+          {a.notes && <ListItem icon="pencil" title={type === 'note' ? 'More' : 'Notes'} meta={<span className={s.selectable}>{a.notes}</span>} />}
         </ListGroup>
-        {a.location && <div className={s.planMap}><MapView pins={[{ lat: a.location.lat, lng: a.location.lng, label: where ?? a.title }]} zoom={15} height={180} /></div>}
+        {a.location && <div className={s.planMap}><MapView pins={[{ lat: a.location.lat, lng: a.location.lng, label: a.fromText || where || a.title }, ...(a.to ? [{ lat: a.to.lat, lng: a.to.lng, label: a.toText || a.title }] : [])]} zoom={a.to ? undefined : 15} height={180} /></div>}
       </PageSection>
 
       <PageSection title="Files & links" meta="Tickets, bookings and PDFs" action={<Button variant="ghost" size="regular" iconEnd="chevron-right" onClick={() => setAddingDoc(true)}>Add</Button>}>

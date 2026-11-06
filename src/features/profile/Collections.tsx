@@ -8,15 +8,13 @@ import { MapView } from '../shared/Map';
 
 /** Your travel collections: the places you've been, grouped by kind. Cafés and restaurants share one. */
 export const COLLECTIONS: { key: string; label: string; one: string; icon: IconName; categories: Category[] }[] = [
-  { key: 'sights', label: 'Sights seen', one: 'Sight seen', icon: 'camera', categories: ['sight'] },
-  { key: 'food', label: 'Cafés & restaurants', one: 'Café or restaurant', icon: 'utensils', categories: ['food', 'cafe'] },
-  { key: 'bars', label: 'Bars', one: 'Bar', icon: 'cocktail', categories: ['drinks'] },
-  { key: 'activities', label: 'Activities', one: 'Activity', icon: 'ticket', categories: ['activity'] },
+  { key: 'food', label: 'Food & drink', one: 'Place to eat or drink', icon: 'utensils', categories: ['food', 'cafe', 'drinks'] },
+  { key: 'activities', label: 'Activities', one: 'Activity', icon: 'ticket', categories: ['activity', 'sight', 'other'] },
   { key: 'stays', label: 'Stays', one: 'Stay', icon: 'bed', categories: ['stay'] },
 ];
 
 /** "See all" from the You tab's Favourite places: every event you starred. */
-const FAVOURITES = { key: 'favourites', label: 'Favourite places', one: 'Favourite place', icon: 'star' as IconName, categories: ['activity', 'food', 'cafe', 'drinks', 'sight', 'flight', 'transport', 'stay', 'other'] as Category[] };
+const FAVOURITES = { key: 'favourites', label: 'Favourite places', one: 'Favourite place', icon: 'star' as IconName, categories: ['flight', 'stay', 'transport', 'food', 'activity', 'note', 'cafe', 'drinks', 'sight', 'other'] as Category[] };
 
 /**
  * A collection's places: ones you starred (favourites) and ones you've been to (an event that has happened, that

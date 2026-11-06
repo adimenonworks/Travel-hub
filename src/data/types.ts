@@ -44,7 +44,8 @@ export type Trip = {
 /** A link, PDF or booking. `emailUrl` optionally points at the email it came from (e.g. a Gmail message link). */
 export type LinkItem = { label: string; url: string; emailUrl?: string };
 
-export type Category = 'activity' | 'food' | 'drinks' | 'cafe' | 'sight' | 'flight' | 'transport' | 'stay' | 'other';
+/** The six event types (src/lib/categories.ts). 'cafe', 'drinks', 'sight' and 'other' are older values, read as Food & drink or Activity. */
+export type Category = 'flight' | 'stay' | 'transport' | 'food' | 'activity' | 'note' | 'drinks' | 'cafe' | 'sight' | 'other';
 
 export type Activity = {
   id: string;
@@ -61,6 +62,14 @@ export type Activity = {
   attendeeIds: string[];
   /** People who starred this event: it shows in their travel collections as a favourite. */
   starredBy?: string[];
+  /** A Stay's check-out day (one Stay shows as check-in on `date` and check-out on `endDate`); a Flight's arrival day when it lands on a later day. */
+  endDate?: string;
+  /** Flight and Transport: where it leaves from and arrives (`location` is the departure place). Typed text and the place it found. */
+  fromText?: string;
+  toText?: string;
+  to?: Place | null;
+  /** Flight number (Flight). */
+  ref?: string;
   createdBy: string;
   createdAt: number;
 };
