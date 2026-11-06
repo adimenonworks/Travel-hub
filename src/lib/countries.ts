@@ -31,6 +31,6 @@ export function tripCountries(trip: Trip, activities: Activity[]): string[] {
   const out: string[] = [];
   const add = (c?: string) => { if (c && !out.includes(c)) out.push(c); };
   add(countryCodeOf(trip.destination));
-  [...activities].sort((a, b) => (a.date + (a.startTime || '99')).localeCompare(b.date + (b.startTime || '99'))).forEach((a) => add(countryCodeOf(a.location)));
+  [...activities].sort((a, b) => (a.date + (a.startTime || '99')).localeCompare(b.date + (b.startTime || '99'))).forEach((a) => { add(countryCodeOf(a.location)); add(countryCodeOf(a.to)); });
   return out;
 }
