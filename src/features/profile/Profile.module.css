@@ -8,3 +8,5 @@
 .addField { flex: 1 1 calc(160rem / 17); min-width: 0; }
 .appearance { display: flex; flex-direction: column; gap: var(--space-default-700); padding: var(--space-default-500); } /* Figma: card padding 16 */
 .appearanceRow { display: flex; flex-direction: column; gap: var(--space-default-400); }
+/* The map of places you've been: a deliberate viewport, 24 corners */
+.map { border-radius: var(--radius-600); overflow: hidden; border: 1px solid var(--on-light-border-subtle); }

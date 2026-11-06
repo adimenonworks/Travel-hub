@@ -1,11 +1,19 @@
 import { useState, type CSSProperties } from 'react';
 import {
-  Avatar, AvatarStack, Badge, Banner, BudgetCard, Chip, Divider, Notification, Button, Card, ContentCard, EmptyState, EventRow, FieldRow, HeroCard, Icon, IconButton,
-  LinkButton, List, ListRow, PageHeader, SegmentedControl, Section, Select, Sheet, Spinner, Tabs, TextArea, TextField, Timeline, Illustration,
-  type IllustrationName, COVER_ILLUSTRATIONS, ICON_NAMES, useToast, Modal, BottomNav, Skeleton,
+  Avatar, AvatarStack, Badge, BudgetCard, Chip, Notification, Button, Card, EmptyState, FieldRow, HeroCard, Icon, IconButton,
+  LinkButton, PageHeader, PageSection, SegmentedControl, Select, Sheet, Tabs, TextArea, TextField, Timeline, Illustration,
+  type IllustrationName, COVER_ILLUSTRATIONS, ICON_NAMES, useToast, BottomNav, Skeleton,
+  ListItem, ListGroup, SectionHeader, EventCard, TravelConnector, IdeaRow, Tile, QuickAction, MapCard, StatStrip, ProfileCard,
+  OptionCard, SearchField, StepProgress, DestinationHeader, TripHeader, DayCard, CountryModal,
 } from '../../design/components';
 import { flagUrl } from '../../lib/countries';
+import type { ReactNode } from 'react';
 import s from './DesignSystem.module.css';
+
+/** A titled block of this page: the Figma Section header (title, the note as its meta) and what it shows. */
+function Section({ title, footer, children }: { title: string; footer?: ReactNode; children: ReactNode }) {
+  return <PageSection title={title} meta={footer}>{children}</PageSection>;
+}
 
 // Colour by surface: same groups and names as the Figma "Color" collection. Every set has the same token names
 // (accents leave out status), so each one is shown on its own surface.
@@ -27,8 +35,7 @@ const colorGroups: { title: string; tokens: string[] }[] = [
 // One row per Figma text style, at the default iPhone text size.
 const typeStyles = [
   ['t-display', 'Display', '48 · Poppins Black · 100%'],
-  ['t-display-small', 'Display small', '56 · Poppins Black · 100%'],
-  ['t-display-secondary', 'Display secondary', '40 · Poppins Black · 100%'],
+  ['t-display-tiny', 'Display tiny', '32 · Poppins Black · 100%'],
   ['t-heading-1', 'Heading 1', '28 · Manrope Bold · 100%'],
   ['t-heading-2', 'Heading 2', '20 · Semibold · 100%'],
   ['t-heading-3', 'Heading 3', '18 · Semibold · 100%'],
@@ -58,8 +65,9 @@ const icons = ICON_NAMES;
 export function DesignSystem() {
   const [seg, setSeg] = useState<'a' | 'b' | 'c'>('a');
   const [sheet, setSheet] = useState(false);
+  const [country, setCountry] = useState<string | null>(null);
+  const [opt, setOpt] = useState('others');
   const toast = useToast();
-  const [modal, setModal] = useState(false);
 
   return (
     <>
@@ -203,12 +211,11 @@ export function DesignSystem() {
             <Button size="regular" icon="plus">Small</Button>
             <Button disabled>Disabled</Button>
             <LinkButton to="/" variant="secondary">Link button</LinkButton>
-            <IconButton icon="comment" label="Comments" />
-            <IconButton icon="star" state="filled" label="Starred" />
-            <IconButton icon="plus" label="Add" variant="secondary" />
+            <IconButton icon="x" label="Close (Ghost)" />
+            <IconButton icon="pencil" label="Edit (Secondary)" tone="secondary" />
             <Select compact aria-label="Compact select (matches a small button)"><option>Organizer</option><option>Member</option></Select>
           </Card>
-          <Card tone="accent" className={s.row}><Button variant="inverse">Inverse</Button><IconButton icon="pencil" label="Edit" variant="inverse" /></Card>
+          <Card tone="accent" className={s.row}><Button variant="inverse">Inverse</Button><IconButton icon="x" label="Close (On brand)" tone="on-brand" /></Card>
         </Section>
 
         <Section title="Navigation" footer="Tabs switch between sections of a page (each trip uses them). The current tab is darker and underlined in emerald (--interactive-selected-ghost-border).">
@@ -232,33 +239,87 @@ export function DesignSystem() {
           </div>
         </Section>
 
-        <Section title="Banners, chips and dividers" footer="Banner (Home promo cards: Brand, Orange, Yellow, Green, Pink), Chip (country pills; tap opens the Country Modal), Divider.">
-          <Banner tone="brand" label="Welcome to Rove" subtext="Have a holiday coming up?" action={<Button variant="inverse">Plan your upcoming holiday</Button>} />
-          <Banner tone="pink" label="Pink banner" subtext="Accent banners use the Tertiary button." action={<Button variant="tertiary">Tertiary button</Button>} />
-          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-            <Chip flag={flagUrl('pt')} onClick={() => {}} label="About Portugal">Portugal</Chip>
+        <Section title="Chips and tags" footer="Chip (country pills: tap opens the Country sheet; Active / Inactive) and Tags (Neutral, Tint, Category, Success, Warning, Danger).">
+          <div className={s.row}>
+            <Chip flag={flagUrl('pt')} onClick={() => setCountry('pt')} label="About Portugal">Portugal</Chip>
             <Chip active flag={flagUrl('es')}>Spain</Chip>
+            <Chip icon="people">4 going</Chip>
           </div>
-          <Divider />
+          <div className={s.row}>
+            <Badge icon="check">Neutral</Badge><Badge tone="tint" icon="calendar">In 9 days</Badge><Badge tone="category" icon="camera">Category</Badge><Badge tone="success" icon="star">Most votes</Badge><Badge tone="warning">Warning</Badge><Badge tone="danger">Danger</Badge>
+          </div>
         </Section>
 
-        <Section title="Trip components" footer="Hero Card, Content Card, Event row, Budget card and Timeline: built from the components above, as in Figma.">
-          <HeroCard image={<Illustration name={COVER_ILLUSTRATIONS[0]} />} title="Summer in Lisbon" subtitle="Jul 3 – 9 · 7 days"
+        <Section title="Trip components" footer="Hero Card (phase-aware: countdown, then the next thing), Trip header, Budget card (Planning / During), Day Card, Timeline.">
+          <HeroCard cover={<Illustration name={COVER_ILLUSTRATIONS[1]} />} countdown={{ label: 'In 9 days' }} title="Portugal & Spain" meta="Nov 2 – 11 · 10 days"
             countries={[{ code: 'pt', name: 'Portugal', flag: flagUrl('pt') }, { code: 'es', name: 'Spain', flag: flagUrl('es') }]}
-            people={['Ana', 'Ben', 'Cy'].map((n) => ({ id: n, name: n }))} count={{ value: 28, label: 'Days to go' }} to="/design" />
-          <HeroCard tone="brand" image={<Illustration name={COVER_ILLUSTRATIONS[1]} />} title="Tokyo trip" subtitle="Nov 12 – 20 · 9 days"
-            countries={[{ code: 'jp', name: 'Japan', flag: flagUrl('jp') }]} people={['Ana', 'Ben'].map((n) => ({ id: n, name: n }))} count={{ value: 9, label: 'Days left' }} to="/design" />
-          <BudgetCard amount="€120" label="Left today" total="€2,000" level="ok" action={<Button variant="secondary" icon="pencil">Edit budgets</Button>} />
-          <BudgetCard amount="€0" label="Planned so far" total="No total set" level="ok" action={<Button variant="secondary" icon="pencil">Add budget</Button>} />
-          <BudgetCard amount="€35" label="Left today" total="€2,000" level="low" />
-          <BudgetCard amount="€20" label="Over today" total="€2,000" level="over" />
-          <Timeline time="2:30 PM" />
-          <EventRow to="/design" title="Sunset at Miradouro" location="Miradouro da Graça" time="7:30 PM" category={{ icon: 'camera', label: 'Sightseeing' }}
-            going people={['Ana', 'Ben'].map((n) => ({ id: n, name: n }))} price="€12 pp" />
-          <div className={s.cards}>
-            <ContentCard to="/design" cover={<Illustration name={COVER_ILLUSTRATIONS[1]} />} when="in 12 days" people={['Ana', 'Ben'].map((n) => ({ id: n, name: n }))}
-              name="Tokyo trip" place="Tokyo, Japan" dates="Nov 12 – 20" />
+            people={[{ id: 'a', name: 'Alex Menon' }, { id: 'j', name: 'Jo Ma' }, { id: 's', name: 'Sam Lee' }, { id: 'p', name: 'Priya Shah' }]} next={{ icon: 'plane', title: 'Flight to Lisbon', meta: 'Mon 2 Nov, 08:30 · TP1351', to: '/design' }} to="/design" />
+          <HeroCard countdown={{ label: 'Day 3 of 15' }} title="Japan" meta="Mar 20 – Apr 3 · 15 days" countries={[{ code: 'jp', name: 'Japan', flag: flagUrl('jp') }]} people={[{ id: 'a', name: 'Alex Menon' }, { id: 'j', name: 'Jo Ma' }, { id: 's', name: 'Sam Lee' }, { id: 'p', name: 'Priya Shah' }]}
+            next={{ icon: 'lightbulb', title: '24 ideas to sort', meta: 'Brought over from your Japan saves' }} />
+          <TripHeader title="Portugal & Spain" back={{ to: '/design', label: 'Trips' }} action={{ icon: 'pencil', label: 'Edit trip', onClick: () => {} }}
+            meta="Nov 2 – 11 · 10 days · in 9 days" countries={[{ code: 'pt', name: 'Portugal', flag: flagUrl('pt') }]} going={{ label: '4 going', to: '/design' }} />
+          <BudgetCard label="Trip cost so far" amount="€3,160" action={<Button variant="ghost" size="regular" iconEnd="chevron-right">Details</Button>} segments={[
+            { label: 'Flights', value: '€1,330', amount: 1330, color: 'brand' }, { label: 'Stays', value: '€1,410', amount: 1410, color: 'mid' },
+            { label: 'Planned activities & food', value: '€420', amount: 420, color: 'orange' }, { label: 'Spending money left', value: '€840 of €1,260', amount: 840, color: 'empty' }]} />
+          <BudgetCard label="Today" amount="€45 of €80" action={<Button variant="ghost" size="regular" iconEnd="chevron-right">Details</Button>} segments={[
+            { label: 'Planned today', value: '€45', amount: 45, color: 'orange' }, { label: 'Left today', value: '€35', amount: 35, color: 'empty' }, { label: 'Left for the trip', value: '€380', amount: 0, color: 'empty' }]} />
+          <div className={s.row}>
+            <DayCard day={3} month="Nov" word="Today" tag="3 more events" selected onClick={() => {}} />
+            <DayCard day={4} month="Nov" word="Tomorrow" selected={false} onClick={() => {}} />
+            <DayCard day={5} month="Nov" word="Day 4" selected={false} onClick={() => {}} />
           </div>
+          <Timeline time="12:30" />
+        </Section>
+
+        <Section title="Event cards" footer="Event card: Layout Standard / Journey / Note × State Default / Next / Done, joined by Travel connectors.">
+          <EventCard icon="coffee" title="Breakfast at Manteigaria" time="09:00 – 10:00" place="Chiado" amount="€12" state="done" to="/design" />
+          <TravelConnector label="About 8 min walk" />
+          <EventCard icon="utensils" title="Time Out Market" time="13:30 – 15:00" place="Cais do Sodré" amount="€25" state="next" to="/design"
+            extras={[{ icon: 'info', label: 'Next · in 1 hr' }, { icon: 'people', label: '2 of 4 going' }]} />
+          <TravelConnector label="About 20 min by car" icon="car" />
+          <EventCard icon="plane" layout="journey" title="Lisbon → Porto" time="TP1946" place="TAP Air Portugal" amount="€89" status="Check-in open" to="/design"
+            journey={{ fromTime: '08:30', fromPlace: 'LIS · T1', duration: '55m · direct', toTime: '09:25', toPlace: 'OPO' }} />
+          <EventCard icon="pencil" layout="note" title="Bag drop closes 40 min before" place="Sam has the passports" />
+        </Section>
+
+        <Section title="Rows, groups and tiles" footer="Section header, List group of List items (Default / Compact), Idea rows with Vote buttons, Tiles, Quick actions, Map card, Stat strip, Profile Card.">
+          <SectionHeader title="Saved for later" meta="4 places · 61 saves" action={<LinkButton to="/design" variant="ghost" size="regular" iconEnd="chevron-right">See all</LinkButton>} />
+          <ListGroup>
+            <ListItem icon="utensils" title="Ichiran Shibuya" meta="Ramen · Tokyo · from TikTok" trailing="2h" onClick={() => {}} />
+            <ListItem icon="link" title="10 things to do in Cusco" meta="Article · Peru · cntraveler.com" trailing="Yesterday" />
+            <ListItem size="compact" icon="doc" title="TAP e-ticket" trailing="PDF · 2h ago" />
+          </ListGroup>
+          <ListGroup>
+            <IdeaRow icon="star" title="Fado night in Alfama" meta="Show · Clube de Fado · €30 · Sam" tag={{ icon: 'star', label: 'Most votes' }} vote={{ count: 4, voted: true, onClick: () => {} }} />
+            <IdeaRow icon="utensils" title="Pastéis de Belém" meta="Bakery · Belém · Priya" vote={{ count: 2, voted: false, onClick: () => {} }} />
+          </ListGroup>
+          <div className={s.tiles}>
+            <Tile tone="orange" media={<img src={flagUrl('jp')} alt="" />} title="Japan" meta="24 saves · 3 cities" />
+            <Tile tone="green" media={<img src={flagUrl('pe')} alt="" />} title="Peru" meta="18 saves" />
+            <Tile tone="yellow" media={<img src={flagUrl('ca')} alt="" />} title="Canada" meta="12 saves" />
+            <Tile tone="pink" media={<img src={flagUrl('mx')} alt="" />} title="Mexico" meta="7 saves" />
+            <Tile icon="plane" title="Flights" meta="3 flights" to="/design" />
+            <Tile tone="add" icon="plus" title="New place to go" />
+          </div>
+          <div className={s.quickRow}>
+            <QuickAction icon="link" label="Save a link" onClick={() => {}} />
+            <QuickAction icon="pin" label="Add a place" onClick={() => {}} />
+            <QuickAction icon="calendar" label="Plan a trip" onClick={() => {}} />
+            <QuickAction icon="people" label="Invite" onClick={() => {}} />
+          </div>
+          <MapCard media={<Illustration name="map" size={72} />} title="See 15 places on a map" meta="Tokyo, Kyoto, Osaka" onClick={() => {}} />
+          <StatStrip stats={[{ value: 12, label: 'countries' }, { value: 31, label: 'cities' }, { value: 96, label: 'days away' }]} />
+          <ProfileCard name="Alex Menon" email="alex.menon@gmail.com · Google" onClick={() => {}} />
+          <DestinationHeader tone="orange" flag={<img src={flagUrl('jp')} alt="" />} title="24 saves · 3 cities" meta="Saved by you and Sam" action={<Button variant="inverse" block iconEnd="chevron-right">Turn into a trip</Button>} />
+        </Section>
+
+        <Section title="Flow" footer="Search field, Option cards and Step progress (shown on the bright emerald Flow screen).">
+          <SearchField label="Search a country or city" placeholder="Search a country or city" />
+          <div className={s.tiles}>
+            <OptionCard icon="person" label="Just me" selected={opt === 'me'} onClick={() => setOpt('me')} />
+            <OptionCard icon="people" label="With others" selected={opt === 'others'} onClick={() => setOpt('others')} />
+          </div>
+          <div className={s.flowSample}><StepProgress step={2} /></div>
         </Section>
 
         <Section title="Inputs">
@@ -276,40 +337,28 @@ export function DesignSystem() {
           </Card>
         </Section>
 
-        <Section title="Lists">
-          <List>
-            <ListRow icon="calendar" title="With icon" subtitle="And a subtitle" chevron onClick={() => {}} />
-            <ListRow icon="wallet" title="Trailing value" trailing="$120" />
-            <ListRow title="With an action" subtitle="Figma “Show actions”" trailing="$80 used" actions={<IconButton icon="pencil" size="regular" label="Edit" />} />
-            <ListRow leading={<Avatar name="Sam Rivera" size={40} />} title="With avatar" trailing={<Badge tone="tint">Owner</Badge>} />
-          </List>
-        </Section>
-
         <Section title="Feedback & identity">
           <Card className={s.stack}>
             <div className={s.row}>
-              <Badge>Neutral</Badge><Badge tone="tint">Tint</Badge><Badge tone="success" icon="check">Success</Badge><Badge tone="warning">Warning</Badge><Badge tone="danger">Danger</Badge><Badge tone="category" icon="camera">Category</Badge><Badge tone="inverse">Inverse</Badge><Badge icon="star" iconState="filled">With icon</Badge>
+              <Avatar name="Alex Kim" size={24} />
             </div>
             <div className={s.row}>
               <Avatar name="Alex Kim" size={40} /><Avatar name="Jo" size={32} />
               <AvatarStack people={['Ana', 'Ben', 'Cy', 'Dee', 'Eli', 'Fay'].map((n) => ({ id: n, name: n }))} />
-              <Spinner />
             </div>
             {(['brand', 'neutral', 'success', 'warning', 'error'] as const).map((st) => <Notification key={st} state={st}>Notification, state {st}.</Notification>)}
             <div className={s.row}>
               <Button variant="secondary" icon="copy" onClick={() => toast({ icon: 'copy', label: 'Address copied' })}>Show a toast</Button>
               <Button variant="secondary" onClick={() => toast({ tone: 'error', label: "Couldn't save. Check your connection" })}>Error toast</Button>
-              <Button variant="secondary" onClick={() => setModal(true)}>Open a modal</Button>
             </div>
-            <Modal open={modal} title="Add to your favourites?" body="Beverly rooftop" badge={<Badge tone="category" icon="cocktail">Drinks</Badge>}
-              confirmLabel="Add" onCancel={() => setModal(false)} onConfirm={() => setModal(false)} />
           </Card>
           <Card><EmptyState illustration="ideas" title="Empty state" message="Explains what goes here and how to start." action={<Button variant="secondary" onClick={() => setSheet(true)}>Open a sheet</Button>} /></Card>
         </Section>
       </div>
-      <Sheet open={sheet} title="Sheet" onClose={() => setSheet(false)} onSubmit={() => setSheet(false)}>
-        <TextField label="Bottom sheet on phones" placeholder="Centered modal on iPad and desktop" />
+      <Sheet open={sheet} title="Save to Rove" subtitle="A short task over the current screen" onClose={() => setSheet(false)} onSubmit={() => setSheet(false)} submitLabel="Save">
+        <TextField label="Note (optional)" placeholder="Why did you save this?" />
       </Sheet>
+      <CountryModal code={country} onClose={() => setCountry(null)} />
     </>
   );
 }

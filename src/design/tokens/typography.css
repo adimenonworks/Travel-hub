@@ -4,9 +4,7 @@
  */
 :root {
   --type-display: var(--weight-black) var(--size-display)/1 var(--font-display);
-  --type-display-small: var(--weight-black) min(calc(56rem / 17), 78px)/1 var(--font-display);
-  --type-display-secondary: var(--weight-black) var(--size-display-secondary)/1 var(--font-display);
-  --type-display-tiny: var(--weight-black) min(calc(32rem / 17), 45px)/1 var(--font-display);
+  --type-display-tiny: var(--weight-black) var(--size-display-tiny)/1 var(--font-display);
   --type-heading-1: var(--weight-bold) var(--size-heading-1)/1 var(--font-family);
   --type-heading-2: var(--weight-semibold) var(--size-heading-2)/1 var(--font-family);
   --type-heading-3: var(--weight-semibold) var(--size-heading-3)/1 var(--font-family);
@@ -19,8 +17,6 @@
   --type-link-small: var(--weight-medium) var(--size-body-small)/1 var(--font-family);
 }
 .t-display { font: var(--type-display); letter-spacing: -0.01em; }
-.t-display-small { font: var(--type-display-small); letter-spacing: -0.01em; }
-.t-display-secondary { font: var(--type-display-secondary); letter-spacing: -0.01em; }
 .t-display-tiny { font: var(--type-display-tiny); letter-spacing: -0.01em; }
 .t-heading-1 { font: var(--type-heading-1); letter-spacing: -0.02em; }
 .t-heading-2 { font: var(--type-heading-2); letter-spacing: -0.02em; }
@@ -29,11 +25,13 @@
 .t-body { font: var(--type-body); }
 .t-body-small { font: var(--type-body-small); }
 .t-label { font: var(--type-label); }
+/* Label styles are for controls only: Figma trims them to the cap height so they sit centred in a button. */
+@supports (text-box: trim-both cap alphabetic) { .t-label, .t-label-small { text-box: trim-both cap alphabetic; } }
 .t-label-small { font: var(--type-label-small); }
 .t-link { font: var(--type-link); }
 .t-link-small { font: var(--type-link-small); }
 
-.t-display, .t-display-small, .t-display-secondary, .t-display-tiny { color: var(--on-light-text-brand); }
+.t-display, .t-display-tiny { color: var(--on-light-text-brand); }
 .t-heading-1, .t-heading-2, .t-heading-3, .t-heading-4 { color: var(--on-light-text-primary); }
 
 /* Helpers */

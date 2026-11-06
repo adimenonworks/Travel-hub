@@ -1,8 +1,50 @@
-import type { Trip } from '../data/types';
-import { tripPhase } from './dates';
+import type { Activity, Trip } from '../data/types';
+import { daysBetween as between, today as todayDay, tripPhase } from './dates';
 
 /** The trip that matters now: the one you're on, else the next one. Home's hero and the Trip tab both use it. */
 export function featuredTrip(trips: Trip[] | null | undefined): Trip | undefined {
   const all = (trips ?? []).slice().sort((a, b) => a.startDate.localeCompare(b.startDate));
   return all.find((t) => tripPhase(t.startDate, t.endDate) === 'current') ?? all.find((t) => tripPhase(t.startDate, t.endDate) === 'upcoming');
+}
+
+/**
+ * The countdown Tag on the Hero Card, by phase: "In 9 days" (or "Tomorrow") before the trip, "Day 3 of 10" during it,
+ * nothing after.
+ */
+export function heroCountdown(trip: Trip, now = todayDay()): { label: string; icon: 'calendar' } | undefined {
+  const total = between(trip.startDate, trip.endDate) + 1;
+  if (now < trip.startDate) { const n = between(now, trip.startDate); return { label: n === 1 ? 'Tomorrow' : `In ${n} days`, icon: 'calendar' }; }
+  if (now <= trip.endDate) return { label: `Day ${between(trip.startDate, now) + 1} of ${total}`, icon: 'calendar' };
+  return undefined;
+}
+
+/** When an event finishes, for sorting what's still to come. An event with no time counts until the day is over. */
+const endsAt = (a: Activity) => (a.endTime && a.endTime >= a.startTime ? a.endTime : a.endTime ? '99:99' : a.startTime || '99:99');
+
+/** The next thing in the plan: today's next event that hasn't finished, else the first one on a later day. */
+export function nextEvent(activities: Activity[], now = todayDay(), time = new Date().toTimeString().slice(0, 5)): Activity | undefined {
+  return activities
+    .filter((a) => a.date > now || (a.date === now && endsAt(a) > time))
+    .sort((a, b) => a.date.localeCompare(b.date) || (a.startTime || '99').localeCompare(b.startTime || '99'))[0];
+}
+
+/** Straight-line distance between two points in km (haversine). */
+export function distanceKm(a: { lat: number; lng: number }, b: { lat: number; lng: number }) {
+  const r = (x: number) => (x * Math.PI) / 180;
+  const h = Math.sin(r(b.lat - a.lat) / 2) ** 2 + Math.cos(r(a.lat)) * Math.cos(r(b.lat)) * Math.sin(r(b.lng - a.lng) / 2) ** 2;
+  return 12742 * Math.asin(Math.sqrt(h));
+}
+
+/**
+ * A rough "how long to get there" between two events, for the Travel connector: walking under 2 km (about 5 km/h on
+ * streets, 1.3× the straight line), otherwise by car (about 25 km/h in town). Only an estimate; null without both places.
+ */
+export function travelEstimate(from: Activity, to: Activity): { label: string; icon: 'pin' | 'car' } | null {
+  if (!from.location || !to.location) return null;
+  const km = distanceKm(from.location, to.location) * 1.3;
+  if (km < 0.05) return null;
+  const walk = km < 2;
+  const min = Math.max(1, Math.round((km / (walk ? 5 : 25)) * 60));
+  const t = min < 60 ? `${min} min` : `${Math.floor(min / 60)} h ${min % 60 ? `${min % 60} min` : ''}`.trim();
+  return { label: `About ${t} ${walk ? 'walk' : 'by car'}`, icon: walk ? 'pin' : 'car' };
 }

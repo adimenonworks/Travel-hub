@@ -58,3 +58,31 @@
 .block { width: 100%; }
 /* Icon only ("Show text" off): the same pill with just the icon (Large 24px icon, Regular 16px) */
 .iconOnly.large { padding: var(--space-default-400) var(--space-default-500); }
+
+/* Figma "Icon button": 40px circle, 24px icon, 44px tap area. Secondary and Ghost use the Button's tokens. */
+.iconButton {
+  position: relative; flex: none; display: inline-grid; place-items: center;
+  width: 40px; height: 40px; padding: 0; border: 0; border-radius: var(--radius-1000);
+  cursor: pointer; transition: background var(--motion-fast), transform var(--motion-release);
+}
+.iconButton::after { content: ''; position: absolute; inset: -2px; }
+.iconButton:active:not(:disabled) { transform: scale(0.92); transition: background var(--motion-fast), transform var(--motion-press); }
+.icon-secondary { background: var(--interactive-button-secondary-background); color: var(--interactive-button-secondary-icon); }
+.icon-secondary:hover:not(:disabled) { background: var(--interactive-button-secondary-background-hover); }
+.icon-secondary:active:not(:disabled) { background: var(--interactive-button-secondary-background-pressed); }
+.icon-ghost { background: var(--interactive-button-ghost-background); color: var(--interactive-button-ghost-icon); }
+.icon-ghost:hover:not(:disabled) { background: var(--interactive-button-ghost-background-hover); }
+.icon-ghost:active:not(:disabled) { background: var(--interactive-button-ghost-background-pressed); }
+.icon-on-brand { background: var(--on-mid-surface-sunken); color: var(--on-mid-icon-primary); }
+.icon-on-brand:hover:not(:disabled) { background: var(--interactive-button-ghost-background-pressed); }
+.iconButton:disabled { cursor: default; color: var(--interactive-button-ghost-disabled-foreground); }
+
+/* Each variant's icons use its own icon token (Figma: …/icon), separate from the label colour. */
+.primary .glyph { color: var(--interactive-button-primary-icon); }
+.secondary .glyph { color: var(--interactive-button-secondary-icon); }
+.destructive .glyph { color: var(--interactive-button-destructive-icon); }
+.inverse .glyph { color: var(--interactive-button-inverse-brand-icon); }
+.neutral .glyph { color: var(--interactive-button-inverse-neutral-icon); }
+.tertiary .glyph { color: var(--interactive-button-tertiary-icon); }
+.ghost .glyph { color: var(--interactive-button-ghost-icon); }
+.button:disabled .glyph { color: inherit; }

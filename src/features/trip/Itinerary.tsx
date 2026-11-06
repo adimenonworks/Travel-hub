@@ -1,13 +1,14 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { Badge, Button, EmptyState, EventRow, Icon, Timeline } from '../../design/components';
-import { personName, useMe } from '../../data/hooks';
+import { Button, DayCard, EmptyState, EventCard, SectionHeader, Timeline, TravelConnector, type EventState } from '../../design/components';
+import { useMe } from '../../data/hooks';
 import type { Activity } from '../../data/types';
 import { dayWord, formatDay, formatTime, parseDay, today, tripDays } from '../../lib/dates';
 import { money } from '../../lib/format';
-import { categoryInfo } from '../../lib/categories';
-import { defaultUnit, describeWeather, tripWeather, type DayWeather } from '../../lib/weather';
+import { haptic } from '../../lib/native';
+import { travelEstimate } from '../../lib/trips';
 import { ActivityForm } from './ActivityForm';
+import { eventCardProps } from './Overview';
 import type { TripCtx } from './TripPage';
 import s from './trip.module.css';
 
@@ -53,93 +54,67 @@ export function Itinerary(ctx: TripCtx) {
   const eventsLeft = (d: string) =>
     d > t ? counts[d] ?? 0 : d < t ? 0 : activities.filter((a) => a.date === d && finishesAt(a) > now).length;
   const list = activities.filter((a) => a.date === day).sort(byTime);
-  const weather = useDayWeather(ctx, day);
+  const me = useMe();
+  const planned = list.reduce((n, a) => n + a.cost * Math.max(1, a.attendeeIds.length), 0);
 
   // On today's plan, the "now" line (Figma Timeline) sits before the next plan. The page doesn't scroll to it.
   const showNow = day === t && list.length > 1;
-  const nextIndex = list.findIndex((a) => (a.startTime || '99:99') > now);
+  const nextIndex = day === t ? list.findIndex((a) => finishesAt(a) > now) : -1;
   const nowLine = <Timeline time={formatTime(now)} />;
+  const stateOf = (i: number): EventState => day < t || (day === t && finishesAt(list[i]) <= now) ? 'done' : i === nextIndex ? 'next' : 'default';
+  const startsIn = (a: Activity) => {
+    if (!a.startTime || a.startTime <= now) return 'Now';
+    const [h1, m1] = now.split(':').map(Number), [h2, m2] = a.startTime.split(':').map(Number);
+    const min = h2 * 60 + m2 - (h1 * 60 + m1);
+    return min < 60 ? `in ${min} min` : `in ${Math.round(min / 60)} hr`;
+  };
 
   return (
     <div className={s.itinLayout}>
-      {/* Push-expand: every card holds a compact face and an open face. Tapping a card grows it (width in the strip,
-          height in the side list) while the one it replaces shrinks, and the faces cross-fade as they go. */}
       <div ref={stripRef} className={s.days} role="group" aria-label="Trip days">
         {days.map((d) => {
-          const selected = d === day;
           // Today counts the events still to come; any other day shows its total.
           const n = d === t ? eventsLeft(d) : counts[d] ?? 0;
           return (
-            <button key={d} type="button" data-day={d} className={s.day} aria-pressed={selected} onClick={() => setDay(d)}>
-              <span className={s.dayCompact} aria-hidden={selected}>
-                <span className={s.dayNum}>{parseDay(d).getDate()}</span>
-                <span className={s.dayWord}>{word(d)}</span>
-              </span>
-              <span className={s.dayOpen} aria-hidden={!selected}>
-                <span className={s.dayTop}>
-                  <span className={s.dayBig}>{parseDay(d).getDate()}</span>
-                  <span className={s.dayMonth}>{formatDay(d, { month: 'short' })} · {word(d)}</span>
-                </span>
-                {n > 0 && (
-                  <span className={s.dayBadges}>
-                    <Badge tone="inverse">{d === t ? `${n} more event${n === 1 ? '' : 's'}` : `${n} event${n === 1 ? '' : 's'}`}</Badge>
-                  </span>
-                )}
-              </span>
-            </button>
+            <DayCard key={d} dataDay={d} day={parseDay(d).getDate()} month={formatDay(d, { month: 'short' })} word={word(d)} selected={d === day}
+              onClick={() => { haptic('selection'); setDay(d); }}
+              tag={n > 0 ? (d === t ? `${n} more event${n === 1 ? '' : 's'}` : `${n} event${n === 1 ? '' : 's'}`) : undefined} />
           );
         })}
       </div>
 
-      <div className={s.timeline}>
-        <div className={s.dayHead}>
-          <div>
-            <div className={s.dayTitle}>
-              <h2 className="t-heading-1">{word(day)}</h2>
-              {weather && <WeatherChip w={weather.day} typical={weather.typical} />}
-            </div>
-          </div>
-          <Button size="regular" icon="plus" onClick={() => setAdding(true)}>Add event</Button>
-        </div>
+      <section className={s.timeline} aria-label={word(day)}>
+        <SectionHeader title={word(day)}
+          meta={[formatDay(day), `${list.length} plan${list.length === 1 ? '' : 's'}`, planned > 0 ? `${money(planned, trip.currency)} planned` : ''].filter(Boolean).join(' · ')}
+          action={<Button variant="ghost" size="regular" iconEnd="chevron-right" onClick={() => setAdding(true)}>Add event</Button>} />
 
         {list.length === 0 ? (
-          <EmptyState illustration="calendar" title="Nothing planned yet" message="Add something to do, or approve an idea from the Ideas board."
+          <EmptyState illustration="calendar" title="Nothing planned yet" message="Add something to do, or schedule an idea from the Ideas board."
             action={<Button variant="secondary" icon="plus" onClick={() => setAdding(true)}>Add event</Button>} />
         ) : (
-          <>
-            {list.map((a, n) => (
-              <div key={a.id} className={s.timelineItem}>
-                {showNow && n === nextIndex && nowLine}
-                <ActivityRow a={a} ctx={ctx} />
-              </div>
-            ))}
+          <div className={s.eventList}>
+            {list.map((a, n) => {
+              const state = stateOf(n);
+              const trip2 = n > 0 ? travelEstimate(list[n - 1], a) : null;
+              return (
+                <div key={a.id} className={s.timelineItem}>
+                  {trip2 && <TravelConnector label={trip2.label} icon={trip2.icon} />}
+                  {showNow && n === nextIndex && nowLine}
+                  <EventCard {...eventCardProps(a, ctx)} state={state}
+                    extras={state === 'next' ? [
+                      { icon: 'info', label: `Next · ${startsIn(a)}` },
+                      ...(a.attendeeIds.length > 0 ? [{ icon: 'people' as const, label: a.attendeeIds.includes(me.uid) && a.attendeeIds.length === 1 ? 'You’re going' : `${a.attendeeIds.length} of ${trip.memberIds.length} going` }] : []),
+                    ] : undefined} />
+                </div>
+              );
+            })}
             {showNow && nextIndex === -1 && nowLine}
-          </>
+          </div>
         )}
-      </div>
+      </section>
 
       <ActivityForm open={adding} trip={trip} date={day} onClose={() => setAdding(false)} />
     </div>
-  );
-}
-
-/** A plan in the timeline (Figma "Event row"): what was entered in the sheet. The title opens the plan's own page;
-    Maps and Uber take you to its location. */
-function ActivityRow({ a, ctx }: { a: Activity; ctx: TripCtx }) {
-  const me = useMe();
-  const cat = categoryInfo(a.category);
-  const where = a.locationText || a.location?.name;
-  return (
-    <EventRow
-      to={`/trip/${ctx.trip.id}/plan/${a.id}`}
-      title={a.title}
-      location={where}
-      time={a.startTime ? `${formatTime(a.startTime)}${a.endTime ? `–${formatTime(a.endTime)}` : ''}` : undefined}
-      category={{ icon: cat.icon, label: cat.label }}
-      going={a.attendeeIds.includes(me.uid)}
-      people={a.attendeeIds.map((id) => ({ id, name: personName(ctx.profiles, id), photo: ctx.profiles[id]?.photo }))}
-      price={a.cost > 0 ? `${money(a.cost, ctx.trip.currency)} pp` : undefined}
-    />
   );
 }
 
@@ -154,30 +129,3 @@ function useNow() {
   return now;
 }
 
-/** The forecast for one day of the trip (or last year's weather as a guide when it's too far ahead). */
-function useDayWeather({ trip }: TripCtx, day: string) {
-  const [res, setRes] = useState<{ days: DayWeather[]; typical: boolean } | null>(null);
-  const place = trip.destination;
-  useEffect(() => {
-    if (!place) return;
-    let live = true;
-    tripWeather(place, trip.startDate, trip.endDate, defaultUnit())
-      .then((r) => live && setRes({ days: r.days, typical: r.kind === 'typical' }))
-      .catch(() => live && setRes(null));
-    return () => { live = false; };
-  }, [place?.lat, place?.lng, trip.startDate, trip.endDate]);
-  const d = res?.days.find((x) => x.date === day);
-  return d ? { day: d, typical: res!.typical } : null;
-}
-
-function WeatherChip({ w, typical }: { w: DayWeather; typical: boolean }) {
-  const { label, icon } = describeWeather(w.code);
-  const temps = `${Math.round(w.max)}° / ${Math.round(w.min)}°`;
-  return (
-    <span className={s.weatherChip} title={typical ? 'Typical for this date (last year’s weather)' : label}>
-      <Icon name={icon} size={18} />
-      <span aria-hidden="true">{typical ? '~' : ''}{temps}</span>
-      <span className="visually-hidden">{typical ? `Typically ${label.toLowerCase()}` : label}, high {Math.round(w.max)}°, low {Math.round(w.min)}°</span>
-    </span>
-  );
-}

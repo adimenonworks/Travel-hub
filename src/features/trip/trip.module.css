@@ -15,101 +15,31 @@
 /* The tab's content */
 .tabPanel { display: flex; flex-direction: column; gap: var(--space-stack); }
 
-/* Day strip (Figma "Day Card"). Push-expand: each card has a fixed size, so the browser can animate between them.
-   Strip: the tapped card widens (74 → 178px) as the old one narrows; all cards share the open card's height (139).
-   List (wide screens): 240 wide, the tapped card grows taller (58 → 131).
-   Both faces sit in the card. The leaving face stays visible (clipped by the card) while it resizes, then the two
-   cross-fade, so the card is never empty mid-move; colours change over the same time as the size. */
+/* Day strip (Figma "Day Card" in a sideways-scrolling row) */
 .days {
-  --day-move: var(--duration-sheet) var(--ease-fluid);
-  display: flex; gap: var(--space-default-300); overflow-x: auto; scroll-snap-type: x proximity; scrollbar-width: none;
+  display: flex; align-items: stretch; gap: var(--space-default-300); overflow-x: auto; scroll-snap-type: x proximity; scrollbar-width: none;
   margin: 0 calc(-1 * var(--space-gutter)); padding: 2px var(--space-gutter) var(--space-default-200);
   scroll-padding-inline: var(--space-gutter);
 }
 .days::-webkit-scrollbar { display: none; }
-.day {
-  --day-open: calc(178rem / 17);
-  position: relative; flex: none; scroll-snap-align: start; overflow: hidden;
-  width: calc(74rem / 17); height: calc(138rem / 17); padding: 0; /* Figma Day Card hugs to 136, plus the 1px border top and bottom; grows with the text size */
-  border-radius: var(--radius-600); border: 1px solid var(--interactive-unselected-ghost-border); text-align: left;
-  background: var(--interactive-unselected-ghost-background); color: var(--interactive-unselected-ghost-text);
-  transition: width var(--day-move), height var(--day-move), background-color var(--day-move), color var(--day-move), border-color var(--day-move);
-}
-.day:hover { background-color: var(--interactive-unselected-ghost-background-hover); }
-.day:active { background-color: var(--interactive-unselected-ghost-background-pressed); }
-.day[aria-pressed='true'] { width: var(--day-open); border-color: transparent; background-color: var(--interactive-selected-secondary-background); color: var(--interactive-selected-secondary-text); }
-.day[aria-pressed='true']:hover { background-color: var(--interactive-selected-secondary-background-hover); }
-.day[aria-pressed='true']:active { background-color: var(--interactive-selected-secondary-background-pressed); }
-
-.dayCompact, .dayOpen { position: absolute; top: 0; left: 0; }
-/* Strip, not selected: padding 16, number over the day word, centred */
-.dayCompact {
-  width: 100%; height: 100%; padding: var(--space-default-500);
-  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--space-default-100);
-  transition: opacity var(--duration-base) var(--ease-standard) calc(var(--duration-sheet) * 0.45);
-}
-/* Selected: padding 20/16, the date row then the events badge, gap 12 */
-.dayOpen {
-  width: var(--day-open); height: 100%; padding: var(--space-default-600) var(--space-default-500);
-  display: flex; flex-direction: column; justify-content: center; align-items: flex-start; gap: var(--space-default-400);
-  opacity: 0; pointer-events: none;
-  transition: opacity var(--duration-base) var(--ease-standard) calc(var(--duration-sheet) * 0.45);
-}
-.day[aria-pressed='true'] .dayCompact { opacity: 0; pointer-events: none; }
-.day[aria-pressed='true'] .dayOpen { opacity: 1; }
-
-.dayNum { font: var(--type-display-tiny); letter-spacing: -0.01em; } /* Display tiny */
-.dayWord { font: var(--type-label); line-height: 1; white-space: nowrap; } /* Label */
-.dayTop { display: flex; align-items: baseline; gap: var(--space-default-200); white-space: nowrap; }
-.dayBig { font: var(--type-display-small); letter-spacing: -0.01em; } /* Display small */
-.dayMonth { font: var(--type-body-small); } /* Body small */
-.dayBadges { display: flex; gap: var(--space-default-200); white-space: nowrap; }
 
 .itinLayout { display: flex; flex-direction: column; gap: calc(var(--space-default-800) - var(--space-default-200)); } /* 32 from the day cards to the day's plan (the strip keeps 4 below the cards for focus rings) */
 
 /* The day's plan */
 .timeline { display: flex; flex-direction: column; gap: var(--space-default-500); }
 .dayTitle { display: flex; align-items: center; gap: var(--space-default-400); flex-wrap: wrap; }
-.weatherChip { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: var(--radius-1000); background: var(--on-light-surface-primary); color: var(--on-light-text-primary); font-size: var(--size-body-small); font-weight: var(--weight-semibold); font-variant-numeric: tabular-nums; }
-.weatherChip svg { color: var(--on-light-icon-brand); }
-.timelineItem { display: flex; flex-direction: column; gap: var(--space-default-500); }
+.timelineItem { display: flex; flex-direction: column; gap: var(--space-default-300); }
 
 /* A tab's title with its one action beside it; the text wraps rather than pushing the button underneath. */
 .dayHead { display: flex; align-items: center; justify-content: space-between; gap: var(--space-default-400); }
 .dayHead > :first-child { flex: 1; min-width: 0; }
 .dayHead > :last-child { flex: none; }
-.dayBudget { font-size: var(--size-body-small); color: var(--on-light-text-secondary); }
 
-.actTop { display: flex; justify-content: space-between; align-items: flex-start; gap: var(--space-default-400); }
-.actMeta { display: flex; flex-wrap: wrap; gap: var(--space-default-300); align-items: center; margin-top: var(--space-default-300); }
 
-.actNotes { -webkit-user-select: text; user-select: text; -webkit-touch-callout: default; white-space: pre-wrap; color: var(--on-light-text-secondary); font-size: var(--size-body-small); line-height: 1.5; }
 
 /* Ideas */
-.ideaGrid { display: grid; gap: var(--space-default-500); grid-template-columns: minmax(0, 1fr); } /* one column, 16 apart (Figma) */
-.idea { display: flex; flex-direction: column; gap: var(--space-default-400); }
-.ideaFoot { display: flex; align-items: center; gap: var(--space-default-300); flex-wrap: wrap; margin-top: auto; padding-top: var(--space-default-300); }
-.vote { position: relative; display: inline-flex; align-items: center; gap: 6px; min-height: var(--size-control-sm); padding: 0 var(--space-default-500); border-radius: var(--radius-1000); border: 0; background: var(--on-light-surface-sunken); color: var(--on-light-text-primary); font-weight: var(--weight-semibold); font-size: var(--size-body-small); font-variant-numeric: tabular-nums; }
-.vote::after { content: ''; position: absolute; inset: calc((var(--size-control-sm) - var(--size-tap)) / 2) 0; }
-.vote:hover { background: var(--interactive-button-ghost-background-hover); }
-.vote:active { background: var(--interactive-button-ghost-background-pressed); }
-.vote[aria-pressed='true'] { background: var(--interactive-selected-secondary-background); color: var(--interactive-selected-secondary-text); }
-.vote[aria-pressed='true']:hover { background: var(--interactive-selected-secondary-background-hover); }
-.vote[aria-pressed='true']:active { background: var(--interactive-selected-secondary-background-pressed); }
-.votes { display: inline-flex; gap: var(--space-default-200); }
-.spacer { flex: 1; }
 
 /* A plan's own page */
-.planMeta { display: flex; flex-wrap: wrap; gap: var(--space-default-300); }
-.planGrid { display: grid; gap: var(--space-stack); }
-.planCol { display: flex; flex-direction: column; gap: var(--space-stack); min-width: 0; }
-.planLocation { display: flex; flex-direction: column; gap: var(--space-default-500); }
-.planAddress { -webkit-user-select: text; user-select: text; -webkit-touch-callout: default; font-weight: var(--weight-semibold); color: var(--on-light-text-primary); }
-.planButtons { display: flex; flex-wrap: wrap; gap: var(--space-default-300); }
-a.docLink { -webkit-user-select: text; user-select: text; -webkit-touch-callout: default; color: var(--on-light-link-default); text-decoration: underline; text-underline-offset: 3px; overflow-wrap: anywhere; }
-a.docLink:hover { text-decoration-thickness: 2px; color: var(--on-light-link-hover); }
-.docActions { display: inline-flex; align-items: center; gap: var(--space-default-200); }
-.emptyNote { padding: var(--space-default-600) var(--space-inset); border-radius: var(--radius-600); border: 1px solid var(--on-light-border-subtle); color: var(--on-light-text-secondary); font-size: var(--size-body-small); }
 
 /* People */
 .inviteActions { display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-default-400); margin-top: var(--space-default-400); }
@@ -118,15 +48,42 @@ a.docLink:hover { text-decoration-thickness: 2px; color: var(--on-light-link-hov
 .dangerZone { display: flex; gap: var(--space-default-400); flex-wrap: wrap; }
 
 /* Photos */
+/* Photos: albums as Figma Cards (24 corners, 16 padding) with a cover scene on top (8 corners: 24 − 16) */
 .albumGrid { display: grid; gap: var(--space-default-500); grid-template-columns: minmax(0, 1fr); }
-.album { display: flex; flex-direction: column; }
-/* Figma "Album Card": grey cover (120) with the photo icon, then padding 20: title + source on the left, Open album (Regular) on the right */
-.albumCover { height: 120px; display: grid; place-items: center; background: var(--on-light-illustration-secondary); color: var(--on-light-icon-primary); }
-.albumBody { padding: var(--space-default-600); display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-default-200) var(--space-default-300); flex: 1; }
-.albumText { flex: 1 1 calc(140rem / 17); min-width: 0; display: flex; flex-direction: column; gap: var(--space-default-200); }
-.albumActions { display: flex; align-items: center; gap: var(--space-default-200); }
+.album { position: relative; display: flex; flex-direction: column; gap: var(--space-default-500); padding: var(--space-default-500); border-radius: var(--radius-600); border: 1px solid var(--on-light-border-subtle); background: var(--on-light-surface-primary); }
+.albumCover { aspect-ratio: 2 / 1; border-radius: var(--radius-300); overflow: hidden; }
+.albumCover > * { width: 100%; height: 100%; }
+.albumBody { display: flex; align-items: flex-start; gap: var(--space-default-300); }
+.albumText { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: var(--space-default-100); }
+.albumTitle { margin: 0; font: var(--type-heading-2); letter-spacing: -0.02em; color: var(--on-light-text-primary); }
+.albumLink { color: inherit; text-decoration: none !important; }
+.albumLink::after { content: ''; position: absolute; inset: 0; border-radius: var(--radius-600); } /* the whole card opens the album */
+.albumEdit { position: relative; z-index: 1; }
 .albumHelp { display: flex; flex-direction: column; gap: var(--space-default-300); padding: var(--space-default-500) var(--space-default-600); border-radius: var(--radius-600); background: var(--on-light-surface-sunken); font-size: var(--size-body-small); line-height: 1.5; color: var(--on-light-text-secondary); }
 .albumHelp b { color: var(--on-light-text-primary); font-weight: var(--weight-semibold); }
 
 /* Idea Card buttons (Figma "Buttons"): Deny | Approve, equal halves, 12 apart, 8 below the votes row (24 in all with the card gap) */
 .ideaButtons { display: grid; grid-template-columns: repeat(auto-fit, minmax(calc(120rem / 17), 1fr)); gap: var(--space-default-400); margin-top: var(--space-default-300); }
+
+/* Overview: sections 32 apart */
+.overview { display: flex; flex-direction: column; gap: var(--space-stack); }
+/* Bookings tiles: two columns, 8 apart (one column when text is very large) */
+.tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(calc(130rem / 17), 1fr)); gap: var(--space-default-300); }
+.flagThumb { width: 32px; height: 32px; border-radius: 50%; }
+/* Event cards and their Travel connectors, 8 apart */
+.eventList { display: flex; flex-direction: column; gap: var(--space-default-300); }
+
+/* Event detail */
+.planButtons { display: grid; grid-template-columns: repeat(auto-fit, minmax(calc(140rem / 17), 1fr)); gap: var(--space-default-300); }
+.planMap { border-radius: var(--radius-600); overflow: hidden; border: 1px solid var(--on-light-border-subtle); }
+.docRow { display: flex; align-items: center; gap: var(--space-default-200); }
+.docRow > :first-child { flex: 1; min-width: 0; }
+.selectable { -webkit-user-select: text; user-select: text; -webkit-touch-callout: default; white-space: pre-wrap; }
+
+/* New trip flow */
+.optionGrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(calc(130rem / 17), 1fr)); gap: var(--space-default-300); }
+.flowSummary { display: flex; flex-direction: column; gap: var(--space-default-100); }
+.flowSummaryTitle { font: var(--type-heading-2); letter-spacing: -0.02em; color: var(--on-mid-text-primary); }
+.flowSummaryMeta { margin: 0; font: var(--type-body-small); color: var(--on-mid-text-secondary); }
+/* The Ghost button on the deep emerald Celebration screen uses the ghost "inverse" text */
+.onDarkGhost[class] { color: var(--on-dark-text-primary); }

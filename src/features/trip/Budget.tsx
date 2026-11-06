@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { BudgetCard, Button, IconButton, useToast, FieldRow, List, ListRow, Section, Select, Sheet, TextField } from '../../design/components';
+import { BudgetCard, Button, IconButton, useToast, FieldRow, ListGroup, ListItem, PageSection, Select, Sheet, TextField } from '../../design/components';
 import { store } from '../../data';
 import { personName, useMe } from '../../data/hooks';
 import type { Category, Expense } from '../../data/types';
@@ -10,9 +10,10 @@ import { tripBudget } from './tripBudget';
 import type { TripCtx } from './TripPage';
 
 /**
- * Figma "Budget card" under the trip header: the chosen day's budget (worked out from the trip's total) and the total.
- * Its button: "Add budget" (no total yet) opens Edit trip; "Edit budgets" opens the budgets sheet, where each day has
- * a pencil: past days correct what was spent, today and later days set that day's own budget. Organizers only.
+ * Figma "Budget card" on the trip's Overview. Planning (before and after the trip): what it costs so far (flights,
+ * stays, planned activities and food) and the spending money left. During: today's planned spend against the day's
+ * budget (worked out from the trip's total). "Details" opens the budgets sheet, where organizers can set a day's own
+ * budget (today and later) or correct what was spent (past days), and add costs that aren't events.
  */
 export function TripBudget({ ctx, day, onSetBudget }: { ctx: TripCtx; day: string; onSetBudget?: () => void }) {
   const { trip, expenses, profiles, canManage } = ctx;
@@ -28,14 +29,30 @@ export function TripBudget({ ctx, day, onSetBudget }: { ctx: TripCtx; day: strin
   const lower = (w: string) => (w === 'Today' || w === 'Tomorrow' || w === 'Yesterday' ? w.toLowerCase() : w);
   const d = b.forDay(day);
 
-  const card = b.total > 0 ? (() => {
-    const w = word(day);
-    const when = day === t ? 'today' : w === 'Tomorrow' || w === 'Yesterday' ? w.toLowerCase() : `on ${w}`;
-    return <BudgetCard amount={fmt(Math.abs(d.left))} label={d.left < 0 ? `Over ${when}` : `Left ${when}`} total={fmt(b.total)} level={d.level}
-      action={canManage && <Button variant="secondary" size="regular" icon="pencil" onClick={() => setOpen(true)}>Edit budgets</Button>} />;
-  })() : (
-    <BudgetCard amount={fmt(b.planned)} label="Planned so far" total="No total set" level="ok"
-      action={onSetBudget && <Button variant="secondary" size="regular" icon="pencil" onClick={onSetBudget}>Add budget</Button>} />
+  // Figma "Budget card": Phase During (today, while the trip is on) or Planning (before and after it).
+  const during = day === t && t >= trip.startDate && t <= trip.endDate;
+  const details = <Button variant="ghost" size="regular" iconEnd="chevron-right" onClick={() => setOpen(true)}>Details</Button>;
+  const card = during ? (
+    <BudgetCard label="Today" amount={b.total > 0 ? `${fmt(d.spent)} of ${fmt(d.daily)}` : fmt(d.spent)} action={details}
+      segments={[
+        { label: 'Planned today', value: fmt(d.spent), amount: d.spent, color: 'orange' },
+        ...(b.total > 0 ? [
+          { label: d.left < 0 ? 'Over today' : 'Left today', value: fmt(Math.abs(d.left)), amount: Math.max(0, d.left), color: 'empty' as const },
+          { label: 'Left for the trip', value: fmt(b.total - b.planned), amount: 0, color: 'empty' as const },
+        ] : []),
+      ]}
+      note={d.level !== 'ok' && b.total > 0 ? <p className={d.level === 'over' ? 't-body-small t-danger' : 't-body-small t-secondary'}>{d.level === 'over' ? 'Today’s plans are over the daily budget.' : 'Less than half of today’s budget is left.'}</p> : undefined} />
+  ) : (
+    <BudgetCard label="Trip cost so far" amount={fmt(b.planned)} action={details}
+      segments={[
+        { label: 'Flights', value: fmt(b.flights), amount: b.flights, color: 'brand' },
+        { label: 'Stays', value: fmt(b.stays), amount: b.stays, color: 'mid' },
+        { label: 'Planned activities & food', value: fmt(b.plans), amount: b.plans, color: 'orange' },
+        ...(b.total > 0
+          ? [{ label: 'Spending money left', value: `${fmt(Math.max(0, b.total - b.planned))} of ${fmt(b.total)}`, amount: Math.max(0, b.total - b.planned), color: 'empty' as const }]
+          : []),
+      ]}
+      note={b.total === 0 && onSetBudget ? <Button variant="secondary" size="regular" icon="plus" onClick={onSetBudget}>Add a budget</Button> : undefined} />
   );
 
   // One day's editor: a past day corrects what was spent; today and later set the day's own budget.
@@ -60,38 +77,35 @@ export function TripBudget({ ctx, day, onSetBudget }: { ctx: TripCtx; day: strin
   return (
     <div id="budget">
       {card}
-      <Sheet open={open} title="Budgets" onClose={() => setOpen(false)}>
+      <Sheet open={open} title="Budget" subtitle="For the whole group" onClose={() => setOpen(false)}>
         <p className="t-body t-secondary">
           {fmt(b.planned)} planned{b.total > 0 ? ` of ${fmt(b.total)}` : ''} for the whole group.
           {b.total > 0 ? ' Each day gets what’s left of the total, shared over the days still to come.' : ''}
         </p>
-        <Section title="Day by day">
-          <List>
+        <PageSection title="Day by day">
+          <ListGroup label="Day by day">
             {days.map((x) => {
               const f = b.forDay(x);
               const isPast = x < t;
               return (
-                <ListRow key={x} title={word(x)} subtitle={formatDay(x)}
-                  trailing={<span className={['t-num', !isPast && f.left < 0 && b.total > 0 ? 't-danger' : ''].join(' ')}>
-                    {isPast ? `${fmt(f.spent)} used` : b.total > 0 ? (f.left < 0 ? `${fmt(-f.left)} over` : `${fmt(f.left)} left`) : fmt(f.spent)}
-                  </span>}
-                  actions={canManage && <IconButton icon="pencil" size="regular" label={isPast ? `Edit what was spent ${lower(word(x))}` : `Edit ${lower(word(x))}’s budget`} onClick={() => editDay(x)} />} />
+                <ListItem key={x} title={word(x)} meta={`${formatDay(x)} · ${isPast ? `${fmt(f.spent)} used` : b.total > 0 ? (f.left < 0 ? `${fmt(-f.left)} over` : `${fmt(f.left)} left`) : `${fmt(f.spent)} planned`}`}
+                  trailing={canManage ? <IconButton icon="pencil" label={isPast ? `Edit what was spent ${lower(word(x))}` : `Edit ${lower(word(x))}’s budget`} onClick={() => editDay(x)} /> : undefined} />
               );
             })}
-          </List>
-        </Section>
-        <Section title="Other expenses" action={<Button size="regular" icon="plus" onClick={() => { setOpen(false); setEditing('new'); }}>Add expense</Button>}
-          footer="Event prices come from the itinerary. Add flights, hotels, car hire and anything else here.">
-          {expenses.length === 0 ? <p className="t-body-small t-secondary">No expenses yet.</p> : (
-            <List>
+          </ListGroup>
+        </PageSection>
+        <PageSection title="Other costs" meta="Bookings that aren’t events: choose Flight or Stay so they count in the right place"
+          action={<Button variant="ghost" size="regular" iconEnd="chevron-right" onClick={() => { setOpen(false); setEditing('new'); }}>Add cost</Button>}>
+          {expenses.length === 0 ? <p className="t-body-small t-secondary">Nothing yet. Event prices come from the itinerary.</p> : (
+            <ListGroup label="Other costs">
               {expenses.slice().sort((x, y) => (x.date || '0').localeCompare(y.date || '0')).map((e) => (
-                <ListRow key={e.id} icon={categoryInfo(e.category).icon} title={e.title}
-                  subtitle={`${e.date ? formatDay(e.date) : 'Whole trip'} · paid by ${personName(profiles, e.paidBy)}`}
-                  trailing={<span className="t-num">{fmt(e.amount)}</span>} chevron onClick={() => { setOpen(false); setEditing(e); }} />
+                <ListItem key={e.id} icon={categoryInfo(e.category).icon} title={e.title}
+                  meta={`${e.date ? formatDay(e.date) : 'Whole trip'} · paid by ${personName(profiles, e.paidBy)}`}
+                  trailing={fmt(e.amount)} onClick={() => { setOpen(false); setEditing(e); }} />
               ))}
-            </List>
+            </ListGroup>
           )}
-        </Section>
+        </PageSection>
       </Sheet>
       <Sheet open={!!dayEdit} title={dayEdit ? (past ? `Spent ${lower(word(dayEdit))}` : `${word(dayEdit)}’s budget`) : ''} onClose={closeDay} onSubmit={saveDay} submitLabel="Save">
         {dayEdit && (past ? (

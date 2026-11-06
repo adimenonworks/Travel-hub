@@ -1,5 +1,5 @@
 import { useParams } from 'react-router-dom';
-import { Badge, Card, EmptyState, LinkButton, List, ListRow, PageHeader, Section, PageSkeleton, type IconName } from '../../design/components';
+import { EmptyState, LinkButton, ListGroup, ListItem, PageHeader, PageSection, PageSkeleton, type IconName } from '../../design/components';
 import { useActivitiesFor, useMe, useMyTrips } from '../../data/hooks';
 import type { Activity, Category, Trip } from '../../data/types';
 import { formatDay, today } from '../../lib/dates';
@@ -14,6 +14,9 @@ export const COLLECTIONS: { key: string; label: string; one: string; icon: IconN
   { key: 'activities', label: 'Activities', one: 'Activity', icon: 'ticket', categories: ['activity'] },
   { key: 'stays', label: 'Stays', one: 'Stay', icon: 'bed', categories: ['stay'] },
 ];
+
+/** "See all" from the You tab's Favourite places: every event you starred. */
+const FAVOURITES = { key: 'favourites', label: 'Favourite places', one: 'Favourite place', icon: 'star' as IconName, categories: ['activity', 'food', 'cafe', 'drinks', 'sight', 'flight', 'transport', 'stay', 'other'] as Category[] };
 
 /**
  * A collection's places: ones you starred (favourites) and ones you've been to (an event that has happened, that
@@ -33,7 +36,7 @@ export function CollectionPage() {
   const me = useMe();
   const trips = useMyTrips();
   const byTrip = useActivitiesFor((trips ?? []).map((t) => t.id));
-  const c = COLLECTIONS.find((x) => x.key === key);
+  const c = key === FAVOURITES.key ? FAVOURITES : COLLECTIONS.find((x) => x.key === key);
   if (!c) return <Content><EmptyState illustration="compass" title="Collection not found" action={<LinkButton to="/profile" variant="secondary">Back to profile</LinkButton>} /></Content>;
   if (!trips) return <PageSkeleton />;
 
@@ -44,24 +47,23 @@ export function CollectionPage() {
 
   const row = (a: Activity) => {
     const t = tripOf[a.id];
-    return <ListRow key={a.id} icon={c.icon} title={a.title} subtitle={`${a.locationText || a.location?.name || t.name} · ${formatDay(a.date, { month: 'short', day: 'numeric', year: 'numeric' })}`}
-      to={`/trip/${t.id}/plan/${a.id}`} chevron />;
+    return <ListItem key={a.id} icon={c.icon} title={a.title} meta={`${a.locationText || a.location?.name?.split(',')[0] || t.name} · ${formatDay(a.date, { month: 'short', day: 'numeric', year: 'numeric' })}`}
+      to={`/trip/${t.id}/plan/${a.id}`} />;
   };
 
   return (
     <Content>
-      <PageHeader title={c.label} back={{ to: '/profile', label: 'Profile' }} />
-      {favourites.length + rest.length === 0 ? (
+      <PageHeader title={c.label} back={{ to: '/profile', label: 'You' }} />
+      {favourites.length + (c === FAVOURITES ? 0 : rest.length) === 0 ? (
         <EmptyState illustration="memories" title="Nothing here yet"
           message="Places you’ve been show up here once the day has passed." />
       ) : (
         <>
-          {pins.length > 0 && <Card flush><MapView pins={pins} height={280} /></Card>}
-          <Section title={<>Favourites <Badge tone="neutral" icon="star" iconState="filled">{favourites.length}</Badge></>}
-            footer={favourites.length === 0 ? 'Events you star show up here.' : undefined}>
-            {favourites.length > 0 && <List>{favourites.map(row)}</List>}
-          </Section>
-          {rest.length > 0 && <Section title="Everywhere else"><List>{rest.map(row)}</List></Section>}
+          {pins.length > 0 && <div style={{ borderRadius: 'var(--radius-600)', overflow: 'hidden' }}><MapView pins={pins} height={280} /></div>}
+          <PageSection title="Favourites" meta={favourites.length === 0 ? 'Events you star show up here.' : `${favourites.length} starred`}>
+            {favourites.length > 0 && <ListGroup>{favourites.map(row)}</ListGroup>}
+          </PageSection>
+          {rest.length > 0 && c !== FAVOURITES && <PageSection title="Everywhere else"><ListGroup>{rest.map(row)}</ListGroup></PageSection>}
         </>
       )}
     </Content>

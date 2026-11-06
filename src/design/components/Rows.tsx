@@ -1,0 +1,287 @@
+import type { ReactNode } from 'react';
+import { Link } from 'react-router-dom';
+import { Icon, type IconName } from './Icon';
+import { Avatar } from './Misc';
+import { Badge } from './Misc';
+import s from './Rows.module.css';
+
+type Press = { to?: string; href?: string; onClick?: () => void; label?: string };
+
+/** Renders as a link, an external link, a button or a plain element, so every row and card can be tapped the same way. */
+function Pressable({ to, href, onClick, label, className, children, role }: Press & { className: string; children: ReactNode; role?: string }) {
+  if (to) return <Link to={to} className={`${className} ${s.pressable}`} aria-label={label} role={role}>{children}</Link>;
+  if (href) return <a href={href} target="_blank" rel="noreferrer" className={`${className} ${s.pressable}`} aria-label={label} role={role}>{children}</a>;
+  if (onClick) return <button type="button" onClick={onClick} className={`${className} ${s.pressable}`} aria-label={label} role={role}>{children}</button>;
+  return <div className={className} role={role}>{children}</div>;
+}
+
+/** The square (8px corners) or round thumb that leads a row: an icon on the light grey surface, or a flag/avatar. */
+function Thumb({ icon, media, round }: { icon?: IconName; media?: ReactNode; round?: boolean }) {
+  return <span className={[s.thumb, round && s.thumbRound].filter(Boolean).join(' ')} aria-hidden={media ? undefined : true}>{media ?? (icon && <Icon name={icon} size={24} />)}</span>;
+}
+
+/**
+ * Figma "List item" (Size Default / Compact): a 48px thumb (Compact: 32), the title (Heading 3; Compact: Body),
+ * a meta line (Body small) and optional trailing text. Used inside a List group.
+ */
+export function ListItem({ title, meta, trailing, icon, media, size = 'default', round, ...press }: Press & {
+  title: ReactNode; meta?: ReactNode; trailing?: ReactNode; icon?: IconName; media?: ReactNode; size?: 'default' | 'compact'; round?: boolean;
+}) {
+  return (
+    <Pressable {...press} role="listitem" className={[s.item, size === 'compact' && s.compact].filter(Boolean).join(' ')}>
+      {(icon || media) && <Thumb icon={icon} media={media} round={round} />}
+      <span className={s.itemText}>
+        <span className={s.itemTitle}>{title}</span>
+        {meta && <span className={s.itemMeta}>{meta}</span>}
+      </span>
+      {trailing !== undefined && trailing !== null && trailing !== false && <span className={s.itemTrailing}>{trailing}</span>}
+    </Pressable>
+  );
+}
+
+/** Figma "List group": the rounded white container (24px corners, subtle border) that stacks List items. */
+export function ListGroup({ children, label, className }: { children: ReactNode; label?: string; className?: string }) {
+  return <div role="list" aria-label={label} className={[s.group, className].filter(Boolean).join(' ')}>{children}</div>;
+}
+
+/** Figma "Section header": Heading 2 title, optional Body small meta under it, optional Ghost action (e.g. "See all ›"). */
+export function SectionHeader({ title, meta, action, level = 2 }: {
+  title: ReactNode; meta?: ReactNode; action?: ReactNode; level?: 2 | 3;
+}) {
+  const H = level === 2 ? 'h2' : 'h3';
+  return (
+    <div className={s.sectionHeader}>
+      <div className={s.sectionText}>
+        <H className={s.sectionTitle}>{title}</H>
+        {meta && <div className={s.sectionMeta}>{meta}</div>}
+      </div>
+      {action}
+    </div>
+  );
+}
+
+/** A Section header with what sits under it, as one section of a page. */
+export function PageSection({ title, meta, action, children, label }: { title: ReactNode; meta?: ReactNode; action?: ReactNode; children: ReactNode; label?: string }) {
+  return (
+    <section className={s.pageSection} aria-label={label}>
+      <SectionHeader title={title} meta={meta} action={action} />
+      {children}
+    </section>
+  );
+}
+
+export type EventState = 'default' | 'next' | 'done';
+
+/**
+ * Figma "Event card" (Layout Standard / Journey / Note × State Default / Next / Done). The icon in a 40px circle,
+ * the title (Heading 3), time · place (Body), an optional amount; Journey adds the from → to times; Extras show tags.
+ * Next has the brand border; Done fades the content. The whole card opens the event.
+ */
+export function EventCard({ title, time, place, amount, icon, layout = 'standard', state = 'default', journey, extras, status, to, onClick }: {
+  title: string; time?: string; place?: string; amount?: string; icon: IconName;
+  layout?: 'standard' | 'journey' | 'note'; state?: EventState;
+  journey?: { fromTime: string; fromPlace?: string; duration?: string; toTime: string; toPlace?: string; mode?: IconName };
+  /** Figma "Show extras": Tag 1, Tag 2 */
+  extras?: { icon?: IconName; label: string }[];
+  /** Figma "Show status", e.g. "Check-in open" */
+  status?: string;
+  to?: string; onClick?: () => void;
+}) {
+  const cls = [s.event, s[`event-${layout}`], s[`event-${state}`]].filter(Boolean).join(' ');
+  const stateText = state === 'next' ? ', up next' : state === 'done' ? ', done' : '';
+  return (
+    <Pressable to={to} onClick={onClick} className={cls} label={`${title}${time ? `, ${time}` : ''}${place ? `, ${place}` : ''}${amount ? `, ${amount}` : ''}${stateText}`}>
+      <span className={s.eventIcon} aria-hidden="true"><Icon name={icon} size={24} /></span>
+      <span className={s.eventBody} aria-hidden="true">
+        <span className={s.eventHeader}>
+          <span className={s.eventText}>
+            <span className={s.eventTitle}>{title}</span>
+            {(time || place) && (
+              <span className={s.eventMeta}>
+                {time && <span className={s.eventTime}>{time}</span>}
+                {time && place && <span className={s.dot}>·</span>}
+                {place && <span className={s.eventPlace}>{place}</span>}
+              </span>
+            )}
+          </span>
+          {(amount || status) && (
+            <span className={s.eventTrailing}>
+              {amount && <span className={s.eventAmount}>{amount}</span>}
+              {status && <span className={s.eventStatus}>{status}</span>}
+            </span>
+          )}
+        </span>
+        {layout === 'journey' && journey && (
+          <span className={s.route}>
+            <span className={s.routeTimes}>
+              <span className={s.routeEnd}><span className={s.routeTime}>{journey.fromTime}</span>{journey.fromPlace && <span className={s.routePlace}>{journey.fromPlace}</span>}</span>
+              <span className={s.routeMid}>
+                {journey.duration && <span className={s.routePlace}>{journey.duration}</span>}
+                <span className={s.routeLine}><span /><Icon name={journey.mode ?? 'plane'} size={16} /><span /></span>
+              </span>
+              <span className={`${s.routeEnd} ${s.routeEndTo}`}><span className={s.routeTime}>{journey.toTime}</span>{journey.toPlace && <span className={s.routePlace}>{journey.toPlace}</span>}</span>
+            </span>
+          </span>
+        )}
+        {extras && extras.length > 0 && (
+          <span className={s.eventExtras}>{extras.map((e) => <Badge key={e.label} tone="neutral" icon={e.icon}>{e.label}</Badge>)}</span>
+        )}
+      </span>
+    </Pressable>
+  );
+}
+
+/** Figma "Travel connector": the line between two Event cards with how long getting there takes. */
+export function TravelConnector({ label, icon = 'pin' }: { label: string; icon?: IconName }) {
+  return <div className={s.connector}><Icon name={icon} size={16} />{label}</div>;
+}
+
+/** Figma "Vote button" (Voted No / Yes): thumbs up with the count. */
+export function VoteButton({ count, voted, onClick, label }: { count: number; voted: boolean; onClick: () => void; label: string }) {
+  return (
+    <button type="button" className={[s.vote, voted && s.voted].filter(Boolean).join(' ')} aria-pressed={voted} aria-label={label} onClick={onClick}>
+      <Icon name="thumbs-up" size={16} state={voted ? 'filled' : 'default'} style={voted ? { color: 'currentColor' } : undefined} />
+      <span className="t-num">{count}</span>
+    </button>
+  );
+}
+
+/** Figma "Idea row": thumb, title (Heading 3), meta, an optional tag under it, and the Vote button. */
+export function IdeaRow({ title, meta, icon, tag, vote, onClick }: {
+  title: string; meta?: ReactNode; icon: IconName; tag?: { icon?: IconName; label: string };
+  vote: { count: number; voted: boolean; onClick: () => void };
+  onClick?: () => void;
+}) {
+  return (
+    <div role="listitem" className={s.ideaRow}>
+      <Pressable onClick={onClick} className={s.ideaMain} label={onClick ? `${title}: open` : undefined}>
+        <Thumb icon={icon} />
+        <span className={s.itemText}>
+          <span className={s.itemTitle}>{title}</span>
+          {meta && <span className={s.itemMeta}>{meta}</span>}
+          {tag && <span className={s.ideaTag}><Badge tone="success" icon={tag.icon}>{tag.label}</Badge></span>}
+        </span>
+      </Pressable>
+      <VoteButton count={vote.count} voted={vote.voted} onClick={vote.onClick}
+        label={`${vote.voted ? 'Remove your vote for' : 'Vote for'} ${title}, ${vote.count} ${vote.count === 1 ? 'vote' : 'votes'}`} />
+    </div>
+  );
+}
+
+export type TileTone = 'default' | 'orange' | 'green' | 'yellow' | 'pink' | 'add';
+
+/** Figma "Tile": a 24px-corner square with a round icon or flag at the top and a title + meta at the bottom. */
+export function Tile({ title, meta, icon, media, tone = 'default', ...press }: Press & {
+  title: string; meta?: ReactNode; icon?: IconName; media?: ReactNode; tone?: TileTone;
+}) {
+  return (
+    <Pressable {...press} className={[s.tile, s[`tile-${tone}`]].join(' ')}>
+      <span className={s.tileIcon} aria-hidden="true">{media ?? (icon && <Icon name={icon} size={24} />)}</span>
+      <span className={s.tileText}>
+        <span className={s.tileTitle}>{title}</span>
+        {meta && <span className={s.tileMeta}>{meta}</span>}
+      </span>
+    </Pressable>
+  );
+}
+
+/** Figma "Quick action": a 56px emerald circle with an icon and a Body small label under it. */
+export function QuickAction({ icon, label, ...press }: Press & { icon: IconName; label: string }) {
+  return (
+    <Pressable {...press} className={s.quick}>
+      <span className={s.quickCircle} aria-hidden="true"><Icon name={icon} size={24} /></span>
+      <span className={s.quickLabel}>{label}</span>
+    </Pressable>
+  );
+}
+
+/** Figma "Map card": an illustration, a title and meta, and a chevron, on the light grey surface. */
+export function MapCard({ title, meta, media, ...press }: Press & { title: string; meta?: ReactNode; media: ReactNode }) {
+  return (
+    <Pressable {...press} className={s.mapCard}>
+      <span className={s.mapMedia} aria-hidden="true">{media}</span>
+      <span className={s.itemText}>
+        <span className={s.itemTitle}>{title}</span>
+        {meta && <span className={s.itemMeta}>{meta}</span>}
+      </span>
+      <Icon name="chevron-right" size={24} className={s.chevron} />
+    </Pressable>
+  );
+}
+
+/** Figma "Stat strip" of "Stat"s: big numbers (Heading 1) with a label, on the light emerald surface. */
+export function StatStrip({ stats }: { stats: { value: ReactNode; label: string }[] }) {
+  return (
+    <dl className={s.stats}>
+      {stats.map((st) => (
+        <div key={st.label} className={s.stat}>
+          <dt className={s.statLabel}>{st.label}</dt>
+          <dd className={s.statValue}>{st.value}</dd>
+        </div>
+      ))}
+    </dl>
+  );
+}
+
+/** Figma "Profile Card": 40px avatar, name (Heading 2), email (Body small), chevron. */
+export function ProfileCard({ name, email, photo, avatar, ...press }: Press & { name: string; email?: ReactNode; photo?: string | null; avatar?: ReactNode }) {
+  return (
+    <Pressable {...press} className={s.profile}>
+      {avatar ?? <Avatar name={name} photo={photo} size={40} />}
+      <span className={s.itemText}>
+        <span className={s.profileName}>{name}</span>
+        {email && <span className={s.itemMeta}>{email}</span>}
+      </span>
+      {(press.to || press.onClick || press.href) && <Icon name="chevron-right" size={24} className={s.chevron} />}
+    </Pressable>
+  );
+}
+
+/** Figma "Option card" (Selected No / Yes): a big tappable choice with an icon and a Heading 3 label. */
+export function OptionCard({ icon, label, selected, onClick }: { icon: IconName; label: string; selected: boolean; onClick: () => void }) {
+  return (
+    <button type="button" className={[s.option, selected && s.optionSelected].filter(Boolean).join(' ')} aria-pressed={selected} onClick={onClick}>
+      <Icon name={icon} size={24} />
+      <span className={s.optionLabel}>{label}</span>
+    </button>
+  );
+}
+
+/** Figma "Search field": a white pill with a 24px icon and a Body input. */
+export function SearchField({ icon = 'pin', label, ...rest }: React.InputHTMLAttributes<HTMLInputElement> & { icon?: IconName; label: string }) {
+  return (
+    <label className={s.search}>
+      <Icon name={icon} size={24} />
+      <span className="visually-hidden">{label}</span>
+      <input type="search" enterKeyHint="search" autoComplete="off" {...rest} />
+    </label>
+  );
+}
+
+/** Figma "Step progress": "1 of 4" and four segments, filled up to the current step. On the bright emerald flow screen. */
+export function StepProgress({ step, of = 4 }: { step: number; of?: number }) {
+  return (
+    <div className={s.steps} role="progressbar" aria-valuemin={1} aria-valuemax={of} aria-valuenow={step} aria-label={`Step ${step} of ${of}`}>
+      <span className={s.stepCount} aria-hidden="true">{step} of {of}</span>
+      <span className={s.stepSegments} aria-hidden="true">
+        {Array.from({ length: of }, (_, i) => <span key={i} className={i < step ? s.stepOn : undefined} />)}
+      </span>
+    </div>
+  );
+}
+
+/** Figma "Destination header" (4 tones): flag, title and meta on an accent surface, and one Inverse button. */
+export function DestinationHeader({ tone, flag, title, meta, action }: { tone: 'orange' | 'green' | 'yellow' | 'pink'; flag: ReactNode; title: string; meta?: ReactNode; action?: ReactNode }) {
+  return (
+    <section className={[s.destination, s[`tile-${tone}`]].join(' ')}>
+      <div className={s.destinationTop}>
+        <span className={s.destinationFlag} aria-hidden="true">{flag}</span>
+        <span className={s.itemText}>
+          <span className={s.tileTitleSmall}>{title}</span>
+          {meta && <span className={s.tileMeta}>{meta}</span>}
+        </span>
+      </div>
+      {action}
+    </section>
+  );
+}

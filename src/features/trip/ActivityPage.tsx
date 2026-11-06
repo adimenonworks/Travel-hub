@@ -1,21 +1,22 @@
 import { useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
-import { Avatar, Badge, Button, Card, EmptyState, IconButton, LinkButton, List, ListRow, PageHeader, Section, Sheet, TextField } from '../../design/components';
+import { useParams } from 'react-router-dom';
+import { Button, EmptyState, EventCard, IconButton, LinkButton, ListGroup, ListItem, PageHeader, PageSection, Sheet, TextField, useToast } from '../../design/components';
 import { store } from '../../data';
 import { personName, useMe } from '../../data/hooks';
 import type { LinkItem } from '../../data/types';
 import { formatDay, formatTime } from '../../lib/dates';
 import { hostOf, isPdf, money, normalizeUrl } from '../../lib/format';
-import { mapsUrl, uberUrl } from '../../lib/geocode';
+import { mapsUrl } from '../../lib/geocode';
+import { haptic } from '../../lib/native';
 import { getMapsApp, mapsAppLabel } from '../../lib/prefs';
-import { categoryInfo } from '../../lib/categories';
 import { Comments } from '../shared/Comments';
 import { MapView } from '../shared/Map';
 import { ActivityForm } from './ActivityForm';
+import { eventCardProps } from './Overview';
 import type { TripCtx } from './TripPage';
 import s from './trip.module.css';
 
-/** One plan from the itinerary: when, where, who's going, and its tickets and bookings. */
+/** An event's own page (Figma "Event detail"): the Event card, its details, files and links, and comments. */
 export function ActivityPage(ctx: TripCtx) {
   const { activityId = '' } = useParams();
   const me = useMe();
@@ -23,109 +24,86 @@ export function ActivityPage(ctx: TripCtx) {
   const a = ctx.activities.find((x) => x.id === activityId);
   const [editing, setEditing] = useState(false);
   const [addingDoc, setAddingDoc] = useState(false);
-  const itinerary = `/trip/${trip.id}${a ? `?day=${a.date}` : ''}`;
+  const toast = useToast();
+  const itinerary = `/trip/${trip.id}/itinerary${a ? `?day=${a.date}` : ''}`;
 
   if (!a)
     return (
       <>
-        <PageHeader title="Plan not found" back={{ to: itinerary, label: 'Itinerary' }} />
-        <Card><EmptyState illustration="calendar" title="This plan was deleted" message="It may have been removed from the itinerary." action={<LinkButton to={itinerary} variant="secondary">Back to itinerary</LinkButton>} /></Card>
+        <PageHeader title="Event not found" back={{ to: itinerary, label: 'Itinerary' }} />
+        <EmptyState illustration="calendar" title="This event was deleted" message="It may have been removed from the itinerary." action={<LinkButton to={itinerary} variant="secondary">Back to itinerary</LinkButton>} />
       </>
     );
 
-  const cat = categoryInfo(a.category);
   const going = a.attendeeIds.includes(me.uid);
-  const time = a.startTime ? `${formatTime(a.startTime)}${a.endTime ? ` – ${formatTime(a.endTime)}` : ''}` : 'Any time';
+  const starred = !!a.starredBy?.includes(me.uid);
   const app = getMapsApp();
-  const removeDoc = (i: number) => {
+  const where = a.locationText || a.location?.name;
+  const removeDoc = async (i: number) => {
     const doc = a.links[i];
-    if (confirm(`Remove "${doc.label || hostOf(doc.url)}"?`)) store.updateSub(trip.id, 'activities', a.id, { links: a.links.filter((_, j) => j !== i) });
+    if (!confirm(`Remove "${doc.label || hostOf(doc.url)}"?`)) return;
+    try { await store.updateSub(trip.id, 'activities', a.id, { links: a.links.filter((_, j) => j !== i) }); toast({ icon: 'trash', label: 'Removed' }); }
+    catch { toast({ tone: 'error', label: "Couldn't delete. Check your connection" }); }
   };
+  const toggle = async (field: 'attendeeIds' | 'starredBy', on: boolean, label: string) => {
+    haptic('light');
+    try { await store.toggleInArray(trip.id, 'activities', a.id, field, me.uid, on); toast({ icon: field === 'starredBy' ? 'star' : 'check', label }); }
+    catch { toast({ tone: 'error', label: "Couldn't save. Check your connection" }); }
+  };
+  const goingNames = a.attendeeIds.map((id) => (id === me.uid ? 'you' : personName(profiles, id).split(' ')[0]));
 
   return (
     <>
-      <PageHeader
-        title={a.title}
-        subtitle={`${formatDay(a.date, { weekday: 'long', month: 'long', day: 'numeric' })} · ${time}`}
-        back={{ to: itinerary, label: 'Itinerary' }}
-        action={{ icon: 'pencil', label: 'Edit event', onClick: () => setEditing(true) }}
-      />
+      <PageHeader title={a.title} size="small" back={{ to: itinerary, label: 'Itinerary' }}
+        action={{ icon: 'pencil', label: 'Edit event', onClick: () => setEditing(true) }} />
 
-      <div className={s.planMeta}>
-        <Badge tone="category" icon={cat.icon}>{cat.label}</Badge>
-        {a.cost > 0 && <Badge>{money(a.cost, trip.currency)} per person</Badge>}
+      {/* Figma "Event detail": one template for every event type. Event card, then only the rows that have something. */}
+      <EventCard {...eventCardProps(a, ctx)} to={undefined} time={[formatDay(a.date, { weekday: 'short', day: 'numeric', month: 'short' }), a.startTime ? `${formatTime(a.startTime)}${a.endTime ? ` – ${formatTime(a.endTime)}` : ''}` : ''].filter(Boolean).join(', ')}
+        extras={starred ? [{ icon: 'star', label: 'Favourite' }] : undefined} />
+
+      <div className={s.planButtons}>
+        <Button block icon={going ? 'check' : 'plus'} variant={going ? 'secondary' : 'primary'} onClick={() => toggle('attendeeIds', !going, going ? 'You’re not going' : 'You’re going')}>{going ? 'You’re going' : 'I’m going'}</Button>
+        <Button block variant="secondary" icon="star" onClick={() => toggle('starredBy', !starred, starred ? 'Removed from favourites' : 'Added to favourites')}>{starred ? 'Favourite' : 'Add to favourites'}</Button>
       </div>
-      {a.notes && <Card><p className={s.actNotes}>{a.notes}</p></Card>}
 
-      <div className={s.planGrid}>
-        <div className={s.planCol}>
-          <Section title="Location"
-            footer={a.locationText && <>Opens in {mapsAppLabel(app)}. <Link to="/profile">Change your maps app</Link></>}>
-            {a.locationText ? (
-              <Card className={s.planLocation}>
-                {a.location && <MapView pins={[{ lat: a.location.lat, lng: a.location.lng, label: a.locationText }]} zoom={15} height={200} />}
-                <div className={s.planAddress}>{a.locationText}</div>
-                <div className={s.planButtons}>
-                  <LinkButton href={mapsUrl(a.locationText, a.location, app)} icon="map" variant="secondary">Open in {mapsAppLabel(app)}</LinkButton>
-                  <LinkButton href={uberUrl(a.locationText, a.location)} icon="car" variant="secondary">Get an Uber</LinkButton>
+      <PageSection title="Details">
+        <ListGroup label="Details">
+          {where && <ListItem icon="pin" title="Address" meta={where} href={mapsUrl(where, a.location, app)} label={`${where}: open in ${mapsAppLabel(app)}`} trailing={mapsAppLabel(app)} />}
+          <ListItem icon="people" title="Who’s going" meta={a.attendeeIds.length ? `${a.attendeeIds.length} of ${trip.memberIds.length}: ${goingNames.join(', ')}` : 'No one has said yet'} />
+          {a.cost > 0 && <ListItem icon="wallet" title="Cost" meta={`${money(a.cost, trip.currency)} per person · ${money(a.cost * Math.max(1, a.attendeeIds.length), trip.currency)} in all`} />}
+          {a.notes && <ListItem icon="pencil" title="Notes" meta={<span className={s.selectable}>{a.notes}</span>} />}
+        </ListGroup>
+        {a.location && <div className={s.planMap}><MapView pins={[{ lat: a.location.lat, lng: a.location.lng, label: where ?? a.title }]} zoom={15} height={180} /></div>}
+      </PageSection>
+
+      <PageSection title="Files & links" meta="Tickets, bookings and PDFs" action={<Button variant="ghost" size="regular" iconEnd="chevron-right" onClick={() => setAddingDoc(true)}>Add</Button>}>
+        {a.links.length > 0 ? (
+          <ListGroup label="Files and links">
+            {a.links.map((l, i) => {
+              const name = l.label || hostOf(l.url);
+              return (
+                <div key={i} className={s.docRow}>
+                  <ListItem icon={isPdf(l.url) ? 'doc' : 'link'} title={name} meta={`${hostOf(l.url)}${l.emailUrl ? ' · from email' : ''}`}
+                    trailing={isPdf(l.url) ? 'PDF' : undefined} href={l.url} label={`${name} (opens in a new tab)`} />
+                  {l.emailUrl && <LinkButton href={l.emailUrl} size="regular" variant="ghost" icon="mail" label={`Open the email for ${name}`} />}
+                  <IconButton icon="trash" label={`Remove ${name}`} onClick={() => removeDoc(i)} />
                 </div>
-              </Card>
-            ) : (
-              <Card><EmptyState illustration="map" title="No location yet" message="Add an address to get directions and an Uber in one tap."
-                action={<Button variant="secondary" icon="pencil" onClick={() => setEditing(true)}>Add location</Button>} /></Card>
-            )}
-          </Section>
+              );
+            })}
+          </ListGroup>
+        ) : <p className="t-body-small t-secondary">Nothing attached yet. Add a ticket, confirmation or booking link.</p>}
+      </PageSection>
 
-          <Section title="Who’s going"
-            action={<Button size="regular" variant={going ? 'primary' : 'secondary'} icon={going ? 'check' : 'plus'}
-              onClick={() => store.toggleInArray(trip.id, 'activities', a.id, 'attendeeIds', me.uid, !going)}>{going ? "I'm in" : 'Join'}</Button>}>
-            {a.attendeeIds.length ? (
-              <List>
-                {a.attendeeIds.map((id) => (
-                  <ListRow key={id} leading={<Avatar name={personName(profiles, id)} photo={profiles[id]?.photo} seed={id} size={40} />}
-                    title={id === me.uid ? `${personName(profiles, id)} (you)` : personName(profiles, id)} />
-                ))}
-              </List>
-            ) : (
-              <div className={s.emptyNote}>No one has joined yet.</div>
-            )}
-          </Section>
-        </div>
-
-        <div className={s.planCol}>
-          <Section title="Documents" action={<Button size="regular" variant="secondary" icon="plus" onClick={() => setAddingDoc(true)}>Add</Button>}
-            footer="Tickets, bookings and PDFs. Add the email it came from to find it again quickly.">
-            {a.links.length ? (
-              <List>
-                {a.links.map((l, i) => {
-                  const name = l.label || hostOf(l.url);
-                  return (
-                    <ListRow key={i} icon={isPdf(l.url) ? 'doc' : 'link'}
-                      title={<a href={l.url} target="_blank" rel="noreferrer" className={s.docLink}>{name}<span className="visually-hidden"> (opens in a new tab)</span></a>}
-                      subtitle={`${isPdf(l.url) ? 'PDF · ' : ''}${hostOf(l.url)}${l.emailUrl ? ' · from email' : ''}`}
-                      trailing={
-                        <span className={s.docActions}>
-                          {l.emailUrl && <LinkButton href={l.emailUrl} size="regular" variant="ghost" icon="mail" label={`Open the email for ${name}`} />}
-                          <IconButton icon="trash" size="regular" label={`Remove ${name}`} onClick={() => removeDoc(i)} />
-                        </span>
-                      } />
-                  );
-                })}
-              </List>
-            ) : (
-              <div className={s.emptyNote}>No documents yet.</div>
-            )}
-          </Section>
-
-          <Section title="Comments">
-            <Card><Comments tripId={trip.id} targetId={a.id} comments={ctx.comments} profiles={profiles} /></Card>
-          </Section>
-        </div>
-      </div>
+      <PageSection title="Comments">
+        <Comments tripId={trip.id} targetId={a.id} comments={ctx.comments} profiles={profiles} />
+      </PageSection>
 
       <ActivityForm open={editing} trip={trip} date={a.date} activity={a} onClose={() => setEditing(false)} />
       <DocumentForm open={addingDoc} onClose={() => setAddingDoc(false)}
-        onAdd={(d) => store.updateSub(trip.id, 'activities', a.id, { links: [...a.links, d] })} />
+        onAdd={async (d) => {
+          try { await store.updateSub(trip.id, 'activities', a.id, { links: [...a.links, d] }); toast({ icon: 'check', label: 'Added' }); }
+          catch { toast({ tone: 'error', label: "Couldn't save. Check your connection" }); }
+        }} />
     </>
   );
 }

@@ -3,10 +3,10 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { BottomNav, Notification, ToastProvider, type NavTab } from '../design/components';
 import { store } from '../data';
 import { screenKey, useScreenTransition } from './navigation';
-import { TripForm } from '../features/trip/TripForm';
+import { NewTrip } from '../features/trip/NewTrip';
 import s from './Shell.module.css';
 
-/** Opens the "New trip" sheet from anywhere (e.g. the home page's plan tile). */
+/** Opens the full-screen New trip flow from anywhere (Home, Trips). */
 const NewTripContext = createContext<() => void>(() => {});
 export const useNewTrip = () => useContext(NewTripContext);
 
@@ -17,7 +17,7 @@ const TABS: NavTab[] = [
   { to: '/profile', label: 'You', icon: 'person', active: (p) => p.startsWith('/profile') },
 ];
 
-/** App frame: the page and the Bottom Nav. The New trip sheet lives here so any page can open it. */
+/** App frame: the page and the Bottom Nav. The New trip flow lives here so any page can open it. */
 export function Shell({ children }: { children: ReactNode }) {
   const navigate = useNavigate();
   const [creating, setCreating] = useState(false);
@@ -40,7 +40,7 @@ export function Shell({ children }: { children: ReactNode }) {
           <div key={screenKey(pathname)} className={transition === 'none' ? undefined : s[transition]}>{children}</div>
         </main>
         {showNav && <BottomNav tabs={tabs} />}
-        <TripForm open={creating} onClose={() => setCreating(false)} onSaved={(id) => navigate(`/trip/${id}`)} />
+        <NewTrip open={creating} onClose={() => setCreating(false)} onOpenTrip={(id) => navigate(`/trip/${id}`)} />
       </div>
       </ToastProvider>
     </NewTripContext.Provider>

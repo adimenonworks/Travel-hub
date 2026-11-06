@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Button, Card, EmptyState, Icon, IconButton, LinkButton, Sheet, TextField } from '../../design/components';
+import { Button, COVER_ILLUSTRATIONS, EmptyState, IconButton, Illustration, SectionHeader, Sheet, TextField } from '../../design/components';
 import { store } from '../../data';
 import { personName, useMe } from '../../data/hooks';
 import type { Album } from '../../data/types';
@@ -21,21 +21,14 @@ export function Photos(ctx: TripCtx) {
 
   return (
     <>
-      <div className={s.dayHead}>
-        <div>
-          <h2 className="t-heading-1">Photos</h2>
-          <div className={s.dayBudget}>Shared albums for this trip. Anyone on the trip can add one.</div>
-        </div>
-        <Button icon="plus" onClick={() => setEditing('new')}>Add album</Button>
-      </div>
+      <SectionHeader title="Shared albums" meta="Anyone on the trip can add one"
+        action={<Button variant="ghost" size="regular" iconEnd="chevron-right" onClick={() => setEditing('new')}>Add album</Button>} />
       {sorted.length === 0 ? (
-        <Card>
-          <EmptyState illustration="memories" title="No albums yet"
-            message="Make a shared album in Google Photos or Apple Photos, then add its link here so everyone can find the pictures." />
-        </Card>
+        <EmptyState illustration="memories" title="No albums yet"
+          message="Make a shared album in Google Photos or Apple Photos, then add its link here so everyone can find the pictures." />
       ) : (
         <div className={s.albumGrid}>
-          {sorted.map((a) => <AlbumCard key={a.id} album={a} ctx={ctx} onEdit={() => setEditing(a)} />)}
+          {sorted.map((a, i) => <AlbumCard key={a.id} album={a} ctx={ctx} index={i} onEdit={() => setEditing(a)} />)}
         </div>
       )}
       <AlbumForm open={!!editing} tripId={trip.id} album={editing === 'new' ? undefined : editing ?? undefined}
@@ -44,26 +37,22 @@ export function Photos(ctx: TripCtx) {
   );
 }
 
-function AlbumCard({ album, ctx, onEdit }: { album: Album; ctx: TripCtx; onEdit: () => void }) {
+/** An album as a Figma "Card" with a cover scene on top: the whole card opens the album; the pencil edits it. */
+function AlbumCard({ album, ctx, index, onEdit }: { album: Album; ctx: TripCtx; index: number; onEdit: () => void }) {
   const me = useMe();
   const provider = albumProvider(album.url);
   const canEdit = ctx.canManage || album.createdBy === me.uid;
   return (
-    <Card flush className={s.album}>
-      <div className={s.albumCover} >
-        <Icon name="photo" size={40} />
-      </div>
+    <article className={s.album}>
+      <div className={s.albumCover} aria-hidden="true"><Illustration name={COVER_ILLUSTRATIONS[index % COVER_ILLUSTRATIONS.length]} /></div>
       <div className={s.albumBody}>
         <div className={s.albumText}>
-          <h3 className="t-heading-3">{album.title}</h3>
+          <h3 className={s.albumTitle}><a href={album.url} target="_blank" rel="noreferrer" className={s.albumLink}>{album.title}<span className="visually-hidden"> (opens {providerName[provider]})</span></a></h3>
           <div className="t-body-small t-secondary">{providerName[provider]} · added by {album.createdBy === me.uid ? 'you' : personName(ctx.profiles, album.createdBy)}</div>
         </div>
-        <div className={s.albumActions}>
-          <LinkButton href={album.url} size="regular" icon="arrow-up-right">Open album</LinkButton>
-          {canEdit && <IconButton icon="pencil" size="regular" label={`Edit ${album.title}`} onClick={onEdit} />}
-        </div>
+        {canEdit && <IconButton icon="pencil" label={`Edit ${album.title}`} onClick={onEdit} className={s.albumEdit} />}
       </div>
-    </Card>
+    </article>
   );
 }
 
