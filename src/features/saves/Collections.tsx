@@ -1,6 +1,7 @@
 import { useMemo, useState, type ReactNode } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Button, Card, Chip, EmptyState, Icon, Illustration, LinkButton, ListGroup, ListItem, MapCard, PageHeader, PageSkeleton, Select, Sheet, useToast } from '../../design/components';
+import { Button, Card, Chip, DestinationHeader, EmptyState, Icon, Illustration, LinkButton, ListGroup, ListItem, MapCard, PageHeader, PageSection, PageSkeleton, Select, Sheet, useToast } from '../../design/components';
+import { hostOf } from '../../lib/format';
 import { store } from '../../data';
 import { useActivitiesFor, useMyTrips, usePlaces } from '../../data/hooks';
 import type { PlaceCategory, SavedPlace } from '../../data/types';
@@ -106,11 +107,15 @@ export function PlaceSheet({ place, onClose }: { place: SavedPlace | null; onClo
   );
 }
 
-type Filter = 'all' | 'visited' | PlaceCategory;
+type Filter = 'all' | 'places' | 'links' | 'notes' | 'visited';
+const kindOf = (p: SavedPlace) => p.type ?? 'place';
+const SHOW = 3;
 
 /**
- * A country's collection (Trips → Saved → a country): its Places by city, then category, unvisited first, with
- * ✓ visited and ★ favourite. Chips filter by category and Visited. "Unsorted" holds saves with no country.
+ * A country's collection (Figma "Saved destination"): the neutral flag-led header ("24 saves · 3 cities · Saved by
+ * you"), filter Chips (All · Places · Links · Notes, and Visited once something is), the map card, a section per city
+ * (three Places, "See all n" for the rest; unvisited first, with ★ and ✓) and Links & notes last. A Place opens its
+ * sheet, where it's moved, recategorised or deleted.
  */
 export function CountryCollection() {
   const { country = '' } = useParams();
@@ -119,17 +124,29 @@ export function CountryCollection() {
   const navigate = useNavigate();
   const openSave = useSave();
   const [filter, setFilter] = useState<Filter>('all');
+  const [expanded, setExpanded] = useState<string[]>([]);
   const [open, setOpen] = useState<string | null>(null);
   const [map, setMap] = useState(false);
   const code = country === 'unsorted' ? '' : country;
   const mine = useMemo(() => (all ?? []).filter((p) => p.countryCode === code), [all, code]);
   if (all === null) return <PageSkeleton />;
   const title = code ? countryName(code) : 'Unsorted';
-  const shown = sortPlaces(mine.filter((p) => filter === 'all' || (filter === 'visited' ? visited.has(p.id) : p.category === filter)), visited);
-  const cats = PLACE_CATEGORIES.filter((c) => mine.some((p) => p.category === c.value));
-  const pins = mine.filter((p) => p.lat != null && p.lng != null).map((p) => ({ lat: p.lat!, lng: p.lng!, label: p.name }));
-  const cities = groupBy(shown, cityOf);
+  const places = mine.filter((p) => kindOf(p) === 'place');
+  const links = mine.filter((p) => kindOf(p) === 'link'), notes = mine.filter((p) => kindOf(p) === 'note');
+  const showPlaces = filter === 'all' || filter === 'places' || filter === 'visited';
+  const cityList = sortPlaces(places.filter((p) => filter !== 'visited' || visited.has(p.id)), visited);
+  const cities = showPlaces ? groupBy(cityList, cityOf) : [];
+  const extras = filter === 'all' ? [...links, ...notes] : filter === 'links' ? links : filter === 'notes' ? notes : [];
+  const pins = places.filter((p) => p.lat != null && p.lng != null).map((p) => ({ lat: p.lat!, lng: p.lng!, label: p.name }));
   const live = open ? mine.find((p) => p.id === open) ?? null : null;
+  const cityCount = new Set(places.map(cityOf)).size;
+  const filters: { value: Filter; label: string; n: number }[] = [
+    { value: 'all', label: 'All', n: mine.length }, { value: 'places', label: 'Places', n: places.length },
+    { value: 'links', label: 'Links', n: links.length }, { value: 'notes', label: 'Notes', n: notes.length },
+    ...(places.some((p) => visited.has(p.id)) ? [{ value: 'visited' as Filter, label: 'Visited', n: places.filter((p) => visited.has(p.id)).length }] : []),
+  ];
+  const seeAll = (key: string, n: number) => n > SHOW && !expanded.includes(key)
+    ? <Button variant="ghost" size="regular" iconEnd="chevron-right" onClick={() => setExpanded((x) => [...x, key])}>{`See all ${n}`}</Button> : undefined;
 
   return (
     <Content>
@@ -139,27 +156,35 @@ export function CountryCollection() {
           action={<Button icon="plus" onClick={() => { openSave({ mode: 'link' }); navigate('/trips'); }}>Save a place</Button>} />
       ) : (
         <>
+          <DestinationHeader flag={code ? <img src={flagUrl(code)} alt="" /> : <Icon name="lightbulb" size={24} />}
+            title={`${mine.length} save${mine.length === 1 ? '' : 's'}${cityCount > 1 ? ` · ${cityCount} cities` : ''}`} meta="Saved by you" />
           <ul className={s.chips} aria-label="Filter">
-            {([{ value: 'all', label: 'All' }, ...cats, ...(mine.some((p) => visited.has(p.id)) ? [{ value: 'visited', label: 'Visited' }] : [])] as { value: Filter; label: string }[]).map((f) => (
-              <li key={f.value}><Chip active={filter === f.value} onClick={() => { haptic('selection'); setFilter(f.value); }} label={`${f.label}${filter === f.value ? ', selected' : ''}`}>{f.label}</Chip></li>
+            {filters.map((f) => (
+              <li key={f.value}><Chip active={filter === f.value} onClick={() => { haptic('selection'); setFilter(f.value); }} label={`${f.label}, ${f.n}${filter === f.value ? ', selected' : ''}`}>{`${f.label} ${f.n}`}</Chip></li>
             ))}
           </ul>
-          {pins.length > 0 && <MapCard media={<Illustration name="map" size={72} />} title={`See ${pins.length} place${pins.length === 1 ? '' : 's'} on a map`}
-            meta={[...new Set(mine.map(cityOf))].slice(0, 3).join(', ')} onClick={() => setMap(true)} />}
-          {cities.length === 0 && <p className="t-body t-secondary">Nothing matches this filter.</p>}
+          {showPlaces && pins.length > 0 && <MapCard media={<Illustration name="map" size={72} />} title={`See ${pins.length} place${pins.length === 1 ? '' : 's'} on a map`}
+            meta={[...new Set(places.map(cityOf))].slice(0, 3).join(', ')} onClick={() => setMap(true)} />}
+          {cities.length === 0 && extras.length === 0 && <p className="t-body t-secondary">Nothing matches this filter.</p>}
           {cities.map(([city, list]) => (
-            <section key={city} className={s.citySection} aria-label={city}>
-              <h2 className="t-heading-2">{city}</h2>
-              {groupBy(list, (p) => p.category).map(([cat, items]) => (
-                <div key={cat} className={s.category}>
-                  <h3 className={s.categoryTitle}><Icon name={placeCategory(cat as PlaceCategory).icon} size={16} />{placeCategory(cat as PlaceCategory).label}</h3>
-                  <ListGroup label={`${city}, ${placeCategory(cat as PlaceCategory).label}`}>
-                    {items.map((p) => <PlaceRow key={p.id} place={p} visited={visited.has(p.id)} starred={starred(p)} onClick={() => setOpen(p.id)} />)}
-                  </ListGroup>
-                </div>
-              ))}
-            </section>
+            <PageSection key={city} title={city} action={seeAll(city, list.length)}>
+              <ListGroup label={city}>
+                {(expanded.includes(city) ? list : list.slice(0, SHOW)).map((p) => (
+                  <PlaceRow key={p.id} place={p} visited={visited.has(p.id)} starred={starred(p)} onClick={() => setOpen(p.id)} />
+                ))}
+              </ListGroup>
+            </PageSection>
           ))}
+          {extras.length > 0 && (
+            <PageSection title="Links & notes" action={seeAll('links', extras.length)}>
+              <ListGroup label="Links and notes">
+                {(expanded.includes('links') ? extras : extras.slice(0, SHOW)).map((p) => (
+                  <ListItem key={p.id} icon={kindOf(p) === 'note' ? 'lightbulb' : 'link'} title={p.name} onClick={() => setOpen(p.id)}
+                    meta={[kindOf(p) === 'note' ? 'Note' : p.kind || 'Link', p.notes && kindOf(p) === 'note' ? p.notes.split('\n')[0] : p.url ? hostOf(p.url) : null].filter(Boolean).join(' · ')} />
+                ))}
+              </ListGroup>
+            </PageSection>
+          )}
         </>
       )}
       <PlaceSheet place={live} onClose={() => setOpen(null)} />
@@ -187,24 +212,22 @@ export function placeCounts(list: SavedPlace[]) {
 }
 
 /**
- * Favourites (You → Favourite places → See all): every Place you've starred. Chips filter by category, with a second
- * row of Chips for the city.
+ * Favourites (You → Favourite places → See all): every Place you've starred. Chips filter by country (All, then each
+ * country with its flag); the page is sectioned by city ("Lisbon", "Portugal · 3 places"), each Place with its ★.
  */
 export function Favourites() {
   const all = usePlaces();
   const { visited, starred } = usePlaceMarks();
-  const [cat, setCat] = useState<PlaceCategory | 'all'>('all');
-  const [city, setCity] = useState<string>('all');
+  const [country, setCountry] = useState<string>('all');
   const [open, setOpen] = useState<string | null>(null);
   if (all === null) return <PageSkeleton />;
   const favs = sortPlaces(all.filter(starred), visited);
-  const cats = PLACE_CATEGORIES.filter((c) => favs.some((p) => p.category === c.value));
-  const inCat = favs.filter((p) => cat === 'all' || p.category === cat);
-  const cities = [...new Set(inCat.map(cityOf))];
-  const shown = inCat.filter((p) => city === 'all' || cityOf(p) === city);
+  const countries = [...new Set(favs.map((p) => p.countryCode))];
+  const shown = favs.filter((p) => country === 'all' || p.countryCode === country);
+  const cities = groupBy(shown, cityOf);
   const live = open ? all.find((p) => p.id === open) ?? null : null;
-  const chip = (active: boolean, label: string, onClick: () => void) => (
-    <li key={label}><Chip active={active} onClick={() => { haptic('selection'); onClick(); }} label={`${label}${active ? ', selected' : ''}`}>{label}</Chip></li>
+  const chip = (key: string, label: string, flag?: string) => (
+    <li key={key}><Chip active={country === key} flag={flag} onClick={() => { haptic('selection'); setCountry(key); }} label={`${label}${country === key ? ', selected' : ''}`}>{label}</Chip></li>
   );
   return (
     <Content>
@@ -213,20 +236,21 @@ export function Favourites() {
         <Card media={<Illustration name="memories" size={120} />} title="No favourites yet" body="Star a place in your collections, or an idea or event on a trip, and it shows here." />
       ) : (
         <>
-          <ul className={s.chips} aria-label="Category">
-            {chip(cat === 'all', 'All', () => { setCat('all'); setCity('all'); })}
-            {cats.map((c) => chip(cat === c.value, c.label, () => { setCat(c.value); setCity('all'); }))}
+          <ul className={s.chips} aria-label="Country">
+            {chip('all', 'All')}
+            {countries.map((c) => chip(c, c ? countryName(c) : 'Unsorted', c ? flagUrl(c) : undefined))}
           </ul>
-          {cities.length > 0 && (
-            <ul className={s.chips} aria-label="City">
-              {chip(city === 'all', 'Every city', () => setCity('all'))}
-              {cities.map((c) => chip(city === c, c, () => setCity(c)))}
-            </ul>
-          )}
-          <ListGroup label="Favourite places">
-            {shown.map((p) => <PlaceRow key={p.id} place={p} visited={visited.has(p.id)} starred
-              meta={[placeCategory(p.category).one, p.city, p.countryCode ? countryName(p.countryCode) : null].filter(Boolean).join(' · ')} onClick={() => setOpen(p.id)} />)}
-          </ListGroup>
+          {cities.map(([city, list]) => {
+            const cc = list[0].countryCode;
+            return (
+              <PageSection key={city} title={city} meta={[cc ? countryName(cc) : null, `${list.length} place${list.length === 1 ? '' : 's'}`].filter(Boolean).join(' · ')}>
+                <ListGroup label={city}>
+                  {list.map((p) => <PlaceRow key={p.id} place={p} visited={visited.has(p.id)} starred onClick={() => setOpen(p.id)}
+                    meta={[p.kind || placeCategory(p.category).one, p.source ? `from ${p.source}` : null].filter(Boolean).join(' · ')} />)}
+                </ListGroup>
+              </PageSection>
+            );
+          })}
         </>
       )}
       <PlaceSheet place={live} onClose={() => setOpen(null)} />

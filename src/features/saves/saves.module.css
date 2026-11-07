@@ -24,7 +24,11 @@
 .check { flex: none; color: var(--on-light-icon-brand); }
 .flag { width: 32px; height: 32px; border-radius: 50%; }
 /* Saved destination */
-.chips { margin: 0; padding: 0; list-style: none; display: flex; flex-wrap: wrap; gap: var(--space-default-300); }
+/* Filter chips: one row that scrolls sideways under the gutter (Figma "Filters (scroll)"); 7px above and below keeps
+   each chip's 44px tap area inside the scroll box */
+.chips { margin: 0 calc(-1 * var(--space-gutter)); padding: var(--space-default-200) var(--space-gutter); list-style: none; display: flex; gap: var(--space-default-300); overflow-x: auto; scrollbar-width: none; scroll-padding-inline: var(--space-gutter); }
+.chips::-webkit-scrollbar { display: none; }
+.chips > li { flex: none; }
 .saveImage { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; border-radius: var(--radius-500); }
 .map { border-radius: var(--radius-600); overflow: hidden; }
 /* Saved for later on Home: tiles in a row that scrolls sideways (Figma: 156 wide) */
