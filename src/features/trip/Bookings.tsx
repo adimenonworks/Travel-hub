@@ -2,6 +2,7 @@ import { useParams } from 'react-router-dom';
 import { EventCard, ListGroup, ListItem, PageHeader, PageSection, SectionHeader, EmptyState } from '../../design/components';
 import { formatDay } from '../../lib/dates';
 import { hostOf, isPdf } from '../../lib/format';
+import { recordView } from '../../lib/recent';
 import { BOOKING_GROUPS, eventType } from '../../lib/categories';
 import { byTime } from './Itinerary';
 import { eventCardProps } from './events';
@@ -28,6 +29,7 @@ export function Bookings(ctx: TripCtx) {
             {docs.map(({ a, l }, i) => (
               <ListItem key={`${a.id}-${i}`} icon={isPdf(l.url) ? 'doc' : 'link'} title={l.label || hostOf(l.url)}
                 meta={`${a.title} · ${formatDay(a.date)}`} trailing={isPdf(l.url) ? 'PDF' : undefined} href={l.url}
+                onClick={() => recordView(trip.id, { url: l.url, label: l.label || hostOf(l.url), meta: a.title })}
                 label={`${l.label || hostOf(l.url)}, for ${a.title} (opens in a new tab)`} />
             ))}
           </ListGroup>

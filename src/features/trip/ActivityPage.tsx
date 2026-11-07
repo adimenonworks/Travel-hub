@@ -10,6 +10,7 @@ import { hostOf, isPdf, normalizeUrl } from '../../lib/format';
 import { mapsUrl } from '../../lib/geocode';
 import { haptic } from '../../lib/native';
 import { priceOf } from '../../lib/currency';
+import { recordView } from '../../lib/recent';
 import { PriceWithConversion } from '../shared/Price';
 import { eventType } from '../../lib/categories';
 import { getMapsApp, mapsAppLabel } from '../../lib/prefs';
@@ -105,7 +106,8 @@ export function ActivityPage(ctx: TripCtx) {
               return (
                 <div key={i} className={s.docRow}>
                   <ListItem icon={isPdf(l.url) ? 'doc' : 'link'} title={name} meta={`${hostOf(l.url)}${l.emailUrl ? ' · from email' : ''}`}
-                    trailing={isPdf(l.url) ? 'PDF' : undefined} href={l.url} label={`${name} (opens in a new tab)`} />
+                    trailing={isPdf(l.url) ? 'PDF' : undefined} href={l.url} label={`${name} (opens in a new tab)`}
+                    onClick={() => recordView(trip.id, { url: l.url, label: name, meta: a.title })} />
                   {l.emailUrl && <LinkButton href={l.emailUrl} size="regular" variant="ghost" icon="mail" label={`Open the email for ${name}`} />}
                   <IconButton icon="trash" label={`Remove ${name}`} onClick={() => removeDoc(i)} />
                 </div>

@@ -3,12 +3,13 @@ import type { LinkItem } from '../../data/types';
 import { hostOf, isPdf, normalizeUrl } from '../../lib/format';
 import s from './shared.module.css';
 
-export function LinkChips({ links }: { links: LinkItem[] }) {
+/** Links as chips. `onOpen` hears which one was opened (for Recently viewed). */
+export function LinkChips({ links, onOpen }: { links: LinkItem[]; onOpen?: (l: LinkItem) => void }) {
   if (!links.length) return null;
   return (
     <div className={s.links}>
       {links.map((l, i) => (
-        <a key={i} href={l.url} target="_blank" rel="noreferrer" className={s.chip} onClick={(e) => e.stopPropagation()}>
+        <a key={i} href={l.url} target="_blank" rel="noreferrer" className={s.chip} onClick={(e) => { e.stopPropagation(); onOpen?.(l); }}>
           <Icon name={isPdf(l.url) ? 'doc' : 'link'} size={16} />
           <span>{l.label || hostOf(l.url)}</span>
         </a>

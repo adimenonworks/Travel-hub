@@ -10,6 +10,8 @@ import { usePlaceMarks } from '../saves/placeMarks';
 import { haptic } from '../../lib/native';
 import { CATEGORIES, categoryInfo, eventType } from '../../lib/categories';
 import { priceOf, priceText } from '../../lib/currency';
+import { recordView } from '../../lib/recent';
+import { hostOf } from '../../lib/format';
 import { PriceField, PriceWithConversion, fromPriceDraft, toPriceDraft, type PriceDraft } from '../shared/Price';
 import { Comments } from '../shared/Comments';
 import { LinkChips, LinkEditor, cleanLinks } from '../shared/Links';
@@ -164,7 +166,7 @@ function IdeaSheet({ idea, place, ctx, onClose, onEdit, onSchedule }: { idea: Id
       {place && <PlaceMarks visited={visited.has(place.id)} starred={starred(place)} />}
       {priceOf(idea, ctx.trip) && <p className="t-body">Price: <PriceWithConversion price={priceOf(idea, ctx.trip)!} /></p>}
       {(idea.notes || place?.notes) && <p className="t-body">{idea.notes || place?.notes}</p>}
-      <LinkChips links={idea.links} />
+      <LinkChips links={idea.links} onOpen={(l) => recordView(ctx.trip.id, { url: l.url, label: l.label || hostOf(l.url), meta: idea.title })} />
       {place && (
         <div className={s.ideaButtons}>
           {place.url && <LinkButton href={place.url} variant="secondary" icon="arrow-up-right">{`Open on ${place.source || 'the web'}`}</LinkButton>}

@@ -10,7 +10,7 @@ type Press = { to?: string; href?: string; onClick?: () => void; label?: string 
 /** Renders as a link, an external link, a button or a plain element, so every row and card can be tapped the same way. */
 function Pressable({ to, href, onClick, label, className, children, role }: Press & { className: string; children: ReactNode; role?: string }) {
   if (to) return <Link to={to} className={`${className} ${s.pressable}`} aria-label={label} role={role}>{children}</Link>;
-  if (href) return <a href={href} target="_blank" rel="noreferrer" className={`${className} ${s.pressable}`} aria-label={label} role={role}>{children}</a>;
+  if (href) return <a href={href} target="_blank" rel="noreferrer" onClick={onClick} className={`${className} ${s.pressable}`} aria-label={label} role={role}>{children}</a>;
   if (onClick) return <button type="button" onClick={onClick} className={`${className} ${s.pressable}`} aria-label={label} role={role}>{children}</button>;
   return <div className={className} role={role}>{children}</div>;
 }

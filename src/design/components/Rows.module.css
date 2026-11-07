@@ -109,7 +109,7 @@
 .tileIcon { display: grid; place-items: center; width: 40px; height: 40px; border-radius: var(--radius-1000); background: var(--on-light-surface-secondary); color: var(--on-light-icon-primary); overflow: hidden; }
 .tileIcon img { width: 24px; height: 24px; border-radius: 50%; }
 .tileText { display: flex; flex-direction: column; gap: var(--space-default-100); min-width: 0; }
-.tileTitle { font: var(--type-heading-2); letter-spacing: -0.02em; color: var(--on-light-text-primary); overflow-wrap: anywhere; }
+.tileTitle { font: var(--type-heading-2); letter-spacing: -0.02em; color: var(--on-light-text-primary); overflow-wrap: break-word; } /* wraps between words; only a word too long for the tile breaks */
 .tileTitleSmall { font: var(--type-heading-3); letter-spacing: -0.02em; color: var(--on-light-text-primary); }
 .tileMeta { font: var(--type-body-small); color: var(--on-light-text-secondary); }
 .tile-orange, .tile-green, .tile-yellow, .tile-pink { border-color: transparent; }

@@ -70,8 +70,11 @@
 
 /* Overview: sections 32 apart */
 .overview { display: flex; flex-direction: column; gap: var(--space-stack); }
-/* Bookings tiles: two columns, 8 apart (one column when text is very large) */
-.tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(calc(130rem / 17), 1fr)); gap: var(--space-default-300); }
+/* Next stop: the Event card on the brand surface. 8 around it, so its corners are 16 + 8 = 24 (radius/600). */
+.nextStop { padding: var(--space-default-300); border-radius: var(--radius-600); background: var(--on-light-surface-brand); }
+/* Bookings tiles: two columns, 8 apart (one column when text is very large). Tiles in a row stretch to the same
+   height; titles keep their size and wrap between words. */
+.tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(calc(130rem / 17), 1fr)); align-items: stretch; gap: var(--space-default-300); }
 .flagThumb { width: 32px; height: 32px; border-radius: 50%; }
 /* Event cards and their Travel connectors, 8 apart */
 .eventList { display: flex; flex-direction: column; gap: var(--space-default-300); }
