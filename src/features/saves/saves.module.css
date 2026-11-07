@@ -24,9 +24,9 @@
 .check { flex: none; color: var(--on-light-icon-brand); }
 .flag { width: 32px; height: 32px; border-radius: 50%; }
 /* Saved destination */
-/* Filter chips: one row that scrolls sideways under the gutter (Figma "Filters (scroll)"); 7px above and below keeps
-   each chip's 44px tap area inside the scroll box */
-.chips { margin: 0 calc(-1 * var(--space-gutter)); padding: var(--space-default-200) var(--space-gutter); list-style: none; display: flex; gap: var(--space-default-300); overflow-x: auto; scrollbar-width: none; scroll-padding-inline: var(--space-gutter); }
+/* Filter chips: one row that scrolls sideways under the gutter (Figma "Filters (scroll)"). 8 above and below (taken
+   back with negative margins) keeps each chip's 44px tap area inside the scroll box, which would otherwise clip it. */
+.chips { margin: calc(-1 * var(--space-default-300)) calc(-1 * var(--space-gutter)); padding: var(--space-default-300) var(--space-gutter); list-style: none; display: flex; gap: var(--space-default-300); overflow-x: auto; scrollbar-width: none; scroll-padding-inline: var(--space-gutter); }
 .chips::-webkit-scrollbar { display: none; }
 .chips > li { flex: none; }
 .saveImage { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; border-radius: var(--radius-500); }
