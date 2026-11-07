@@ -14,7 +14,7 @@ export const EVENT_TYPES: { value: EventType; label: string; icon: IconName; hin
   { value: 'transport', label: 'Transport', icon: 'train', hint: 'Train, bus, ferry, tram, taxi or car hire' },
   { value: 'food', label: 'Food & drink', icon: 'utensils', hint: 'Restaurants, cafés and bars' },
   { value: 'activity', label: 'Activity', icon: 'ticket', hint: 'Sights, tours, shows and things to do' },
-  { value: 'note', label: 'Note', icon: 'pencil', hint: 'A reminder, with or without a time' },
+  { value: 'note', label: 'Note', icon: 'notebook', hint: 'A reminder, with or without a time' },
 ];
 
 /** Older events used finer types; each folds into one of the six. */

@@ -119,7 +119,7 @@ export function SaveSheet({ request, onClose }: { request: SaveRequest | null; o
       {!preview && (
         <div className={s.modes} role="group" aria-label="How to save">
           <Chip active={mode === 'link'} icon="link" onClick={() => setMode('link')} label={`Paste a link${mode === 'link' ? ', selected' : ''}`}>Paste a link</Chip>
-          <Chip active={mode === 'place'} icon="pin" onClick={() => setMode('place')} label={`Search${mode === 'place' ? ', selected' : ''}`}>Search</Chip>
+          <Chip active={mode === 'place'} icon="search" onClick={() => setMode('place')} label={`Search${mode === 'place' ? ', selected' : ''}`}>Search</Chip>
         </div>
       )}
 

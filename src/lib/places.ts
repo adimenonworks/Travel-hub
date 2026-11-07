@@ -8,7 +8,7 @@ export const PLACE_CATEGORIES: { value: PlaceCategory; label: string; one: strin
   { value: 'restaurant', label: 'Restaurants', one: 'Restaurant', icon: 'utensils' },
   { value: 'cafe', label: 'Cafés', one: 'Café', icon: 'coffee' },
   { value: 'bar', label: 'Bars', one: 'Bar', icon: 'cocktail' },
-  { value: 'shop', label: 'Shops', one: 'Shop', icon: 'wallet' },
+  { value: 'shop', label: 'Shops', one: 'Shop', icon: 'shopping-bag' },
   { value: 'stay', label: 'Stays', one: 'Stay', icon: 'bed' },
   { value: 'sight', label: 'Sights & activities', one: 'Sight', icon: 'camera' },
 ];

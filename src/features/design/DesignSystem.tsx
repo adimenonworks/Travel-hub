@@ -274,7 +274,7 @@ export function DesignSystem() {
           <TravelConnector label="About 20 min by car" icon="car" />
           <EventCard icon="plane" layout="journey" title="Lisbon → Porto" time="TP1946" place="TAP Air Portugal" amount="€89" status="Check-in open" to="/design"
             journey={{ fromTime: '08:30', fromPlace: 'LIS · T1', duration: '55m · direct', toTime: '09:25', toPlace: 'OPO' }} />
-          <EventCard icon="pencil" layout="note" title="Bag drop closes 40 min before" place="Sam has the passports" />
+          <EventCard icon="notebook" layout="note" title="Bag drop closes 40 min before" place="Sam has the passports" />
         </Section>
 
         <Section title="Rows, groups and tiles" footer="Section header, List group of List items (Default / Compact), Idea rows with Vote buttons, Tiles, Quick actions, Map card, Stat strip, Profile Card.">

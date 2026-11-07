@@ -52,7 +52,7 @@ export function People({ trip, profiles, canManage, isOwner }: TripCtx) {
   return (
     <>
       <SectionHeader title="Travellers" meta={`${members.length} ${members.length === 1 ? 'person' : 'people'}${isOwner && members.length > 1 ? ' · tap someone to change their role' : ''}`}
-        action={canManage ? <Button size="regular" icon="plus" onClick={invite} disabled={busy}>Add people</Button> : undefined} />
+        action={canManage ? <Button size="regular" icon="user-add" onClick={invite} disabled={busy}>Add people</Button> : undefined} />
       <ListGroup label="Travellers">
         {members.map((id) => {
           const name = personName(profiles, id);
