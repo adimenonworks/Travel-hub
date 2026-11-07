@@ -182,3 +182,5 @@
 .destinationFlag { flex: none; display: grid; place-items: center; width: 48px; height: 48px; border-radius: var(--radius-1000); background: var(--on-light-surface-primary); }
 .destinationFlag img { width: 24px; height: 24px; border-radius: 50%; }
 .search input::-webkit-search-cancel-button { -webkit-appearance: none; appearance: none; }
+.eventTitleRow { display: flex; align-items: center; gap: var(--space-default-200); min-width: 0; }
+.eventTitleRow svg { flex: none; }

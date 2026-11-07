@@ -9,7 +9,7 @@ import { EVENT_TYPES, eventType, type EventType } from '../../lib/categories';
 import { haptic } from '../../lib/native';
 import { LinkEditor, cleanLinks } from '../shared/Links';
 
-export type ActivityDraft = Partial<Pick<Activity, 'title' | 'category' | 'notes' | 'cost' | 'links' | 'date' | 'startTime' | 'endTime' | 'locationText'>>;
+export type ActivityDraft = Partial<Pick<Activity, 'title' | 'category' | 'notes' | 'cost' | 'links' | 'date' | 'startTime' | 'endTime' | 'locationText' | 'placeId'>>;
 
 type Form = {
   type: EventType | null; title: string; date: string; endDate: string; startTime: string; endTime: string;
@@ -102,7 +102,7 @@ export function ActivityForm({ open, trip, date, activity, draft, onClose, onCre
       };
       if (activity) await store.updateSub(trip.id, 'activities', activity.id, data);
       else {
-        const id = await store.addSub(trip.id, 'activities', { ...(data as Omit<Activity, 'id' | 'createdBy' | 'createdAt' | 'attendeeIds'>), attendeeIds: [me.uid] });
+        const id = await store.addSub(trip.id, 'activities', { ...(data as Omit<Activity, 'id' | 'createdBy' | 'createdAt' | 'attendeeIds'>), ...(draft?.placeId ? { placeId: draft.placeId } : {}), attendeeIds: [me.uid] });
         onCreated?.(id);
       }
       toast({ icon: 'check', label: activity ? 'Changes saved' : type === 'stay' ? 'Stay added: check-in and check-out' : 'Event added' });

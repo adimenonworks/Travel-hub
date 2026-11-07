@@ -1,8 +1,12 @@
 import { useEffect, useState } from 'react';
-import { Button, EmptyState, FieldRow, IdeaRow, ListGroup, SectionHeader, SegmentedControl, Select, Sheet, TextArea, TextField, useToast } from '../../design/components';
+import { Button, EmptyState, FieldRow, IdeaRow, LinkButton, ListGroup, ListItem, SectionHeader, SegmentedControl, Select, Sheet, TextArea, TextField, useToast } from '../../design/components';
 import { store } from '../../data';
-import { personName, useMe } from '../../data/hooks';
-import type { Category, Idea, LinkItem } from '../../data/types';
+import { personName, useMe, usePlaces, usePlacesById } from '../../data/hooks';
+import type { Category, Idea, LinkItem, PlaceCategory, SavedPlace } from '../../data/types';
+import { countryName } from '../../lib/countries';
+import { cityOf, eventCategoryOf, groupBy, placeCategory, sortPlaces, tripCountryCodes } from '../../lib/places';
+import { PlaceMarks, PlaceRow } from '../saves/Collections';
+import { usePlaceMarks } from '../saves/placeMarks';
 import { haptic } from '../../lib/native';
 import { CATEGORIES, categoryInfo } from '../../lib/categories';
 import { money } from '../../lib/format';
@@ -42,11 +46,14 @@ export function Ideas(ctx: TripCtx) {
     catch { toast({ tone: 'error', label: "Couldn't save your vote. Check your connection" }); }
   };
   const live = viewing ? ideas.find((i) => i.id === viewing.id) ?? null : null;
+  // Ideas that point at a saved Place show the Place (its name, kind and city); it's never copied into the idea.
+  const places = usePlacesById(ideas.flatMap((i) => (i.placeId ? [i.placeId] : [])));
+  const [adding, setAdding] = useState(false);
 
   return (
     <>
       <SectionHeader title="Ideas board" meta={ctx.canManage ? 'Vote, then add the winners to a day' : 'Vote for the ones you like; organizers add the winners to a day'}
-        action={<Button variant="ghost" size="regular" iconEnd="chevron-right" onClick={() => setEditing('new')}>Add idea</Button>} />
+        action={<Button variant="ghost" size="regular" iconEnd="chevron-right" onClick={() => setAdding(true)}>Add idea</Button>} />
       <SegmentedControl label="Show ideas" block value={filter} onChange={setFilter} options={[
         { value: 'open', label: `To decide · ${count('open')}` },
         { value: 'approved', label: `Planned · ${count('approved')}` },
@@ -58,10 +65,12 @@ export function Ideas(ctx: TripCtx) {
       ) : (
         <ListGroup label="Ideas">
           {shown.map((i) => {
+            const place = i.placeId ? places[i.placeId] : undefined;
             const cat = categoryInfo(i.category);
-            const meta = [cat.label, i.cost > 0 ? `~${money(i.cost, trip.currency)}` : '', i.createdBy === me.uid ? 'you' : personName(ctx.profiles, i.createdBy).split(' ')[0]].filter(Boolean).join(' · ');
+            const kind = place ? [place.kind || placeCategory(place.category).one, place.city].filter(Boolean).join(' · ') : cat.label;
+            const meta = [kind, i.cost > 0 ? `~${money(i.cost, trip.currency)}` : '', i.createdBy === me.uid ? 'you' : personName(ctx.profiles, i.createdBy).split(' ')[0]].filter(Boolean).join(' · ');
             return (
-              <IdeaRow key={i.id} title={i.title} meta={meta} icon={cat.icon}
+              <IdeaRow key={i.id} title={place?.name ?? i.title} meta={meta} icon={place ? placeCategory(place.category).icon : cat.icon}
                 tag={i.id === top ? { icon: 'star', label: 'Most votes' } : undefined}
                 vote={{ count: ups(i), voted: !!i.votes?.[me.uid], onClick: () => vote(i) }}
                 onClick={() => setViewing(i)} />
@@ -69,7 +78,8 @@ export function Ideas(ctx: TripCtx) {
           })}
         </ListGroup>
       )}
-      <IdeaSheet idea={live} ctx={ctx} onClose={() => setViewing(null)}
+      <AddIdeaSheet open={adding} ctx={ctx} onClose={() => setAdding(false)} onNew={() => { setAdding(false); setEditing('new'); }} />
+      <IdeaSheet idea={live} place={live?.placeId ? places[live.placeId] : undefined} ctx={ctx} onClose={() => setViewing(null)}
         onEdit={() => { setEditing(live); setViewing(null); }}
         onSchedule={() => { setScheduling(live); setViewing(null); }} />
       <IdeaForm open={!!editing} tripId={trip.id} currency={trip.currency} idea={editing === 'new' ? undefined : editing ?? undefined} onClose={() => setEditing(null)} />
@@ -77,7 +87,7 @@ export function Ideas(ctx: TripCtx) {
         open={!!scheduling}
         trip={trip}
         date={trip.startDate}
-        draft={scheduling ?? undefined}
+        draft={scheduling ? { ...scheduling, ...(scheduling.placeId && places[scheduling.placeId] ? placeDraft(places[scheduling.placeId]) : {}) } : undefined}
         onClose={() => setScheduling(null)}
         onCreated={(activityId) => scheduling && store.updateSub(trip.id, 'ideas', scheduling.id, { status: 'approved', activityId })}
       />
@@ -85,11 +95,62 @@ export function Ideas(ctx: TripCtx) {
   );
 }
 
-/** One idea opened: what it is, links, who added it, comments; organizers add it to a day or pass on it. */
-function IdeaSheet({ idea, ctx, onClose, onEdit, onSchedule }: { idea: Idea | null; ctx: TripCtx; onClose: () => void; onEdit: () => void; onSchedule: () => void }) {
+/** An event drafted from a Place: its name, where it is, and the Place it points at. */
+const placeDraft = (p: SavedPlace) => ({ title: p.name, placeId: p.id, locationText: [p.name, p.city].filter(Boolean).join(', '), category: eventCategoryOf(p.category) });
+
+/**
+ * "Add idea": your saved Places from this trip's countries and cities, by city then category ("Add from saved"),
+ * or a new idea. Choosing a Place adds an Idea that points at it.
+ */
+function AddIdeaSheet({ open, ctx, onClose, onNew }: { open: boolean; ctx: TripCtx; onClose: () => void; onNew: () => void }) {
   const me = useMe();
   const toast = useToast();
+  const all = usePlaces() ?? [];
+  const { visited, starred } = usePlaceMarks();
+  const codes = tripCountryCodes(ctx.trip, ctx.activities);
+  const added = new Set(ctx.ideas.flatMap((i) => (i.placeId ? [i.placeId] : [])));
+  const fits = all.filter((p) => p.ownerId === me.uid && p.countryCode && codes.has(p.countryCode));
+  const add = async (p: SavedPlace) => {
+    try {
+      await store.addSub(ctx.trip.id, 'ideas', { title: p.name, category: eventCategoryOf(p.category), notes: '', cost: 0, links: [], votes: {}, status: 'open', placeId: p.id });
+      haptic('light');
+      toast({ icon: 'check', label: `${p.name} added to ideas` });
+    } catch { toast({ tone: 'error', label: "Couldn't save. Check your connection" }); }
+  };
+  return (
+    <Sheet open={open} title="Add an idea" subtitle={fits.length ? 'From your saved places, or something new' : undefined} onClose={onClose}>
+      <Button variant="secondary" icon="plus" block onClick={onNew}>New idea</Button>
+      {fits.length === 0 ? (
+        <p className="t-body-small t-secondary">Places you save in {[...codes].map(countryName).join(' or ') || 'this trip’s countries'} show up here, ready to add.</p>
+      ) : groupBy(sortPlaces(fits, visited), cityOf).map(([city, list]) => (
+        <section key={city} className={s.addSection} aria-label={city}>
+          <h3 className="t-heading-3">{city}</h3>
+          {groupBy(list, (p) => p.category).map(([cat, items]) => (
+            <ListGroup key={cat} label={`${city}, ${placeCategory(cat as PlaceCategory).label}`}>
+              {items.map((p) => added.has(p.id)
+                ? <ListItem key={p.id} icon={placeCategory(p.category).icon} title={p.name} meta={placeCategory(p.category).one} trailing="Added" />
+                : <PlaceRow key={p.id} place={p} visited={visited.has(p.id)} starred={starred(p)} onClick={() => add(p)} />)}
+            </ListGroup>
+          ))}
+        </section>
+      ))}
+    </Sheet>
+  );
+}
+
+/** One idea opened: what it is (its Place, when it has one), links, who added it, comments; organizers add it to a day or pass on it. */
+function IdeaSheet({ idea, place, ctx, onClose, onEdit, onSchedule }: { idea: Idea | null; place?: SavedPlace; ctx: TripCtx; onClose: () => void; onEdit: () => void; onSchedule: () => void }) {
+  const me = useMe();
+  const toast = useToast();
+  const { visited, starred } = usePlaceMarks();
   if (!idea) return <Sheet open={false} title="" onClose={onClose}>{null}</Sheet>;
+  const star = async () => {
+    if (!place) return;
+    haptic('light');
+    const on = !starred(place);
+    try { await store.starPlace(place.id, me.uid, on); toast({ icon: 'star', label: on ? 'Added to favourites' : 'Removed from favourites' }); }
+    catch { toast({ tone: 'error', label: "Couldn't save. Check your connection" }); }
+  };
   const cat = categoryInfo(idea.category);
   const canEdit = ctx.canManage || idea.createdBy === me.uid;
   const setStatus = async (status: Idea['status'], label: string) => {
@@ -97,9 +158,17 @@ function IdeaSheet({ idea, ctx, onClose, onEdit, onSchedule }: { idea: Idea | nu
     catch { toast({ tone: 'error', label: "Couldn't save. Check your connection" }); }
   };
   return (
-    <Sheet open title={idea.title} subtitle={[cat.label, idea.cost > 0 ? `~${money(idea.cost, ctx.trip.currency)} per person` : '', `added by ${idea.createdBy === me.uid ? 'you' : personName(ctx.profiles, idea.createdBy)}`].filter(Boolean).join(' · ')} onClose={onClose}>
-      {idea.notes && <p className="t-body">{idea.notes}</p>}
+    <Sheet open title={place?.name ?? idea.title} subtitle={[place ? [place.kind || placeCategory(place.category).one, place.city].filter(Boolean).join(' · ') : cat.label, idea.cost > 0 ? `~${money(idea.cost, ctx.trip.currency)} per person` : '', `added by ${idea.createdBy === me.uid ? 'you' : personName(ctx.profiles, idea.createdBy)}`].filter(Boolean).join(' · ')} onClose={onClose}>
+      {place?.image && <img src={place.image} alt="" className={s.ideaImage} />}
+      {place && <PlaceMarks visited={visited.has(place.id)} starred={starred(place)} />}
+      {(idea.notes || place?.notes) && <p className="t-body">{idea.notes || place?.notes}</p>}
       <LinkChips links={idea.links} />
+      {place && (
+        <div className={s.ideaButtons}>
+          {place.url && <LinkButton href={place.url} variant="secondary" icon="arrow-up-right">{`Open on ${place.source || 'the web'}`}</LinkButton>}
+          <Button variant="secondary" icon="star" onClick={star}>{starred(place) ? 'Favourite' : 'Add to favourites'}</Button>
+        </div>
+      )}
       {ctx.canManage && idea.status === 'open' && (
         <div className={s.ideaButtons}>
           <Button variant="secondary" onClick={() => setStatus('rejected', 'Idea passed')}>Pass</Button>

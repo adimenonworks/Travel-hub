@@ -14,17 +14,9 @@ export type Profile = {
   visited?: Place[];
 };
 
-/**
- * A trip moves Saved → Planned → Past as one record (links, ideas and photos carry across).
- * Saved: a place to go one day, with no dates yet (its saves are its ideas). Missing = 'planned' (every older trip).
- * Past is worked out from the dates.
- */
-export type TripStatus = 'saved' | 'planned';
-
 export type Trip = {
   id: string;
   name: string;
-  status?: TripStatus;
   destination: Place | null;
   startDate: string; // YYYY-MM-DD
   endDate: string;
@@ -68,7 +60,9 @@ export type Activity = {
   cost: number;
   links: LinkItem[];
   attendeeIds: string[];
-  /** People who starred this event: it shows in their travel collections as a favourite. */
+  /** The saved Place this event is at, when it came from Collections or was starred. Starring the event stars the Place. */
+  placeId?: string;
+  /** Older events: people who starred this event. Moved to the event's Place (see useStarMigration). */
   starredBy?: string[];
   /** A Stay's check-out day (one Stay shows as check-in on `date` and check-out on `endDate`); a Flight's arrival day when it lands on a later day. */
   endDate?: string;
@@ -90,13 +84,8 @@ export type IdeaStatus = 'open' | 'approved' | 'rejected';
 export type Idea = {
   id: string;
   title: string;
-  /** A save: the link it came from, its preview photo and site ("TikTok"), and the place it's about. */
-  url?: string;
-  image?: string;
-  source?: string;
-  place?: (Place & { city?: string; kind?: string }) | null;
-  /** Everyone who saved the same thing (it merges instead of appearing twice). */
-  savedBy?: string[];
+  /** The saved Place this idea is about (Collections). The Place is the source of truth; the idea only points at it. */
+  placeId?: string;
   category: Category;
   notes: string;
   cost: number;
@@ -152,6 +141,37 @@ export type SubName = keyof SubCollections;
 /** Fields the caller supplies when creating; the store fills id/createdBy/createdAt. */
 export type NewDoc<T> = Omit<T, 'id' | 'createdBy' | 'createdAt'>;
 
+/** The fixed Collections categories. Set from the place type Rove detects when saving; the person can change it. */
+export type PlaceCategory = 'restaurant' | 'cafe' | 'bar' | 'shop' | 'stay' | 'sight';
+
+/**
+ * A saved Place (Collections): a café, bar, restaurant, shop, stay or sight, filed under country → city → category.
+ * Personal: it belongs to the person who saved it. It's the single source of truth: Ideas and Events point at it
+ * (`placeId`) and never copy it. Anyone signed in can read one by id, so trip-mates see a Place added to their trip.
+ * `starredBy`: everyone who starred it (each person's favourites). Deleting a trip never deletes Places.
+ */
+export type SavedPlace = {
+  id: string;
+  ownerId: string;
+  name: string;
+  category: PlaceCategory;
+  city: string;
+  country: string;
+  /** ISO code, lower case; '' when no country was found (the Unsorted collection). */
+  countryCode: string;
+  lat: number | null;
+  lng: number | null;
+  url?: string;
+  image?: string;
+  /** Where it was saved from ("TikTok", "Google Maps"). */
+  source?: string;
+  /** What kind of place the map data calls it ("Ramen", "Museum"). */
+  kind?: string;
+  notes?: string;
+  starredBy?: string[];
+  createdAt: number;
+};
+
 /** What the readLink Cloud Function (or the in-app fallback) found in a shared link. */
 export type LinkPreview = {
   url: string;
@@ -159,5 +179,5 @@ export type LinkPreview = {
   title: string;
   image: string;
   description?: string;
-  place: { name: string; city: string; country: string; countryCode: string; lat: number; lng: number; type: string; kind: string; isArea?: boolean } | null;
+  place: { name: string; city: string; country: string; countryCode: string; lat: number; lng: number; type: string; kind: string; isArea?: boolean; category?: PlaceCategory } | null;
 };

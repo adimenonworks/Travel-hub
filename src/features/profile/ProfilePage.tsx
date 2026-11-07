@@ -1,15 +1,17 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react';
 import { Avatar, Button, Card, IconButton, LinkButton, ListGroup, ListItem, PageHeader, PageSection, ProfileCard as FigmaProfileCard, SegmentedControl, Sheet, StatStrip, TextField, useToast } from '../../design/components';
 import { store } from '../../data';
-import { useActivitiesFor, useMe, useMyTrips, useProfile } from '../../data/hooks';
+import { useMe, useMyTrips, usePlaces, useProfile } from '../../data/hooks';
+import { countryName } from '../../lib/countries';
+import { placeCategory } from '../../lib/places';
+import { PlaceRow, PlaceSheet } from '../saves/Collections';
+import { usePlaceMarks } from '../saves/placeMarks';
 import type { Place } from '../../data/types';
 import { daysBetween, today, tripPhase } from '../../lib/dates';
-import { categoryInfo } from '../../lib/categories';
 import { shrinkPhoto } from '../../lib/image';
 import { MAPS_APPS, getMapsApp, setMapsApp, type MapsApp } from '../../lib/prefs';
 import { applyTheme, getTheme, type ThemePref } from '../../lib/theme';
 import { Content } from '../../app/Shell';
-import { plannedTrips } from '../../lib/saves';
 import { CityPicker } from '../shared/CityPicker';
 import { MapView } from '../shared/Map';
 import s from './Profile.module.css';
@@ -30,17 +32,14 @@ export function ProfilePage() {
   const [pickerKey, setPickerKey] = useState(0);
   const [open, setOpen] = useState<Open>(null);
   const toast = useToast();
-  const myTrips = useMyTrips();
-  // Saved places (no dates yet) don't count as travels.
-  const trips = myTrips === null ? null : plannedTrips(myTrips);
+  const trips = useMyTrips();
   const visited = profile?.visited ?? [];
   const been = (trips ?? []).filter((t) => tripPhase(t.startDate, t.endDate) !== 'upcoming');
   const pastPlaces = been.filter((t) => t.destination).map((t) => t.destination!);
-  const byTrip = useActivitiesFor((trips ?? []).map((t) => t.id));
-  const tripOf: Record<string, string> = {};
-  const all = (trips ?? []).flatMap((t) => (byTrip[t.id] ?? []).map((a) => { tripOf[a.id] = t.id; return a; }));
-  const favourites = all.filter((a) => a.starredBy?.includes(me.uid)).sort((x, y) => y.date.localeCompare(x.date));
-  const tripName = (id: string) => (trips ?? []).find((t) => t.id === id)?.name ?? '';
+  const { visited: beenTo } = usePlaceMarks();
+  // Favourite places: the Places you've starred (from Collections, or an idea or event on a trip).
+  const favourites = (usePlaces() ?? []).filter((p) => p.starredBy?.includes(me.uid)).sort((x, y) => y.createdAt - x.createdAt);
+  const [openPlace, setOpenPlace] = useState<string | null>(null);
 
   // Your travels: places from trips that have started, plus the places you added yourself.
   const places = [...pastPlaces, ...visited];
@@ -83,20 +82,20 @@ export function ProfilePage() {
         <div className={s.map}><MapView pins={pins} height={200} /></div>
       </PageSection>
 
-      <PageSection title="Favourite places" meta="Starred from your trips"
-        action={favourites.length > 3 ? <LinkButton to="/profile/collections/favourites" variant="ghost" size="regular" iconEnd="chevron-right">{`See all ${favourites.length}`}</LinkButton> : undefined}>
+      <PageSection title="Favourite places" meta="Places you've starred"
+        action={favourites.length > 0 ? <LinkButton to="/profile/favourites" variant="ghost" size="regular" iconEnd="chevron-right">See all</LinkButton> : undefined}>
         {favourites.length === 0
-          ? <ListGroup><ListItem icon="star" title="No favourites yet" meta="Star an event on its page and it shows here." /></ListGroup>
+          ? <ListGroup><ListItem icon="star" title="No favourites yet" meta="Star a saved place, or an idea or event on a trip, and it shows here." /></ListGroup>
           : (
             <ListGroup label="Favourite places">
-              {favourites.slice(0, 3).map((a) => (
-                <ListItem key={a.id} icon={categoryInfo(a.category).icon} title={a.title}
-                  meta={[a.locationText || a.location?.name?.split(',')[0], tripName(tripOf[a.id])].filter(Boolean).join(' · ')}
-                  to={`/trip/${tripOf[a.id]}/plan/${a.id}`} />
+              {favourites.slice(0, 3).map((p) => (
+                <PlaceRow key={p.id} place={p} visited={beenTo.has(p.id)} starred onClick={() => setOpenPlace(p.id)}
+                  meta={[placeCategory(p.category).one, p.city, p.countryCode ? countryName(p.countryCode) : null].filter(Boolean).join(' · ')} />
               ))}
             </ListGroup>
           )}
       </PageSection>
+      <PlaceSheet place={openPlace ? favourites.find((p) => p.id === openPlace) ?? null : null} onClose={() => setOpenPlace(null)} />
 
       <PageSection title="Settings">
         <ListGroup label="Settings">

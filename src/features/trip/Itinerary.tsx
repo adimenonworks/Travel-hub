@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Button, DayCard, EmptyState, EventCard, SectionHeader, Timeline, TravelConnector, type EventState } from '../../design/components';
-import { useMe } from '../../data/hooks';
+import { useMe, usePlacesById } from '../../data/hooks';
 import type { Activity } from '../../data/types';
 import { dayWord, formatDay, formatTime, parseDay, today, tripDays } from '../../lib/dates';
 import { money } from '../../lib/format';
@@ -50,6 +50,7 @@ export function Itinerary(ctx: TripCtx) {
     d > t ? byDay[d]?.length ?? 0 : d < t ? 0 : (byDay[d] ?? []).filter((e) => entryEnd(e) > now).length;
   const list: DayEntry[] = byDay[day] ?? [];
   const me = useMe();
+  const places = usePlacesById(activities.flatMap((x) => (x.placeId ? [x.placeId] : [])));
   const planned = list.filter((e) => e.part !== 'out').reduce((n, { a }) => n + a.cost * Math.max(1, a.attendeeIds.length), 0);
 
   // On today's plan, the "now" line (Figma Timeline) sits before the next plan. The page doesn't scroll to it.
@@ -97,7 +98,7 @@ export function Itinerary(ctx: TripCtx) {
                 <div key={`${a.id}-${e.part ?? ''}`} className={s.timelineItem}>
                   {trip2 && <TravelConnector label={trip2.label} icon={trip2.icon} />}
                   {showNow && n === nextIndex && nowLine}
-                  <EventCard {...eventCardProps(e, ctx)} state={state}
+                  <EventCard {...eventCardProps(e, ctx)} state={state} favourite={!!(a.placeId && places[a.placeId]?.starredBy?.includes(me.uid))}
                     extras={state === 'next' ? [
                       { icon: 'info', label: `Next · ${startsIn(e)}` },
                       ...(a.attendeeIds.length > 0 ? [{ icon: 'people' as const, label: a.attendeeIds.includes(me.uid) && a.attendeeIds.length === 1 ? 'You’re going' : `${a.attendeeIds.length} of ${trip.memberIds.length} going` }] : []),

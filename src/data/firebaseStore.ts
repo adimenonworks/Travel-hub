@@ -8,7 +8,7 @@ import {
   initializeFirestore, onSnapshot, persistentLocalCache, persistentMultipleTabManager, query, setDoc, updateDoc, where, writeBatch, type DocumentData,
 } from 'firebase/firestore';
 import type { Store } from './store';
-import type { Invite, LinkPreview, Profile, SubName, Trip } from './types';
+import type { Invite, LinkPreview, Profile, SavedPlace, SubName, Trip } from './types';
 import { getFunctions, httpsCallable } from 'firebase/functions';
 import { randomCode } from './util';
 import { googleIosClientId, isNativeApp } from '../lib/native';
@@ -202,6 +202,36 @@ export function createFirebaseStore(config: FirebaseOptions): Store {
       const ref = doc(collection(db, 'trips'));
       const saved = setDoc(ref, { ...data, ownerId: uid, memberIds: [uid], roles: { [uid]: 'owner' }, createdAt: Date.now() });
       return { id: ref.id, saved };
+    },
+    watchPlaces(uid, cb) {
+      // Two live queries merged: Places you saved, and other people's Places you've starred.
+      let own: SavedPlace[] = [], starred: SavedPlace[] = [];
+      const emit = () => cb([...own, ...starred.filter((p) => !own.some((o) => o.id === p.id))]);
+      const toList = (docs: { id: string; data: () => DocumentData }[]) => docs.map((d) => withId<SavedPlace>(d.id, d.data()));
+      const offOwn = onSnapshot(query(collection(db, 'places'), where('ownerId', '==', uid)), (q) => { own = toList(q.docs); emit(); }, () => { own = []; emit(); });
+      const offStar = onSnapshot(query(collection(db, 'places'), where('starredBy', 'array-contains', uid)), (q) => { starred = toList(q.docs); emit(); }, () => {});
+      return () => { offOwn(); offStar(); };
+    },
+    async getPlaces(ids) {
+      const out: Record<string, SavedPlace> = {};
+      await Promise.all([...new Set(ids)].map(async (id) => {
+        try { const d = await getDoc(doc(db, 'places', id)); if (d.exists()) out[id] = withId<SavedPlace>(id, d.data()); } catch { /* no access or offline */ }
+      }));
+      return out;
+    },
+    addPlace(data) {
+      const ref = doc(collection(db, 'places'));
+      const saved = setDoc(ref, { ...data, ownerId: auth.currentUser!.uid, createdAt: Date.now() });
+      return { id: ref.id, saved };
+    },
+    async updatePlace(id, patch) {
+      await updateDoc(doc(db, 'places', id), patch);
+    },
+    async deletePlace(id) {
+      await deleteDoc(doc(db, 'places', id));
+    },
+    async starPlace(id, uid, on) {
+      await updateDoc(doc(db, 'places', id), { starredBy: on ? arrayUnion(uid) : arrayRemove(uid) });
     },
     async readLink(url) {
       try {

@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
 import { Button, Calendar, CelebrationScreen, FlowScreen, Icon, Illustration, ListGroup, ListItem, OptionCard, SearchField, useToast } from '../../design/components';
 import { store } from '../../data';
-import type { Idea, Place, Trip } from '../../data/types';
-import { useMyTrips, useSubFor } from '../../data/hooks';
-import { UNSORTED, saveCity, saveCounts, savedPlaces } from '../../lib/saves';
+import type { Place, Trip } from '../../data/types';
+import { useMe, usePlaces } from '../../data/hooks';
+import { cityOf, eventCategoryOf, groupBy } from '../../lib/places';
 import { daysBetween, formatDay, today } from '../../lib/dates';
 import { countryCodeOf, countryName, flagUrl } from '../../lib/countries';
 import { searchCities } from '../../lib/geocode';
@@ -12,86 +12,57 @@ import s from './trip.module.css';
 
 type Step = 1 | 2 | 3 | 4;
 
-/** Where the flow starts: blank, or from a saved place ("Turn into a trip" fills in the destination). */
-export type NewTripStart = { fromSaved?: string };
 
 const defaultCurrency = () => (Intl.NumberFormat().resolvedOptions().locale.startsWith('en-GB') ? 'GBP' : 'USD');
 
 /**
  * New trip (Figma "New trip — 1…5"): a full-screen, brand-coloured flow, never a sheet. Where to next? (search a city)
  * → When are you going? (a date range on the Calendar) → Who's coming? (Option cards) → Create my trip → the
- * Celebration screen with a days-to-go count-up. Step 1 also lists your saved places; picking one (or starting from
- * one with "Turn into a trip") adds step 4, "Bring your saves?", and creating the trip turns that same record from
- * Saved into Planned: nothing is copied, its saves are already the trip's Ideas. Unticked cities' saves move to
- * Passed. The trip is named after its city (or the saved place); rename it any time in Edit trip.
+ * Celebration screen with a days-to-go count-up. A trip is never made from a collection: when you have saved Places
+ * in the destination's country, step 4 "Bring your saves?" lets you pick cities, and their Places become the new trip's
+ * Ideas (each one points at the Place). The trip is named after its city; rename it any time in Edit trip.
  */
-export function NewTrip({ open, start: begin, onClose, onOpenTrip }: { open: boolean; start?: NewTripStart; onClose: () => void; onOpenTrip: (id: string) => void }) {
+export function NewTrip({ open, onClose, onOpenTrip }: { open: boolean; onClose: () => void; onOpenTrip: (id: string) => void }) {
   const [step, setStep] = useState<Step>(1);
   const [place, setPlace] = useState<Place | null>(null);
-  const [fromSaved, setFromSaved] = useState<string | null>(null);
-  const [leftBehind, setLeftBehind] = useState<string[]>([]);
-  const trips = useMyTrips();
-  const saved = savedPlaces(trips).filter((t) => t.name !== UNSORTED);
-  const savesBy = useSubFor(saved.map((t) => t.id), 'ideas');
-  const source = saved.find((t) => t.id === fromSaved);
-  const saves = (source && savesBy[source.id]?.filter((i) => i.status === 'open')) ?? [];
-  const steps = saves.length ? 4 : 3;
   const [start, setStart] = useState('');
   const [end, setEnd] = useState('');
   const [company, setCompany] = useState<'me' | 'others' | null>(null);
   const [busy, setBusy] = useState(false);
   const [created, setCreated] = useState<{ id: string; name: string; start: string; brought?: number } | null>(null);
+  /** Cities left out on step 4 (every matching city comes along unless unticked). */
+  const [leftBehind, setLeftBehind] = useState<string[]>([]);
   const toast = useToast();
+  // Your saved Places in the destination's country, by city: what step 4 offers.
+  const places = usePlaces() ?? [];
+  const me = useMe();
+  const code = countryCodeOf(place);
+  const matching = code ? places.filter((p) => p.ownerId === me.uid && p.countryCode === code) : [];
+  const cities = groupBy(matching, cityOf).sort((a, b) => b[1].length - a[1].length);
+  const steps = cities.length ? 4 : 3;
 
   useEffect(() => {
     if (!open) return;
-    setStep(1); setPlace(null); setStart(''); setEnd(''); setCompany(null); setBusy(false); setCreated(null); setFromSaved(null); setLeftBehind([]);
+    setStep(1); setPlace(null); setStart(''); setEnd(''); setCompany(null); setBusy(false); setCreated(null); setLeftBehind([]);
   }, [open]);
-  // "Turn into a trip": the destination is filled in, so the flow opens on the dates.
-  useEffect(() => {
-    if (!open || !begin?.fromSaved) return;
-    const t = saved.find((x) => x.id === begin.fromSaved);
-    // Straight to the dates when the saves say which city; a place with nothing saved yet starts at the search.
-    if (t) { if (pickSaved(t)) setStep(2); }
-  }, [open, begin?.fromSaved, saved.length]); // eslint-disable-line react-hooks/exhaustive-deps
   if (!open) return null;
 
-  /** A saved place as the destination: its busiest city (from the saves) when it has one, else the country. */
-  function pickSaved(t: Trip) {
-    const ideas = (savesBy[t.id] ?? []).filter((i) => i.place);
-    const counts = new Map<string, Idea>();
-    const tally: Record<string, number> = {};
-    for (const i of ideas) { const c = saveCity(i)!; tally[c] = (tally[c] ?? 0) + 1; if (!counts.has(c)) counts.set(c, i); }
-    const top = Object.entries(tally).sort((a, b) => b[1] - a[1])[0]?.[0];
-    const at = top ? counts.get(top)!.place! : null;
-    const known = t.destination && (t.destination.lat !== 0 || t.destination.lng !== 0) ? t.destination : null;
-    const where = at ? { name: `${top}, ${at.country ?? countryName(at.countryCode ?? '')}`, lat: at.lat, lng: at.lng, country: at.country, countryCode: at.countryCode } : known;
-    setPlace(where);
-    setFromSaved(t.id);
-    return !!where;
-  }
-
-  const city = source ? source.name : place?.name.split(',')[0] ?? '';
+  const city = place?.name.split(',')[0] ?? '';
   const nDays = start && end ? daysBetween(start, end) + 1 : 0;
 
   const create = async () => {
     if (!place || !start || !end) return;
     setBusy(true);
     try {
-      let id: string;
-      if (source) {
-        // The same record changes status: Saved → Planned. Its saves are already its Ideas.
-        await store.updateTrip(source.id, { status: 'planned', name: city, destination: place, startDate: start, endDate: end });
-        await Promise.all(saves.filter((i) => leftBehind.includes(saveCity(i) ?? '')).map((i) => store.updateSub(source.id, 'ideas', i.id, { status: 'rejected' })));
-        id = source.id;
-      } else {
-        id = await store.createTrip({
-          name: city, status: 'planned', destination: place, startDate: start, endDate: end, currency: defaultCurrency(),
-          totalBudget: 0, dailyBudget: 0, coverPhoto: null, coverPosition: null,
-        });
-      }
+      const id = await store.createTrip({
+        name: city, destination: place, startDate: start, endDate: end, currency: defaultCurrency(),
+        totalBudget: 0, dailyBudget: 0, coverPhoto: null, coverPosition: null,
+      });
+      // "Bring your saves?": each chosen Place becomes an Idea that points at it.
+      const bring = matching.filter((p) => !leftBehind.includes(cityOf(p)));
+      await Promise.all(bring.map((p) => store.addSub(id, 'ideas', { title: p.name, category: eventCategoryOf(p.category), notes: '', cost: 0, links: [], votes: {}, status: 'open', placeId: p.id })));
       haptic('success');
-      setCreated({ id, name: city, start, brought: source ? saves.length - saves.filter((i) => leftBehind.includes(saveCity(i) ?? '')).length : undefined });
+      setCreated({ id, name: city, start, brought: bring.length });
     } catch {
       haptic('error');
       toast({ tone: 'error', label: "Couldn't create the trip. Check your connection" });
@@ -131,28 +102,9 @@ export function NewTrip({ open, start: begin, onClose, onOpenTrip }: { open: boo
 
   if (step === 1)
     return (
-      <FlowScreen step={1} of={steps} stepKey={1} title="Where to next?" subtitle={saved.length ? 'Pick a place you’ve saved, or search anywhere.' : 'Search for a city, anywhere.'} onClose={onClose}
+      <FlowScreen step={1} of={steps} stepKey={1} title="Where to next?" subtitle="Search for a city, anywhere." onClose={onClose}
         footer={<Button variant="inverse" iconEnd="chevron-right" disabled={!place} onClick={() => next(2)}>{place ? `Plan ${city}` : 'Pick a place'}</Button>}>
-        <DestinationSearch value={fromSaved ? null : place} onPick={(p) => {
-          haptic('selection'); setPlace(p);
-          // A city in the saved place's country keeps it as the source (its saves come along); anywhere else starts fresh.
-          if (source && countryCodeOf(p) !== countryCodeOf(source.destination)) setFromSaved(null);
-        }} />
-        {saved.length > 0 && (
-          <section className={s.flowSection} aria-label="From your saved places">
-            <h2 className={s.flowSummaryTitle}>From your saved places</h2>
-            <ListGroup label="Saved places">
-              {saved.map((t) => {
-                const code = countryCodeOf(t.destination);
-                return (
-                  <ListItem key={t.id} round media={code && flagUrl(code) ? <img src={flagUrl(code)} alt="" className={s.flagThumb} /> : undefined} icon={code ? undefined : 'pin'}
-                    title={t.name} meta={saveCounts(savesBy[t.id] ?? [])} trailing={fromSaved === t.id ? 'Selected' : undefined}
-                    onClick={() => { haptic('selection'); pickSaved(t); }} label={`${t.name}${fromSaved === t.id ? ', selected' : ''}`} />
-                );
-              })}
-            </ListGroup>
-          </section>
-        )}
+        <DestinationSearch value={place} onPick={(p) => { haptic('selection'); setPlace(p); setLeftBehind([]); }} />
       </FlowScreen>
     );
 
@@ -187,28 +139,26 @@ export function NewTrip({ open, start: begin, onClose, onOpenTrip }: { open: boo
       </FlowScreen>
     );
 
-  // Step 4: "Bring your saves?" — one row per city (and Links & notes); untick one to leave it behind.
-  const groups = Object.entries(saves.reduce<Record<string, Idea[]>>((m, i) => { const k = saveCity(i) ?? ''; (m[k] ??= []).push(i); return m; }, {}))
-    .sort((a, b) => (a[0] === '' ? 1 : b[0] === '' ? -1 : b[1].length - a[1].length));
-  const kept = saves.filter((i) => !leftBehind.includes(saveCity(i) ?? '')).length;
+  // Step 4: "Bring your saves?" — the cities you've saved Places in, in this country; untick one to leave it out.
+  const kept = matching.filter((p) => !leftBehind.includes(cityOf(p))).length;
   return (
-    <FlowScreen step={4} of={4} stepKey={4} title={`Bring your ${source?.name ?? ''} saves?`} subtitle="They’ll wait in Ideas until you add them to a day." onClose={onClose}
+    <FlowScreen step={4} of={4} stepKey={4} title={`Bring your ${countryName(code!)} saves?`} subtitle="They’ll wait in Ideas until you add them to a day." onClose={onClose}
       footer={<Button variant="inverse" iconEnd="chevron-right" disabled={busy} onClick={create}>{createLabel}</Button>}>
-      <ListGroup label="Saves by city">
-        {groups.map(([c, list]) => {
+      <ListGroup label="Saved places by city">
+        {cities.map(([c, list]) => {
           const on = !leftBehind.includes(c);
           return (
-            <ListItem key={c || 'links'} icon={c ? 'pin' : 'link'} title={c || 'Links & notes'}
-              meta={list.slice(0, 3).map((i) => i.title).join(', ') + (list.length > 3 ? ` +${list.length - 3}` : '')}
+            <ListItem key={c} icon="pin" title={c}
+              meta={list.slice(0, 3).map((p) => p.name).join(', ') + (list.length > 3 ? ` +${list.length - 3}` : '')}
               trailing={<span className={s.tick}>{list.length}{on && <Icon name="check" size={16} />}</span>}
               onClick={() => { haptic('selection'); setLeftBehind((x) => (on ? [...x, c] : x.filter((y) => y !== c))); }}
-              label={`${c || 'Links and notes'}, ${list.length} saves, ${on ? 'coming with you' : 'left behind'}`} />
+              label={`${c}, ${list.length} saved places, ${on ? 'coming with you' : 'left out'}`} />
           );
         })}
       </ListGroup>
       <div className={s.flowSummary}>
-        <span className={s.flowSummaryTitle}>{kept} of {saves.length} selected</span>
-        <span className={s.flowSummaryMeta}>Untick a city to leave it behind</span>
+        <span className={s.flowSummaryTitle}>{kept} of {matching.length} selected</span>
+        <span className={s.flowSummaryMeta}>Untick a city to leave it out. Your saves stay in your collection either way.</span>
       </div>
     </FlowScreen>
   );

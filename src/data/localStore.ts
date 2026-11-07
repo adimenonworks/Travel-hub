@@ -1,5 +1,5 @@
 import type { Store } from './store';
-import type { Invite, Profile, SubName, Trip, User } from './types';
+import type { Invite, Profile, SavedPlace, SubName, Trip, User } from './types';
 import { randomCode } from './util';
 
 /**
@@ -9,6 +9,7 @@ import { randomCode } from './util';
  */
 type DB = {
   users: Record<string, Profile>;
+  places?: Record<string, SavedPlace>;
   trips: Record<string, Trip>;
   subs: Record<string, Record<string, Record<string, Record<string, unknown>>>>; // tripId -> sub -> id -> doc
   invites: Record<string, Invite>;
@@ -149,6 +150,31 @@ export function createLocalStore(): Store {
       db.trips[id] = { ...data, id, ownerId: uid, memberIds: [uid], roles: { [uid]: 'owner' }, createdAt: Date.now() };
       save();
       return { id, saved: Promise.resolve() };
+    },
+    watchPlaces(uid, cb) {
+      return watch(() => Object.values(db.places ?? {}).filter((p) => p.ownerId === uid || p.starredBy?.includes(uid)), cb);
+    },
+    async getPlaces(ids) {
+      return Object.fromEntries(ids.flatMap((id) => (db.places?.[id] ? [[id, structuredClone(db.places[id])]] : [])));
+    },
+    addPlace(data) {
+      const id = randomCode(16);
+      (db.places ??= {})[id] = { ...data, id, ownerId: me(), createdAt: Date.now() };
+      save();
+      return { id, saved: Promise.resolve() };
+    },
+    async updatePlace(id, patch) {
+      if (db.places?.[id]) { db.places[id] = { ...db.places[id], ...patch, id }; save(); }
+    },
+    async deletePlace(id) {
+      if (db.places) { delete db.places[id]; save(); }
+    },
+    async starPlace(id, uid, on) {
+      const p = db.places?.[id];
+      if (!p) return;
+      const list = (p.starredBy ?? []).filter((x) => x !== uid);
+      p.starredBy = on ? [...list, uid] : list;
+      save();
     },
     // Demo mode has no Cloud Function: the app reads what it can from the link itself (src/lib/links.ts).
     async readLink() {

@@ -2,7 +2,8 @@ import { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { Button, EmptyState, EventCard, IconButton, LinkButton, ListGroup, ListItem, PageHeader, PageSection, Sheet, TextField, useToast } from '../../design/components';
 import { store } from '../../data';
-import { personName, useMe } from '../../data/hooks';
+import { personName, useMe, usePlacesById } from '../../data/hooks';
+import { placeForEvent } from '../saves/starEvent';
 import type { LinkItem } from '../../data/types';
 import { formatDay, formatTime } from '../../lib/dates';
 import { hostOf, isPdf, money, normalizeUrl } from '../../lib/format';
@@ -26,6 +27,7 @@ export function ActivityPage(ctx: TripCtx) {
   const [editing, setEditing] = useState(false);
   const [addingDoc, setAddingDoc] = useState(false);
   const toast = useToast();
+  const places = usePlacesById(ctx.activities.flatMap((x) => (x.placeId ? [x.placeId] : [])));
   const itinerary = `/trip/${trip.id}/itinerary${a ? `?day=${a.date}` : ''}`;
 
   if (!a)
@@ -37,7 +39,8 @@ export function ActivityPage(ctx: TripCtx) {
     );
 
   const going = a.attendeeIds.includes(me.uid);
-  const starred = !!a.starredBy?.includes(me.uid);
+  const place = a.placeId ? places[a.placeId] : undefined;
+  const starred = !!place?.starredBy?.includes(me.uid);
   const app = getMapsApp();
   const where = a.locationText || a.location?.name;
   const type = eventType(a.category);
@@ -47,9 +50,18 @@ export function ActivityPage(ctx: TripCtx) {
     try { await store.updateSub(trip.id, 'activities', a.id, { links: a.links.filter((_, j) => j !== i) }); toast({ icon: 'trash', label: 'Removed' }); }
     catch { toast({ tone: 'error', label: "Couldn't delete. Check your connection" }); }
   };
-  const toggle = async (field: 'attendeeIds' | 'starredBy', on: boolean, label: string) => {
+  // Starring the event stars its Place (made in your Collections first if the event doesn't have one).
+  const star = async () => {
     haptic('light');
-    try { await store.toggleInArray(trip.id, 'activities', a.id, field, me.uid, on); toast({ icon: field === 'starredBy' ? 'star' : 'check', label }); }
+    try {
+      if (place) await store.starPlace(place.id, me.uid, !starred);
+      else await placeForEvent(trip.id, a, [me.uid]);
+      toast({ icon: 'star', label: starred ? 'Removed from favourites' : 'Added to favourites' });
+    } catch { toast({ tone: 'error', label: "Couldn't save. Check your connection" }); }
+  };
+  const toggle = async (field: 'attendeeIds', on: boolean, label: string) => {
+    haptic('light');
+    try { await store.toggleInArray(trip.id, 'activities', a.id, field, me.uid, on); toast({ icon: 'check', label }); }
     catch { toast({ tone: 'error', label: "Couldn't save. Check your connection" }); }
   };
   const goingNames = a.attendeeIds.map((id) => (id === me.uid ? 'you' : personName(profiles, id).split(' ')[0]));
@@ -61,11 +73,11 @@ export function ActivityPage(ctx: TripCtx) {
 
       {/* Figma "Event detail": one template for every event type. Event card, then only the rows that have something. */}
       <EventCard {...eventCardProps(a, ctx, true)} to={undefined}
-        extras={starred ? [{ icon: 'star', label: 'Favourite' }] : undefined} />
+        favourite={starred} />
 
       <div className={s.planButtons}>
         <Button block icon={going ? 'check' : 'plus'} variant={going ? 'secondary' : 'primary'} onClick={() => toggle('attendeeIds', !going, going ? 'You’re not going' : 'You’re going')}>{going ? 'You’re going' : 'I’m going'}</Button>
-        <Button block variant="secondary" icon="star" onClick={() => toggle('starredBy', !starred, starred ? 'Removed from favourites' : 'Added to favourites')}>{starred ? 'Favourite' : 'Add to favourites'}</Button>
+        {a.category !== 'note' && <Button block variant="secondary" icon="star" onClick={star}>{starred ? 'Favourite' : 'Add to favourites'}</Button>}
       </div>
 
       <PageSection title="Details">

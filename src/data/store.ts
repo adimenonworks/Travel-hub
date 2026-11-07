@@ -1,4 +1,4 @@
-import type { Vote, Invite, LinkPreview, NewDoc, Profile, SubCollections, SubName, Trip, User } from './types';
+import type { Vote, Invite, LinkPreview, NewDoc, Profile, SavedPlace, SubCollections, SubName, Trip, User } from './types';
 
 export type Unsubscribe = () => void;
 
@@ -43,6 +43,16 @@ export interface Store {
    */
   queueSub<K extends SubName>(tripId: string, name: K, data: NewDoc<SubCollections[K]>): { id: string; saved: Promise<void> };
   queueTrip(data: Omit<Trip, 'id' | 'ownerId' | 'memberIds' | 'roles' | 'createdAt'>): { id: string; saved: Promise<void> };
+  /** Collections: your saved Places and the ones you've starred (others' Places added to your trips), live. */
+  watchPlaces(uid: string, cb: (places: SavedPlace[]) => void): Unsubscribe;
+  /** Places by id (e.g. a trip-mate's Place that an idea points at). Missing ones are left out. */
+  getPlaces(ids: string[]): Promise<Record<string, SavedPlace>>;
+  /** Save a Place without waiting for the server (works offline). */
+  addPlace(data: Omit<SavedPlace, 'id' | 'ownerId' | 'createdAt'>): { id: string; saved: Promise<void> };
+  updatePlace(id: string, patch: Partial<Omit<SavedPlace, 'id' | 'ownerId'>>): Promise<void>;
+  deletePlace(id: string): Promise<void>;
+  /** Star or unstar a Place for one person (anyone can star any Place they can see; it only changes their own star). */
+  starPlace(id: string, uid: string, on: boolean): Promise<void>;
   /** Read a shared link (title, photo, place) with the readLink Cloud Function. Demo mode and errors: null. */
   readLink(url: string): Promise<LinkPreview | null>;
 

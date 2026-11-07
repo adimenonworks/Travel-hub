@@ -4,7 +4,7 @@ export { TextField, TextArea, Select, FieldRow } from './Field';
 export { Card } from './Card';
 export { SegmentedControl } from './SegmentedControl';
 export { Sheet } from './Sheet';
-export { Avatar, AvatarStack, Badge, Chip, EmptyState, Notification, type BadgeTone, type NotificationState } from './Misc';
+export { Avatar, AvatarStack, Badge, Chip, EmptyState, Notification, Switch, type BadgeTone, type NotificationState } from './Misc';
 export { Skeleton, PageSkeleton } from './Skeleton';
 export { BottomNav, type NavTab } from './BottomNav';
 export { PageHeader, HeaderProfileContext, Tabs, type TabItem } from './Bars';

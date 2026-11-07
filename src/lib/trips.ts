@@ -3,8 +3,7 @@ import { daysBetween as between, today as todayDay, tripPhase } from './dates';
 
 /** The trip that matters now: the one you're on, else the next one. Home's hero and the Trip tab both use it. */
 export function featuredTrip(trips: Trip[] | null | undefined): Trip | undefined {
-  // Saved places have no dates; only planned trips can be "the one that matters now".
-  const all = (trips ?? []).filter((t) => t.status !== 'saved').sort((a, b) => a.startDate.localeCompare(b.startDate));
+  const all = (trips ?? []).slice().sort((a, b) => a.startDate.localeCompare(b.startDate));
   return all.find((t) => tripPhase(t.startDate, t.endDate) === 'current') ?? all.find((t) => tripPhase(t.startDate, t.endDate) === 'upcoming');
 }
 

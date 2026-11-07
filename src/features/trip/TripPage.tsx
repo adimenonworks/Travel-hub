@@ -1,14 +1,14 @@
 import { useState } from 'react';
 import { Navigate, Route, Routes, useLocation, useMatch, useNavigate, useParams } from 'react-router-dom';
 import { EmptyState, LinkButton, PageSkeleton, Tabs, TripHeader, type TabItem } from '../../design/components';
-import { useProfiles, useRole, useSub, useTrip } from '../../data/hooks';
+import { useMe, useProfiles, useRole, useSub, useTrip } from '../../data/hooks';
+import { useStarMigration } from '../saves/starEvent';
 import type { Activity, Album, Comment, Expense, Idea, Profile, Trip } from '../../data/types';
 import { daysBetween, formatRange, today } from '../../lib/dates';
 import { countryName, flagUrl, tripCountries } from '../../lib/countries';
 import { Content } from '../../app/Shell';
 import { ActivityPage } from './ActivityPage';
 import { Bookings } from './Bookings';
-import { SavedPlace } from '../saves/SavedPlace';
 import { Overview } from './Overview';
 import { Ideas } from './Ideas';
 import { Itinerary } from './Itinerary';
@@ -51,11 +51,13 @@ function TripLoaded({ trip }: { trip: Trip }) {
   const albums = useSub(trip.id, 'albums');
   const profiles = useProfiles(trip.memberIds);
   const { canManage, isOwner } = useRole(trip);
+  const me = useMe();
   const [editing, setEditing] = useState(false);
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const planPage = useMatch('/trip/:tripId/plan/:activityId');
 
+  useStarMigration(trip.id, activities ?? [], me.uid);
   if (!activities || !ideas || !expenses || !comments || !albums) return <PageSkeleton />;
   const ctx: TripCtx = { trip, activities, ideas, expenses, comments, albums, profiles, canManage, isOwner };
   const nDays = daysBetween(trip.startDate, trip.endDate) + 1;
@@ -74,9 +76,6 @@ function TripLoaded({ trip }: { trip: Trip }) {
     { to: `${base}/photos`, label: 'Photos', active: section === 'photos' },
     { to: `${base}/people`, label: 'People', active: section === 'people' },
   ];
-
-  // A saved place (no dates yet) has its own page: Figma "Saved destination".
-  if (trip.status === 'saved') return <Content><SavedPlace {...ctx} /></Content>;
 
   // An event's own page and the bookings lists replace the trip header and tabs.
   if (planPage || section === 'bookings')

@@ -1,26 +1,15 @@
-import { Button, Card, Illustration, LinkButton, ListGroup, ListItem, PageHeader, PageSection, PageSkeleton, QuickAction } from '../../design/components';
-import { useMe, useMyTrips, useProfile, useProfiles, useSubFor } from '../../data/hooks';
-import type { Idea } from '../../data/types';
-import { categoryInfo } from '../../lib/categories';
+import { Button, Card, Illustration, LinkButton, ListGroup, PageHeader, PageSection, PageSkeleton, QuickAction } from '../../design/components';
+import { useMe, useMyTrips, usePlaces, useProfile } from '../../data/hooks';
+import { countryName } from '../../lib/countries';
 import { featuredTrip } from '../../lib/trips';
-import { savedPlaces } from '../../lib/saves';
 import { Content, useNewTrip, useSave } from '../../app/Shell';
 import { TripHero } from '../shared/TripHero';
-import { saveMeta } from '../saves/SavedPlace';
-import { PlaceTile } from './Trips';
+import { PlaceRow, PlaceSheet, useCountries } from '../saves/Collections';
+import { usePlaceMarks } from '../saves/placeMarks';
+import { CountryTile } from './Trips';
+import { useState } from 'react';
 import s from './Home.module.css';
 import ss from '../saves/saves.module.css';
-
-/** "2h", "Yesterday", "Mon", "3 Oct": how long ago something was saved. */
-function ago(ms: number) {
-  const mins = Math.round((Date.now() - ms) / 60000);
-  if (mins < 60) return mins <= 1 ? 'Now' : `${mins}m`;
-  const h = Math.round(mins / 60);
-  if (h < 24) return `${h}h`;
-  const d = new Date(ms);
-  if (h < 48) return 'Yesterday';
-  return h < 24 * 7 ? d.toLocaleDateString(undefined, { weekday: 'short' }) : d.toLocaleDateString(undefined, { day: 'numeric', month: 'short' });
-}
 
 /**
  * Home (Figma "Home — v2"): what's happening now. The greeting, your trip as the phase-aware Hero Card, quick actions
@@ -34,17 +23,13 @@ export function Home() {
   const featured = featuredTrip(trips);
   const newTrip = useNewTrip();
   const openSave = useSave();
-  const places = savedPlaces(trips).sort((a, b) => a.createdAt - b.createdAt);
-  // Saves live in saved places and in trips' Ideas; Recently saved shows the newest that came from a link or place search.
-  const ideasBy = useSubFor((trips ?? []).map((t) => t.id), 'ideas');
-  const recent = Object.entries(ideasBy).flatMap(([tripId, list]) => list.filter((i) => i.url || i.place).map((i) => ({ i, tripId })))
-    .sort((a, b) => b.i.createdAt - a.i.createdAt).slice(0, 3);
-  const profiles = useProfiles([...new Set(recent.flatMap(({ i }) => i.savedBy ?? [i.createdBy]))]);
-  const total = places.reduce((n, t) => n + (ideasBy[t.id]?.filter((i) => i.status !== 'rejected').length ?? 0), 0);
-  const where = (tripId: string) => {
-    const t = trips?.find((x) => x.id === tripId);
-    return t?.status === 'saved' ? `/trip/${tripId}` : `/trip/${tripId}/ideas`;
-  };
+  // Saved for later: your Collections by country. Recently saved: the newest Places.
+  const countries = useCountries() ?? [];
+  const places = usePlaces() ?? [];
+  const { visited, starred } = usePlaceMarks();
+  const [open, setOpen] = useState<string | null>(null);
+  const recent = places.filter((p) => p.ownerId === me.uid).sort((a, b) => b.createdAt - a.createdAt).slice(0, 3);
+  const live = open ? places.find((p) => p.id === open) ?? null : null;
 
   return (
     <Content>
@@ -65,11 +50,11 @@ export function Home() {
         {featured && <QuickAction icon="people" label="Invite" to={`/trip/${featured.id}/people`} />}
       </nav>
 
-      {places.length > 0 && (
-        <PageSection title="Saved for later" meta={`${places.length} place${places.length === 1 ? '' : 's'} · ${total} save${total === 1 ? '' : 's'}`}
+      {countries.length > 0 && (
+        <PageSection title="Saved for later" meta={`${countries.length} ${countries.length === 1 ? 'country' : 'countries'} · ${places.length} place${places.length === 1 ? '' : 's'}`}
           action={<LinkButton to="/trips?show=saved" variant="ghost" size="regular" iconEnd="chevron-right">See all</LinkButton>}>
           <div className={ss.tileRow}>
-            {places.map((t) => <PlaceTile key={t.id} trip={t} trips={trips ?? []} ideas={ideasBy[t.id]} />)}
+            {countries.map((c, i) => <CountryTile key={c.code} country={c} index={i} />)}
           </div>
         </PageSection>
       )}
@@ -77,13 +62,14 @@ export function Home() {
       {recent.length > 0 && (
         <PageSection title="Recently saved">
           <ListGroup label="Recently saved">
-            {recent.map(({ i, tripId }: { i: Idea; tripId: string }) => (
-              <ListItem key={i.id} icon={categoryInfo(i.category).icon} media={i.image ? <img src={i.image} alt="" /> : undefined}
-                title={i.title} meta={saveMeta(i, profiles, me.uid)} trailing={ago(i.createdAt)} to={where(tripId)} />
+            {recent.map((p) => (
+              <PlaceRow key={p.id} place={p} visited={visited.has(p.id)} starred={starred(p)} onClick={() => setOpen(p.id)}
+                meta={[p.kind, p.city || (p.countryCode ? countryName(p.countryCode) : null), p.source ? `from ${p.source}` : null].filter(Boolean).join(' · ')} />
             ))}
           </ListGroup>
         </PageSection>
       )}
+      <PlaceSheet place={live} onClose={() => setOpen(null)} />
     </Content>
   );
 }

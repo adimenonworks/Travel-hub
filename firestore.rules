@@ -79,6 +79,24 @@ service cloud.firestore {
       }
     }
 
+    // Saved Places (Collections): personal. Each belongs to the person who saved it. Anyone signed in can read one
+    // by id (trip-mates see a Place that's been added to their trip's ideas), but a list only returns your own Places
+    // and the ones you've starred. Only the owner edits or deletes it; anyone else may only add or remove their own star.
+    match /places/{placeId} {
+      function stars(d) { return d.get('starredBy', []); }
+      allow get: if signedIn();
+      allow list: if signedIn() && (resource.data.ownerId == uid() || uid() in stars(resource.data));
+      allow create: if signedIn()
+        && request.resource.data.ownerId == uid()
+        && stars(request.resource.data).toSet().difference([uid()].toSet()).size() == 0;
+      allow update: if signedIn() && (
+        (resource.data.ownerId == uid() && request.resource.data.ownerId == resource.data.ownerId)
+        || (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['starredBy'])
+            && stars(request.resource.data).toSet().difference(stars(resource.data).toSet())
+                 .union(stars(resource.data).toSet().difference(stars(request.resource.data).toSet())).hasOnly([uid()])));
+      allow delete: if signedIn() && resource.data.ownerId == uid();
+    }
+
     match /invites/{code} {
       allow get: if signedIn();
       allow list: if false;

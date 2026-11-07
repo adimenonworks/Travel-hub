@@ -58,6 +58,28 @@ await t('editor cannot take ownership', assertFails(updateDoc(doc(B, 'trips/t1')
 await t('bob leaves', assertSucceeds(updateDoc(doc(B, 'trips/t1'), { memberIds: arrayRemove('bob'), 'roles.bob': deleteField() })));
 await t('ex-member cannot read', assertFails(getDoc(doc(B, 'trips/t1'))));
 await t('owner cannot leave (must delete)', assertFails(updateDoc(doc(A, 'trips/t1'), { memberIds: arrayRemove('alice'), 'roles.alice': deleteField() })));
+
+// Saved Places (Collections)
+const place = { ownerId: 'alice', name: 'Ichiran', category: 'restaurant', city: 'Tokyo', country: 'Japan', countryCode: 'jp', lat: 35.6, lng: 139.7 };
+await t('owner saves a place', assertSucceeds(setDoc(doc(A, 'places/p1'), place)));
+await t('cannot save a place as someone else', assertFails(setDoc(doc(B, 'places/p2'), place)));
+await t('cannot create a place starred for someone else', assertFails(setDoc(doc(A, 'places/p3'), { ...place, starredBy: ['bob'] })));
+await t('owner creates a place starred by themselves', assertSucceeds(setDoc(doc(A, 'places/p4'), { ...place, starredBy: ['alice'] })));
+await t('anyone signed in reads a place by id', assertSucceeds(getDoc(doc(B, 'places/p1'))));
+await t('anon cannot read a place', assertFails(getDoc(doc(anon, 'places/p1'))));
+await t('owner lists own places', assertSucceeds(getDocs(query(collection(A, 'places'), where('ownerId', '==', 'alice')))));
+await t('cannot list someone else\'s places', assertFails(getDocs(query(collection(B, 'places'), where('ownerId', '==', 'alice')))));
+await t('unfiltered place list denied', assertFails(getDocs(collection(B, 'places'))));
+await t('owner edits a place', assertSucceeds(updateDoc(doc(A, 'places/p1'), { category: 'cafe' })));
+await t('others cannot edit a place', assertFails(updateDoc(doc(B, 'places/p1'), { name: 'x' })));
+await t('others star a place for themselves', assertSucceeds(updateDoc(doc(B, 'places/p1'), { starredBy: arrayUnion('bob') })));
+await t('starred places list works', assertSucceeds(getDocs(query(collection(B, 'places'), where('starredBy', 'array-contains', 'bob')))));
+await t('cannot star a place for someone else', assertFails(updateDoc(doc(B, 'places/p1'), { starredBy: arrayUnion('carol') })));
+await t('cannot remove someone else\'s star', assertFails(updateDoc(doc(C, 'places/p1'), { starredBy: arrayRemove('bob') })));
+await t('others unstar a place for themselves', assertSucceeds(updateDoc(doc(B, 'places/p1'), { starredBy: arrayRemove('bob') })));
+await t('owner cannot hand a place to someone else', assertFails(updateDoc(doc(A, 'places/p1'), { ownerId: 'bob' })));
+await t('others cannot delete a place', assertFails(deleteDoc(doc(B, 'places/p1'))));
+await t('owner deletes a place', assertSucceeds(deleteDoc(doc(A, 'places/p1'))));
 await t('user writes own profile', assertSucceeds(setDoc(doc(A, 'users/alice'), { name: 'Alice', photo: null })));
 await t('user cannot write others profile', assertFails(setDoc(doc(B, 'users/alice'), { name: 'x' })));
 await t('signed-in user reads a public profile by id', assertSucceeds(getDoc(doc(B, 'users/alice'))));

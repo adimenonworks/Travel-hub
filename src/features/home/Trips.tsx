@@ -1,11 +1,10 @@
 import { useSearchParams } from 'react-router-dom';
 import { Button, Card, Icon, Illustration, PageHeader, PageSection, PageSkeleton, SegmentedControl, Tile } from '../../design/components';
-import { useMyTrips, useSubFor } from '../../data/hooks';
-import type { Trip } from '../../data/types';
+import { useMyTrips } from '../../data/hooks';
+import type { SavedPlace } from '../../data/types';
 import { tripPhase } from '../../lib/dates';
-import { countryCodeOf, flagUrl } from '../../lib/countries';
 import { featuredTrip } from '../../lib/trips';
-import { placeTone, plannedTrips, saveCounts, savedPlaces } from '../../lib/saves';
+import { placeCounts, useCountries } from '../saves/Collections';
 import { Content, useNewTrip, useSave } from '../../app/Shell';
 import { TripHero } from '../shared/TripHero';
 import s from './Home.module.css';
@@ -13,20 +12,21 @@ import ss from '../saves/saves.module.css';
 
 type Segment = 'upcoming' | 'saved' | 'past';
 
-/** A saved place as a Figma "Tile" (accent tone, flag, name, "24 saves · 3 cities"). */
-export function PlaceTile({ trip, trips, ideas }: { trip: Trip; trips: Trip[]; ideas?: { status: string }[] }) {
-  const code = countryCodeOf(trip.destination);
+const TONES = ['orange', 'green', 'yellow', 'pink'] as const;
+
+/** A country you've saved in, as a Figma "Tile" (accent tone, flag, name, "12 places · 3 cities"); opens its collection. */
+export function CountryTile({ country, index }: { country: { code: string; name: string; flag?: string; places: SavedPlace[] }; index: number }) {
   return (
-    <Tile tone={placeTone(trips, trip)} to={`/trip/${trip.id}`} title={trip.name}
-      media={code && flagUrl(code) ? <img src={flagUrl(code)} alt="" /> : <Icon name="lightbulb" size={24} />}
-      meta={saveCounts((ideas ?? []).filter((i) => i.status !== 'rejected') as never[])} />
+    <Tile tone={TONES[index % 4]} to={`/saved/${country.code || 'unsorted'}`} title={country.name}
+      media={country.flag ? <img src={country.flag} alt="" /> : <Icon name="lightbulb" size={24} />}
+      meta={placeCounts(country.places)} />
   );
 }
 
 /**
- * Trips tab (Figma "Trips tab — Upcoming / Saved"): the library. Upcoming · Saved · Past, "Plan a new trip", then:
- * Upcoming: the trip that matters now as the Hero Card, and the others being planned. Saved: places to go one day as
- * Tiles, and "New place to go". Past: finished trips, newest first.
+ * Trips tab: the library. Upcoming · Saved · Past, "Plan a new trip", then:
+ * Upcoming: the trip that matters now as the Hero Card, and the others being planned. Saved: your Collections, one
+ * country Tile each. Past: finished trips, newest first.
  */
 export function Trips() {
   const trips = useMyTrips();
@@ -35,9 +35,8 @@ export function Trips() {
   const [params, setParams] = useSearchParams();
   const show = params.get('show');
   const segment: Segment = show === 'past' || show === 'saved' ? show : 'upcoming';
-  const dated = plannedTrips(trips).sort((a, b) => a.startDate.localeCompare(b.startDate));
-  const places = savedPlaces(trips).sort((a, b) => a.createdAt - b.createdAt);
-  const saves = useSubFor(places.map((t) => t.id), 'ideas');
+  const dated = (trips ?? []).slice().sort((a, b) => a.startDate.localeCompare(b.startDate));
+  const countries = useCountries() ?? [];
   const featured = featuredTrip(trips);
   const planned = dated.filter((t) => t !== featured && tripPhase(t.startDate, t.endDate) !== 'past');
   const past = dated.filter((t) => tripPhase(t.startDate, t.endDate) === 'past').reverse();
@@ -49,7 +48,7 @@ export function Trips() {
       {trips === null ? <PageSkeleton bare /> : (
         <div className={s.segments}>
           <SegmentedControl label="Show trips" block value={segment} onChange={(v) => setParams(v === 'upcoming' ? {} : { show: v }, { replace: true })}
-            options={[{ value: 'upcoming', label: `Upcoming · ${upcoming}` }, { value: 'saved', label: `Saved · ${places.length}` }, { value: 'past', label: `Past · ${past.length}` }]} />
+            options={[{ value: 'upcoming', label: `Upcoming · ${upcoming}` }, { value: 'saved', label: `Saved · ${countries.length}` }, { value: 'past', label: `Past · ${past.length}` }]} />
           <Button block icon="plus" onClick={() => newTrip()}>Plan a new trip</Button>
           {segment === 'upcoming' && (upcoming === 0 ? (
             <Card media={<Illustration name="suitcase" size={120} />} title="No trips coming up"
@@ -66,8 +65,8 @@ export function Trips() {
           ))}
           {segment === 'saved' && (
             <div className={ss.tileGrid}>
-              {places.map((t) => <PlaceTile key={t.id} trip={t} trips={trips} ideas={saves[t.id]} />)}
-              <Tile tone="add" icon="plus" title="New place to go" onClick={() => openSave({ mode: 'country' })} />
+              {countries.map((c, i) => <CountryTile key={c.code} country={c} index={i} />)}
+              <Tile tone="add" icon="plus" title="Save a place" onClick={() => openSave({ mode: 'link' })} />
             </div>
           )}
           {segment === 'past' && (past.length === 0 ? (

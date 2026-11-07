@@ -27,6 +27,7 @@ function toPlace(f: PhotonFeature, fallback: string): FoundPlace | null {
     type: area ? 'activity' : FOOD.includes(v) ? 'food' : STAY.includes(v) ? 'stay' : MOVE.includes(v) ? 'transport' : 'activity',
     kind: !area && v ? v.replace(/_/g, ' ').replace(/^./, (c) => c.toUpperCase()) : '',
     isArea: area,
+    ...(p.osm_key === 'shop' || v === 'marketplace' || v === 'mall' ? { category: 'shop' as const } : {}),
   };
 }
 

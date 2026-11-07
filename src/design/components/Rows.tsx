@@ -77,8 +77,10 @@ export type EventState = 'default' | 'next' | 'done';
  * the title (Heading 3), time · place (Body), an optional amount; Journey adds the from → to times; Extras show tags.
  * Next has the brand border; Done fades the content. The whole card opens the event.
  */
-export function EventCard({ title, time, place, amount, icon, layout = 'standard', state = 'default', journey, extras, status, to, onClick }: {
+export function EventCard({ title, time, place, amount, icon, layout = 'standard', state = 'default', journey, extras, status, favourite, to, onClick }: {
   title: string; time?: string; place?: string; amount?: string; icon: IconName;
+  /** Figma "Favourite": a filled star after the title (the event's Place is starred). */
+  favourite?: boolean;
   layout?: 'standard' | 'journey' | 'note'; state?: EventState;
   journey?: { fromTime: string; fromPlace?: string; duration?: string; toTime: string; toPlace?: string; mode?: IconName };
   /** Figma "Show extras": Tag 1, Tag 2 */
@@ -90,12 +92,12 @@ export function EventCard({ title, time, place, amount, icon, layout = 'standard
   const cls = [s.event, s[`event-${layout}`], s[`event-${state}`]].filter(Boolean).join(' ');
   const stateText = state === 'next' ? ', up next' : state === 'done' ? ', done' : '';
   return (
-    <Pressable to={to} onClick={onClick} className={cls} label={`${title}${time ? `, ${time}` : ''}${place ? `, ${place}` : ''}${amount ? `, ${amount}` : ''}${stateText}`}>
+    <Pressable to={to} onClick={onClick} className={cls} label={`${title}${favourite ? ', favourite' : ''}${time ? `, ${time}` : ''}${place ? `, ${place}` : ''}${amount ? `, ${amount}` : ''}${stateText}`}>
       <span className={s.eventIcon} aria-hidden="true"><Icon name={icon} size={24} /></span>
       <span className={s.eventBody} aria-hidden="true">
         <span className={s.eventHeader}>
           <span className={s.eventText}>
-            <span className={s.eventTitle}>{title}</span>
+            <span className={s.eventTitleRow}><span className={s.eventTitle}>{title}</span>{favourite && <Icon name="star" size={16} state="filled" />}</span>
             {(time || place) && (
               <span className={s.eventMeta}>
                 {time && <span className={s.eventTime}>{time}</span>}
