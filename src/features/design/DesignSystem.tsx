@@ -305,7 +305,7 @@ export function DesignSystem() {
           <MapCard media={<Illustration name="map" size={72} />} title="See 15 places on a map" meta="Tokyo, Kyoto, Osaka" onClick={() => {}} />
           <StatStrip stats={[{ value: 12, label: 'countries' }, { value: 31, label: 'cities' }, { value: 96, label: 'days away' }]} />
           <ProfileCard name="Alex Menon" email="alex.menon@gmail.com · Google" onClick={() => {}} />
-          <DestinationHeader tone="orange" flag={<img src={flagUrl('jp')} alt="" />} title="24 saves · 3 cities" meta="Saved by you and Sam" action={<Button variant="inverse" block iconEnd="chevron-right">Turn into a trip</Button>} />
+          <DestinationHeader tone="orange" flag={<img src={flagUrl('jp')} alt="" />} title="24 saves · 3 cities" meta="Saved by you and Sam" />
         </Section>
 
         <Section title="Flow" footer="Search field, Option cards and Step progress (shown on the bright emerald Flow screen).">
