@@ -1,12 +1,11 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react';
-import { Avatar, Button, Card, Select, IconButton, LinkButton, ListGroup, ListItem, PageHeader, PageSection, ProfileCard as FigmaProfileCard, SegmentedControl, Sheet, StatStrip, TextField, useToast } from '../../design/components';
+import { Avatar, Button, Card, Select, LinkButton, ListGroup, ListItem, PageHeader, PageSection, ProfileCard as FigmaProfileCard, SegmentedControl, Sheet, StatStrip, TextField, useToast } from '../../design/components';
 import { store } from '../../data';
 import { useMe, useMyTrips, usePlaces, useProfile } from '../../data/hooks';
 import { countryName } from '../../lib/countries';
 import { placeCategory } from '../../lib/places';
 import { PlaceRow, PlaceSheet } from '../saves/Collections';
 import { usePlaceMarks } from '../saves/placeMarks';
-import type { Place } from '../../data/types';
 import { daysBetween, today, tripPhase } from '../../lib/dates';
 import { shrinkPhoto } from '../../lib/image';
 import { MAPS_APPS, getMapsApp, setMapsApp, type MapsApp } from '../../lib/prefs';
@@ -18,11 +17,12 @@ import { CityPicker } from '../shared/CityPicker';
 import { MapView } from '../shared/Map';
 import s from './Profile.module.css';
 
-type Open = 'profile' | 'home' | 'places' | 'maps' | 'appearance' | 'currency' | null;
+type Open = 'profile' | 'home' | 'maps' | 'appearance' | 'currency' | null;
 
 /**
  * You tab (Figma "You tab — Profile"): the Profile Card, "Your travels" (a Stat strip of countries, cities and days
- * away, and the map of places you've been), "Favourite places" (events you starred), Settings, and Sign out.
+ * away on the bright brand surface, and the map of places you've been), "Favourite places" (Places you starred; See all
+ * opens Favourites), Settings, and Sign out.
  * Each setting opens a Sheet.
  */
 export function ProfilePage() {
@@ -30,8 +30,6 @@ export function ProfilePage() {
   const profile = useProfile(me.uid);
   const [theme, setTheme] = useState<ThemePref>(getTheme);
   const [maps, setMaps] = useState<MapsApp>(getMapsApp);
-  const [adding, setAdding] = useState<Place | null>(null);
-  const [pickerKey, setPickerKey] = useState(0);
   const [open, setOpen] = useState<Open>(null);
   const toast = useToast();
   const trips = useMyTrips();
@@ -59,12 +57,6 @@ export function ProfilePage() {
     try { await store.saveProfile(me.uid, data); toast({ icon: 'check', label }); }
     catch { toast({ tone: 'error', label: "Couldn't save. Check your connection" }); }
   };
-  const addPlace = async () => {
-    if (!adding) return;
-    await save({ visited: [...visited.filter((v) => v.name !== adding.name), adding] }, `${adding.name.split(',')[0]} added`);
-    setAdding(null);
-    setPickerKey((k) => k + 1);
-  };
   const name = profile?.name || me.name;
   const home = useHomeCurrency();
   const themeLabel = { auto: 'Automatic', light: 'Light', dark: 'Dark' }[theme];
@@ -76,7 +68,7 @@ export function ProfilePage() {
         email={[me.email, store.mode === 'demo' ? 'Demo account' : 'Google'].filter(Boolean).join(' · ')}
         onClick={() => setOpen('profile')} label={`${name}: edit your name and photo`} />
 
-      <PageSection title="Your travels" action={<Button variant="ghost" size="regular" iconEnd="chevron-right" onClick={() => setOpen('places')}>Places</Button>}>
+      <PageSection title="Your travels">
         <StatStrip stats={[
           { value: countries, label: countries === 1 ? 'country' : 'countries' },
           { value: cities, label: cities === 1 ? 'city' : 'cities' },
@@ -119,21 +111,6 @@ export function ProfilePage() {
         <CityPicker key={profile?.home?.name ?? 'none'} label="Home city" placeholder="Melbourne" value={profile?.home ?? null}
           onChange={(p) => p && save({ home: p, homeCity: p.name }, 'Home city saved')} />
         {profile?.home && <Button variant="destructive" icon="trash" onClick={() => save({ home: null, homeCity: '' }, 'Home city removed')}>Remove home city</Button>}
-      </Sheet>
-
-      <Sheet open={open === 'places'} title="Places I’ve been" subtitle="Your map shows these, your home city and past trips" onClose={() => setOpen(null)}>
-        <div className={s.add}>
-          <div className={s.addField}><CityPicker key={pickerKey} label="Add a place" placeholder="Tokyo" value={adding} onChange={setAdding} /></div>
-          <Button icon="plus" onClick={addPlace} disabled={!adding}>Add</Button>
-        </div>
-        {visited.length > 0 && (
-          <ListGroup label="Places you added">
-            {visited.map((v) => (
-              <ListItem key={v.name} icon="pin" title={v.name.split(',')[0]} meta={v.name.split(',').slice(1).join(',').trim() || undefined}
-                trailing={<IconButton icon="trash" label={`Remove ${v.name}`} onClick={() => save({ visited: visited.filter((x) => x.name !== v.name) }, `${v.name.split(',')[0]} removed`)} />} />
-            ))}
-          </ListGroup>
-        )}
       </Sheet>
 
       <Sheet open={open === 'currency'} title="Currency" subtitle="Prices show in the currency they were booked in, then converted to this one" onClose={() => setOpen(null)}>

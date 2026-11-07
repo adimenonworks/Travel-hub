@@ -216,7 +216,7 @@ export function Favourites() {
             {chip(cat === 'all', 'All', () => { setCat('all'); setCity('all'); })}
             {cats.map((c) => chip(cat === c.value, c.label, () => { setCat(c.value); setCity('all'); }))}
           </ul>
-          {cities.length > 1 && (
+          {cities.length > 0 && (
             <ul className={s.chips} aria-label="City">
               {chip(city === 'all', 'Every city', () => setCity('all'))}
               {cities.map((c) => chip(city === c, c, () => setCity(c)))}

@@ -140,10 +140,18 @@
 .mapMedia { flex: none; width: 72px; display: grid; place-items: center; }
 
 /* Stat strip: 20 / 16 padding, 24 corners, light emerald */
-.stats { margin: 0; display: flex; justify-content: space-between; gap: var(--space-default-400); flex-wrap: wrap; padding: var(--space-default-600) var(--space-default-500); border-radius: var(--radius-600); background: var(--on-light-surface-brand); }
-.stat { display: flex; flex-direction: column-reverse; align-items: center; gap: var(--space-default-100); min-width: 0; }
-.statValue { margin: 0; font: var(--type-heading-1); letter-spacing: -0.02em; color: var(--on-light-text-brand); font-variant-numeric: tabular-nums; }
-.statLabel { font: var(--type-body-small); color: var(--on-light-text-brand); }
+/* Stat strip: the bright brand surface (on-mid), each stat centred on its own inner surface, all the same width
+   (they wrap to more rows, still equal, when text is large). 8 around and between, so inner corners are 24 − 8 = 16. */
+.stats {
+  margin: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(calc(80rem / 17), 1fr)); gap: var(--space-default-300);
+  padding: var(--space-default-300); border-radius: var(--radius-600); background: var(--on-mid-surface-primary);
+}
+.stat {
+  display: flex; flex-direction: column-reverse; align-items: center; justify-content: center; gap: var(--space-default-100); min-width: 0; text-align: center;
+  padding: var(--space-default-500) var(--space-default-300); border-radius: var(--radius-500); background: var(--on-mid-surface-brand);
+}
+.statValue { margin: 0; font: var(--type-heading-1); letter-spacing: -0.02em; color: var(--on-mid-text-primary); font-variant-numeric: tabular-nums; }
+.statLabel { font: var(--type-body-small); color: var(--on-mid-text-secondary); }
 
 /* Profile Card */
 .profile { display: flex; align-items: center; gap: var(--space-default-400); padding: var(--space-default-500); border-radius: var(--radius-600); background: var(--on-light-surface-primary); border: 1px solid var(--on-light-border-subtle); }

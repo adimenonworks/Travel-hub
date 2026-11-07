@@ -4,7 +4,6 @@
 .avatarButton { flex: none; display: grid; place-items: center; min-width: var(--size-tap); min-height: var(--size-tap); margin: -2px; padding: 0; border: 0; background: none; border-radius: 50%; transition: transform var(--motion-release); }
 .avatarButton:active { transform: scale(0.94); transition: transform var(--motion-press); }
 .nameRow { display: flex; flex-wrap: wrap; gap: var(--space-default-400); align-items: flex-end; margin-bottom: calc(var(--space-default-400) * -1); }
-.add { display: flex; gap: var(--space-default-400); align-items: flex-end; }
 .addField { flex: 1 1 calc(160rem / 17); min-width: 0; }
 .appearance { display: flex; flex-direction: column; gap: var(--space-default-700); padding: var(--space-default-500); } /* Figma: card padding 16 */
 .appearanceRow { display: flex; flex-direction: column; gap: var(--space-default-400); }
