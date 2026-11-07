@@ -52,7 +52,7 @@ Some browsers (notably Safari on iPhone) block the cross-site storage that Googl
 
 ## Cloud Function: reading saved links
 
-`functions/` holds `readLink`, which Save to Rove calls to read a shared link (its title, photo and site, and the place it's about, matched with a free place search). It needs Firebase's pay-as-you-go **Blaze** plan; at Rove's size it costs nothing. Until it's deployed (and in demo mode), the app still saves links: it reads what it can from the link itself.
+`functions/` holds `readLink`, which reads a shared link (its title, photo and site, and the place it's about, matched with a free place search). **It isn't deployed, by choice:** it needs Firebase's pay-as-you-go **Blaze** plan. It isn't needed for the iPhone app, which reads links itself (`readOnPhone` in `src/lib/links.ts`, native networking). Only the website (and demo mode) would use it; without it they save links with what the link itself shows. Deploy it only if the website ever needs full previews.
 
 Deploy it (first time, and whenever `functions/` changes), from Google Cloud Shell, which is already signed in as you:
 

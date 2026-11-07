@@ -1,6 +1,8 @@
 import { store } from '../data';
 import type { LinkPreview } from '../data/types';
+import { CapacitorHttp } from '@capacitor/core';
 import { countryName } from './countries';
+import { isNativeApp } from './native';
 
 type FoundPlace = NonNullable<LinkPreview['place']>;
 
@@ -59,12 +61,64 @@ export function findUrl(text: string) {
   return text.match(/https?:\/\/[^\s<>"]+/)?.[0]?.replace(/[).,]+$/, '') ?? null;
 }
 
+const decode = (t: string) => {
+  const el = document.createElement('textarea');
+  el.innerHTML = t;
+  return el.value.trim();
+};
+
+/** A page's preview tag (Open Graph / Twitter / description). */
+function meta(html: string, ...names: string[]) {
+  for (const n of names) {
+    const tag = html.match(new RegExp(`<meta[^>]+(?:property|name)=["']${n}["'][^>]*>`, 'i'))?.[0];
+    const content = tag?.match(/content=["']([^"']*)["']/i)?.[1];
+    if (content) return decode(content);
+  }
+  return '';
+}
+
 /**
- * Read a link for Save to Rove: the readLink Cloud Function when it's deployed (title, photo, place); otherwise what
- * the app can tell from the link itself (the site, a Google Maps place name, and a place search for it).
+ * In the iPhone app: read the page itself (native networking isn't blocked the way a website's is), the same way the
+ * readLink Cloud Function would: its preview tags, TikTok's public oEmbed, a Google Maps place, then one place search.
+ * Free, and needs no server.
+ */
+async function readOnPhone(url: string): Promise<LinkPreview | null> {
+  try {
+    const res = await CapacitorHttp.get({
+      url, responseType: 'text', connectTimeout: 8000, readTimeout: 8000,
+      headers: { 'User-Agent': 'facebookexternalhit/1.1 (Rove link preview)', Accept: 'text/html', 'Accept-Language': 'en' },
+    });
+    const finalUrl = res.url || url;
+    const html = typeof res.data === 'string' ? res.data.slice(0, 1_500_000) : '';
+    const host = new URL(finalUrl).hostname.replace(/^www\./, '');
+    let site = meta(html, 'og:site_name') || siteOf(finalUrl);
+    let title = meta(html, 'og:title', 'twitter:title') || decode(html.match(/<title[^>]*>([^<]*)<\/title>/i)?.[1] ?? '');
+    let image = meta(html, 'og:image', 'og:image:url', 'twitter:image');
+    if (/(^|\.)tiktok\.com$/.test(host)) {
+      try {
+        const o = (await CapacitorHttp.get({ url: `https://www.tiktok.com/oembed?url=${encodeURIComponent(finalUrl)}`, responseType: 'json' })).data as { title?: string; thumbnail_url?: string };
+        title = o.title || title; image = o.thumbnail_url || image; site = 'TikTok';
+      } catch { /* keep what we have */ }
+    }
+    const name = mapsPlace(new URL(finalUrl));
+    const query = name ?? title.replace(/\s*[|·–—-]\s*[^|·–—-]*$/, '').slice(0, 80);
+    let place: FoundPlace | null = null;
+    if (query) { try { place = (await searchPlaces(query))[0] ?? null; } catch { /* offline */ } }
+    return { url: finalUrl, site, title: title || name || host, image: /^https:\/\//.test(image) ? image : '', place };
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Read a link for Save to Rove (title, photo, place). The iPhone app reads the page itself; elsewhere the readLink
+ * Cloud Function does (only if it's deployed, which needs Firebase's paid Blaze plan; it isn't for now). Failing both,
+ * what the app can tell from the link alone: the site, a Google Maps place name, and a place search for it.
  */
 export async function readLink(raw: string): Promise<LinkPreview> {
   const url = raw.trim();
+  const onPhone = isNativeApp ? await readOnPhone(url) : null;
+  if (onPhone) return onPhone;
   const fromServer = await store.readLink(url);
   if (fromServer) return fromServer;
   let u: URL | null = null;
