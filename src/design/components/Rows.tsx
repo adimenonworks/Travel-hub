@@ -239,8 +239,8 @@ export function ProfileCard({ name, email, photo, avatar, ...press }: Press & { 
   );
 }
 
-/** Figma "Option card" (Selected No / Yes): a big tappable choice with an icon and a Heading 3 label. */
-export function OptionCard({ icon, label, selected, onClick }: { icon: IconName; label: string; selected: boolean; onClick: () => void }) {
+/** Figma "Option card" (Selected No / Yes): a big tappable choice with an icon and a Heading 3 label. Leave `selected` out when it's a one-tap choice (e.g. the add-event picker), not a toggle. */
+export function OptionCard({ icon, label, selected, onClick }: { icon: IconName; label: string; selected?: boolean; onClick: () => void }) {
   return (
     <button type="button" className={[s.option, selected && s.optionSelected].filter(Boolean).join(' ')} aria-pressed={selected} onClick={onClick}>
       <Icon name={icon} size={24} />
