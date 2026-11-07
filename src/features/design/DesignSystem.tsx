@@ -246,7 +246,7 @@ export function DesignSystem() {
             <Chip icon="people">4 going</Chip>
           </div>
           <div className={s.row}>
-            <Badge icon="check">Neutral</Badge><Badge tone="tint" icon="calendar">In 9 days</Badge><Badge tone="category" icon="camera">Category</Badge><Badge tone="success" icon="star">Most votes</Badge><Badge tone="warning">Warning</Badge><Badge tone="danger">Danger</Badge>
+            <Badge icon="calendar">In 9 days</Badge><Badge tone="tint" icon="check">Tint (unused)</Badge><Badge tone="category" icon="camera">Category</Badge><Badge tone="success" icon="check">Success</Badge><Badge tone="warning">Warning</Badge><Badge tone="danger">Danger</Badge>
           </div>
         </Section>
 

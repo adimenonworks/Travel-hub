@@ -34,7 +34,10 @@ export function AvatarStack({ people, max = 3, size = 32 }: { people: { id: stri
   );
 }
 
-/** Figma "Tags" Tone: Neutral, Tint, Category, Success, Warning, Danger. */
+/**
+ * Figma "Tags" Tone: Neutral, Tint, Category, Success, Warning, Danger. Neutral is the default and what the app uses;
+ * Success / Warning / Danger only for a real status. Tint stays in the component but isn't used anywhere.
+ */
 export type BadgeTone = 'neutral' | 'tint' | 'success' | 'warning' | 'danger' | 'category';
 
 /** Figma "Tags": a pill with an optional 16px icon and a Label small label. */

@@ -48,7 +48,7 @@ export function HeroCard({ size = 'regular', cover, countdown, title, meta, peop
       {cover && (
         <div className={s.cover}>
           {cover}
-          {countdown && <span className={s.countdown}><Badge tone="tint" icon={countdown.icon ?? 'calendar'}>{countdown.label}</Badge></span>}
+          {countdown && <span className={s.countdown}><Badge tone="neutral" icon={countdown.icon ?? 'calendar'}>{countdown.label}</Badge></span>}
         </div>
       )}
       <div className={s.body}>
@@ -59,7 +59,7 @@ export function HeroCard({ size = 'regular', cover, countdown, title, meta, peop
           </div>
           {size === 'regular' && people && people.length > 0 && <AvatarStack people={people} />}
         </div>
-        {!cover && countdown && <div><Badge tone="tint" icon={countdown.icon ?? 'calendar'}>{countdown.label}</Badge></div>}
+        {!cover && countdown && <div><Badge tone="neutral" icon={countdown.icon ?? 'calendar'}>{countdown.label}</Badge></div>}
         {size === 'regular' && next && (
           <div className={s.rows}>
             <ListItem icon={next.icon} title={next.title} meta={next.meta} to={next.to} round />

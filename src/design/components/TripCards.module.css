@@ -9,7 +9,9 @@
 .heroCompact .cover { aspect-ratio: 3 / 1; }
 .cover > :first-child { position: absolute; inset: 0; width: 100%; height: 100%; }
 .cover > :first-child svg { width: 100%; height: 100%; }
-.countdown { position: absolute; top: var(--space-default-500); left: var(--space-default-500); }
+.countdown { position: absolute; top: var(--space-default-500); left: var(--space-default-500);
+  /* On a cover the Neutral tag is a white pill (the page surface), so it reads on any photo or scene */
+  --tag-neutral-background: var(--on-light-surface-primary); --tag-neutral-text: var(--on-light-text-primary); }
 .body { display: flex; flex-direction: column; gap: var(--space-default-400); padding: var(--space-default-500) var(--space-default-500) var(--space-default-200); }
 .body:not(:has(.rows)) { padding-bottom: var(--space-default-500); }
 .titleRow { display: flex; align-items: center; gap: var(--space-default-300); }

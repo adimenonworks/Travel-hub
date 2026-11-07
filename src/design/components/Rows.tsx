@@ -161,7 +161,7 @@ export function IdeaRow({ title, meta, icon, tag, vote, onClick }: {
         <span className={s.itemText}>
           <span className={s.itemTitle}>{title}</span>
           {meta && <span className={s.itemMeta}>{meta}</span>}
-          {tag && <span className={s.ideaTag}><Badge tone="success" icon={tag.icon}>{tag.label}</Badge></span>}
+          {tag && <span className={s.ideaTag}><Badge tone="neutral" icon={tag.icon}>{tag.label}</Badge></span>}
         </span>
       </Pressable>
       <VoteButton count={vote.count} voted={vote.voted} onClick={vote.onClick}
