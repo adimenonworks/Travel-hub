@@ -29,7 +29,7 @@ export function Bookings(ctx: TripCtx) {
             {docs.map(({ a, l }, i) => (
               <ListItem key={`${a.id}-${i}`} icon={isPdf(l.url) ? 'doc' : 'link'} title={l.label || hostOf(l.url)}
                 meta={`${a.title} · ${formatDay(a.date)}`} trailing={isPdf(l.url) ? 'PDF' : undefined} href={l.url}
-                onClick={() => recordView(trip.id, { url: l.url, label: l.label || hostOf(l.url), meta: a.title })}
+                onClick={() => recordView(trip.id, { url: l.url, kind: isPdf(l.url) ? 'PDF' : 'Link', label: l.label || hostOf(l.url), meta: a.title })}
                 label={`${l.label || hostOf(l.url)}, for ${a.title} (opens in a new tab)`} />
             ))}
           </ListGroup>

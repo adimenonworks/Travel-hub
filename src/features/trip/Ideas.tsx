@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { Button, EmptyState, IdeaRow, LinkButton, ListGroup, ListItem, SectionHeader, SegmentedControl, Select, Sheet, TextArea, TextField, useToast } from '../../design/components';
 import { store } from '../../data';
 import { personName, useMe, usePlaces, usePlacesById } from '../../data/hooks';
@@ -11,7 +12,7 @@ import { haptic, confirmAction } from '../../lib/native';
 import { CATEGORIES, categoryInfo, eventType } from '../../lib/categories';
 import { priceOf, priceText } from '../../lib/currency';
 import { recordView } from '../../lib/recent';
-import { hostOf } from '../../lib/format';
+import { hostOf, isPdf } from '../../lib/format';
 import { PriceField, PriceWithConversion, fromPriceDraft, toPriceDraft, type PriceDraft } from '../shared/Price';
 import { Comments } from '../shared/Comments';
 import { LinkChips, LinkEditor, cleanLinks } from '../shared/Links';
@@ -34,6 +35,15 @@ export function Ideas(ctx: TripCtx) {
   const [filter, setFilter] = useState<Filter>('open');
   const [editing, setEditing] = useState<Idea | 'new' | null>(null);
   const [viewing, setViewing] = useState<Idea | null>(null);
+  // ?idea=<id> (e.g. from Overview → Recently viewed) opens that idea's sheet
+  const [params, setParams] = useSearchParams();
+  const linked = params.get('idea');
+  useEffect(() => {
+    if (!linked) return;
+    const hit = ctx.ideas.find((x) => x.id === linked);
+    if (hit) setViewing(hit);
+    setParams({}, { replace: true });
+  }, [linked]); // eslint-disable-line react-hooks/exhaustive-deps
   const [scheduling, setScheduling] = useState<Idea | null>(null);
   const toast = useToast();
 
@@ -76,7 +86,7 @@ export function Ideas(ctx: TripCtx) {
               <IdeaRow key={i.id} title={place?.name ?? i.title} meta={meta} icon={place ? placeCategory(place.category).icon : cat.icon}
                 tag={i.id === top ? { icon: 'star', label: 'Most votes' } : undefined}
                 vote={{ count: ups(i), voted: !!i.votes?.[me.uid], onClick: () => vote(i) }}
-                onClick={() => setViewing(i)} />
+                onClick={() => { setViewing(i); if (place) recordView(trip.id, { url: `/trip/${trip.id}/ideas?idea=${i.id}`, label: place.name, kind: 'Place' }); }} />
             );
           })}
         </ListGroup>
@@ -166,7 +176,7 @@ function IdeaSheet({ idea, place, ctx, onClose, onEdit, onSchedule }: { idea: Id
       {place && <PlaceMarks visited={visited.has(place.id)} starred={starred(place)} />}
       {priceOf(idea, ctx.trip) && <p className="t-body">Price: <PriceWithConversion price={priceOf(idea, ctx.trip)!} /></p>}
       {(idea.notes || place?.notes) && <p className="t-body">{idea.notes || place?.notes}</p>}
-      <LinkChips links={idea.links} onOpen={(l) => recordView(ctx.trip.id, { url: l.url, label: l.label || hostOf(l.url), meta: idea.title })} />
+      <LinkChips links={idea.links} onOpen={(l) => recordView(ctx.trip.id, { url: l.url, kind: isPdf(l.url) ? 'PDF' : 'Link', label: l.label || hostOf(l.url), meta: idea.title })} />
       {place && (
         <div className={s.ideaButtons}>
           {place.url && <LinkButton href={place.url} variant="secondary" icon="arrow-up-right">{`Open on ${place.source || 'the web'}`}</LinkButton>}

@@ -1,19 +1,24 @@
 import { useState } from 'react';
-import { CountryModal, EventCard, LinkButton, ListGroup, ListItem, PageSection, Tile } from '../../design/components';
+import { CountryModal, EventCard, LinkButton, ListGroup, ListItem, PageSection } from '../../design/components';
+import type { IconName } from '../../design/components';
+import { useMe, useProfile } from '../../data/hooks';
+import type { Place } from '../../data/types';
 import { BOOKING_GROUPS, eventType } from '../../lib/categories';
-import { countryName, flagUrl, tripCountries } from '../../lib/countries';
+import { countryCodeOf, countryName, flagUrl, tripCountries } from '../../lib/countries';
+import { timeAgo } from '../../lib/dates';
 import { emergencyFor } from '../../lib/emergency';
 import { nextEvent } from '../../lib/trips';
-import { recordView, useRecentViews } from '../../lib/recent';
-import { hostOf, isPdf } from '../../lib/format';
+import { isInApp, recordView, useRecentViews, type ViewKind } from '../../lib/recent';
 import { eventCardProps } from './events';
 import type { TripCtx } from './TripPage';
 import s from './trip.module.css';
 
+const KIND_ICON: Record<ViewKind, IconName> = { PDF: 'doc', Email: 'mail', Link: 'link', Booking: 'ticket', Place: 'pin' };
+
 /**
- * Trip "Overview" tab (Figma "Trip — Overview"): the hub. Next stop (the next event on a brand surface) → Bookings
- * tiles (a plain count of each kind of event) → Recently viewed (documents and links you opened, on this device) →
- * Good to know (each country's emergency number and entry requirements).
+ * Trip "Overview" tab (Figma "Trip — Overview"): Next stop (the next event as the deep green Next card) → Bookings (a
+ * list, one row per type with a plain count, each opening that type's list) → Recently viewed (documents, bookings
+ * and places you last opened, on this device) → Good to know (each country's emergency number; opens the Country sheet).
  */
 export function Overview(ctx: TripCtx) {
   const { trip, activities } = ctx;
@@ -23,34 +28,42 @@ export function Overview(ctx: TripCtx) {
   const docs = activities.reduce((n, a) => n + a.links.length, 0);
   const countries = tripCountries(trip, activities);
   const recent = useRecentViews(trip.id);
+  const me = useMe();
+  const home = useProfile(me.uid)?.home ?? null;
+  // A spot on the trip in the chosen country, for its local time
+  const spots: Place[] = [trip.destination, ...activities.flatMap((a) => [a.location, a.to])].filter((p): p is Place => !!p);
+  const spot = country ? spots.find((p) => countryCodeOf(p) === country) ?? null : null;
 
   return (
     <div className={s.overview}>
 
       <PageSection title="Next stop" action={<LinkButton to={`${base}/itinerary`} variant="ghost" size="regular" iconEnd="chevron-right">Itinerary</LinkButton>}>
         {next
-          ? <div className={s.nextStop}><EventCard {...eventCardProps(next, ctx, true)} /></div>
+          ? <EventCard {...eventCardProps(next, ctx, true)} state="next" />
           : <ListGroup><ListItem icon="calendar" title="Nothing planned yet" meta="Add events to the itinerary and the next one shows here." to={`${base}/itinerary`} /></ListGroup>}
       </PageSection>
 
-      <PageSection title="Bookings" meta="Your plans, by type">
-        <div className={s.tiles}>
+      <PageSection title="Bookings" meta="Tickets, confirmations and PDFs, by type">
+        <ListGroup label="Bookings">
           {BOOKING_GROUPS.map((g) => {
             const n = activities.filter((a) => eventType(a.category) === g.type).length;
-            return <Tile key={g.key} icon={g.icon} title={g.title} meta={`${n} ${n === 1 ? g.one : g.many}`} to={`${base}/bookings/${g.key}`} />;
+            return <ListItem key={g.key} icon={g.icon} title={g.title} meta={`${n} ${n === 1 ? g.one : g.many}`} to={`${base}/bookings/${g.key}`} />;
           })}
-          <Tile icon="doc" title="Documents" meta={`${docs} ${docs === 1 ? 'file or link' : 'files and links'}`} to={`${base}/bookings/documents`} />
-        </div>
+          <ListItem icon="doc" title="Documents" meta={`${docs} ${docs === 1 ? 'file' : 'files'}`} to={`${base}/bookings/documents`} />
+        </ListGroup>
       </PageSection>
 
       {recent.length > 0 && (
-        <PageSection title="Recently viewed" meta="Documents and links you opened">
+        <PageSection title="Recently viewed">
           <ListGroup label="Recently viewed">
-            {recent.map((v) => (
-              <ListItem key={v.url} icon={isPdf(v.url) ? 'doc' : 'link'} title={v.label} meta={[v.meta, hostOf(v.url)].filter(Boolean).join(' · ')}
-                trailing={isPdf(v.url) ? 'PDF' : undefined} href={v.url} label={`${v.label} (opens in a new tab)`}
-                onClick={() => recordView(trip.id, { url: v.url, label: v.label, meta: v.meta })} />
-            ))}
+            {recent.map((v) => {
+              const kind = v.kind ?? 'Link';
+              const trailing = `${kind} · ${timeAgo(v.at)}`;
+              return isInApp(v)
+                ? <ListItem key={v.url} size="compact" icon={KIND_ICON[kind]} title={v.label} trailing={trailing} to={v.url} />
+                : <ListItem key={v.url} size="compact" icon={KIND_ICON[kind]} title={v.label} trailing={trailing} href={v.url} label={`${v.label} (opens in a new tab)`}
+                    onClick={() => recordView(trip.id, { url: v.url, label: v.label, meta: v.meta, kind })} />;
+            })}
           </ListGroup>
         </PageSection>
       )}
@@ -70,7 +83,7 @@ export function Overview(ctx: TripCtx) {
           </ListGroup>
         </PageSection>
       )}
-      <CountryModal code={country} onClose={() => setCountry(null)} />
+      <CountryModal code={country} onClose={() => setCountry(null)} place={spot} home={home ? { ...home, countryCode: countryCodeOf(home) } : null} />
     </div>
   );
 }

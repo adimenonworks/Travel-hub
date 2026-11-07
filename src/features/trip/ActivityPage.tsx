@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { Button, EmptyState, EventCard, IconButton, LinkButton, ListGroup, ListItem, PageHeader, PageSection, Sheet, TextField, useToast } from '../../design/components';
 import { store } from '../../data';
@@ -30,6 +30,10 @@ export function ActivityPage(ctx: TripCtx) {
   const toast = useToast();
   const places = usePlacesById(ctx.activities.flatMap((x) => (x.placeId ? [x.placeId] : [])));
   const itinerary = `/trip/${trip.id}/itinerary${a ? `?day=${a.date}` : ''}`;
+  // Recently viewed: a booking you open (any event but a note)
+  useEffect(() => {
+    if (a && eventType(a.category) !== 'note') recordView(trip.id, { url: `/trip/${trip.id}/plan/${a.id}`, label: a.title, kind: 'Booking' });
+  }, [a?.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   if (!a)
     return (
@@ -103,7 +107,7 @@ export function ActivityPage(ctx: TripCtx) {
                 <div key={i} className={s.docRow}>
                   <ListItem icon={isPdf(l.url) ? 'doc' : 'link'} title={name} meta={`${hostOf(l.url)}${l.emailUrl ? ' · from email' : ''}`}
                     trailing={isPdf(l.url) ? 'PDF' : undefined} href={l.url} label={`${name} (opens in a new tab)`}
-                    onClick={() => recordView(trip.id, { url: l.url, label: name, meta: a.title })} />
+                    onClick={() => recordView(trip.id, { url: l.url, kind: isPdf(l.url) ? 'PDF' : 'Link', label: name, meta: a.title })} />
                   {l.emailUrl && <LinkButton href={l.emailUrl} size="regular" variant="ghost" icon="mail" label={`Open the email for ${name}`} />}
                   <IconButton icon="trash" label={`Remove ${name}`} onClick={() => removeDoc(i)} />
                 </div>
