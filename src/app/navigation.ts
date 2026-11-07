@@ -21,12 +21,14 @@ export function goBack(navigate: NavigateFunction, parent: string) {
   if (idx > 0) navigate(-1); else navigate(parent, { replace: true });
 }
 
-/** A screen is the path without a trip's tab (Itinerary, Ideas, Photos and People are one screen with tabs). */
-export const screenKey = (path: string) => path.replace(/^(\/trip\/[^/]+)\/(ideas|photos|people|info)$/, '$1');
+/** A screen is the path without a trip's tab (Overview, Itinerary, Ideas, Photos and People are one screen with tabs). */
+export const screenKey = (path: string) => path.replace(/^(\/trip\/[^/]+)\/(itinerary|ideas|photos|people|info)$/, '$1');
 
 const scrolls = new Map<string, number>();
 /** Where each tab's screen was scrolled to (by path), so coming back to a tab returns you there. */
 const tabScrolls = new Map<string, number>();
+/** Where a path was last scrolled to (a trip's tabs each remember their own). */
+export const savedScroll = (path: string) => tabScrolls.get(path);
 if (typeof window !== 'undefined' && 'scrollRestoration' in window.history) window.history.scrollRestoration = 'manual';
 
 /** Returns the class for the incoming screen's slide, and handles scroll memory. */
