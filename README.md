@@ -2,9 +2,10 @@
 
 A shared vacation planner. Create trips, invite friends, and plan together:
 
-- **Itinerary**: one tab per day with timed plans, locations, links/PDFs, costs, who's going, and comments.
+- **Itinerary**: one tab per day with timed plans (flights, stays, transport, food & drink, activities, notes), locations, links/PDFs, optional prices, who's going, and comments.
 - **Ideas board**: anyone can drop ideas and vote; organizers approve an idea and schedule it into a day.
-- **Budget**: daily budget against planned spend for each day and the whole trip, either your share or the whole group's, plus flights, stays and other expenses.
+- **Saved places**: save a place from a link or a search into your Collections (country → city → category), star favourites, and bring them into a trip's ideas.
+- **Prices**: an optional price on ideas and events, in the currency you booked in, with a conversion to your home currency (rates by ExchangeRate-API).
 - **Info**: weather for your dates (a live forecast within 16 days, otherwise last year's weather on the same dates), local headlines, and a map of your plans.
 - **Cover photos**: pick a photo for each trip; it's shrunk on your device and saved with the trip (free, no Firebase Storage needed).
 - **Photos**: links to shared Google Photos or iCloud albums for the trip (those services don't allow embedding, so each album opens in its own app or tab).
@@ -88,7 +89,7 @@ src/
   app/         router + shell (top bar)
   data/        types, Store interface, Firebase + demo implementations, React hooks
   design/      tokens + components
-  features/    home, trip (itinerary, ideas, budget, info, people), profile, auth, design page
+  features/    home, saves, trip (itinerary, ideas, photos, people), profile, auth, design page
   lib/         dates, money/links, weather, news, geocoding
 firestore.rules
 tests/rules/   security-rules tests (Firestore emulator)
