@@ -28,6 +28,8 @@ function Routed() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/trips" element={<Trips />} />
+        {/* Links shared to Rove arrive at #/save?url=… (the Shell opens Save to Rove) */}
+        <Route path="/save" element={<Home />} />
         <Route path="/trip/:tripId/*" element={<TripPage />} />
         <Route path="/join/:code" element={<Join />} />
         <Route path="/profile" element={<ProfilePage />} />

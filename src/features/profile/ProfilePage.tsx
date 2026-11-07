@@ -9,6 +9,7 @@ import { shrinkPhoto } from '../../lib/image';
 import { MAPS_APPS, getMapsApp, setMapsApp, type MapsApp } from '../../lib/prefs';
 import { applyTheme, getTheme, type ThemePref } from '../../lib/theme';
 import { Content } from '../../app/Shell';
+import { plannedTrips } from '../../lib/saves';
 import { CityPicker } from '../shared/CityPicker';
 import { MapView } from '../shared/Map';
 import s from './Profile.module.css';
@@ -29,7 +30,9 @@ export function ProfilePage() {
   const [pickerKey, setPickerKey] = useState(0);
   const [open, setOpen] = useState<Open>(null);
   const toast = useToast();
-  const trips = useMyTrips();
+  const myTrips = useMyTrips();
+  // Saved places (no dates yet) don't count as travels.
+  const trips = myTrips === null ? null : plannedTrips(myTrips);
   const visited = profile?.visited ?? [];
   const been = (trips ?? []).filter((t) => tripPhase(t.startDate, t.endDate) !== 'upcoming');
   const pastPlaces = been.filter((t) => t.destination).map((t) => t.destination!);

@@ -50,6 +50,23 @@ Some browsers (notably Safari on iPhone) block the cross-site storage that Googl
 2. GitHub repo → Settings → Secrets and variables → Actions → **New repository secret**. Name it `FIREBASE_SERVICE_ACCOUNT` and paste the whole contents of the file.
 3. Re-run the "Deploy site" workflow. Every deploy then publishes to both addresses.
 
+## Cloud Function: reading saved links
+
+`functions/` holds `readLink`, which Save to Rove calls to read a shared link (its title, photo and site, and the place it's about, matched with a free place search). It needs Firebase's pay-as-you-go **Blaze** plan; at Rove's size it costs nothing. Until it's deployed (and in demo mode), the app still saves links: it reads what it can from the link itself.
+
+Deploy it (first time, and whenever `functions/` changes), from Google Cloud Shell, which is already signed in as you:
+
+1. Open https://console.cloud.google.com/?project=travel-hub-a1aa2 and click the **Activate Cloud Shell** button (top right, `>_`).
+2. Paste this and press Enter:
+   ```bash
+   rm -rf Travel-hub && git clone https://github.com/adimenonworks/Travel-hub.git && cd Travel-hub/functions && npm install && npx firebase-tools@15.34.1 deploy --only functions --project travel-hub-a1aa2
+   ```
+3. If it asks you to log in, run `npx firebase-tools@15.34.1 login --no-localhost`, follow the link, then run step 2's last command again.
+
+## Sharing to Rove from other apps (iPhone)
+
+`ios/App/ShareExtension` is the share extension: in Instagram, TikTok, Safari or Google Maps, Share → Rove. It opens Rove at `rove://save?url=<link>` and the Save to Rove sheet takes over (`onSharedLink` in `src/lib/native.ts`). The test site accepts the same at `#/save?url=<link>`.
+
 ## Design system
 
 `src/design/` has three layers, and you can swap pieces at any of them:

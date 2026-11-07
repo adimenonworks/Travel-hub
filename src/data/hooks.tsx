@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
 import { store } from './index';
-import type { Activity, Profile, Role, SubCollections, SubName, Trip, User } from './types';
+import type { Profile, Role, SubCollections, SubName, Trip, User } from './types';
 
 type AuthState = { user: User | null; loading: boolean };
 const AuthContext = createContext<AuthState>({ user: null, loading: true });
@@ -55,17 +55,20 @@ export function useSub<K extends SubName>(tripId: string, name: K) {
 }
 
 /** Activities for several trips, keyed by trip id (used for the travel metrics on Home). */
-export function useActivitiesFor(tripIds: string[]) {
+/** One kind of sub-collection for several trips at once (e.g. the saves of every saved place), by trip id. */
+export function useSubFor<K extends SubName>(tripIds: string[], name: K) {
   const key = tripIds.join(',');
-  const [byTrip, setByTrip] = useState<Record<string, Activity[]>>(() =>
-    Object.fromEntries(tripIds.flatMap((id) => (memo.has(`sub:${id}:activities`) ? [[id, memo.get(`sub:${id}:activities`) as Activity[]]] : []))));
+  const [byTrip, setByTrip] = useState<Record<string, SubCollections[K][]>>(() =>
+    Object.fromEntries(tripIds.flatMap((id) => (memo.has(`sub:${id}:${name}`) ? [[id, memo.get(`sub:${id}:${name}`) as SubCollections[K][]]] : []))));
   useEffect(() => {
-    const offs = tripIds.map((id) => store.watchSub(id, 'activities', (items) => { memo.set(`sub:${id}:activities`, items); setByTrip((m) => ({ ...m, [id]: items })); }));
+    const offs = tripIds.map((id) => store.watchSub(id, name, (items) => { memo.set(`sub:${id}:${name}`, items); setByTrip((m) => ({ ...m, [id]: items })); }));
     return () => offs.forEach((off) => off());
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [key]);
+  }, [key, name]);
   return byTrip;
 }
+
+export const useActivitiesFor = (tripIds: string[]) => useSubFor(tripIds, 'activities');
 
 export function useProfile(uid: string) {
   const [p, setP] = useCached<Profile | null>(`profile:${uid}`, null);

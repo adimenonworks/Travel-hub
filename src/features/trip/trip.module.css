@@ -87,3 +87,7 @@
 .flowSummaryMeta { margin: 0; font: var(--type-body-small); color: var(--on-mid-text-secondary); }
 /* The Ghost button on the deep emerald Celebration screen uses the ghost "inverse" text */
 .onDarkGhost[class] { color: var(--on-dark-text-primary); }
+
+.flowSection { display: flex; flex-direction: column; gap: var(--space-default-400); padding-top: var(--space-default-300); }
+.tick { display: inline-flex; align-items: center; gap: var(--space-default-100); color: var(--on-light-text-primary); font: var(--type-body-small); }
+.tick svg { color: var(--on-light-icon-brand); }

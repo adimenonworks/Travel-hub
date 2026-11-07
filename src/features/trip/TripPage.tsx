@@ -8,6 +8,7 @@ import { countryName, flagUrl, tripCountries } from '../../lib/countries';
 import { Content } from '../../app/Shell';
 import { ActivityPage } from './ActivityPage';
 import { Bookings } from './Bookings';
+import { SavedPlace } from '../saves/SavedPlace';
 import { Overview } from './Overview';
 import { Ideas } from './Ideas';
 import { Itinerary } from './Itinerary';
@@ -73,6 +74,9 @@ function TripLoaded({ trip }: { trip: Trip }) {
     { to: `${base}/photos`, label: 'Photos', active: section === 'photos' },
     { to: `${base}/people`, label: 'People', active: section === 'people' },
   ];
+
+  // A saved place (no dates yet) has its own page: Figma "Saved destination".
+  if (trip.status === 'saved') return <Content><SavedPlace {...ctx} /></Content>;
 
   // An event's own page and the bookings lists replace the trip header and tabs.
   if (planPage || section === 'bookings')

@@ -21,3 +21,8 @@
   .leaving { animation-direction: reverse; }
   @keyframes fade { from { opacity: 0; } to { opacity: 1; } }
 }
+
+/* Toast action (e.g. Undo): a short ghost text button with a 44px tap area */
+.action { position: relative; pointer-events: auto; margin-left: var(--space-default-200); padding: 0; border: 0; background: none; font: var(--type-label-small); color: var(--on-light-link-default); cursor: pointer; }
+.action::before { content: '·'; color: var(--on-light-text-secondary); margin-right: var(--space-default-200); }
+.action::after { content: ''; position: absolute; inset: -14px -8px; }

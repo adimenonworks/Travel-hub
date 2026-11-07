@@ -8,7 +8,8 @@ import {
   initializeFirestore, onSnapshot, persistentLocalCache, persistentMultipleTabManager, query, setDoc, updateDoc, where, writeBatch, type DocumentData,
 } from 'firebase/firestore';
 import type { Store } from './store';
-import type { Invite, Profile, SubName, Trip } from './types';
+import type { Invite, LinkPreview, Profile, SubName, Trip } from './types';
+import { getFunctions, httpsCallable } from 'firebase/functions';
 import { randomCode } from './util';
 import { googleIosClientId, isNativeApp } from '../lib/native';
 
@@ -190,6 +191,26 @@ export function createFirebaseStore(config: FirebaseOptions): Store {
 
     watchSub(tripId, name, cb) {
       return onSnapshot(collection(db, 'trips', tripId, name), (s) => cb(s.docs.map((d) => withId(d.id, d.data()))));
+    },
+    queueSub(tripId, name, data) {
+      const ref = doc(collection(db, 'trips', tripId, name));
+      const saved = setDoc(ref, { ...data, createdBy: auth.currentUser!.uid, createdAt: Date.now() });
+      return { id: ref.id, saved };
+    },
+    queueTrip(data) {
+      const uid = auth.currentUser!.uid;
+      const ref = doc(collection(db, 'trips'));
+      const saved = setDoc(ref, { ...data, ownerId: uid, memberIds: [uid], roles: { [uid]: 'owner' }, createdAt: Date.now() });
+      return { id: ref.id, saved };
+    },
+    async readLink(url) {
+      try {
+        // The function runs in Sydney (functions/index.js); it needs the paid (Blaze) plan to be deployed.
+        const call = httpsCallable<{ url: string }, LinkPreview>(getFunctions(app, 'australia-southeast1'), 'readLink', { timeout: 20000 });
+        return (await call({ url })).data;
+      } catch {
+        return null;
+      }
     },
     async addSub(tripId, name, data) {
       const ref = await addDoc(collection(db, 'trips', tripId, name), { ...data, createdBy: auth.currentUser!.uid, createdAt: Date.now() });

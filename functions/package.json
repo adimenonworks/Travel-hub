@@ -1,0 +1,12 @@
+{
+  "name": "rove-functions",
+  "private": true,
+  "description": "Rove's Cloud Functions: readLink reads a shared link (title, photo, place) for Save to Rove.",
+  "type": "module",
+  "main": "index.js",
+  "engines": { "node": "22" },
+  "dependencies": {
+    "firebase-admin": "14.5.0",
+    "firebase-functions": "7.4.0"
+  }
+}

@@ -4,6 +4,7 @@ import { useActivitiesFor, useMe, useMyTrips } from '../../data/hooks';
 import type { Activity, Category, Trip } from '../../data/types';
 import { formatDay, today } from '../../lib/dates';
 import { Content } from '../../app/Shell';
+import { plannedTrips } from '../../lib/saves';
 import { MapView } from '../shared/Map';
 
 /** Your travel collections: the places you've been, grouped by kind. Cafés and restaurants share one. */
@@ -32,7 +33,9 @@ export function collectionItems(all: Activity[], categories: Category[], uid: st
 export function CollectionPage() {
   const { key = '' } = useParams();
   const me = useMe();
-  const trips = useMyTrips();
+  const myTrips = useMyTrips();
+  // Saved places (no dates yet) don't count as travels.
+  const trips = myTrips === null ? null : plannedTrips(myTrips);
   const byTrip = useActivitiesFor((trips ?? []).map((t) => t.id));
   const c = key === FAVOURITES.key ? FAVOURITES : COLLECTIONS.find((x) => x.key === key);
   if (!c) return <Content><EmptyState illustration="compass" title="Collection not found" action={<LinkButton to="/profile" variant="secondary">Back to profile</LinkButton>} /></Content>;

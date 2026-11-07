@@ -14,9 +14,17 @@ export type Profile = {
   visited?: Place[];
 };
 
+/**
+ * A trip moves Saved → Planned → Past as one record (links, ideas and photos carry across).
+ * Saved: a place to go one day, with no dates yet (its saves are its ideas). Missing = 'planned' (every older trip).
+ * Past is worked out from the dates.
+ */
+export type TripStatus = 'saved' | 'planned';
+
 export type Trip = {
   id: string;
   name: string;
+  status?: TripStatus;
   destination: Place | null;
   startDate: string; // YYYY-MM-DD
   endDate: string;
@@ -82,6 +90,13 @@ export type IdeaStatus = 'open' | 'approved' | 'rejected';
 export type Idea = {
   id: string;
   title: string;
+  /** A save: the link it came from, its preview photo and site ("TikTok"), and the place it's about. */
+  url?: string;
+  image?: string;
+  source?: string;
+  place?: (Place & { city?: string; kind?: string }) | null;
+  /** Everyone who saved the same thing (it merges instead of appearing twice). */
+  savedBy?: string[];
   category: Category;
   notes: string;
   cost: number;
@@ -136,3 +151,13 @@ export type SubName = keyof SubCollections;
 
 /** Fields the caller supplies when creating; the store fills id/createdBy/createdAt. */
 export type NewDoc<T> = Omit<T, 'id' | 'createdBy' | 'createdAt'>;
+
+/** What the readLink Cloud Function (or the in-app fallback) found in a shared link. */
+export type LinkPreview = {
+  url: string;
+  site: string;
+  title: string;
+  image: string;
+  description?: string;
+  place: { name: string; city: string; country: string; countryCode: string; lat: number; lng: number; type: string; kind: string; isArea?: boolean } | null;
+};

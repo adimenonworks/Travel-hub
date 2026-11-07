@@ -72,3 +72,33 @@ export function haptic(kind: Haptic) {
     } catch { /* no haptics on this device */ }
   });
 }
+
+/**
+ * Links shared to Rove from another app. The iPhone share extension (ios/App/ShareExtension) opens
+ * rove://save?url=<link>; the test site accepts the same at #/save?url=<link>. Calls back with each link.
+ */
+export function onSharedLink(cb: (url: string) => void): () => void {
+  const take = (raw: string) => {
+    try {
+      const u = new URL(raw);
+      const link = u.searchParams.get('url');
+      if (u.protocol === 'rove:' && link) cb(link);
+    } catch { /* not ours */ }
+  };
+  // On the website (and for testing): #/save?url=…
+  const fromHash = () => {
+    const m = location.hash.match(/^#\/save\?(.*)$/);
+    const link = m && new URLSearchParams(m[1]).get('url');
+    if (link) { cb(link); history.replaceState(null, '', `${location.pathname}#/`); }
+  };
+  fromHash();
+  window.addEventListener('hashchange', fromHash);
+  let remove: (() => void) | undefined;
+  if (isNativeApp) {
+    import('@capacitor/app').then(({ App }) => {
+      App.getLaunchUrl().then((r) => r?.url && take(r.url)).catch(() => {});
+      App.addListener('appUrlOpen', (e) => take(e.url)).then((h) => { remove = () => h.remove(); });
+    });
+  }
+  return () => { window.removeEventListener('hashchange', fromHash); remove?.(); };
+}

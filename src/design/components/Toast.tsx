@@ -2,7 +2,8 @@ import { createContext, useCallback, useContext, useEffect, useRef, useState, ty
 import { Icon, type IconName } from './Icon';
 import s from './Toast.module.css';
 
-type ToastMessage = { id: number; icon?: IconName; label: string; tone?: 'neutral' | 'error' };
+/** `action`: one short text button, e.g. Undo after a save (the toast then stays 5 seconds). */
+type ToastMessage = { id: number; icon?: IconName; label: string; tone?: 'neutral' | 'error'; action?: { label: string; onClick: () => void } };
 
 const ToastContext = createContext<(t: Omit<ToastMessage, 'id'>) => void>(() => {});
 
@@ -29,9 +30,10 @@ export function ToastProvider({ children }: { children: ReactNode }) {
     clear();
     setLeaving(false);
     setMsg({ ...t, id: Date.now() });
+    const ms = t.action ? SHOW_MS + 2000 : SHOW_MS;
     timers.current.push(
-      window.setTimeout(() => setLeaving(true), SHOW_MS),
-      window.setTimeout(() => setMsg(null), SHOW_MS + LEAVE_MS),
+      window.setTimeout(() => setLeaving(true), ms),
+      window.setTimeout(() => setMsg(null), ms + LEAVE_MS),
     );
   }, []);
   useEffect(() => clear, []);
@@ -44,6 +46,11 @@ export function ToastProvider({ children }: { children: ReactNode }) {
           <div key={msg.id} className={[s.toast, s.small, msg.tone === 'error' && s.error, leaving && s.leaving].filter(Boolean).join(' ')}>
             {(msg.icon || msg.tone === 'error') && <Icon name={msg.icon ?? 'info'} size={16} className={s.icon} />}
             <span>{msg.label}</span>
+            {msg.action && (
+              <button type="button" className={s.action} onClick={() => { msg.action!.onClick(); clear(); setLeaving(true); timers.current.push(window.setTimeout(() => setMsg(null), LEAVE_MS)); }}>
+                {msg.action.label}
+              </button>
+            )}
           </div>
         )}
       </div>

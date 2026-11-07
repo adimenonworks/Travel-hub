@@ -137,6 +137,23 @@ export function createLocalStore(): Store {
     watchSub(tripId, name, cb) {
       return watch(() => Object.values(sub(tripId, name)), cb as (v: unknown[]) => void);
     },
+    queueSub(tripId, name, data) {
+      const id = randomCode(16);
+      sub(tripId, name)[id] = { ...data, id, createdBy: me(), createdAt: Date.now() };
+      save();
+      return { id, saved: Promise.resolve() };
+    },
+    queueTrip(data) {
+      const id = randomCode(16);
+      const uid = me();
+      db.trips[id] = { ...data, id, ownerId: uid, memberIds: [uid], roles: { [uid]: 'owner' }, createdAt: Date.now() };
+      save();
+      return { id, saved: Promise.resolve() };
+    },
+    // Demo mode has no Cloud Function: the app reads what it can from the link itself (src/lib/links.ts).
+    async readLink() {
+      return null;
+    },
     async addSub(tripId, name, data) {
       const id = randomCode(16);
       sub(tripId, name)[id] = { ...data, id, createdBy: me(), createdAt: Date.now() };

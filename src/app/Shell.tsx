@@ -1,14 +1,19 @@
-import { createContext, useContext, useState, type ReactNode } from 'react';
+import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { BottomNav, Notification, ToastProvider, type NavTab } from '../design/components';
 import { store } from '../data';
 import { screenKey, useScreenTransition } from './navigation';
-import { NewTrip } from '../features/trip/NewTrip';
+import { NewTrip, type NewTripStart } from '../features/trip/NewTrip';
+import { SaveSheet, type SaveRequest } from '../features/saves/SaveSheet';
+import { onSharedLink } from '../lib/native';
 import s from './Shell.module.css';
 
-/** Opens the full-screen New trip flow from anywhere (Home, Trips). */
-const NewTripContext = createContext<() => void>(() => {});
+/** Opens the full-screen New trip flow from anywhere (Home, Trips), optionally from a saved place ("Turn into a trip"). */
+const NewTripContext = createContext<(start?: NewTripStart) => void>(() => {});
 export const useNewTrip = () => useContext(NewTripContext);
+/** Opens the Save to Rove sheet: a link (Save a link, or shared from another app) or a place search (Add a place). */
+const SaveContext = createContext<(r: SaveRequest) => void>(() => {});
+export const useSave = () => useContext(SaveContext);
 
 /** Bottom Nav (Figma): Home, Trips (your trips, and each trip's pages) and You. */
 const TABS: NavTab[] = [
@@ -20,8 +25,11 @@ const TABS: NavTab[] = [
 /** App frame: the page and the Bottom Nav. The New trip flow lives here so any page can open it. */
 export function Shell({ children }: { children: ReactNode }) {
   const navigate = useNavigate();
-  const [creating, setCreating] = useState(false);
-  const newTrip = () => setCreating(true);
+  const [creating, setCreating] = useState<NewTripStart | null>(null);
+  const newTrip = (start?: NewTripStart) => setCreating(start ?? {});
+  const [saving, setSaving] = useState<SaveRequest | null>(null);
+  // Links shared to Rove from other apps (the iPhone share extension opens rove://save?url=…).
+  useEffect(() => onSharedLink((url) => setSaving({ mode: 'link', url })), []);
   const { pathname } = useLocation();
   const tabs = TABS;
   const showNav = !pathname.startsWith('/join/') && pathname !== '/design';
@@ -29,6 +37,7 @@ export function Shell({ children }: { children: ReactNode }) {
 
   return (
     <NewTripContext.Provider value={newTrip}>
+      <SaveContext.Provider value={setSaving}>
       <ToastProvider>
       <div className={s.shell}>
         <main id="main" className={[s.main, showNav && s.withNav].filter(Boolean).join(' ')}>
@@ -40,9 +49,11 @@ export function Shell({ children }: { children: ReactNode }) {
           <div key={screenKey(pathname)} className={transition === 'none' ? undefined : s[transition]}>{children}</div>
         </main>
         {showNav && <BottomNav tabs={tabs} />}
-        <NewTrip open={creating} onClose={() => setCreating(false)} onOpenTrip={(id) => navigate(`/trip/${id}`)} />
+        <NewTrip open={!!creating} start={creating ?? undefined} onClose={() => setCreating(null)} onOpenTrip={(id) => navigate(`/trip/${id}`)} />
+        <SaveSheet request={saving} onClose={() => setSaving(null)} />
       </div>
       </ToastProvider>
+      </SaveContext.Provider>
     </NewTripContext.Provider>
   );
 }

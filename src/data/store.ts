@@ -1,4 +1,4 @@
-import type { Vote, Invite, NewDoc, Profile, SubCollections, SubName, Trip, User } from './types';
+import type { Vote, Invite, LinkPreview, NewDoc, Profile, SubCollections, SubName, Trip, User } from './types';
 
 export type Unsubscribe = () => void;
 
@@ -36,6 +36,15 @@ export interface Store {
   toggleInArray(tripId: string, name: SubName, id: string, field: string, uid: string, on: boolean): Promise<void>;
   /** Set one person's vote on an idea: up, down, or none. A person has at most one of the two. */
   setVote(tripId: string, ideaId: string, uid: string, vote: Vote): Promise<void>;
+
+  /**
+   * Add without waiting for the server: returns the new id at once and a promise that settles when it's saved.
+   * Offline, the write waits in the on-device queue and syncs later (saves still confirm straight away).
+   */
+  queueSub<K extends SubName>(tripId: string, name: K, data: NewDoc<SubCollections[K]>): { id: string; saved: Promise<void> };
+  queueTrip(data: Omit<Trip, 'id' | 'ownerId' | 'memberIds' | 'roles' | 'createdAt'>): { id: string; saved: Promise<void> };
+  /** Read a shared link (title, photo, place) with the readLink Cloud Function. Demo mode and errors: null. */
+  readLink(url: string): Promise<LinkPreview | null>;
 
   createInvite(trip: Trip): Promise<string>;
   getInvite(code: string): Promise<Invite | null>;
