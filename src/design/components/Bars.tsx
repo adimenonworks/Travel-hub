@@ -3,6 +3,7 @@ import { NavLink, Link, useLocation, useNavigate } from 'react-router-dom';
 import { goBack } from '../../app/navigation';
 import { Icon, type IconName } from './Icon';
 import { IconButton, LinkButton } from './Button';
+import { haptic } from '../../lib/native';
 import s from './Bars.module.css';
 
 /** Kept for older callers; the Figma Page Header no longer shows your profile picture (the You tab does). */
@@ -96,7 +97,7 @@ export function Tabs({ items, label, className }: { items: TabItem[]; label: str
         );
         return t.active === undefined
           ? <NavLink key={t.to} to={t.to} end={t.end} className={s.tab}>{body}</NavLink>
-          : <Link key={t.to} to={t.to} className={s.tab} aria-current={t.active ? 'page' : undefined}>{body}</Link>;
+          : <Link key={t.to} to={t.to} className={s.tab} aria-current={t.active ? 'page' : undefined} onClick={() => { if (!t.active) haptic('selection'); }}>{body}</Link>;
       })}
     </nav>
   );

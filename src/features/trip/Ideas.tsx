@@ -7,7 +7,7 @@ import { countryName } from '../../lib/countries';
 import { cityOf, eventCategoryOf, groupBy, placeCategory, sortPlaces, tripCountryCodes } from '../../lib/places';
 import { PlaceMarks, PlaceRow } from '../saves/Collections';
 import { usePlaceMarks } from '../saves/placeMarks';
-import { haptic } from '../../lib/native';
+import { haptic, confirmAction } from '../../lib/native';
 import { CATEGORIES, categoryInfo, eventType } from '../../lib/categories';
 import { priceOf, priceText } from '../../lib/currency';
 import { recordView } from '../../lib/recent';
@@ -207,7 +207,7 @@ function IdeaForm({ open, tripId, currency, idea, onClose }: { open: boolean; tr
     } catch { toast({ tone: 'error', label: "Couldn't save. Check your connection" }); }
   };
   const remove = async () => {
-    if (!idea || !confirm(`Delete "${idea.title}"?`)) return;
+    if (!idea || !confirmAction(`Delete "${idea.title}"?`)) return;
     try { await store.deleteSub(tripId, 'ideas', idea.id); toast({ icon: 'trash', label: 'Idea deleted' }); onClose(); }
     catch { toast({ tone: 'error', label: "Couldn't delete. Check your connection" }); }
   };

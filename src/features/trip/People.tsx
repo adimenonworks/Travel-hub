@@ -5,7 +5,7 @@ import { store } from '../../data';
 import { personName, useMe } from '../../data/hooks';
 import type { TripCtx } from './TripPage';
 import s from './trip.module.css';
-import { isNativeApp, PUBLIC_SITE, shareLink } from '../../lib/native';
+import { isNativeApp, PUBLIC_SITE, shareLink, confirmAction } from '../../lib/native';
 
 /** Trip "People" tab (Figma "Trip — People"): the travellers as a List group (the owner can tap someone to change their role or remove them), then the invite card. */
 export function People({ trip, profiles, canManage, isOwner }: TripCtx) {
@@ -85,7 +85,7 @@ export function People({ trip, profiles, canManage, isOwner }: TripCtx) {
       {/* Deleting the trip lives in Edit trip; here members other than the owner can leave. */}
       {!isOwner && (
         <Button variant="destructive" icon="signout" onClick={async () => {
-          if (!confirm(`Leave "${trip.name}"?`)) return;
+          if (!confirmAction(`Leave "${trip.name}"?`)) return;
           await store.leaveTrip(trip.id, me.uid);
           navigate('/');
         }}>Leave trip</Button>
@@ -97,7 +97,7 @@ export function People({ trip, profiles, canManage, isOwner }: TripCtx) {
         {person && (
           <Button variant="destructive" icon="trash" onClick={async () => {
             const name = personName(profiles, person);
-            if (!confirm(`Remove ${name} from this trip?`)) return;
+            if (!confirmAction(`Remove ${name} from this trip?`)) return;
             try { await store.removeMember(trip, person); toast({ icon: 'trash', label: `${name} removed` }); setPerson(null); }
             catch { toast({ tone: 'error', label: "Couldn't remove. Check your connection" }); }
           }}>Remove from trip</Button>

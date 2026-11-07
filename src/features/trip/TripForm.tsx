@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { confirmAction } from '../../lib/native';
 import { Button, FieldRow, Select, Sheet, TextField, useToast } from '../../design/components';
 import { store } from '../../data';
 import type { Place, Trip } from '../../data/types';
@@ -61,7 +62,7 @@ export function TripForm({ open, trip, onClose, onSaved, onDeleted }: { open: bo
   };
 
   const remove = async () => {
-    if (!trip || !confirm(`Delete "${trip.name}" for everyone? This can't be undone.`)) return;
+    if (!trip || !confirmAction(`Delete "${trip.name}" for everyone? This can't be undone.`)) return;
     try {
       await store.deleteTrip(trip.id);
       toast({ icon: 'trash', label: 'Trip deleted' });

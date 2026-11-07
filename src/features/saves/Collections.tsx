@@ -6,7 +6,7 @@ import { useActivitiesFor, useMyTrips, usePlaces } from '../../data/hooks';
 import type { PlaceCategory, SavedPlace } from '../../data/types';
 import { countryName, flagUrl } from '../../lib/countries';
 import { today } from '../../lib/dates';
-import { haptic } from '../../lib/native';
+import { haptic, confirmAction } from '../../lib/native';
 import { PLACE_CATEGORIES, cityOf, eventCategoryOf, groupBy, placeCategory, sortPlaces, tripCountryCodes } from '../../lib/places';
 import { Content, useSave } from '../../app/Shell';
 import { MapView } from '../shared/Map';
@@ -96,7 +96,7 @@ export function PlaceSheet({ place, onClose }: { place: SavedPlace | null; onClo
       )}
       {mine && (
         <Button variant="destructive" icon="trash" onClick={async () => {
-          if (!confirm(`Delete "${place.name}" from your collection?`)) return;
+          if (!confirmAction(`Delete "${place.name}" from your collection?`)) return;
           try { await store.deletePlace(place.id); toast({ icon: 'trash', label: 'Place deleted' }); onClose(); }
           catch { toast({ tone: 'error', label: "Couldn't delete. Check your connection" }); }
         }}>Delete place</Button>

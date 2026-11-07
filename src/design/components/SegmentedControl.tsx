@@ -1,4 +1,5 @@
 import { useLayoutEffect, useRef, useState, type CSSProperties } from 'react';
+import { haptic } from '../../lib/native';
 import s from './SegmentedControl.module.css';
 
 type Option<T extends string> = { value: T; label: string };
@@ -38,7 +39,7 @@ export function SegmentedControl<T extends string>({ options, value, onChange, b
       {pill && <span className={[s.thumb, pill.ready && s.animate].filter(Boolean).join(' ')} aria-hidden="true"
         style={{ '--x': `${pill.x}px`, '--w': `${pill.w}px` } as CSSProperties} />}
       {options.map((o) => (
-        <button key={o.value} type="button" role="radio" aria-checked={o.value === value} className={s.option} onClick={() => onChange(o.value)}>
+        <button key={o.value} type="button" role="radio" aria-checked={o.value === value} className={s.option} onClick={() => { if (o.value !== value) haptic('selection'); onChange(o.value); }}>
           {o.label}
         </button>
       ))}

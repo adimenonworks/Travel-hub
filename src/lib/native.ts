@@ -102,3 +102,9 @@ export function onSharedLink(cb: (url: string) => void): () => void {
   }
   return () => { window.removeEventListener('hashchange', fromHash); remove?.(); };
 }
+
+/** A destructive confirmation (delete, remove, leave) with the Warning haptic first, as in the Figma Haptics map. */
+export function confirmAction(message: string): boolean {
+  haptic('warning');
+  return window.confirm(message);
+}

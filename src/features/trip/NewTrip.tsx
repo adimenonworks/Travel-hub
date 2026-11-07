@@ -125,7 +125,7 @@ export function NewTrip({ open, onClose, onOpenTrip }: { open: boolean; onClose:
   if (step === 3)
     return (
       <FlowScreen step={3} of={steps} stepKey={3} title="Who’s coming?" subtitle="Everyone you add can see and edit the plan." onClose={onClose}
-        footer={<Button variant="inverse" iconEnd="chevron-right" disabled={busy} onClick={create3}>{steps === 4 ? 'Continue' : createLabel}</Button>}>
+        footer={<Button variant="inverse" iconEnd="chevron-right" loading={busy && steps !== 4} disabled={busy} onClick={create3}>{steps === 4 ? 'Continue' : createLabel}</Button>}>
         <div className={s.optionGrid}>
           <OptionCard icon="person" label="Just me" selected={company === 'me'} onClick={() => { haptic('light'); setCompany('me'); }} />
           <OptionCard icon="people" label="With others" selected={company === 'others'} onClick={() => { haptic('light'); setCompany('others'); }} />
@@ -143,7 +143,7 @@ export function NewTrip({ open, onClose, onOpenTrip }: { open: boolean; onClose:
   const kept = matching.filter((p) => !leftBehind.includes(cityOf(p))).length;
   return (
     <FlowScreen step={4} of={4} stepKey={4} title={`Bring your ${countryName(code!)} saves?`} subtitle="They’ll wait in Ideas until you add them to a day." onClose={onClose}
-      footer={<Button variant="inverse" iconEnd="chevron-right" disabled={busy} onClick={create}>{createLabel}</Button>}>
+      footer={<Button variant="inverse" iconEnd="chevron-right" loading={busy} disabled={busy} onClick={create}>{createLabel}</Button>}>
       <ListGroup label="Saved places by city">
         {cities.map(([c, list]) => {
           const on = !leftBehind.includes(c);

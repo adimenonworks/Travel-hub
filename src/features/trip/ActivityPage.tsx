@@ -8,7 +8,7 @@ import type { LinkItem } from '../../data/types';
 import { formatDay, formatTime } from '../../lib/dates';
 import { hostOf, isPdf, normalizeUrl } from '../../lib/format';
 import { mapsUrl } from '../../lib/geocode';
-import { haptic } from '../../lib/native';
+import { haptic, confirmAction } from '../../lib/native';
 import { recordView } from '../../lib/recent';
 import { eventType } from '../../lib/categories';
 import { getMapsApp, mapsAppLabel } from '../../lib/prefs';
@@ -47,7 +47,7 @@ export function ActivityPage(ctx: TripCtx) {
   const type = eventType(a.category);
   const removeDoc = async (i: number) => {
     const doc = a.links[i];
-    if (!confirm(`Remove "${doc.label || hostOf(doc.url)}"?`)) return;
+    if (!confirmAction(`Remove "${doc.label || hostOf(doc.url)}"?`)) return;
     try { await store.updateSub(trip.id, 'activities', a.id, { links: a.links.filter((_, j) => j !== i) }); toast({ icon: 'trash', label: 'Removed' }); }
     catch { toast({ tone: 'error', label: "Couldn't delete. Check your connection" }); }
   };

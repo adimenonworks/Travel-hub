@@ -90,3 +90,8 @@
 .tertiary .glyph { color: var(--interactive-button-tertiary-icon); }
 .ghost .glyph { color: var(--interactive-button-ghost-icon); }
 .button:disabled .glyph { color: inherit; }
+
+/* Loading: a ring in the label colour that turns (Reduce Motion: it stays still) */
+.spinner { flex: none; border-radius: var(--radius-1000); border: 2px solid currentColor; border-right-color: transparent; animation: spin 0.8s linear infinite; }
+@keyframes spin { to { transform: rotate(1turn); } }
+@media (prefers-reduced-motion: reduce) { .spinner { animation: none; } }

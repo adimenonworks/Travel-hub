@@ -1,5 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useRef, useState, type ReactNode } from 'react';
 import { Icon, type IconName } from './Icon';
+import { haptic } from '../../lib/native';
 import s from './Toast.module.css';
 
 /** `action`: one short text button, e.g. Undo after a save (the toast then stays 5 seconds). */
@@ -30,6 +31,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
     clear();
     setLeaving(false);
     setMsg({ ...t, id: Date.now() });
+    if (t.tone === 'error') haptic('error'); // Figma Haptics map: Error when a save fails
     const ms = t.action ? SHOW_MS + 2000 : SHOW_MS;
     timers.current.push(
       window.setTimeout(() => setLeaving(true), ms),

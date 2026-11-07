@@ -6,7 +6,7 @@ import type { Activity, Category, LinkItem, Place, Trip } from '../../data/types
 import { addDays, dayWord, formatDay, tripDays } from '../../lib/dates';
 import { geocodePlace } from '../../lib/geocode';
 import { EVENT_TYPES, eventType, type EventType } from '../../lib/categories';
-import { haptic } from '../../lib/native';
+import { haptic, confirmAction } from '../../lib/native';
 import { LinkEditor, cleanLinks } from '../shared/Links';
 import s from './trip.module.css';
 
@@ -126,7 +126,7 @@ export function ActivityForm({ open, trip, date, activity, draft, onClose, onCre
   };
 
   const remove = async () => {
-    if (!activity || !confirm(`Delete "${activity.title}"?`)) return;
+    if (!activity || !confirmAction(`Delete "${activity.title}"?`)) return;
     try {
       await store.deleteSub(trip.id, 'activities', activity.id);
       toast({ icon: 'trash', label: 'Event deleted' });

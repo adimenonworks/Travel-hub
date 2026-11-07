@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { confirmAction } from '../../lib/native';
 import { Button, COVER_ILLUSTRATIONS, EmptyState, IconButton, Illustration, SectionHeader, Sheet, TextField } from '../../design/components';
 import { store } from '../../data';
 import { personName, useMe } from '../../data/hooks';
@@ -76,7 +77,7 @@ function AlbumForm({ open, tripId, album, canDelete, onClose }: { open: boolean;
     onClose();
   };
   const remove = async () => {
-    if (!album || !confirm(`Remove "${album.title}" from this trip? The album itself isn't deleted.`)) return;
+    if (!album || !confirmAction(`Remove "${album.title}" from this trip? The album itself isn't deleted.`)) return;
     await store.deleteSub(tripId, 'albums', album.id);
     onClose();
   };
