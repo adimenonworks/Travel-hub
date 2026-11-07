@@ -11,12 +11,11 @@ import ss from '../saves/saves.module.css';
 
 type Segment = 'upcoming' | 'saved' | 'past';
 
-const TONES = ['orange', 'green', 'yellow', 'pink'] as const;
 
-/** A country you've saved in, as a Figma "Tile" (accent tone, flag, name, "12 places · 3 cities"); opens its collection. */
-export function CountryTile({ country, index }: { country: { code: string; name: string; flag?: string; places: SavedPlace[] }; index: number }) {
+/** A country you've saved in, as a Figma "Tile" (Default tone: grey, flag-led, "24 saves · 3 cities"); opens its collection. */
+export function CountryTile({ country }: { country: { code: string; name: string; flag?: string; places: SavedPlace[] }; index?: number }) {
   return (
-    <Tile tone={TONES[index % 4]} to={`/saved/${country.code || 'unsorted'}`} title={country.name}
+    <Tile tone="default" to={`/saved/${country.code || 'unsorted'}`} title={country.name}
       media={country.flag ? <img src={country.flag} alt="" /> : <Icon name="lightbulb" size={24} />}
       meta={placeCounts(country.places)} />
   );
@@ -56,21 +55,21 @@ export function Trips() {
           <SegmentedControl label="Show trips" block value={segment} onChange={pick}
             options={[{ value: 'upcoming', label: 'Upcoming' }, { value: 'saved', label: 'Saved' }, { value: 'past', label: 'Past' }]} />
           {segment === 'upcoming' && (upcoming.length === 0 ? (
-            <Card tone="accent" media={<Illustration name="suitcase" size={120} />} title="No trips planned yet"
-              actions={<Button variant="inverse" block icon="plus" onClick={() => newTrip()}>Plan a trip</Button>} />
+            <Card tone="accent" title="No trips planned yet" body="Pick where, when and who. Your saves come with you."
+              actions={<Button block iconEnd="chevron-right" onClick={() => newTrip()}>Plan a trip</Button>} />
           ) : (
             <>
-              <Button block icon="plus" onClick={() => newTrip()}>Plan a new trip</Button>
+              <Button block iconEnd="chevron-right" onClick={() => newTrip()}>Plan a new trip</Button>
               <div className={s.list}>{upcoming.map((t) => <TripHero key={t.id} trip={t} size="compact" />)}</div>
             </>
           ))}
           {segment === 'saved' && (countries.length === 0 ? (
-            <Card tone="accent" media={<Illustration name="map" size={120} />} title="Looks a little empty" body="Save things to organise your future trip"
-              actions={<Button variant="inverse" block icon="plus" onClick={() => openSave({ mode: 'link' })}>Save a place</Button>} />
+            <Card media={<Illustration name="map" size={120} />} title="Looks a little empty" body="Save things to organise your future trip"
+              actions={<Button block onClick={() => openSave({ mode: 'link' })}>Save a place</Button>} />
           ) : (
             <div className={ss.tileGrid}>
-              {countries.map((c, i) => <CountryTile key={c.code} country={c} index={i} />)}
-              <Tile tone="add" icon="plus" title="Save a place" onClick={() => openSave({ mode: 'link' })} />
+              {countries.map((c) => <CountryTile key={c.code} country={c} />)}
+              <Tile tone="add" icon="plus" title="New place to go" onClick={() => openSave({ mode: 'link' })} />
             </div>
           ))}
           {segment === 'past' && (past.length === 0 ? (

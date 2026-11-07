@@ -25,12 +25,13 @@ export function PlaceMarks({ visited, starred }: { visited: boolean; starred: bo
 }
 
 /** A Place as a List item: category icon, name, what kind and where it came from, then ✓ and ★. */
-export function PlaceRow({ place, visited, starred, onClick, meta }: { place: SavedPlace; visited: boolean; starred: boolean; onClick: () => void; meta?: ReactNode }) {
+/** A saved Place as a List item: category icon, name, meta, and its ✓ / ★ marks (or other trailing text, e.g. "2h"). */
+export function PlaceRow({ place, visited, starred, onClick, meta, trailing }: { place: SavedPlace; visited: boolean; starred: boolean; onClick: () => void; meta?: ReactNode; trailing?: ReactNode }) {
   const c = placeCategory(place.category);
   return (
     <ListItem icon={c.icon} media={place.image ? <img src={place.image} alt="" /> : undefined} title={place.name}
       meta={meta ?? [place.kind || c.one, place.source ? `from ${place.source}` : null].filter(Boolean).join(' · ')}
-      trailing={<PlaceMarks visited={visited} starred={starred} />} onClick={onClick}
+      trailing={trailing ?? <PlaceMarks visited={visited} starred={starred} />} onClick={onClick}
       label={`${place.name}${visited ? ', visited' : ''}${starred ? ', favourite' : ''}`} />
   );
 }
@@ -182,7 +183,7 @@ export function useCountries() {
 /** "12 places · 3 cities" */
 export function placeCounts(list: SavedPlace[]) {
   const cities = new Set(list.map((p) => p.city).filter(Boolean)).size;
-  return `${list.length} place${list.length === 1 ? '' : 's'}${cities > 1 ? ` · ${cities} cities` : ''}`;
+  return `${list.length} save${list.length === 1 ? '' : 's'}${cities > 1 ? ` · ${cities} cities` : ''}`;
 }
 
 /**

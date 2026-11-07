@@ -69,3 +69,16 @@ export function countdown(start: string, end: string, now = today()): { value: n
   if (now <= end) { const n = daysBetween(now, end) + 1; return { value: n, label: n === 1 ? 'Day left' : 'Days left' }; }
   return undefined;
 }
+
+/** When something was saved, short, for a row's trailing text: "now", "2h", "Yesterday", "Mon", then "3 Nov". */
+export function timeAgo(ms: number, now = Date.now()) {
+  const min = Math.round((now - ms) / 60000);
+  if (min < 1) return 'now';
+  if (min < 60) return `${min}m`;
+  const then = new Date(ms), d0 = new Date(now);
+  if (toDay(then) === toDay(d0)) return `${Math.round(min / 60)}h`;
+  const days = daysBetween(toDay(then), toDay(d0));
+  if (days === 1) return 'Yesterday';
+  if (days < 7) return then.toLocaleDateString(undefined, { weekday: 'short' });
+  return then.toLocaleDateString(undefined, { day: 'numeric', month: 'short' });
+}
