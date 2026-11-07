@@ -7,9 +7,6 @@ export function featuredTrip(trips: Trip[] | null | undefined): Trip | undefined
   return all.find((t) => tripPhase(t.startDate, t.endDate) === 'current') ?? all.find((t) => tripPhase(t.startDate, t.endDate) === 'upcoming');
 }
 
-/**
- * The countdown Tag on the Hero Card, by phase: "In 9 days" (or "Tomorrow") before the trip, "Day 3 of 10" during it.
- */
 /** The Hero Card's countdown tag: "In 9 days", "Day 3 of 10", then "Done". Rough (month) trips count in months. */
 export function heroCountdown(trip: Trip, now = todayDay()): { label: string; icon: 'calendar' } {
   const total = between(trip.startDate, trip.endDate) + 1;
