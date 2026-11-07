@@ -23,7 +23,8 @@ export function SegmentedControl<T extends string>({ options, value, onChange, b
       const cur = el.querySelector<HTMLElement>('[aria-checked="true"]');
       if (!cur) return setPill(null);
       const box = el.getBoundingClientRect(), r = cur.getBoundingClientRect();
-      setPill((prev) => ({ x: r.left - box.left + el.scrollLeft, w: r.width, ready: prev !== null }));
+      // The pill sits inside the border, so measure from the padding box (clientLeft is the border width).
+      setPill((prev) => ({ x: r.left - box.left - el.clientLeft + el.scrollLeft, w: r.width, ready: prev !== null }));
     };
     measure();
     const ro = new ResizeObserver(measure);

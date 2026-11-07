@@ -5,6 +5,8 @@
   background: var(--on-light-surface-primary);
 }
 .cover { position: relative; aspect-ratio: 2 / 1; overflow: hidden; }
+/* Size Compact: a shorter cover */
+.heroCompact .cover { aspect-ratio: 3 / 1; }
 .cover > :first-child { position: absolute; inset: 0; width: 100%; height: 100%; }
 .cover > :first-child svg { width: 100%; height: 100%; }
 .countdown { position: absolute; top: var(--space-default-500); left: var(--space-default-500); }

@@ -12,8 +12,9 @@ const plural = (n: number, w: string) => `${n} ${w}${n === 1 ? '' : 's'}`;
 /**
  * A trip as the Figma "Hero Card", phase-aware on one layout: before the trip, the countdown and the next thing planned;
  * during it, "Day 3 of 10" and the next event; after it, a nudge to add the photos. `cover` off shows the panel alone.
+ * `size="compact"` is for lists (Trips tab): a shorter cover, the name, dates and countdown only.
  */
-export function TripHero({ trip, cover = true }: { trip: Trip; cover?: boolean }) {
+export function TripHero({ trip, cover = true, size = 'regular' }: { trip: Trip; cover?: boolean; size?: 'regular' | 'compact' }) {
   const profiles = useProfiles(trip.memberIds);
   const activities = useSub(trip.id, 'activities') ?? [];
   const n = daysBetween(trip.startDate, trip.endDate) + 1;
@@ -28,7 +29,7 @@ export function TripHero({ trip, cover = true }: { trip: Trip; cover?: boolean }
       ? { icon: 'photo' as const, title: 'Add your photos', meta: 'Share an album with everyone who went', to: `${base}/photos` }
       : { icon: 'plus' as const, title: 'Plan the first day', meta: 'Add events to the itinerary', to: `${base}/itinerary` };
   return (
-    <HeroCard to={base}
+    <HeroCard to={base} size={size}
       cover={cover ? <TripCover trip={trip} /> : undefined}
       countdown={heroCountdown(trip)}
       title={trip.name}
