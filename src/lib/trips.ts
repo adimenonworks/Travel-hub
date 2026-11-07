@@ -1,5 +1,5 @@
 import type { Activity, Trip } from '../data/types';
-import { daysBetween as between, today as todayDay, tripPhase } from './dates';
+import { daysBetween as between, formatRange, today as todayDay, tripPhase } from './dates';
 
 /** The trip that matters now: the one you're on, else the next one. Home's hero and the Trip tab both use it. */
 export function featuredTrip(trips: Trip[] | null | undefined): Trip | undefined {
@@ -8,14 +8,28 @@ export function featuredTrip(trips: Trip[] | null | undefined): Trip | undefined
 }
 
 /**
- * The countdown Tag on the Hero Card, by phase: "In 9 days" (or "Tomorrow") before the trip, "Day 3 of 10" during it,
- * nothing after.
+ * The countdown Tag on the Hero Card, by phase: "In 9 days" (or "Tomorrow") before the trip, "Day 3 of 10" during it.
  */
-export function heroCountdown(trip: Trip, now = todayDay()): { label: string; icon: 'calendar' } | undefined {
+/** The Hero Card's countdown tag: "In 9 days", "Day 3 of 10", then "Done". Rough (month) trips count in months. */
+export function heroCountdown(trip: Trip, now = todayDay()): { label: string; icon: 'calendar' } {
   const total = between(trip.startDate, trip.endDate) + 1;
-  if (now < trip.startDate) { const n = between(now, trip.startDate); return { label: n === 1 ? 'Tomorrow' : `In ${n} days`, icon: 'calendar' }; }
-  if (now <= trip.endDate) return { label: `Day ${between(trip.startDate, now) + 1} of ${total}`, icon: 'calendar' };
-  return undefined;
+  if (now < trip.startDate) {
+    if (trip.dateMode === 'month') {
+      const [y1, m1] = now.split('-').map(Number), [y2, m2] = trip.startDate.split('-').map(Number);
+      const months = (y2 - y1) * 12 + (m2 - m1);
+      return { label: months <= 1 ? 'Next month' : `In ${months} months`, icon: 'calendar' };
+    }
+    const n = between(now, trip.startDate); return { label: n === 1 ? 'Tomorrow' : `In ${n} days`, icon: 'calendar' };
+  }
+  if (now <= trip.endDate) return { label: trip.dateMode === 'month' ? 'This month' : `Day ${between(trip.startDate, now) + 1} of ${total}`, icon: 'calendar' };
+  return { label: 'Done', icon: 'calendar' };
+}
+
+/** A trip's dates as shown under its name: "2 – 11 Nov · 10 days", or "March 2027 · dates to confirm" for a rough trip. */
+export function tripDatesLabel(trip: Pick<Trip, 'startDate' | 'endDate' | 'dateMode'>) {
+  if (trip.dateMode === 'month') return `${new Date(trip.startDate + 'T12:00').toLocaleDateString(undefined, { month: 'long', year: 'numeric' })} · dates to confirm`;
+  const n = between(trip.startDate, trip.endDate) + 1;
+  return `${formatRange(trip.startDate, trip.endDate)} · ${n} day${n === 1 ? '' : 's'}`;
 }
 
 /** When an event finishes, for sorting what's still to come. An event with no time counts until the day is over. */

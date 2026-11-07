@@ -8,18 +8,16 @@ import { geocodePlace } from '../../lib/geocode';
 import { EVENT_TYPES, eventType, type EventType } from '../../lib/categories';
 import { haptic } from '../../lib/native';
 import { LinkEditor, cleanLinks } from '../shared/Links';
-import { PriceField, fromPriceDraft, toPriceDraft, type PriceDraft } from '../shared/Price';
-import { priceOf } from '../../lib/currency';
 import s from './trip.module.css';
 
-export type ActivityDraft = Partial<Pick<Activity, 'title' | 'category' | 'notes' | 'price' | 'cost' | 'links' | 'date' | 'startTime' | 'endTime' | 'locationText' | 'placeId'>>;
+export type ActivityDraft = Partial<Pick<Activity, 'title' | 'category' | 'notes' | 'links' | 'date' | 'startTime' | 'endTime' | 'locationText' | 'placeId'>>;
 
 type Form = {
   type: EventType | null; title: string; date: string; endDate: string; startTime: string; endTime: string;
-  locationText: string; fromText: string; toText: string; ref: string; notes: string; price: PriceDraft; links: LinkItem[];
+  locationText: string; fromText: string; toText: string; ref: string; notes: string; links: LinkItem[];
 };
 
-const toForm = (a: ActivityDraft | Activity | undefined, date: string, typed: boolean, currency: string): Form => {
+const toForm = (a: ActivityDraft | Activity | undefined, date: string, typed: boolean): Form => {
   const full = a as Partial<Activity> | undefined;
   return {
     type: typed && a?.category ? eventType(a.category) : null,
@@ -34,13 +32,9 @@ const toForm = (a: ActivityDraft | Activity | undefined, date: string, typed: bo
     toText: full?.toText ?? '',
     ref: full?.ref ?? '',
     notes: a?.notes ?? '',
-    price: toPriceDraft(a ? priceOf(a, { currency }) : null, currency),
     links: a?.links?.length ? a.links : [],
   };
 };
-
-/** The types that can have a price (tickets, tours, flights, stays, transport). Food & drink and notes never ask. */
-const PRICED: EventType[] = ['flight', 'stay', 'transport', 'activity'];
 
 /** Cafés keep the Coffee icon: a Food & drink place whose name says café or coffee. */
 const CAFE = /caf[eé]|coffee|espresso|pastelaria|bakery|patisserie/i;
@@ -51,9 +45,9 @@ const city = (s: string) => s.split(',')[0].replace(/\s*\([^)]*\)\s*/g, ' ').tri
 /**
  * Add an event by hand, or edit one. Adding starts with Option cards for the six types (Flight, Stay, Transport,
  * Food & drink, Activity, Note) inside the Sheet; each type then asks only for what it needs:
- * Flight: from, to, departs, arrives, flight number, price · Stay: place, check-in and check-out dates, price (one
- * booking shows as check-in and check-out in the itinerary) · Transport: from, to, times, price · Food & drink: place,
- * time · Activity: place, time, price · Note: text and an optional time (the only type without a place).
+ * Flight: from, to, departs, arrives, flight number · Stay: place, check-in and check-out dates (one booking shows as
+ * check-in and check-out in the itinerary) · Transport: from, to, times · Food & drink: place, time · Activity: place,
+ * time · Note: text and an optional time (the only type without a place). Events have no price: prices live on Ideas.
  * `draft` prefills a new one (e.g. from an idea added to a day); `onCreated` gets the new id.
  */
 export function ActivityForm({ open, trip, date, activity, draft, onClose, onCreated }: {
@@ -61,9 +55,9 @@ export function ActivityForm({ open, trip, date, activity, draft, onClose, onCre
 }) {
   const me = useMe();
   const toast = useToast();
-  const [f, setF] = useState<Form>(() => toForm(activity ?? draft, date, !!(activity ?? draft), trip.currency));
+  const [f, setF] = useState<Form>(() => toForm(activity ?? draft, date, !!(activity ?? draft)));
   const [busy, setBusy] = useState(false);
-  useEffect(() => { if (open) setF(toForm(activity ?? draft, date, !!(activity ?? draft), trip.currency)); }, [open, activity, draft, date]);
+  useEffect(() => { if (open) setF(toForm(activity ?? draft, date, !!(activity ?? draft))); }, [open, activity, draft, date]);
   const set = (p: Partial<Form>) => setF((x) => ({ ...x, ...p }));
   const days = tripDays(trip.startDate, trip.endDate);
   const type = f.type;
@@ -109,9 +103,6 @@ export function ActivityForm({ open, trip, date, activity, draft, onClose, onCre
         locationText: placeText,
         location,
         notes: f.notes.trim(),
-        // Prices are optional and only asked for things you book; food & drink keeps one it already had, notes never have one.
-        price: type === 'note' ? null : fromPriceDraft(f.price),
-        cost: 0,
         links: cleanLinks(f.links),
         // Type-specific fields; cleared when they don't apply, so a changed type leaves nothing behind.
         endDate: type === 'stay' || (type === 'flight' && f.endDate > f.date) ? f.endDate : '',
@@ -159,7 +150,6 @@ export function ActivityForm({ open, trip, date, activity, draft, onClose, onCre
   );
   const extras = (
     <>
-      {type && PRICED.includes(type) && <PriceField value={f.price} onChange={(price) => set({ price })} />}
       {type !== 'note' && <TextArea label="Notes" placeholder="Booking reference, what to bring…" value={f.notes} onChange={(e) => set({ notes: e.target.value })} />}
       {type !== 'note' && <LinkEditor links={f.links} onChange={(links) => set({ links })} />}
     </>

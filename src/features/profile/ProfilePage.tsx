@@ -113,7 +113,7 @@ export function ProfilePage() {
         {profile?.home && <Button variant="destructive" icon="trash" onClick={() => save({ home: null, homeCity: '' }, 'Home city removed')}>Remove home city</Button>}
       </Sheet>
 
-      <Sheet open={open === 'currency'} title="Currency" subtitle="Prices show in the currency they were booked in, then converted to this one" onClose={() => setOpen(null)}>
+      <Sheet open={open === 'currency'} title="Currency" subtitle="Idea prices show in their own currency, with a conversion to this one." onClose={() => setOpen(null)}>
         <Select label="Your currency" value={home} onChange={(e) => save({ currency: e.target.value }, 'Currency saved')}>
           {[...new Set([home, ...CURRENCIES])].map((c) => <option key={c} value={c}>{c}</option>)}
         </Select>

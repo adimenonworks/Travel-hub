@@ -22,6 +22,8 @@ export type Trip = {
   destination: Place | null;
   startDate: string; // YYYY-MM-DD
   endDate: string;
+  /** 'month': the dates are only roughly known — the whole month from startDate (shown as "March 2027"). Missing means exact. */
+  dateMode?: 'exact' | 'month';
   currency: string;
   /** Budgeting was removed. Older trips may still hold these until an organizer opens them (useBudgetCleanup deletes them). */
   dailyBudget?: number;
@@ -166,6 +168,9 @@ export type PlaceCategory = 'restaurant' | 'cafe' | 'bar' | 'shop' | 'stay' | 's
 export type SavedPlace = {
   id: string;
   ownerId: string;
+  /** 'place' (a real place; the default when missing), 'link' (an article or video with no place) or 'note'.
+   *  Links and notes sit on their country, in "Links & notes", and have no city. */
+  type?: 'place' | 'link' | 'note';
   name: string;
   category: PlaceCategory;
   city: string;
