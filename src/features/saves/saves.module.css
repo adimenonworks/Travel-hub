@@ -2,7 +2,7 @@
 .reading { display: flex; flex-direction: column; gap: var(--space-default-300); }
 .row { display: grid; grid-template-columns: repeat(auto-fit, minmax(calc(120rem / 17), 1fr)); gap: var(--space-default-300); }
 .preview { display: flex; align-items: center; gap: var(--space-default-400); padding: var(--space-default-500); border-radius: var(--radius-600); background: var(--on-light-surface-secondary); }
-.previewThumb { flex: none; display: grid; place-items: center; width: 48px; height: 48px; border-radius: var(--radius-300); overflow: hidden; background: var(--on-light-surface-primary); color: var(--on-light-icon-primary); }
+.previewThumb { flex: none; display: grid; place-items: center; width: 48px; height: 48px; border-radius: var(--radius-1000); overflow: hidden; background: var(--on-light-surface-primary); color: var(--on-light-icon-primary); }
 .previewThumb img { width: 100%; height: 100%; object-fit: cover; }
 .previewText { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: var(--space-default-100); text-align: left; }
 .previewTitle { font: var(--type-heading-3); letter-spacing: -0.02em; color: var(--on-light-text-primary); overflow-wrap: anywhere; }
@@ -45,3 +45,8 @@
 .category { display: flex; flex-direction: column; gap: var(--space-default-300); }
 .categoryTitle { margin: 0; display: flex; align-items: center; gap: var(--space-default-200); font: var(--type-body); color: var(--on-light-text-secondary); }
 .citySection { display: flex; flex-direction: column; gap: var(--space-default-500); }
+
+/* Category and city chips in the Save sheet wrap onto more lines */
+.chipsWrap { display: flex; flex-wrap: wrap; gap: var(--space-default-300); }
+.previewRound { border-radius: var(--radius-1000); }
+.flag, .previewThumb img.flag { width: 24px; height: 24px; border-radius: var(--radius-1000); object-fit: cover; }
