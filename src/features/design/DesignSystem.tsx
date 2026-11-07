@@ -258,7 +258,7 @@ export function DesignSystem() {
             next={{ icon: 'lightbulb', title: '24 ideas to sort', meta: 'Brought over from your Japan saves' }} />
           <HeroCard size="compact" cover={<Illustration name={COVER_ILLUSTRATIONS[2]} />} countdown={{ label: 'In 40 days' }} title="Japan" meta="Dec 17 – 31 · 15 days" to="/design" />
           <TripHeader title="Portugal & Spain" back={{ to: '/design', label: 'Trips' }} action={{ icon: 'pencil', label: 'Edit trip', onClick: () => {} }}
-            meta="Nov 2 – 11 · 10 days · in 9 days" countries={[{ code: 'pt', name: 'Portugal', flag: flagUrl('pt') }]} going={{ label: '4 going', to: '/design' }} />
+            meta="2 – 11 Nov · 10 days" />
           <div className={s.row}>
             <DayCard day={3} weekday="Tue" label="Today, Tuesday 3 November" selected onClick={() => {}} />
             <DayCard day={4} weekday="Wed" label="Tomorrow, Wednesday 4 November" selected={false} onClick={() => {}} />

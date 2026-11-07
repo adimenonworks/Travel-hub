@@ -47,7 +47,7 @@ export function PageHeader({ title, subtitle, back, action, fit, size = 'large' 
         </div>
         {action && (
           <div className={s.actions}>
-            <IconButton icon={action.icon} label={action.label} variant="secondary" size="regular" onClick={action.onClick} />
+            <IconButton icon={action.icon} label={action.label} tone="brand" onClick={action.onClick} />
           </div>
         )}
       </div>

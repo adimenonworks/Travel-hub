@@ -28,7 +28,7 @@ type CardProps = Omit<HTMLAttributes<HTMLDivElement>, 'title'> & {
 export function Card({ tone = 'default', flush, icon, media, title, body, actions, action, to, className, children, ...rest }: CardProps) {
   const btns = actions ?? action;
   const structured = title !== undefined || body !== undefined || icon || media || btns;
-  const cls = [s.card, tone === 'accent' && s.accent, flush && s.flush, structured && s.structured, to && s.interactive, className].filter(Boolean).join(' ');
+  const cls = [s.card, tone === 'accent' && s.accent, tone === 'accent' && 'surface-dark', flush && s.flush, structured && s.structured, to && s.interactive, className].filter(Boolean).join(' ');
   if (!structured) return <div className={cls} {...rest}>{children}</div>;
   const mediaNode = media ?? (icon && <span className={s.mediaTile}><Icon name={icon} size={16} /></span>);
   const inner = (

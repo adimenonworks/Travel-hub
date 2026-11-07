@@ -7,8 +7,7 @@ import { useMe, useProfiles, useRole, useSub, useTrip } from '../../data/hooks';
 import { useStarMigration } from '../saves/starEvent';
 import type { Activity, Album, Comment, Idea, Profile, Trip } from '../../data/types';
 import { useBudgetCleanup } from './budgetCleanup';
-import { daysBetween, formatRange, today } from '../../lib/dates';
-import { countryName, flagUrl, tripCountries } from '../../lib/countries';
+import { tripDatesLabel } from '../../lib/trips';
 import { Content } from '../../app/Shell';
 import { ActivityPage } from './ActivityPage';
 import { Bookings } from './Bookings';
@@ -63,11 +62,6 @@ function TripLoaded({ trip }: { trip: Trip }) {
   useBudgetCleanup(trip, canManage);
   if (!activities || !ideas || !comments || !albums) return <PageSkeleton />;
   const ctx: TripCtx = { trip, activities, ideas, comments, albums, profiles, canManage, isOwner };
-  const nDays = daysBetween(trip.startDate, trip.endDate) + 1;
-  const t = today();
-  const until = daysBetween(t, trip.startDate);
-  const when = t < trip.startDate ? (until === 1 ? 'tomorrow' : `in ${until} days`) : t <= trip.endDate ? `day ${daysBetween(trip.startDate, t) + 1}` : 'done';
-  const countries = tripCountries(trip, activities).map((code) => ({ code, name: countryName(code), flag: flagUrl(code) }));
 
   const base = `/trip/${trip.id}`;
   const section = pathname.slice(base.length + 1).split('/')[0];
@@ -94,14 +88,12 @@ function TripLoaded({ trip }: { trip: Trip }) {
   return (
     <>
       <Content>
-        {/* Figma "Trip header": back to Trips, the name (Title small) with Edit, the meta line, country chips and who's going */}
+        {/* Figma "Trip header": back to Trips, the name (Title small) with Edit, then the dates only */}
         <TripHeader
           title={trip.name}
           back={{ to: '/trips', label: 'Trips' }}
           action={canManage ? { icon: 'pencil', label: 'Edit trip', onClick: () => setEditing(true) } : undefined}
-          meta={`${formatRange(trip.startDate, trip.endDate)} · ${nDays} day${nDays === 1 ? '' : 's'} · ${when}`}
-          countries={countries}
-          going={{ label: `${trip.memberIds.length} going`, to: `${base}/people` }}
+          meta={tripDatesLabel(trip)}
         />
         <div className={s.sectionNav}>
           <Tabs items={tabs} label="Trip sections" />

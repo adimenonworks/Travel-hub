@@ -1,7 +1,7 @@
-/* Figma "Card": white surface, 1px border/subtle, 24px corners */
+/* Figma "Card": the grey container (on-light/surface/secondary), no border, 24px corners */
 .card {
-  background: var(--on-light-surface-primary);
-  border: 1px solid var(--on-light-border-subtle);
+  background: var(--on-light-surface-secondary);
+  border: 1px solid transparent;
   border-radius: var(--radius-600);
   padding: var(--space-inset);
   color: var(--on-light-text-primary);
@@ -11,7 +11,7 @@
 /* Media, text and buttons stacked (Figma's Small card; the Large row layout is archived) */
 .structured { display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-default-500); padding: var(--space-default-500); }
 .structured .title { font: var(--type-heading-2); letter-spacing: -0.01em; } /* Heading 2 */
-.structured .body { font: var(--type-label-small); }
+.structured .body { font: var(--type-body); }
 .structured .buttons { flex-direction: column; align-self: stretch; margin-top: var(--space-default-200); } /* 20 below the text */
 .structured .buttons > * { width: 100%; }
 
@@ -24,37 +24,9 @@
 .body { color: var(--on-light-text-secondary); }
 .buttons { display: flex; flex-wrap: wrap; gap: var(--space-default-300); }
 
-/* Tone=Accent: the card is an on-mid (emerald) surface. Everything inside it that asks for an on-light token
-   gets the on-mid token of the same name instead: the two sets match 1:1, so this is a straight swap. */
-.accent {
-  background: var(--on-mid-surface-primary);
-  border-color: transparent;
-  color: var(--on-mid-text-primary);
-  --on-light-surface-primary: var(--on-mid-surface-primary);
-  --on-light-surface-secondary: var(--on-mid-surface-secondary);
-  --on-light-surface-brand: var(--on-mid-surface-brand);
-  --on-light-surface-sunken: var(--on-mid-surface-sunken);
-  --on-light-text-primary: var(--on-mid-text-primary);
-  --on-light-text-secondary: var(--on-mid-text-secondary);
-  --on-light-text-brand: var(--on-mid-text-brand);
-  --on-light-link-default: var(--on-mid-link-default);
-  --on-light-link-hover: var(--on-mid-link-hover);
-  --on-light-link-pressed: var(--on-mid-link-pressed);
-  --on-light-icon-primary: var(--on-mid-icon-primary);
-  --on-light-icon-secondary: var(--on-mid-icon-secondary);
-  --on-light-icon-brand: var(--on-mid-icon-brand);
-  --on-light-border-subtle: var(--on-mid-border-subtle);
-  --on-light-border-bold: var(--on-mid-border-bold);
-  --on-light-border-focus: var(--on-mid-border-focus);
-  --on-light-border-brand: var(--on-mid-border-brand);
-  --on-light-divider-default: var(--on-mid-divider-default);
-  --on-light-status-success: var(--on-mid-status-success);
-  --on-light-status-success-subtle: var(--on-mid-status-success-subtle);
-  --on-light-status-warning: var(--on-mid-status-warning);
-  --on-light-status-warning-subtle: var(--on-mid-status-warning-subtle);
-  --on-light-status-error: var(--on-mid-status-error);
-  --on-light-status-error-subtle: var(--on-mid-status-error-subtle);
-}
+/* Tone=Accent: the deep green card (on-dark/surface/brand). The global surface-dark class re-points every on-light
+   token inside it to the on-dark token of the same name, so its text and icons turn light; its button is Primary. */
+.accent { border-color: transparent; }
 
 .interactive { position: relative; isolation: isolate; cursor: pointer; transition: transform var(--motion-fast), background var(--motion-fast); text-align: left; width: 100%; color: inherit; display: block; }
 .interactive.structured { display: flex; } /* a structured Card that is a link keeps its column layout */

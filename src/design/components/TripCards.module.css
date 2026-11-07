@@ -1,14 +1,24 @@
-/* Figma "Hero Card": 24 corners, subtle border, cover 2:1 on top, then 16 / 16 / 4 padding with gap 12 */
+/* Figma "Hero Card": the grey container, no border, 24 corners, cover 2:1 on top, then 16 / 16 / 4 padding with gap 12 */
 .hero {
   display: flex; flex-direction: column; overflow: hidden; /* the cover is a deliberate viewport */
-  border-radius: var(--radius-600); border: 1px solid var(--on-light-border-subtle);
-  background: var(--on-light-surface-primary);
+  border-radius: var(--radius-600);
+  background: var(--on-light-surface-secondary);
 }
 .cover { position: relative; aspect-ratio: 2 / 1; overflow: hidden; }
 /* Size Compact: a shorter cover */
 .heroCompact .cover { aspect-ratio: 3 / 1; }
 .cover > :first-child { position: absolute; inset: 0; width: 100%; height: 100%; }
 .cover > :first-child svg { width: 100%; height: 100%; }
+/* Show photo: the place's photo over the illustration, a bottom scrim (black 0 → 45%, 56px; the one raw value Figma
+   allows) and the photographer credit as a ghost link, Body small in white at 70%. */
+.photo { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.scrim { position: absolute; left: 0; right: 0; bottom: 0; height: 56px; background: linear-gradient(to bottom, rgb(0 0 0 / 0), rgb(0 0 0 / 0.45)); pointer-events: none; }
+.credit {
+  position: absolute; right: var(--space-default-300); bottom: var(--space-default-200); z-index: 2; max-width: calc(100% - 2 * var(--space-default-300));
+  padding: var(--space-default-200) var(--space-default-300); font: var(--type-body-small); color: var(--on-dark-text-primary); opacity: 0.7; text-align: right;
+}
+.credit a { color: inherit; text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 2px; position: relative; }
+.credit a::after { content: ''; position: absolute; inset: -12px -4px; } /* 44px tap area */
 .countdown { position: absolute; top: var(--space-default-500); left: var(--space-default-500);
   /* On a cover the Neutral tag is a white pill (the page surface), so it reads on any photo or scene */
   --tag-neutral-background: var(--on-light-surface-primary); --tag-neutral-text: var(--on-light-text-primary); }
@@ -68,3 +78,18 @@
   font: var(--type-label-small); font-variant-numeric: tabular-nums;
 }
 .timelineLine { flex: 1; height: 1px; background: repeating-linear-gradient(90deg, var(--on-light-border-brand) 0 6px, transparent 6px 12px); }
+
+/* Figma "Journey details card": the grey container, 20 padding, 16 between parts, dashed dividers */
+.journey { display: flex; flex-direction: column; gap: var(--space-default-500); padding: var(--space-default-600); border-radius: var(--radius-600); background: var(--on-light-surface-secondary); }
+.journeyTags { display: flex; justify-content: space-between; align-items: center; gap: var(--space-default-300); flex-wrap: wrap; }
+.journeyTimes { display: flex; align-items: center; justify-content: space-between; gap: var(--space-default-400); }
+.journeyEnd { display: flex; flex-direction: column; gap: var(--space-default-200); min-width: 0; }
+.journeyEndTo { align-items: flex-end; text-align: right; }
+.journeyCity { font: var(--type-body); color: var(--on-light-text-secondary); }
+.journeyTime { font: var(--type-heading-1); letter-spacing: -0.01em; color: var(--on-light-text-primary); font-variant-numeric: tabular-nums; }
+.journeyDate { font: var(--type-body-small); color: var(--on-light-text-secondary); }
+.journeyDetails { display: flex; justify-content: space-between; gap: var(--space-default-400); padding-top: var(--space-default-500); border-top: 1px dashed var(--on-light-border-subtle); }
+.journeySide { display: flex; flex-direction: column; gap: var(--space-default-200); min-width: 0; }
+.journeyPlace { font: var(--type-heading-3); letter-spacing: -0.02em; color: var(--on-light-text-primary); }
+.journeyInfo { font: var(--type-body); color: var(--on-light-text-secondary); }
+.journeyFooter { padding-top: var(--space-default-500); border-top: 1px dashed var(--on-light-border-subtle); font: var(--type-body-small); color: var(--on-light-text-secondary); }

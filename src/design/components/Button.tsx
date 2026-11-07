@@ -48,11 +48,12 @@ export function LinkButton({ to, href, variant, size, block, icon, iconEnd, labe
   return <Link to={to!} className={c} aria-label={label} onClick={onClick}>{body}</Link>;
 }
 
-export type IconButtonTone = 'secondary' | 'ghost' | 'on-brand';
+/** Figma Icon button tones, plus 'brand': the Page Header's action, a Figma Button (Secondary) with only an icon. */
+export type IconButtonTone = 'secondary' | 'ghost' | 'on-brand' | 'brand';
 
 /**
  * Figma "Icon button" (Tone Secondary / Ghost / On brand): a 40px circle with a 24px icon, inside a 44px tap area.
- * Secondary and Ghost share the Button's colour tokens; On brand sits on the bright emerald flow screens.
+ * Secondary is the neutral grey circle, Ghost is clear; On brand sits on the bright emerald flow screens.
  * `label` is required: it's what screen readers announce.
  */
 export function IconButton({ icon, label, tone, variant, state, className, type = 'button', ...rest }: Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'size'> & {

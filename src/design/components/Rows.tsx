@@ -89,7 +89,7 @@ export function EventCard({ title, time, place, amount, icon, layout = 'standard
   status?: string;
   to?: string; onClick?: () => void;
 }) {
-  const cls = [s.event, s[`event-${layout}`], s[`event-${state}`]].filter(Boolean).join(' ');
+  const cls = [s.event, s[`event-${layout}`], s[`event-${state}`], state === 'next' && 'surface-dark'].filter(Boolean).join(' ');
   const stateText = state === 'next' ? ', up next' : state === 'done' ? ', done' : '';
   return (
     <Pressable to={to} onClick={onClick} className={cls} label={`${title}${favourite ? ', favourite' : ''}${time ? `, ${time}` : ''}${place ? `, ${place}` : ''}${amount ? `, ${amount}` : ''}${stateText}`}>
@@ -273,9 +273,10 @@ export function StepProgress({ step, of = 4 }: { step: number; of?: number }) {
 }
 
 /** Figma "Destination header" (4 tones): flag, title and meta on an accent surface, and one Inverse button. */
-export function DestinationHeader({ tone, flag, title, meta, action }: { tone: 'orange' | 'green' | 'yellow' | 'pink'; flag: ReactNode; title: string; meta?: ReactNode; action?: ReactNode }) {
+/** Figma "Destination header": a flag in a white circle, "24 saves · 3 cities" and who saved. Tone Neutral (grey) on screens. */
+export function DestinationHeader({ tone = 'neutral', flag, title, meta, action }: { tone?: 'neutral' | 'orange' | 'green' | 'yellow' | 'pink'; flag: ReactNode; title: string; meta?: ReactNode; action?: ReactNode }) {
   return (
-    <section className={[s.destination, s[`tile-${tone}`]].join(' ')}>
+    <section className={[s.destination, tone === 'neutral' ? s.destinationNeutral : s[`tile-${tone}`]].join(' ')}>
       <div className={s.destinationTop}>
         <span className={s.destinationFlag} aria-hidden="true">{flag}</span>
         <span className={s.itemText}>
