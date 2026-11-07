@@ -1,0 +1,17 @@
+.swap { display: grid; }
+.swap > * { grid-area: 1 / 1; min-width: 0; }
+.inRight { animation: inRight var(--duration-base) var(--ease-spring); }
+.inLeft { animation: inLeft var(--duration-base) var(--ease-spring); }
+.outLeft { animation: outLeft var(--duration-base) var(--ease-spring) forwards; pointer-events: none; }
+.outRight { animation: outRight var(--duration-base) var(--ease-spring) forwards; pointer-events: none; }
+/* A full width plus the page gutter, so a view leaves the screen completely */
+@keyframes inRight { from { transform: translateX(calc(100% + var(--space-gutter))); } }
+@keyframes inLeft { from { transform: translateX(calc(-100% - var(--space-gutter))); } }
+@keyframes outLeft { to { transform: translateX(calc(-100% - var(--space-gutter))); } }
+@keyframes outRight { to { transform: translateX(calc(100% + var(--space-gutter))); } }
+@media (prefers-reduced-motion: reduce) {
+  .inRight, .inLeft { animation: fadeIn var(--duration-fast) var(--ease-standard); }
+  .outLeft, .outRight { animation: fadeOut var(--duration-fast) var(--ease-standard) forwards; }
+}
+@keyframes fadeIn { from { opacity: 0; } }
+@keyframes fadeOut { to { opacity: 0; } }

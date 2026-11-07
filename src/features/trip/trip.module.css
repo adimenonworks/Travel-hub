@@ -14,33 +14,19 @@
 
 /* The tab's content */
 .tabPanel { display: flex; flex-direction: column; gap: var(--space-stack); }
-/* The trip's tabs: the old and new panel share one grid cell while they swap, so the page keeps its height. */
-.tabPanels { display: grid; }
-.tabPanels > .tabPanel { grid-area: 1 / 1; min-width: 0; }
-.panelInRight { animation: panelInRight var(--duration-base) var(--ease-spring); }
-.panelInLeft { animation: panelInLeft var(--duration-base) var(--ease-spring); }
-.panelOutLeft { animation: panelOutLeft var(--duration-base) var(--ease-spring) forwards; pointer-events: none; }
-.panelOutRight { animation: panelOutRight var(--duration-base) var(--ease-spring) forwards; pointer-events: none; }
-@keyframes panelInRight { from { transform: translateX(calc(100% + var(--space-gutter))); } }
-@keyframes panelInLeft { from { transform: translateX(calc(-100% - var(--space-gutter))); } }
-@keyframes panelOutLeft { to { transform: translateX(calc(-100% - var(--space-gutter))); } }
-@keyframes panelOutRight { to { transform: translateX(calc(100% + var(--space-gutter))); } }
-@media (prefers-reduced-motion: reduce) {
-  .panelInRight, .panelInLeft { animation: panelFadeIn var(--duration-fast) var(--ease-standard); }
-  .panelOutLeft, .panelOutRight { animation: panelFadeOut var(--duration-fast) var(--ease-standard) forwards; }
-}
-@keyframes panelFadeIn { from { opacity: 0; } }
-@keyframes panelFadeOut { to { opacity: 0; } }
 
 /* Day strip (Figma "Day Card" in a sideways-scrolling row) */
 .days {
   display: flex; align-items: stretch; gap: var(--space-default-300); overflow-x: auto; scroll-snap-type: x proximity; scrollbar-width: none;
-  margin: 0 calc(-1 * var(--space-gutter)); padding: 2px var(--space-gutter) var(--space-default-200);
+  /* Room above and below for the selected card's growth and focus rings (the strip scrolls, so it would clip them),
+     taken back with negative margins so the cards sit where they would without it. */
+  --strip-room: calc(var(--space-default-200) + 10rem / 17);
+  margin: calc(-1 * var(--strip-room)) calc(-1 * var(--space-gutter)); padding: var(--strip-room) var(--space-gutter);
   scroll-padding-inline: var(--space-gutter);
 }
 .days::-webkit-scrollbar { display: none; }
 
-.itinLayout { display: flex; flex-direction: column; gap: calc(var(--space-default-800) - var(--space-default-200)); } /* 32 from the day cards to the day's plan (the strip keeps 4 below the cards for focus rings) */
+.itinLayout { display: flex; flex-direction: column; gap: var(--space-default-800); } /* 32 from the day cards to the day's plan */
 
 /* The day's plan */
 .timeline { display: flex; flex-direction: column; gap: var(--space-default-500); }

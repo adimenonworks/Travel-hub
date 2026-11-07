@@ -1,6 +1,7 @@
-import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { useLayoutEffect, useRef, useState } from 'react';
 import { Navigate, Route, Routes, useLocation, useMatch, useNavigate, useParams, type Location } from 'react-router-dom';
 import { savedScroll } from '../../app/navigation';
+import { SlideSwap } from '../shared/SlideSwap';
 import { EmptyState, LinkButton, PageSkeleton, Tabs, TripHeader, type TabItem } from '../../design/components';
 import { useMe, useProfiles, useRole, useSub, useTrip } from '../../data/hooks';
 import { useStarMigration } from '../saves/starEvent';
@@ -127,25 +128,12 @@ function TripLoaded({ trip }: { trip: Trip }) {
 const TAB_ORDER = ['', 'itinerary', 'ideas', 'photos', 'people'];
 
 /**
- * The trip's tabs as nested views under one header and Tab Bar that never unmount. Switching tab slides the
- * panel in the direction of travel (250ms, transform only; the old panel slides out as the new one comes in), or
- * cross-fades in 150ms with Reduce Motion. Each tab comes back at its own scroll position; a tab not seen yet opens
- * at its top, with the Tab Bar in view.
+ * The trip's tabs as nested views under one header and Tab Bar that never unmount (SlideSwap slides the panel in
+ * the direction of travel). Each tab comes back at its own scroll position; a tab not seen yet opens at its top,
+ * with the Tab Bar in view.
  */
 function TabPanels({ location, section, children }: { location: Location; section: string; children: (loc: Location) => React.ReactNode }) {
   const box = useRef<HTMLDivElement>(null);
-  const [state, setState] = useState<{ current: Location; prev: Location | null; dir: number }>({ current: location, prev: null, dir: 0 });
-  if (state.current.key !== location.key) {
-    const from = TAB_ORDER.indexOf(state.current.pathname.split('/')[3] ?? ''), to = TAB_ORDER.indexOf(section);
-    // Same tab (e.g. another day in the Itinerary): no slide.
-    setState(state.current.pathname === location.pathname ? { ...state, current: location } : { current: location, prev: state.current, dir: Math.sign(to - from) || 1 });
-  }
-  useEffect(() => {
-    if (!state.prev) return;
-    const t = setTimeout(() => setState((x) => ({ ...x, prev: null })), 260);
-    return () => clearTimeout(t);
-  }, [state.prev]);
-  // Each tab's own scroll position (the page scrolls; the header and Tab Bar stay where they are).
   const shown = useRef(location.pathname);
   useLayoutEffect(() => {
     if (shown.current === location.pathname) return;
@@ -160,16 +148,9 @@ function TabPanels({ location, section, children }: { location: Location; sectio
     }
     window.scrollTo(0, savedScroll(location.pathname) ?? Math.min(window.scrollY, top));
   }, [location.pathname]);
-
-  const panels = [...(state.prev ? [{ loc: state.prev, out: true }] : []), { loc: state.current, out: false }];
-  const anim = (out: boolean) => !state.prev ? undefined : out ? (state.dir > 0 ? s.panelOutLeft : s.panelOutRight) : (state.dir > 0 ? s.panelInRight : s.panelInLeft);
   return (
-    <div ref={box} className={s.tabPanels}>
-      {panels.map(({ loc, out }) => (
-        <div key={loc.pathname} className={[s.tabPanel, anim(out)].filter(Boolean).join(' ')} aria-hidden={out || undefined} inert={out || undefined}>
-          {children(loc)}
-        </div>
-      ))}
+    <div ref={box}>
+      <SlideSwap value={location} id={location.pathname} rank={TAB_ORDER.indexOf(section)} className={s.tabPanel}>{children}</SlideSwap>
     </div>
   );
 }

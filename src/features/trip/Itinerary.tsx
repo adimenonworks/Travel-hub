@@ -6,6 +6,7 @@ import type { Activity } from '../../data/types';
 import { dayWord, formatDay, formatTime, parseDay, today, tripDays } from '../../lib/dates';
 import { haptic } from '../../lib/native';
 import { travelEstimate } from '../../lib/trips';
+import { SlideSwap } from '../shared/SlideSwap';
 import { ActivityForm } from './ActivityForm';
 import { entryEnd, entryTime, eventCardProps, eventsOn, type DayEntry } from './events';
 import type { TripCtx } from './TripPage';
@@ -25,9 +26,9 @@ export function Itinerary(ctx: TripCtx) {
   const setDay = (d: string) => {
     if (d === day) return;
     setParams({ day: d }, { replace: true });
-    // Once the tapped card has finished growing, make sure all of it is on screen (phones scroll the strip sideways).
+    // Make sure all of the tapped card is on screen (phones scroll the strip sideways).
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    setTimeout(() => stripRef.current?.querySelector(`[data-day="${d}"]`)?.scrollIntoView({ block: 'nearest', inline: 'nearest', behavior: reduce ? 'auto' : 'smooth' }), reduce ? 0 : 520);
+    stripRef.current?.querySelector(`[data-day="${d}"]`)?.scrollIntoView({ block: 'nearest', inline: 'nearest', behavior: reduce ? 'auto' : 'smooth' });
   };
 
   // On arrival, slide the strip (sideways only, never the page) so the selected day starts fully in view.
@@ -44,18 +45,10 @@ export function Itinerary(ctx: TripCtx) {
   const byDay = useMemo(() => Object.fromEntries(days.map((d) => [d, eventsOn(activities, d)])), [activities, trip.startDate, trip.endDate]); // eslint-disable-line react-hooks/exhaustive-deps
   const now = useNow();
   const word = (d: string) => dayWord(d, trip.startDate, t);
-  // Events still to come: all of a future day's, none of a past day's, and today's that haven't finished.
-  const eventsLeft = (d: string) =>
-    d > t ? byDay[d]?.length ?? 0 : d < t ? 0 : (byDay[d] ?? []).filter((e) => entryEnd(e) > now).length;
   const list: DayEntry[] = byDay[day] ?? [];
   const me = useMe();
   const places = usePlacesById(activities.flatMap((x) => (x.placeId ? [x.placeId] : [])));
-
-  // On today's plan, the "now" line (Figma Timeline) sits before the next plan. The page doesn't scroll to it.
-  const showNow = day === t && list.length > 1;
-  const nextIndex = day === t ? list.findIndex((e) => entryEnd(e) > now) : -1;
   const nowLine = <Timeline time={formatTime(now)} />;
-  const stateOf = (i: number): EventState => day < t || (day === t && entryEnd(list[i]) <= now) ? 'done' : i === nextIndex ? 'next' : 'default';
   const startsIn = (e: DayEntry) => {
     const at = entryTime(e);
     if (!at || at <= now) return 'Now';
@@ -67,15 +60,11 @@ export function Itinerary(ctx: TripCtx) {
   return (
     <div className={s.itinLayout}>
       <div ref={stripRef} className={s.days} role="group" aria-label="Trip days">
-        {days.map((d) => {
-          // Today counts the events still to come; any other day shows its total.
-          const n = d === t ? eventsLeft(d) : byDay[d]?.length ?? 0;
-          return (
-            <DayCard key={d} dataDay={d} day={parseDay(d).getDate()} month={formatDay(d, { month: 'short' })} word={word(d)} selected={d === day}
-              onClick={() => { haptic('selection'); setDay(d); }}
-              tag={n > 0 ? (d === t ? `${n} more event${n === 1 ? '' : 's'}` : `${n} event${n === 1 ? '' : 's'}`) : undefined} />
-          );
-        })}
+        {days.map((d) => (
+          <DayCard key={d} dataDay={d} day={parseDay(d).getDate()} weekday={formatDay(d, { weekday: 'short' })} selected={d === day}
+            label={`${word(d)}, ${formatDay(d, { weekday: 'long', day: 'numeric', month: 'long' })}`}
+            onClick={() => { haptic('selection'); setDay(d); }} />
+        ))}
       </div>
 
       <section className={s.timeline} aria-label={word(day)}>
@@ -83,30 +72,38 @@ export function Itinerary(ctx: TripCtx) {
           meta={[formatDay(day), `${list.length} plan${list.length === 1 ? '' : 's'}`].filter(Boolean).join(' · ')}
           action={<Button variant="ghost" size="regular" iconEnd="chevron-right" onClick={() => setAdding(true)}>Add event</Button>} />
 
-        {list.length === 0 ? (
-          <EmptyState illustration="calendar" title="Nothing planned yet" message="Add something to do, or schedule an idea from the Ideas board."
-            action={<Button variant="secondary" icon="plus" onClick={() => setAdding(true)}>Add event</Button>} />
-        ) : (
-          <div className={s.eventList}>
-            {list.map((e, n) => {
-              const a = e.a;
-              const state = stateOf(n);
-              const trip2 = n > 0 ? travelEstimate(list[n - 1].a, a) : null;
-              return (
-                <div key={`${a.id}-${e.part ?? ''}`} className={s.timelineItem}>
-                  {trip2 && <TravelConnector label={trip2.label} icon={trip2.icon} />}
-                  {showNow && n === nextIndex && nowLine}
-                  <EventCard {...eventCardProps(e, ctx)} state={state} favourite={!!(a.placeId && places[a.placeId]?.starredBy?.includes(me.uid))}
-                    extras={state === 'next' ? [
-                      { icon: 'info', label: `Next · ${startsIn(e)}` },
-                      ...(a.attendeeIds.length > 0 ? [{ icon: 'people' as const, label: a.attendeeIds.includes(me.uid) && a.attendeeIds.length === 1 ? 'You’re going' : `${a.attendeeIds.length} of ${trip.memberIds.length} going` }] : []),
-                    ] : undefined} />
-                </div>
-              );
-            })}
-            {showNow && nextIndex === -1 && nowLine}
-          </div>
-        )}
+        {/* Changing day slides only the plan, from the side of the day you picked */}
+        <SlideSwap value={day} id={day} rank={days.indexOf(day)}>{(d) => {
+          const list: DayEntry[] = byDay[d] ?? [];
+          // On today's plan, the "now" line (Figma Timeline) sits before the next plan. The page doesn't scroll to it.
+          const showNow = d === t && list.length > 1;
+          const nextIndex = d === t ? list.findIndex((e) => entryEnd(e) > now) : -1;
+          const stateOf = (i: number): EventState => d < t || (d === t && entryEnd(list[i]) <= now) ? 'done' : i === nextIndex ? 'next' : 'default';
+          return list.length === 0 ? (
+            <EmptyState illustration="calendar" title="Nothing planned yet" message="Add something to do, or schedule an idea from the Ideas board."
+              action={<Button variant="secondary" icon="plus" onClick={() => setAdding(true)}>Add event</Button>} />
+          ) : (
+            <div className={s.eventList}>
+              {list.map((e, n) => {
+                const a = e.a;
+                const state = stateOf(n);
+                const trip2 = n > 0 ? travelEstimate(list[n - 1].a, a) : null;
+                return (
+                  <div key={`${a.id}-${e.part ?? ''}`} className={s.timelineItem}>
+                    {trip2 && <TravelConnector label={trip2.label} icon={trip2.icon} />}
+                    {showNow && n === nextIndex && nowLine}
+                    <EventCard {...eventCardProps(e, ctx)} state={state} favourite={!!(a.placeId && places[a.placeId]?.starredBy?.includes(me.uid))}
+                      extras={state === 'next' ? [
+                        { icon: 'info', label: `Next · ${startsIn(e)}` },
+                        ...(a.attendeeIds.length > 0 ? [{ icon: 'people' as const, label: a.attendeeIds.includes(me.uid) && a.attendeeIds.length === 1 ? 'You’re going' : `${a.attendeeIds.length} of ${trip.memberIds.length} going` }] : []),
+                      ] : undefined} />
+                  </div>
+                );
+              })}
+              {showNow && nextIndex === -1 && nowLine}
+            </div>
+          );
+        }}</SlideSwap>
       </section>
 
       <ActivityForm open={adding} trip={trip} date={day} onClose={() => setAdding(false)} />

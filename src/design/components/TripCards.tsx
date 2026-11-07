@@ -89,26 +89,16 @@ export function TripHeader({ title, meta, back, action, countries, going }: {
 }
 
 /**
- * Figma "Day Card" (Layout Strip, Selected No / Yes). Unselected: the date (Display tiny) and a word ("Tomorrow", "Day 4").
- * Selected: deep emerald, the date in Display with month and word, and a Tag (e.g. "3 more events").
+ * Figma "Day Card" (Selected No / Yes): a large date number with the weekday below. The selected card is brand
+ * coloured and a little larger; it grows with a spring while its neighbours ease aside (transform only, in CSS).
  */
-export function DayCard({ day, month, word, tag, selected, onClick, dataDay }: {
-  day: number; month: string; word: string; tag?: string; selected: boolean; onClick: () => void; dataDay?: string;
+export function DayCard({ day, weekday, label, selected, onClick, dataDay }: {
+  day: number; weekday: string; label: string; selected: boolean; onClick: () => void; dataDay?: string;
 }) {
   return (
-    <button type="button" data-day={dataDay} className={[s.day, selected && s.daySelected].filter(Boolean).join(' ')} aria-pressed={selected} onClick={onClick}
-      aria-label={`${word}, ${month} ${day}${tag ? `, ${tag}` : ''}`}>
-      {selected ? (
-        <span className={s.dayOpen} aria-hidden="true">
-          <span className={s.dayDate}><span className={s.dayBig}>{day}</span><span className={s.dayMonth}>{month} · {word}</span></span>
-          {tag && <Badge tone="tint">{tag}</Badge>}
-        </span>
-      ) : (
-        <span className={s.dayCompact} aria-hidden="true">
-          <span className={s.dayNum}>{day}</span>
-          <span className={s.dayWord}>{word}</span>
-        </span>
-      )}
+    <button type="button" data-day={dataDay} className={[s.day, selected && s.daySelected].filter(Boolean).join(' ')} aria-pressed={selected} onClick={onClick} aria-label={label}>
+      <span className={s.dayNum} aria-hidden="true">{day}</span>
+      <span className={s.dayWord} aria-hidden="true">{weekday}</span>
     </button>
   );
 }

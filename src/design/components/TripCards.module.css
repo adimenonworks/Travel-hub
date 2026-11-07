@@ -28,27 +28,32 @@
 .goingLink { text-decoration: none !important; display: inline-flex; position: relative; }
 .goingLink::after { content: ''; position: absolute; inset: -8px -2px; }
 
-/* Figma "Day Card" (Strip): 24 corners. Unselected: ghost with a border, 16 / 20. Selected: deep emerald, 20. */
+/* Figma "Day Card": 24 corners, the date (Display tiny) over the weekday. Unselected: ghost with a border.
+   Selected: brand (selected primary), scaled up with a spring; the cards either side move aside by the amount it
+   grew, so nothing overlaps. Every card is the same width, which makes that amount known. Transform only. */
 .day {
-  flex: none; position: relative; display: flex; align-items: center; justify-content: center;
-  min-width: calc(83rem / 17); min-height: calc(123rem / 17);
-  padding: var(--space-default-500) var(--space-default-600); border-radius: var(--radius-600);
+  --day-grow: 1.1;
+  flex: none; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--space-default-100);
+  width: calc(64rem / 17); min-height: calc(84rem / 17);
+  padding: var(--space-default-400) var(--space-default-200); border-radius: var(--radius-600);
   background: var(--interactive-unselected-ghost-background); color: var(--interactive-unselected-ghost-text);
   border: 1px solid var(--interactive-unselected-ghost-border);
   cursor: pointer; scroll-snap-align: start;
-  transition: background var(--motion-fast), transform var(--motion-release);
+  transition: background var(--motion-fast), color var(--motion-fast), transform var(--duration-base) var(--ease-standard);
 }
 .day:hover { background: var(--interactive-unselected-ghost-background-hover); }
+.daySelected {
+  border-color: transparent; background: var(--interactive-selected-primary-background); color: var(--interactive-selected-primary-text);
+  transform: scale(var(--day-grow)); transition: background var(--motion-fast), color var(--motion-fast), transform var(--duration-base) var(--ease-bounce);
+}
+.daySelected:hover { background: var(--interactive-selected-primary-background-hover); }
+.day:has(~ .daySelected) { transform: translateX(calc((1 - var(--day-grow)) * calc(64rem / 17) / 2)); }
+.daySelected ~ .day { transform: translateX(calc((var(--day-grow) - 1) * calc(64rem / 17) / 2)); }
 .day:active { transform: scale(0.97); transition: transform var(--motion-press); }
-.daySelected { align-items: flex-start; justify-content: flex-start; padding: var(--space-default-600); border-color: transparent; background: var(--interactive-selected-secondary-background); color: var(--interactive-selected-secondary-text); }
-.daySelected:hover { background: var(--interactive-selected-secondary-background-hover); }
-.dayCompact { display: flex; flex-direction: column; align-items: center; gap: var(--space-default-100); }
+.daySelected:active { transform: scale(calc(var(--day-grow) - 0.03)); }
 .dayNum { font: var(--type-display-tiny); letter-spacing: -0.01em; }
-.dayWord { font: var(--type-label); white-space: nowrap; }
-.dayOpen { display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-default-400); }
-.dayDate { display: flex; align-items: baseline; gap: var(--space-default-200); }
-.dayBig { font: var(--type-display); letter-spacing: -0.01em; }
-.dayMonth { font: var(--type-label-small); white-space: nowrap; }
+.dayWord { font: var(--type-label-small); white-space: nowrap; }
+@media (prefers-reduced-motion: reduce) { .day, .daySelected { transition: background var(--motion-fast), color var(--motion-fast); } }
 
 /* Figma "Timeline" */
 .timeline { display: flex; align-items: center; gap: var(--space-default-200); }
