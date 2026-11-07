@@ -5,7 +5,7 @@ import { useLocation, useNavigationType, type NavigateFunction } from 'react-rou
  * How screens change, like an iPhone app:
  * - opening something (a link, a card) slides the new screen in from the right;
  * - a back button slides the previous screen back in from the left;
- * - the Bottom Nav cross-fades quickly between tabs (with a light haptic tick), and each tab keeps its own scroll position;
+ * - the Bottom Nav cross-fades quickly between tabs (no haptic: navigation is silent), and each tab keeps its own scroll position;
  * - the phone's own swipe-back switches instantly (iOS animates that itself).
  * Each screen also remembers its scroll position, and going back returns you there.
  */
