@@ -58,7 +58,7 @@
 .albumCover > * { width: 100%; height: 100%; }
 .albumBody { display: flex; align-items: flex-start; gap: var(--space-default-300); }
 .albumText { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: var(--space-default-100); }
-.albumTitle { margin: 0; font: var(--type-heading-2); letter-spacing: -0.02em; color: var(--on-light-text-primary); }
+.albumTitle { margin: 0; font: var(--type-heading-2); letter-spacing: -0.01em; color: var(--on-light-text-primary); }
 .albumLink { color: inherit; text-decoration: none !important; }
 .albumLink::after { content: ''; position: absolute; inset: 0; border-radius: var(--radius-600); } /* the whole card opens the album */
 .albumEdit { position: relative; z-index: 1; }
@@ -89,7 +89,7 @@
 /* New trip flow */
 .optionGrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(calc(130rem / 17), 1fr)); gap: var(--space-default-300); }
 .flowSummary { display: flex; flex-direction: column; gap: var(--space-default-100); }
-.flowSummaryTitle { font: var(--type-heading-2); letter-spacing: -0.02em; color: var(--on-mid-text-primary); }
+.flowSummaryTitle { font: var(--type-heading-2); letter-spacing: -0.01em; color: var(--on-mid-text-primary); }
 .flowSummaryMeta { margin: 0; font: var(--type-body-small); color: var(--on-mid-text-secondary); }
 /* The Ghost button on the deep emerald Celebration screen uses the ghost "inverse" text */
 .onDarkGhost[class] { color: var(--on-dark-text-primary); }

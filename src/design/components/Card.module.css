@@ -10,7 +10,7 @@
 
 /* Media, text and buttons stacked (Figma's Small card; the Large row layout is archived) */
 .structured { display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-default-500); padding: var(--space-default-500); }
-.structured .title { font: var(--type-heading-2); letter-spacing: -0.02em; } /* Heading 2 */
+.structured .title { font: var(--type-heading-2); letter-spacing: -0.01em; } /* Heading 2 */
 .structured .body { font: var(--type-label-small); }
 .structured .buttons { flex-direction: column; align-self: stretch; margin-top: var(--space-default-200); } /* 20 below the text */
 .structured .buttons > * { width: 100%; }
@@ -65,5 +65,5 @@
 
 .section { display: flex; flex-direction: column; gap: var(--space-default-400); }
 .sectionHeader { display: flex; align-items: center; justify-content: space-between; gap: var(--space-default-400); min-height: var(--size-tap); flex-wrap: wrap; }
-.sectionTitle { font: var(--type-heading-2); letter-spacing: -0.02em; color: var(--on-light-text-primary); }
+.sectionTitle { font: var(--type-heading-2); letter-spacing: -0.01em; color: var(--on-light-text-primary); }
 .sectionFooter { font: var(--type-label-small); color: var(--on-light-text-secondary); padding: 0 var(--space-default-300); }

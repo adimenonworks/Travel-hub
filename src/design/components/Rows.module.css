@@ -41,7 +41,7 @@
 /* Section header */
 .sectionHeader { display: flex; align-items: center; justify-content: space-between; gap: var(--space-default-300); flex-wrap: wrap; }
 .sectionText { display: flex; flex-direction: column; gap: var(--space-default-100); min-width: 0; flex: 1 1 calc(140rem / 17); }
-.sectionTitle { margin: 0; font: var(--type-heading-2); letter-spacing: -0.02em; color: var(--on-light-text-primary); }
+.sectionTitle { margin: 0; font: var(--type-heading-2); letter-spacing: -0.01em; color: var(--on-light-text-primary); }
 .sectionMeta { font: var(--type-body-small); color: var(--on-light-text-secondary); }
 .pageSection { display: flex; flex-direction: column; gap: var(--space-default-500); }
 
@@ -72,7 +72,7 @@
 .routeTimes { display: flex; align-items: center; gap: var(--space-default-300); }
 .routeEnd { flex: none; display: flex; flex-direction: column; gap: var(--space-default-100); }
 .routeEndTo { align-items: flex-end; text-align: right; }
-.routeTime { font: var(--type-heading-2); letter-spacing: -0.02em; color: var(--on-light-text-primary); font-variant-numeric: tabular-nums; }
+.routeTime { font: var(--type-heading-2); letter-spacing: -0.01em; color: var(--on-light-text-primary); font-variant-numeric: tabular-nums; }
 .routePlace { font: var(--type-body-small); color: var(--on-light-text-secondary); }
 .routeMid { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; align-items: center; gap: var(--space-default-200); }
 .routeLine { display: flex; align-items: center; gap: var(--space-default-200); width: 100%; color: var(--on-light-icon-secondary); }
@@ -109,7 +109,7 @@
 .tileIcon { display: grid; place-items: center; width: 40px; height: 40px; border-radius: var(--radius-1000); background: var(--on-light-surface-secondary); color: var(--on-light-icon-primary); overflow: hidden; }
 .tileIcon img { width: 24px; height: 24px; border-radius: 50%; }
 .tileText { display: flex; flex-direction: column; gap: var(--space-default-100); min-width: 0; }
-.tileTitle { font: var(--type-heading-2); letter-spacing: -0.02em; color: var(--on-light-text-primary); overflow-wrap: break-word; } /* wraps between words; only a word too long for the tile breaks */
+.tileTitle { font: var(--type-heading-2); letter-spacing: -0.01em; color: var(--on-light-text-primary); overflow-wrap: break-word; } /* wraps between words; only a word too long for the tile breaks */
 .tileTitleSmall { font: var(--type-heading-3); letter-spacing: -0.02em; color: var(--on-light-text-primary); }
 .tileMeta { font: var(--type-body-small); color: var(--on-light-text-secondary); }
 .tile-orange, .tile-green, .tile-yellow, .tile-pink { border-color: transparent; }
@@ -150,13 +150,13 @@
   display: flex; flex-direction: column-reverse; align-items: center; justify-content: center; gap: var(--space-default-100); min-width: 0; text-align: center;
   padding: var(--space-default-500) var(--space-default-300); border-radius: var(--radius-500); background: var(--on-mid-surface-brand);
 }
-.statValue { margin: 0; font: var(--type-heading-1); letter-spacing: -0.02em; color: var(--on-mid-text-primary); font-variant-numeric: tabular-nums; }
+.statValue { margin: 0; font: var(--type-heading-1); letter-spacing: -0.01em; color: var(--on-mid-text-primary); font-variant-numeric: tabular-nums; }
 .statLabel { font: var(--type-body-small); color: var(--on-mid-text-secondary); }
 
 /* Profile Card */
 .profile { display: flex; align-items: center; gap: var(--space-default-400); padding: var(--space-default-500); border-radius: var(--radius-600); background: var(--on-light-surface-primary); border: 1px solid var(--on-light-border-subtle); }
 .profile.pressable:hover { background: var(--interactive-unselected-primary-background-hover); }
-.profileName { font: var(--type-heading-2); letter-spacing: -0.02em; color: var(--on-light-text-primary); overflow-wrap: anywhere; }
+.profileName { font: var(--type-heading-2); letter-spacing: -0.01em; color: var(--on-light-text-primary); overflow-wrap: anywhere; }
 
 /* Option card */
 .option {
