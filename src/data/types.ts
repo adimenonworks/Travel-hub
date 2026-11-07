@@ -12,6 +12,8 @@ export type Profile = {
   homeCity?: string;
   home?: Place | null;
   visited?: Place[];
+  /** Home currency (Settings → Currency): prices are also shown converted to it. Private. */
+  currency?: string;
 };
 
 export type Trip = {
@@ -21,12 +23,10 @@ export type Trip = {
   startDate: string; // YYYY-MM-DD
   endDate: string;
   currency: string;
-  /** Old per-person daily budget. Newer trips set totalBudget (the whole group, whole trip) and the daily figure is worked out. */
-  dailyBudget: number;
+  /** Budgeting was removed. Older trips may still hold these until an organizer opens them (useBudgetCleanup deletes them). */
+  dailyBudget?: number;
   totalBudget?: number;
-  /** Days given their own budget ("Edit today's budget"), by date. The other days share what's left of the total. */
   dayBudgets?: Record<string, number>;
-  /** What the group actually spent on a past day, by date, when someone corrected it. Replaces the worked-out spend. */
   daySpent?: Record<string, number>;
   /** No longer saved or shown; older trips may still have it. */
   coverColor?: string;
@@ -45,6 +45,12 @@ export type Trip = {
 export type LinkItem = { label: string; url: string; emailUrl?: string };
 
 /** The six event types (src/lib/categories.ts). 'cafe', 'drinks', 'sight' and 'other' are older values, read as Food & drink or Activity. */
+/**
+ * A known price, in the currency it was entered or booked in (an amount of 0 is "Free"). Optional everywhere and never
+ * added up: a price belongs to the one item it's on.
+ */
+export type Price = { amount: number; currency: string };
+
 export type Category = 'flight' | 'stay' | 'transport' | 'food' | 'activity' | 'note' | 'drinks' | 'cafe' | 'sight' | 'other';
 
 export type Activity = {
@@ -57,7 +63,10 @@ export type Activity = {
   location: Place | null;
   locationText: string;
   notes: string;
-  cost: number;
+  /** Optional price (tickets, flights, stays). */
+  price?: Price | null;
+  /** Older events: a per-person cost in the trip's currency, shown as the price when there's no `price`. */
+  cost?: number;
   links: LinkItem[];
   attendeeIds: string[];
   /** The saved Place this event is at, when it came from Collections or was starred. Starring the event stars the Place. */
@@ -88,7 +97,10 @@ export type Idea = {
   placeId?: string;
   category: Category;
   notes: string;
-  cost: number;
+  /** Optional price; an Event made from this idea shows the same one. */
+  price?: Price | null;
+  /** Older ideas: an estimated cost per person in the trip's currency. */
+  cost?: number;
   links: LinkItem[];
   votes: Record<string, true>;
   /** Thumbs-down votes. Older ideas don't have this field. */
@@ -99,6 +111,7 @@ export type Idea = {
   createdAt: number;
 };
 
+/** Removed with budgeting; older trips' expenses are deleted by useBudgetCleanup. */
 export type Expense = {
   id: string;
   title: string;

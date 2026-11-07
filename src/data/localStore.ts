@@ -151,6 +151,12 @@ export function createLocalStore(): Store {
       save();
       return { id, saved: Promise.resolve() };
     },
+    async deleteBudgetData(trip) {
+      const t = db.trips[trip.id];
+      if (t) { delete t.totalBudget; delete t.dailyBudget; delete t.dayBudgets; delete t.daySpent; }
+      if (db.subs[trip.id]) db.subs[trip.id].expenses = {};
+      save();
+    },
     watchPlaces(uid, cb) {
       return watch(() => Object.values(db.places ?? {}).filter((p) => p.ownerId === uid || p.starredBy?.includes(uid)), cb);
     },

@@ -4,7 +4,6 @@ import { Button, DayCard, EmptyState, EventCard, SectionHeader, Timeline, Travel
 import { useMe, usePlacesById } from '../../data/hooks';
 import type { Activity } from '../../data/types';
 import { dayWord, formatDay, formatTime, parseDay, today, tripDays } from '../../lib/dates';
-import { money } from '../../lib/format';
 import { haptic } from '../../lib/native';
 import { travelEstimate } from '../../lib/trips';
 import { ActivityForm } from './ActivityForm';
@@ -51,7 +50,6 @@ export function Itinerary(ctx: TripCtx) {
   const list: DayEntry[] = byDay[day] ?? [];
   const me = useMe();
   const places = usePlacesById(activities.flatMap((x) => (x.placeId ? [x.placeId] : [])));
-  const planned = list.filter((e) => e.part !== 'out').reduce((n, { a }) => n + a.cost * Math.max(1, a.attendeeIds.length), 0);
 
   // On today's plan, the "now" line (Figma Timeline) sits before the next plan. The page doesn't scroll to it.
   const showNow = day === t && list.length > 1;
@@ -82,7 +80,7 @@ export function Itinerary(ctx: TripCtx) {
 
       <section className={s.timeline} aria-label={word(day)}>
         <SectionHeader title={word(day)}
-          meta={[formatDay(day), `${list.length} plan${list.length === 1 ? '' : 's'}`, planned > 0 ? `${money(planned, trip.currency)} planned` : ''].filter(Boolean).join(' · ')}
+          meta={[formatDay(day), `${list.length} plan${list.length === 1 ? '' : 's'}`].filter(Boolean).join(' · ')}
           action={<Button variant="ghost" size="regular" iconEnd="chevron-right" onClick={() => setAdding(true)}>Add event</Button>} />
 
         {list.length === 0 ? (

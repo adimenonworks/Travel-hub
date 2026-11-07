@@ -8,15 +8,17 @@ import { geocodePlace } from '../../lib/geocode';
 import { EVENT_TYPES, eventType, type EventType } from '../../lib/categories';
 import { haptic } from '../../lib/native';
 import { LinkEditor, cleanLinks } from '../shared/Links';
+import { PriceField, fromPriceDraft, toPriceDraft, type PriceDraft } from '../shared/Price';
+import { priceOf } from '../../lib/currency';
 
-export type ActivityDraft = Partial<Pick<Activity, 'title' | 'category' | 'notes' | 'cost' | 'links' | 'date' | 'startTime' | 'endTime' | 'locationText' | 'placeId'>>;
+export type ActivityDraft = Partial<Pick<Activity, 'title' | 'category' | 'notes' | 'price' | 'cost' | 'links' | 'date' | 'startTime' | 'endTime' | 'locationText' | 'placeId'>>;
 
 type Form = {
   type: EventType | null; title: string; date: string; endDate: string; startTime: string; endTime: string;
-  locationText: string; fromText: string; toText: string; ref: string; notes: string; cost: string; links: LinkItem[];
+  locationText: string; fromText: string; toText: string; ref: string; notes: string; price: PriceDraft; links: LinkItem[];
 };
 
-const toForm = (a: ActivityDraft | Activity | undefined, date: string, typed: boolean): Form => {
+const toForm = (a: ActivityDraft | Activity | undefined, date: string, typed: boolean, currency: string): Form => {
   const full = a as Partial<Activity> | undefined;
   return {
     type: typed && a?.category ? eventType(a.category) : null,
@@ -30,10 +32,13 @@ const toForm = (a: ActivityDraft | Activity | undefined, date: string, typed: bo
     toText: full?.toText ?? '',
     ref: full?.ref ?? '',
     notes: a?.notes ?? '',
-    cost: a?.cost ? String(a.cost) : '',
+    price: toPriceDraft(a ? priceOf(a, { currency }) : null, currency),
     links: a?.links?.length ? a.links : [],
   };
 };
+
+/** The types that can have a price (tickets, tours, flights, stays, transport). Food & drink and notes never ask. */
+const PRICED: EventType[] = ['flight', 'stay', 'transport', 'activity'];
 
 /** "Lisbon (LIS)" or "Lisbon, Portugal" → "Lisbon", for titles like "Lisbon → Porto". */
 const city = (s: string) => s.split(',')[0].replace(/\s*\([^)]*\)\s*/g, ' ').trim();
@@ -51,9 +56,9 @@ export function ActivityForm({ open, trip, date, activity, draft, onClose, onCre
 }) {
   const me = useMe();
   const toast = useToast();
-  const [f, setF] = useState<Form>(() => toForm(activity ?? draft, date, !!(activity ?? draft)));
+  const [f, setF] = useState<Form>(() => toForm(activity ?? draft, date, !!(activity ?? draft), trip.currency));
   const [busy, setBusy] = useState(false);
-  useEffect(() => { if (open) setF(toForm(activity ?? draft, date, !!(activity ?? draft))); }, [open, activity, draft, date]);
+  useEffect(() => { if (open) setF(toForm(activity ?? draft, date, !!(activity ?? draft), trip.currency)); }, [open, activity, draft, date]);
   const set = (p: Partial<Form>) => setF((x) => ({ ...x, ...p }));
   const days = tripDays(trip.startDate, trip.endDate);
   const type = f.type;
@@ -91,7 +96,9 @@ export function ActivityForm({ open, trip, date, activity, draft, onClose, onCre
         locationText: placeText,
         location,
         notes: f.notes.trim(),
-        cost: Number(f.cost) || 0,
+        // Prices are optional and only asked for things you book; food & drink keeps one it already had, notes never have one.
+        price: type === 'note' ? null : fromPriceDraft(f.price),
+        cost: 0,
         links: cleanLinks(f.links),
         // Type-specific fields; cleared when they don't apply, so a changed type leaves nothing behind.
         endDate: type === 'stay' || (type === 'flight' && f.endDate > f.date) ? f.endDate : '',
@@ -139,7 +146,7 @@ export function ActivityForm({ open, trip, date, activity, draft, onClose, onCre
   );
   const extras = (
     <>
-      {type !== 'note' && <TextField label={`Cost per person (${trip.currency})`} type="number" inputMode="decimal" min={0} step="any" placeholder="0" value={f.cost} onChange={(e) => set({ cost: e.target.value })} />}
+      {type && PRICED.includes(type) && <PriceField value={f.price} onChange={(price) => set({ price })} />}
       {type !== 'note' && <TextArea label="Notes" placeholder="Booking reference, what to bring…" value={f.notes} onChange={(e) => set({ notes: e.target.value })} />}
       {type !== 'note' && <LinkEditor links={f.links} onChange={(links) => set({ links })} />}
     </>

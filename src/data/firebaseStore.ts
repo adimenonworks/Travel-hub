@@ -15,7 +15,7 @@ import { googleIosClientId, isNativeApp } from '../lib/native';
 
 const SUBS: SubName[] = ['activities', 'ideas', 'expenses', 'comments', 'albums'];
 // Profile fields only their owner may read; they live in users/{uid}/private/places.
-const PRIVATE_FIELDS = ['home', 'homeCity', 'visited'] as const;
+const PRIVATE_FIELDS = ['home', 'homeCity', 'visited', 'currency'] as const;
 const INVITE_DAYS = 14;
 
 // Errors from the sign-in flow that mean "try a full-page redirect instead of a popup".
@@ -202,6 +202,12 @@ export function createFirebaseStore(config: FirebaseOptions): Store {
       const ref = doc(collection(db, 'trips'));
       const saved = setDoc(ref, { ...data, ownerId: uid, memberIds: [uid], roles: { [uid]: 'owner' }, createdAt: Date.now() });
       return { id: ref.id, saved };
+    },
+    async deleteBudgetData(trip) {
+      const fields = (['totalBudget', 'dailyBudget', 'dayBudgets', 'daySpent'] as const).filter((k) => k in trip);
+      if (fields.length) await updateDoc(doc(db, 'trips', trip.id), Object.fromEntries(fields.map((k) => [k, deleteField()])));
+      const old = await getDocs(collection(db, 'trips', trip.id, 'expenses'));
+      await Promise.all(old.docs.map((d) => deleteDoc(d.ref)));
     },
     watchPlaces(uid, cb) {
       // Two live queries merged: Places you saved, and other people's Places you've starred.

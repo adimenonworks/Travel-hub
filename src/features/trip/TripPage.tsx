@@ -3,7 +3,8 @@ import { Navigate, Route, Routes, useLocation, useMatch, useNavigate, useParams 
 import { EmptyState, LinkButton, PageSkeleton, Tabs, TripHeader, type TabItem } from '../../design/components';
 import { useMe, useProfiles, useRole, useSub, useTrip } from '../../data/hooks';
 import { useStarMigration } from '../saves/starEvent';
-import type { Activity, Album, Comment, Expense, Idea, Profile, Trip } from '../../data/types';
+import type { Activity, Album, Comment, Idea, Profile, Trip } from '../../data/types';
+import { useBudgetCleanup } from './budgetCleanup';
 import { daysBetween, formatRange, today } from '../../lib/dates';
 import { countryName, flagUrl, tripCountries } from '../../lib/countries';
 import { Content } from '../../app/Shell';
@@ -21,7 +22,6 @@ export type TripCtx = {
   trip: Trip;
   activities: Activity[];
   ideas: Idea[];
-  expenses: Expense[];
   comments: Comment[];
   albums: Album[];
   profiles: Record<string, Profile>;
@@ -46,7 +46,6 @@ export function TripPage() {
 function TripLoaded({ trip }: { trip: Trip }) {
   const activities = useSub(trip.id, 'activities');
   const ideas = useSub(trip.id, 'ideas');
-  const expenses = useSub(trip.id, 'expenses');
   const comments = useSub(trip.id, 'comments');
   const albums = useSub(trip.id, 'albums');
   const profiles = useProfiles(trip.memberIds);
@@ -58,8 +57,9 @@ function TripLoaded({ trip }: { trip: Trip }) {
   const planPage = useMatch('/trip/:tripId/plan/:activityId');
 
   useStarMigration(trip.id, activities ?? [], me.uid);
-  if (!activities || !ideas || !expenses || !comments || !albums) return <PageSkeleton />;
-  const ctx: TripCtx = { trip, activities, ideas, expenses, comments, albums, profiles, canManage, isOwner };
+  useBudgetCleanup(trip, canManage);
+  if (!activities || !ideas || !comments || !albums) return <PageSkeleton />;
+  const ctx: TripCtx = { trip, activities, ideas, comments, albums, profiles, canManage, isOwner };
   const nDays = daysBetween(trip.startDate, trip.endDate) + 1;
   const t = today();
   const until = daysBetween(t, trip.startDate);
@@ -106,7 +106,7 @@ function TripLoaded({ trip }: { trip: Trip }) {
         {/* At least a screen tall, so switching to a shorter tab never pulls the page (and the tabs) up. */}
         <div className={s.tabPanel}>
         <Routes>
-          <Route index element={<Overview {...ctx} onSetBudget={canManage ? () => setEditing(true) : undefined} />} />
+          <Route index element={<Overview {...ctx} />} />
           <Route path="itinerary" element={<Itinerary {...ctx} />} />
           <Route path="ideas" element={<Ideas {...ctx} />} />
           <Route path="budget" element={<Navigate to={base} replace />} />

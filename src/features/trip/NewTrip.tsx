@@ -56,11 +56,11 @@ export function NewTrip({ open, onClose, onOpenTrip }: { open: boolean; onClose:
     try {
       const id = await store.createTrip({
         name: city, destination: place, startDate: start, endDate: end, currency: defaultCurrency(),
-        totalBudget: 0, dailyBudget: 0, coverPhoto: null, coverPosition: null,
+        coverPhoto: null, coverPosition: null,
       });
       // "Bring your saves?": each chosen Place becomes an Idea that points at it.
       const bring = matching.filter((p) => !leftBehind.includes(cityOf(p)));
-      await Promise.all(bring.map((p) => store.addSub(id, 'ideas', { title: p.name, category: eventCategoryOf(p.category), notes: '', cost: 0, links: [], votes: {}, status: 'open', placeId: p.id })));
+      await Promise.all(bring.map((p) => store.addSub(id, 'ideas', { title: p.name, category: eventCategoryOf(p.category), notes: '', links: [], votes: {}, status: 'open', placeId: p.id })));
       haptic('success');
       setCreated({ id, name: city, start, brought: bring.length });
     } catch {

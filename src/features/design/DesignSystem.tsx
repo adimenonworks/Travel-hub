@@ -1,6 +1,6 @@
 import { useState, type CSSProperties } from 'react';
 import {
-  Avatar, AvatarStack, Badge, BudgetCard, Chip, Notification, Button, Card, EmptyState, FieldRow, HeroCard, Icon, IconButton,
+  Avatar, AvatarStack, Badge, Chip, Notification, Button, Card, EmptyState, FieldRow, HeroCard, Icon, IconButton,
   LinkButton, PageHeader, PageSection, SegmentedControl, Select, Sheet, Tabs, TextArea, TextField, Timeline, Illustration,
   type IllustrationName, COVER_ILLUSTRATIONS, ICON_NAMES, useToast, BottomNav, Skeleton,
   ListItem, ListGroup, SectionHeader, EventCard, TravelConnector, IdeaRow, Tile, QuickAction, MapCard, StatStrip, ProfileCard,
@@ -250,7 +250,7 @@ export function DesignSystem() {
           </div>
         </Section>
 
-        <Section title="Trip components" footer="Hero Card (phase-aware: countdown, then the next thing), Trip header, Budget card (Planning / During), Day Card, Timeline.">
+        <Section title="Trip components" footer="Hero Card (phase-aware: countdown, then the next thing), Trip header, Day Card, Timeline.">
           <HeroCard cover={<Illustration name={COVER_ILLUSTRATIONS[1]} />} countdown={{ label: 'In 9 days' }} title="Portugal & Spain" meta="Nov 2 – 11 · 10 days"
             countries={[{ code: 'pt', name: 'Portugal', flag: flagUrl('pt') }, { code: 'es', name: 'Spain', flag: flagUrl('es') }]}
             people={[{ id: 'a', name: 'Alex Menon' }, { id: 'j', name: 'Jo Ma' }, { id: 's', name: 'Sam Lee' }, { id: 'p', name: 'Priya Shah' }]} next={{ icon: 'plane', title: 'Flight to Lisbon', meta: 'Mon 2 Nov, 08:30 · TP1351', to: '/design' }} to="/design" />
@@ -258,11 +258,6 @@ export function DesignSystem() {
             next={{ icon: 'lightbulb', title: '24 ideas to sort', meta: 'Brought over from your Japan saves' }} />
           <TripHeader title="Portugal & Spain" back={{ to: '/design', label: 'Trips' }} action={{ icon: 'pencil', label: 'Edit trip', onClick: () => {} }}
             meta="Nov 2 – 11 · 10 days · in 9 days" countries={[{ code: 'pt', name: 'Portugal', flag: flagUrl('pt') }]} going={{ label: '4 going', to: '/design' }} />
-          <BudgetCard label="Trip cost so far" amount="€3,160" action={<Button variant="ghost" size="regular" iconEnd="chevron-right">Details</Button>} segments={[
-            { label: 'Flights', value: '€1,330', amount: 1330, color: 'brand' }, { label: 'Stays', value: '€1,410', amount: 1410, color: 'mid' },
-            { label: 'Planned activities & food', value: '€420', amount: 420, color: 'orange' }, { label: 'Spending money left', value: '€840 of €1,260', amount: 840, color: 'empty' }]} />
-          <BudgetCard label="Today" amount="€45 of €80" action={<Button variant="ghost" size="regular" iconEnd="chevron-right">Details</Button>} segments={[
-            { label: 'Planned today', value: '€45', amount: 45, color: 'orange' }, { label: 'Left today', value: '€35', amount: 35, color: 'empty' }, { label: 'Left for the trip', value: '€380', amount: 0, color: 'empty' }]} />
           <div className={s.row}>
             <DayCard day={3} month="Nov" word="Today" tag="3 more events" selected onClick={() => {}} />
             <DayCard day={4} month="Nov" word="Tomorrow" selected={false} onClick={() => {}} />

@@ -96,7 +96,7 @@ export function People({ trip, profiles, canManage, isOwner }: TripCtx) {
 
       <Sheet open={!!person} title={person ? personName(profiles, person) : ''} subtitle="What they can do on this trip" onClose={() => setPerson(null)} onSubmit={saveRole} submitLabel="Save">
         <SegmentedControl label="Role" block value={role} onChange={setRoleDraft} options={[{ value: 'member', label: 'Member' }, { value: 'editor', label: 'Organiser' }]} />
-        <p className="t-body-small t-secondary">Organisers can edit the trip, its budget and the itinerary, and add ideas to days.</p>
+        <p className="t-body-small t-secondary">Organisers can edit the trip and the itinerary, and add ideas to days.</p>
         {person && (
           <Button variant="destructive" icon="trash" onClick={async () => {
             const name = personName(profiles, person);

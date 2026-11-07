@@ -22,7 +22,7 @@ export function goBack(navigate: NavigateFunction, parent: string) {
 }
 
 /** A screen is the path without a trip's tab (Itinerary, Ideas, Photos and People are one screen with tabs). */
-export const screenKey = (path: string) => path.replace(/^(\/trip\/[^/]+)\/(ideas|photos|people|budget|info)$/, '$1');
+export const screenKey = (path: string) => path.replace(/^(\/trip\/[^/]+)\/(ideas|photos|people|info)$/, '$1');
 
 const scrolls = new Map<string, number>();
 /** Where each tab's screen was scrolled to (by path), so coming back to a tab returns you there. */

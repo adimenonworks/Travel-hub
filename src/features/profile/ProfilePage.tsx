@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react';
-import { Avatar, Button, Card, IconButton, LinkButton, ListGroup, ListItem, PageHeader, PageSection, ProfileCard as FigmaProfileCard, SegmentedControl, Sheet, StatStrip, TextField, useToast } from '../../design/components';
+import { Avatar, Button, Card, Select, IconButton, LinkButton, ListGroup, ListItem, PageHeader, PageSection, ProfileCard as FigmaProfileCard, SegmentedControl, Sheet, StatStrip, TextField, useToast } from '../../design/components';
 import { store } from '../../data';
 import { useMe, useMyTrips, usePlaces, useProfile } from '../../data/hooks';
 import { countryName } from '../../lib/countries';
@@ -12,11 +12,13 @@ import { shrinkPhoto } from '../../lib/image';
 import { MAPS_APPS, getMapsApp, setMapsApp, type MapsApp } from '../../lib/prefs';
 import { applyTheme, getTheme, type ThemePref } from '../../lib/theme';
 import { Content } from '../../app/Shell';
+import { CURRENCIES } from '../../lib/format';
+import { useHomeCurrency } from '../shared/Price';
 import { CityPicker } from '../shared/CityPicker';
 import { MapView } from '../shared/Map';
 import s from './Profile.module.css';
 
-type Open = 'profile' | 'home' | 'places' | 'maps' | 'appearance' | null;
+type Open = 'profile' | 'home' | 'places' | 'maps' | 'appearance' | 'currency' | null;
 
 /**
  * You tab (Figma "You tab — Profile"): the Profile Card, "Your travels" (a Stat strip of countries, cities and days
@@ -64,6 +66,7 @@ export function ProfilePage() {
     setPickerKey((k) => k + 1);
   };
   const name = profile?.name || me.name;
+  const home = useHomeCurrency();
   const themeLabel = { auto: 'Automatic', light: 'Light', dark: 'Dark' }[theme];
 
   return (
@@ -100,6 +103,7 @@ export function ProfilePage() {
       <PageSection title="Settings">
         <ListGroup label="Settings">
           <ListItem icon="home" title="Home city" meta={profile?.home?.name ?? 'Not set'} onClick={() => setOpen('home')} />
+          <ListItem icon="wallet" title="Currency" meta={home} onClick={() => setOpen('currency')} />
           <ListItem icon="map" title="Maps app" meta={MAPS_APPS.find((m) => m.value === maps)?.label} onClick={() => setOpen('maps')} />
           <ListItem icon="sun" title="Appearance" meta={themeLabel} onClick={() => setOpen('appearance')} />
         </ListGroup>
@@ -130,6 +134,13 @@ export function ProfilePage() {
             ))}
           </ListGroup>
         )}
+      </Sheet>
+
+      <Sheet open={open === 'currency'} title="Currency" subtitle="Prices show in the currency they were booked in, then converted to this one" onClose={() => setOpen(null)}>
+        <Select label="Your currency" value={home} onChange={(e) => save({ currency: e.target.value }, 'Currency saved')}>
+          {[...new Set([home, ...CURRENCIES])].map((c) => <option key={c} value={c}>{c}</option>)}
+        </Select>
+        <p className="t-body-small t-secondary"><a href="https://www.exchangerate-api.com" target="_blank" rel="noreferrer">Rates by Exchange Rate API</a>. Updated once a day; conversions are a guide.</p>
       </Sheet>
 
       <Sheet open={open === 'maps'} title="Maps app" subtitle="Events open their location in this app. Saved on this device." onClose={() => setOpen(null)}>

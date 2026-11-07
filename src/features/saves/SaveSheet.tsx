@@ -95,7 +95,7 @@ export function SaveSheet({ request, onClose }: { request: SaveRequest | null; o
       saved.catch(() => toast({ tone: 'error', label: "Couldn't save. Check your connection" }));
       // "Also add to <trip> ideas": an Idea that points at the Place (never a copy).
       const idea = alsoTrip && trip ? store.queueSub(trip.id, 'ideas', {
-        title: name, category: eventCategoryOf(category), notes: '', cost: 0, links: [], votes: {}, status: 'open', placeId: id,
+        title: name, category: eventCategoryOf(category), notes: '', links: [], votes: {}, status: 'open', placeId: id,
       }) : null;
       haptic('success');
       toast({

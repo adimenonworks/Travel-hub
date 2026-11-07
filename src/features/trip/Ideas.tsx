@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Button, EmptyState, FieldRow, IdeaRow, LinkButton, ListGroup, ListItem, SectionHeader, SegmentedControl, Select, Sheet, TextArea, TextField, useToast } from '../../design/components';
+import { Button, EmptyState, IdeaRow, LinkButton, ListGroup, ListItem, SectionHeader, SegmentedControl, Select, Sheet, TextArea, TextField, useToast } from '../../design/components';
 import { store } from '../../data';
 import { personName, useMe, usePlaces, usePlacesById } from '../../data/hooks';
 import type { Category, Idea, LinkItem, PlaceCategory, SavedPlace } from '../../data/types';
@@ -8,8 +8,9 @@ import { cityOf, eventCategoryOf, groupBy, placeCategory, sortPlaces, tripCountr
 import { PlaceMarks, PlaceRow } from '../saves/Collections';
 import { usePlaceMarks } from '../saves/placeMarks';
 import { haptic } from '../../lib/native';
-import { CATEGORIES, categoryInfo } from '../../lib/categories';
-import { money } from '../../lib/format';
+import { CATEGORIES, categoryInfo, eventType } from '../../lib/categories';
+import { priceOf, priceText } from '../../lib/currency';
+import { PriceField, PriceWithConversion, fromPriceDraft, toPriceDraft, type PriceDraft } from '../shared/Price';
 import { Comments } from '../shared/Comments';
 import { LinkChips, LinkEditor, cleanLinks } from '../shared/Links';
 import { ActivityForm } from './ActivityForm';
@@ -68,7 +69,7 @@ export function Ideas(ctx: TripCtx) {
             const place = i.placeId ? places[i.placeId] : undefined;
             const cat = categoryInfo(i.category);
             const kind = place ? [place.kind || placeCategory(place.category).one, place.city].filter(Boolean).join(' · ') : cat.label;
-            const meta = [kind, i.cost > 0 ? `~${money(i.cost, trip.currency)}` : '', i.createdBy === me.uid ? 'you' : personName(ctx.profiles, i.createdBy).split(' ')[0]].filter(Boolean).join(' · ');
+            const meta = [kind, priceOf(i, trip) ? priceText(priceOf(i, trip)!) : '', i.createdBy === me.uid ? 'you' : personName(ctx.profiles, i.createdBy).split(' ')[0]].filter(Boolean).join(' · ');
             return (
               <IdeaRow key={i.id} title={place?.name ?? i.title} meta={meta} icon={place ? placeCategory(place.category).icon : cat.icon}
                 tag={i.id === top ? { icon: 'star', label: 'Most votes' } : undefined}
@@ -112,7 +113,7 @@ function AddIdeaSheet({ open, ctx, onClose, onNew }: { open: boolean; ctx: TripC
   const fits = all.filter((p) => p.ownerId === me.uid && p.countryCode && codes.has(p.countryCode));
   const add = async (p: SavedPlace) => {
     try {
-      await store.addSub(ctx.trip.id, 'ideas', { title: p.name, category: eventCategoryOf(p.category), notes: '', cost: 0, links: [], votes: {}, status: 'open', placeId: p.id });
+      await store.addSub(ctx.trip.id, 'ideas', { title: p.name, category: eventCategoryOf(p.category), notes: '', links: [], votes: {}, status: 'open', placeId: p.id });
       haptic('light');
       toast({ icon: 'check', label: `${p.name} added to ideas` });
     } catch { toast({ tone: 'error', label: "Couldn't save. Check your connection" }); }
@@ -158,9 +159,10 @@ function IdeaSheet({ idea, place, ctx, onClose, onEdit, onSchedule }: { idea: Id
     catch { toast({ tone: 'error', label: "Couldn't save. Check your connection" }); }
   };
   return (
-    <Sheet open title={place?.name ?? idea.title} subtitle={[place ? [place.kind || placeCategory(place.category).one, place.city].filter(Boolean).join(' · ') : cat.label, idea.cost > 0 ? `~${money(idea.cost, ctx.trip.currency)} per person` : '', `added by ${idea.createdBy === me.uid ? 'you' : personName(ctx.profiles, idea.createdBy)}`].filter(Boolean).join(' · ')} onClose={onClose}>
+    <Sheet open title={place?.name ?? idea.title} subtitle={[place ? [place.kind || placeCategory(place.category).one, place.city].filter(Boolean).join(' · ') : cat.label, `added by ${idea.createdBy === me.uid ? 'you' : personName(ctx.profiles, idea.createdBy)}`].filter(Boolean).join(' · ')} onClose={onClose}>
       {place?.image && <img src={place.image} alt="" className={s.ideaImage} />}
       {place && <PlaceMarks visited={visited.has(place.id)} starred={starred(place)} />}
+      {priceOf(idea, ctx.trip) && <p className="t-body">Price: <PriceWithConversion price={priceOf(idea, ctx.trip)!} /></p>}
       {(idea.notes || place?.notes) && <p className="t-body">{idea.notes || place?.notes}</p>}
       <LinkChips links={idea.links} />
       {place && (
@@ -182,19 +184,19 @@ function IdeaSheet({ idea, place, ctx, onClose, onEdit, onSchedule }: { idea: Id
   );
 }
 
-type Form = { title: string; category: Category; notes: string; cost: string; links: LinkItem[] };
+type Form = { title: string; category: Category; notes: string; price: PriceDraft; links: LinkItem[] };
 
 function IdeaForm({ open, tripId, currency, idea, onClose }: { open: boolean; tripId: string; currency: string; idea?: Idea; onClose: () => void }) {
-  const blank: Form = { title: '', category: 'food', notes: '', cost: '', links: [] };
+  const blank: Form = { title: '', category: 'food', notes: '', price: toPriceDraft(null, currency), links: [] };
   const [f, setF] = useState<Form>(blank);
   useEffect(() => {
-    if (open) setF(idea ? { title: idea.title, category: idea.category, notes: idea.notes, cost: idea.cost ? String(idea.cost) : '', links: idea.links } : blank);
+    if (open) setF(idea ? { title: idea.title, category: idea.category, notes: idea.notes, price: toPriceDraft(priceOf(idea, { currency }), currency), links: idea.links } : blank);
   }, [open, idea]);
   const set = (p: Partial<Form>) => setF((x) => ({ ...x, ...p }));
   const toast = useToast();
 
   const submit = async () => {
-    const data = { title: f.title.trim(), category: f.category, notes: f.notes.trim(), cost: Number(f.cost) || 0, links: cleanLinks(f.links) };
+    const data = { title: f.title.trim(), category: f.category, notes: f.notes.trim(), price: fromPriceDraft(f.price), cost: 0, links: cleanLinks(f.links) };
     try {
       if (idea) await store.updateSub(tripId, 'ideas', idea.id, data);
       else await store.addSub(tripId, 'ideas', { ...data, votes: {}, status: 'open' });
@@ -211,12 +213,10 @@ function IdeaForm({ open, tripId, currency, idea, onClose }: { open: boolean; tr
   return (
     <Sheet open={open} title={idea ? 'Edit idea' : 'New idea'} onClose={onClose} onSubmit={submit} submitLabel={idea ? 'Save' : 'Add'} submitDisabled={!f.title.trim()}>
       <TextField label="Idea" placeholder="Dinner at Taberna da Rua das Flores" value={f.title} onChange={(e) => set({ title: e.target.value })} />
-      <FieldRow>
-        <Select label="Type" value={f.category} onChange={(e) => set({ category: e.target.value as Category })}>
-          {CATEGORIES.map((c) => <option key={c.value} value={c.value}>{c.label}</option>)}
-        </Select>
-        <TextField label={`Est. cost pp (${currency})`} type="number" inputMode="decimal" min={0} step="any" value={f.cost} onChange={(e) => set({ cost: e.target.value })} />
-      </FieldRow>
+      <Select label="Type" value={f.category} onChange={(e) => set({ category: e.target.value as Category })}>
+        {CATEGORIES.map((c) => <option key={c.value} value={c.value}>{c.label}</option>)}
+      </Select>
+      {eventType(f.category) !== 'food' && <PriceField value={f.price} onChange={(price) => set({ price })} />}
       <TextArea label="Why it's great" value={f.notes} onChange={(e) => set({ notes: e.target.value })} />
       <LinkEditor links={f.links} onChange={(links) => set({ links })} />
       {idea && <Button variant="destructive" icon="trash" block onClick={remove}>Delete idea</Button>}

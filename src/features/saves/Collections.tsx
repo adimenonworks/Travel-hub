@@ -60,7 +60,7 @@ export function PlaceSheet({ place, onClose }: { place: SavedPlace | null; onClo
   const addToTrip = async () => {
     if (!target) return;
     try {
-      await store.addSub(target.id, 'ideas', { title: place.name, category: eventCategoryOf(place.category), notes: '', cost: 0, links: [], votes: {}, status: 'open', placeId: place.id });
+      await store.addSub(target.id, 'ideas', { title: place.name, category: eventCategoryOf(place.category), notes: '', links: [], votes: {}, status: 'open', placeId: place.id });
       haptic('success');
       toast({ icon: 'check', label: `Added to ${target.name} ideas` });
       onClose();

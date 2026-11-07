@@ -43,6 +43,8 @@ export interface Store {
    */
   queueSub<K extends SubName>(tripId: string, name: K, data: NewDoc<SubCollections[K]>): { id: string; saved: Promise<void> };
   queueTrip(data: Omit<Trip, 'id' | 'ownerId' | 'memberIds' | 'roles' | 'createdAt'>): { id: string; saved: Promise<void> };
+  /** Budgeting was removed: delete a trip's stored budget fields and logged costs (organizers only; expenses by anyone). */
+  deleteBudgetData(trip: Trip): Promise<void>;
   /** Collections: your saved Places and the ones you've starred (others' Places added to your trips), live. */
   watchPlaces(uid: string, cb: (places: SavedPlace[]) => void): Unsubscribe;
   /** Places by id (e.g. a trip-mate's Place that an idea points at). Missing ones are left out. */

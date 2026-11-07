@@ -6,9 +6,11 @@ import { personName, useMe, usePlacesById } from '../../data/hooks';
 import { placeForEvent } from '../saves/starEvent';
 import type { LinkItem } from '../../data/types';
 import { formatDay, formatTime } from '../../lib/dates';
-import { hostOf, isPdf, money, normalizeUrl } from '../../lib/format';
+import { hostOf, isPdf, normalizeUrl } from '../../lib/format';
 import { mapsUrl } from '../../lib/geocode';
 import { haptic } from '../../lib/native';
+import { priceOf } from '../../lib/currency';
+import { PriceWithConversion } from '../shared/Price';
 import { eventType } from '../../lib/categories';
 import { getMapsApp, mapsAppLabel } from '../../lib/prefs';
 import { Comments } from '../shared/Comments';
@@ -44,6 +46,7 @@ export function ActivityPage(ctx: TripCtx) {
   const app = getMapsApp();
   const where = a.locationText || a.location?.name;
   const type = eventType(a.category);
+  const price = priceOf(a, trip);
   const removeDoc = async (i: number) => {
     const doc = a.links[i];
     if (!confirm(`Remove "${doc.label || hostOf(doc.url)}"?`)) return;
@@ -88,7 +91,7 @@ export function ActivityPage(ctx: TripCtx) {
           {type === 'stay' && a.endDate && <ListItem icon="calendar" title="Check-in and check-out" meta={`${formatDay(a.date)}${a.startTime ? `, ${formatTime(a.startTime)}` : ''} → ${formatDay(a.endDate)}${a.endTime ? `, ${formatTime(a.endTime)}` : ''}`} />}
           {where && !(a.fromText && a.toText) && <ListItem icon="pin" title="Address" meta={where} href={mapsUrl(where, a.location, app)} label={`${where}: open in ${mapsAppLabel(app)}`} trailing={mapsAppLabel(app)} />}
           <ListItem icon="people" title="Who’s going" meta={a.attendeeIds.length ? `${a.attendeeIds.length} of ${trip.memberIds.length}: ${goingNames.join(', ')}` : 'No one has said yet'} />
-          {a.cost > 0 && <ListItem icon="wallet" title="Cost" meta={`${money(a.cost, trip.currency)} per person · ${money(a.cost * Math.max(1, a.attendeeIds.length), trip.currency)} in all`} />}
+          {price && <ListItem icon="wallet" title="Price" meta={<PriceWithConversion price={price} />} />}
           {a.notes && <ListItem icon="pencil" title={type === 'note' ? 'More' : 'Notes'} meta={<span className={s.selectable}>{a.notes}</span>} />}
         </ListGroup>
         {a.location && <div className={s.planMap}><MapView pins={[{ lat: a.location.lat, lng: a.location.lng, label: a.fromText || where || a.title }, ...(a.to ? [{ lat: a.to.lat, lng: a.to.lng, label: a.toText || a.title }] : [])]} zoom={a.to ? undefined : 15} height={180} /></div>}

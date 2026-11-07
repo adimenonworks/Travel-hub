@@ -1,33 +1,28 @@
 import { useState } from 'react';
 import { CountryModal, EventCard, LinkButton, ListGroup, ListItem, PageSection, Tile } from '../../design/components';
-import { today } from '../../lib/dates';
 import { BOOKING_GROUPS, eventType } from '../../lib/categories';
 import { countryName, flagUrl, tripCountries } from '../../lib/countries';
 import { emergencyFor } from '../../lib/emergency';
 import { nextEvent } from '../../lib/trips';
-import { TripBudget } from './Budget';
 import { eventCardProps } from './events';
 import type { TripCtx } from './TripPage';
 import s from './trip.module.css';
 
 /**
- * Trip "Overview" tab (Figma "Trip — Overview"): the hub. Budget card → Next up → Bookings tiles (a plain count of
+ * Trip "Overview" tab (Figma "Trip — Overview"): the hub. Next up → Bookings tiles (a plain count of
  * each kind of event) → Good to know (each country's emergency number and entry requirements).
  * "Recently viewed" arrives with documents.
  */
-export function Overview(ctx: TripCtx & { onSetBudget?: () => void }) {
+export function Overview(ctx: TripCtx) {
   const { trip, activities } = ctx;
   const base = `/trip/${trip.id}`;
   const next = nextEvent(activities);
   const [country, setCountry] = useState<string | null>(null);
-  const t = today();
-  const budgetDay = t >= trip.startDate && t <= trip.endDate ? t : trip.startDate;
   const docs = activities.reduce((n, a) => n + a.links.length, 0);
   const countries = tripCountries(trip, activities);
 
   return (
     <div className={s.overview}>
-      <TripBudget ctx={ctx} day={budgetDay} onSetBudget={ctx.onSetBudget} />
 
       <PageSection title="Next up" action={<LinkButton to={`${base}/itinerary`} variant="ghost" size="regular" iconEnd="chevron-right">Itinerary</LinkButton>}>
         {next

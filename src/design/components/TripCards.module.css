@@ -28,29 +28,6 @@
 .goingLink { text-decoration: none !important; display: inline-flex; position: relative; }
 .goingLink::after { content: ''; position: absolute; inset: -8px -2px; }
 
-/* Figma "Budget card": 16 padding, gap 12, 24 corners */
-.budget {
-  display: flex; flex-direction: column; gap: var(--space-default-400);
-  padding: var(--space-default-500); border-radius: var(--radius-600);
-  border: 1px solid var(--on-light-border-subtle); background: var(--on-light-surface-primary);
-}
-.budgetTop { display: flex; justify-content: space-between; align-items: flex-start; gap: var(--space-default-300); flex-wrap: wrap; }
-.budgetTotal { display: flex; flex-direction: column; gap: var(--space-default-100); }
-.budgetLabel { font: var(--type-body-small); color: var(--on-light-text-secondary); }
-.budgetAmount { font: var(--type-heading-1); letter-spacing: -0.02em; color: var(--on-light-text-primary); font-variant-numeric: tabular-nums; }
-.bar { display: flex; gap: var(--space-default-100); height: 8px; border-radius: var(--radius-1000); overflow: hidden; }
-.bar > span { flex-basis: 0; min-width: 4px; }
-.fill-brand { background: var(--on-light-text-brand); }
-.fill-mid { background: var(--on-mid-surface-primary); }
-.fill-orange { background: var(--on-accent-surface-orange); }
-.fill-empty { background: var(--on-light-surface-secondary); }
-.legend { margin: 0; display: flex; flex-direction: column; gap: var(--space-default-200); }
-.legendRow { display: flex; align-items: center; gap: var(--space-default-300); }
-.legendDot { flex: none; width: 8px; height: 8px; border-radius: var(--radius-1000); }
-.legendDot.fill-empty { box-shadow: inset 0 0 0 1px var(--on-light-border-subtle); }
-.legendLabel { flex: 1; min-width: 0; font: var(--type-body); color: var(--on-light-text-secondary); }
-.legendValue { margin: 0; font: var(--type-body); color: var(--on-light-text-primary); font-variant-numeric: tabular-nums; text-align: right; }
-
 /* Figma "Day Card" (Strip): 24 corners. Unselected: ghost with a border, 16 / 20. Selected: deep emerald, 20. */
 .day {
   flex: none; position: relative; display: flex; align-items: center; justify-content: center;

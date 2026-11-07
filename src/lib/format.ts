@@ -10,7 +10,9 @@ export function money(amount: number, currency: string, opts: { compact?: boolea
   }
 }
 
-export const CURRENCIES = ['USD', 'EUR', 'GBP', 'CAD', 'AUD', 'JPY', 'INR', 'MXN', 'CHF', 'THB', 'SGD', 'AED', 'NZD', 'ZAR', 'BRL', 'KRW'];
+/** Currencies a price can be entered in (ExchangeRate-API converts all of them). */
+export const CURRENCIES = ['AUD', 'USD', 'EUR', 'GBP', 'NZD', 'CAD', 'JPY', 'CNY', 'HKD', 'TWD', 'KRW', 'SGD', 'MYR', 'THB', 'VND', 'KHR', 'LAK', 'IDR', 'PHP', 'INR', 'LKR', 'NPR',
+  'AED', 'SAR', 'QAR', 'TRY', 'ILS', 'EGP', 'MAD', 'ZAR', 'KES', 'CHF', 'NOK', 'SEK', 'DKK', 'ISK', 'PLN', 'CZK', 'HUF', 'MXN', 'BRL', 'ARS', 'CLP', 'COP', 'PEN'];
 
 export function hostOf(url: string) {
   try { return new URL(url).hostname.replace(/^www\./, ''); } catch { return url; }

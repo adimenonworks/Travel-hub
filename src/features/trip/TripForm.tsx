@@ -2,13 +2,13 @@ import { useEffect, useRef, useState } from 'react';
 import { Button, FieldRow, Select, Sheet, TextField, useToast } from '../../design/components';
 import { store } from '../../data';
 import type { Place, Trip } from '../../data/types';
-import { addDays, daysBetween, today } from '../../lib/dates';
+import { addDays, today } from '../../lib/dates';
 import { CURRENCIES } from '../../lib/format';
 import { shrinkPhoto } from '../../lib/image';
 import { CityPicker } from '../shared/CityPicker';
 import s from './trip.module.css';
 
-type Draft = { name: string; destination: Place | null; startDate: string; endDate: string; currency: string; totalBudget: string; coverPhoto: string | null; coverPosition: Pos | null };
+type Draft = { name: string; destination: Place | null; startDate: string; endDate: string; currency: string; coverPhoto: string | null; coverPosition: Pos | null };
 type Pos = { x: number; y: number };
 
 const fromTrip = (t?: Trip): Draft => ({
@@ -17,8 +17,6 @@ const fromTrip = (t?: Trip): Draft => ({
   startDate: t?.startDate ?? addDays(today(), 30),
   endDate: t?.endDate ?? addDays(today(), 34),
   currency: t?.currency ?? (Intl.NumberFormat().resolvedOptions().locale.startsWith('en-GB') ? 'GBP' : 'USD'),
-  // Older trips only have a per-person daily budget: show it as the total it adds up to.
-  totalBudget: t ? String(t.totalBudget ?? (Math.round(t.dailyBudget * t.memberIds.length * (daysBetween(t.startDate, t.endDate) + 1)) || '')) : '',
   coverPhoto: t?.coverPhoto ?? null,
   coverPosition: t?.coverPosition ?? null,
 });
@@ -37,17 +35,12 @@ export function TripForm({ open, trip, onClose, onSaved, onDeleted }: { open: bo
   const valid = d.name.trim() && d.startDate && d.endDate && d.endDate >= d.startDate;
 
   const submit = async () => {
-    const total = Number(d.totalBudget) || 0;
-    const people = trip?.memberIds.length ?? 1;
     const data = {
       name: d.name.trim(),
       destination: d.destination,
       startDate: d.startDate,
       endDate: d.endDate,
       currency: d.currency,
-      totalBudget: total,
-      // Still saved per person per day, for anyone on an older version of the app.
-      dailyBudget: Math.round(total / people / (daysBetween(d.startDate, d.endDate) + 1)),
       coverPhoto: d.coverPhoto,
       coverPosition: d.coverPhoto ? d.coverPosition : null,
     };
@@ -87,13 +80,10 @@ export function TripForm({ open, trip, onClose, onSaved, onDeleted }: { open: bo
         <TextField label="Start" type="date" value={d.startDate} onChange={(e) => set({ startDate: e.target.value, endDate: d.endDate < e.target.value ? e.target.value : d.endDate })} />
         <TextField label="End" type="date" value={d.endDate} min={d.startDate} onChange={(e) => set({ endDate: e.target.value })} />
       </FieldRow>
-      <FieldRow>
-        <TextField label="Total budget" type="number" inputMode="decimal" min={0} placeholder="2000" value={d.totalBudget} onChange={(e) => set({ totalBudget: e.target.value })}
-          hint="For the whole group. Each day's budget is worked out from it." />
-        <Select label="Currency" value={d.currency} onChange={(e) => set({ currency: e.target.value })}>
-          {CURRENCIES.map((c) => <option key={c}>{c}</option>)}
-        </Select>
-      </FieldRow>
+      <Select label="Local currency" value={d.currency} onChange={(e) => set({ currency: e.target.value })}
+        hint="Prices you add start in this currency.">
+        {CURRENCIES.map((c) => <option key={c}>{c}</option>)}
+      </Select>
       <CoverPhotoField value={d.coverPhoto} position={d.coverPosition}
         onChange={(coverPhoto) => set({ coverPhoto, coverPosition: null })} onMove={(coverPosition) => set({ coverPosition })} />
       {error && <p className="t-label-small t-danger">{error}</p>}

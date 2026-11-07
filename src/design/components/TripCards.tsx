@@ -88,45 +88,6 @@ export function TripHeader({ title, meta, back, action, countries, going }: {
   );
 }
 
-type Segment = { label: string; value: string; amount: number; color: 'brand' | 'mid' | 'orange' | 'empty' };
-
-/**
- * Figma "Budget card" (Phase Planning / During). Planning: what the trip costs so far (flights, stays, planned
- * activities and food) and the spending money left. During: today's planned spend against the daily allowance.
- * A bar shows the parts; the legend repeats them in words (colour is never the only cue).
- */
-export function BudgetCard({ label, amount, segments, action, note }: {
-  label: string; amount: string; segments: Segment[]; action?: ReactNode; note?: ReactNode;
-}) {
-  const total = segments.reduce((n, x) => n + Math.max(0, x.amount), 0);
-  return (
-    <section className={s.budget} aria-label="Budget">
-      <div className={s.budgetTop}>
-        <div className={s.budgetTotal}>
-          <span className={s.budgetLabel}>{label}</span>
-          <span className={s.budgetAmount}>{amount}</span>
-        </div>
-        {action}
-      </div>
-      {total > 0 && (
-        <div className={s.bar} aria-hidden="true">
-          {segments.filter((x) => x.amount > 0).map((x) => <span key={x.label} className={s[`fill-${x.color}`]} style={{ flexGrow: x.amount }} />)}
-        </div>
-      )}
-      <dl className={s.legend}>
-        {segments.map((x) => (
-          <div key={x.label} className={s.legendRow}>
-            <span className={[s.legendDot, s[`fill-${x.color}`]].join(' ')} aria-hidden="true" />
-            <dt className={s.legendLabel}>{x.label}</dt>
-            <dd className={s.legendValue}>{x.value}</dd>
-          </div>
-        ))}
-      </dl>
-      {note}
-    </section>
-  );
-}
-
 /**
  * Figma "Day Card" (Layout Strip, Selected No / Yes). Unselected: the date (Display tiny) and a word ("Tomorrow", "Day 4").
  * Selected: deep emerald, the date in Display with month and word, and a Tag (e.g. "3 more events").
