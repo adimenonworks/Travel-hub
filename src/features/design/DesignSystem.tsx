@@ -250,12 +250,12 @@ export function DesignSystem() {
           </div>
         </Section>
 
-        <Section title="Trip components" footer="Hero Card (phase-aware: countdown, then the next thing), Trip header, Day Card, Timeline.">
+        <Section title="Trip components" footer="Hero Card (phase-aware: countdown, then the next thing; Size Compact for lists), Trip header, Day Card, Timeline.">
           <HeroCard cover={<Illustration name={COVER_ILLUSTRATIONS[1]} />} countdown={{ label: 'In 9 days' }} title="Portugal & Spain" meta="Nov 2 – 11 · 10 days"
-            countries={[{ code: 'pt', name: 'Portugal', flag: flagUrl('pt') }, { code: 'es', name: 'Spain', flag: flagUrl('es') }]}
             people={[{ id: 'a', name: 'Alex Menon' }, { id: 'j', name: 'Jo Ma' }, { id: 's', name: 'Sam Lee' }, { id: 'p', name: 'Priya Shah' }]} next={{ icon: 'plane', title: 'Flight to Lisbon', meta: 'Mon 2 Nov, 08:30 · TP1351', to: '/design' }} to="/design" />
-          <HeroCard countdown={{ label: 'Day 3 of 15' }} title="Japan" meta="Mar 20 – Apr 3 · 15 days" countries={[{ code: 'jp', name: 'Japan', flag: flagUrl('jp') }]} people={[{ id: 'a', name: 'Alex Menon' }, { id: 'j', name: 'Jo Ma' }, { id: 's', name: 'Sam Lee' }, { id: 'p', name: 'Priya Shah' }]}
+          <HeroCard countdown={{ label: 'Day 3 of 15' }} title="Japan" meta="Mar 20 – Apr 3 · 15 days" people={[{ id: 'a', name: 'Alex Menon' }, { id: 'j', name: 'Jo Ma' }, { id: 's', name: 'Sam Lee' }, { id: 'p', name: 'Priya Shah' }]}
             next={{ icon: 'lightbulb', title: '24 ideas to sort', meta: 'Brought over from your Japan saves' }} />
+          <HeroCard size="compact" cover={<Illustration name={COVER_ILLUSTRATIONS[2]} />} countdown={{ label: 'In 40 days' }} title="Japan" meta="Dec 17 – 31 · 15 days" to="/design" />
           <TripHeader title="Portugal & Spain" back={{ to: '/design', label: 'Trips' }} action={{ icon: 'pencil', label: 'Edit trip', onClick: () => {} }}
             meta="Nov 2 – 11 · 10 days · in 9 days" countries={[{ code: 'pt', name: 'Portugal', flag: flagUrl('pt') }]} going={{ label: '4 going', to: '/design' }} />
           <div className={s.row}>

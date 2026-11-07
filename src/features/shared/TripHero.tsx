@@ -2,7 +2,6 @@ import { HeroCard } from '../../design/components';
 import { personName, useProfiles, useSub } from '../../data/hooks';
 import type { Trip } from '../../data/types';
 import { daysBetween, formatDay, formatRange, formatTime, today, tripPhase } from '../../lib/dates';
-import { countryName, flagUrl, tripCountries } from '../../lib/countries';
 import { categoryInfo } from '../../lib/categories';
 import { heroCountdown, nextEvent } from '../../lib/trips';
 import { TripCover } from './TripCover';
@@ -34,7 +33,6 @@ export function TripHero({ trip, cover = true, size = 'regular' }: { trip: Trip;
       countdown={heroCountdown(trip)}
       title={trip.name}
       meta={`${formatRange(trip.startDate, trip.endDate)} · ${plural(n, 'day')}`}
-      countries={tripCountries(trip, activities).map((code) => ({ code, name: countryName(code), flag: flagUrl(code) }))}
       people={trip.memberIds.map((id) => ({ id, name: personName(profiles, id), photo: profiles[id]?.photo }))}
       next={next} />
   );

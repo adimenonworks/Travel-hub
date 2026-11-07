@@ -30,14 +30,13 @@ function CountryChips({ countries, extra }: { countries: Country[]; extra?: Reac
  * the country chips and, under a divider, one row: what's next (Show next up). Phase-aware: the caller passes the
  * countdown and the row for before, during or after the trip. The name links to the trip; chips open country info.
  */
-export function HeroCard({ size = 'regular', cover, countdown, title, meta, countries, people, to, next }: {
+export function HeroCard({ size = 'regular', cover, countdown, title, meta, people, to, next }: {
   /** Figma "Size": Regular, or Compact (a shorter cover, the name, dates and countdown; no people, no next up) for lists */
   size?: 'regular' | 'compact';
   /** Figma "Show cover": a photo or Cover Scene; leave out for the panel alone */
   cover?: ReactNode;
   countdown?: { icon?: IconName; label: string };
   title: string; meta: ReactNode;
-  countries: Country[];
   /** Figma "Show people" */
   people?: Person[];
   to?: string;
@@ -61,7 +60,6 @@ export function HeroCard({ size = 'regular', cover, countdown, title, meta, coun
           {size === 'regular' && people && people.length > 0 && <AvatarStack people={people} />}
         </div>
         {!cover && countdown && <div><Badge tone="tint" icon={countdown.icon ?? 'calendar'}>{countdown.label}</Badge></div>}
-        {size === 'regular' && <CountryChips countries={countries} />}
         {size === 'regular' && next && (
           <div className={s.rows}>
             <ListItem icon={next.icon} title={next.title} meta={next.meta} to={next.to} round />
