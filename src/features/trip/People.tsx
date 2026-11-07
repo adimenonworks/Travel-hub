@@ -52,7 +52,7 @@ export function People({ trip, profiles, canManage, isOwner }: TripCtx) {
   return (
     <>
       <SectionHeader title="Travellers" meta={`${members.length} ${members.length === 1 ? 'person' : 'people'}${isOwner && members.length > 1 ? ' · tap someone to change their role' : ''}`}
-        action={canManage ? <Button variant="ghost" size="regular" iconEnd="chevron-right" onClick={invite} disabled={busy}>Invite</Button> : undefined} />
+        action={canManage ? <Button size="regular" icon="plus" onClick={invite} disabled={busy}>Add people</Button> : undefined} />
       <ListGroup label="Travellers">
         {members.map((id) => {
           const name = personName(profiles, id);
@@ -68,20 +68,17 @@ export function People({ trip, profiles, canManage, isOwner }: TripCtx) {
       {canManage && (
         <Card media={<Illustration name="friends" size={120} />}>
           <h2 className="t-heading-2">The more the merrier</h2>
-          <p className="t-body-small t-secondary">Invite friends to plan this trip with you. Anyone with the link can join for the next 14 days after signing in.</p>
-          <div className={s.inviteActions}>
-            {link ? (
-              <>
-                <div className={s.inviteRow}>
-                  <div className={s.inviteUrl} title={link}>{link}</div>
-                  <Button icon="share" onClick={() => share()}>Share</Button>
-                </div>
-                <Button variant="ghost" size="regular" onClick={makeLink} disabled={busy}>Make a new link</Button>
-              </>
-            ) : (
-              <Button size="regular" icon="plus" onClick={invite} disabled={busy}>Invite to trip</Button>
-            )}
-          </div>
+          <p className="t-body-small t-secondary">Tap Add people to get a link for friends to plan this trip with you. Anyone with the link can join for the next 14 days after signing in.</p>
+          {/* "Add people" (in the section header) makes the link; once there is one it shows here to share again */}
+          {link && (
+            <div className={s.inviteActions}>
+              <div className={s.inviteRow}>
+                <div className={s.inviteUrl} title={link}>{link}</div>
+                <Button icon="share" onClick={() => share()}>Share</Button>
+              </div>
+              <Button variant="ghost" size="regular" onClick={makeLink} disabled={busy}>Make a new link</Button>
+            </div>
+          )}
         </Card>
       )}
 

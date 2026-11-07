@@ -22,7 +22,7 @@ export function Photos(ctx: TripCtx) {
   return (
     <>
       <SectionHeader title="Shared albums" meta="Anyone on the trip can add one"
-        action={<Button variant="ghost" size="regular" iconEnd="chevron-right" onClick={() => setEditing('new')}>Add album</Button>} />
+        action={<Button size="regular" icon="plus" onClick={() => setEditing('new')}>Add photos</Button>} />
       {sorted.length === 0 ? (
         <EmptyState illustration="memories" title="No albums yet"
           message="Make a shared album in Google Photos or Apple Photos, then add its link here so everyone can find the pictures." />

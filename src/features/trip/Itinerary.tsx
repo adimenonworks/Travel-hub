@@ -70,7 +70,7 @@ export function Itinerary(ctx: TripCtx) {
       <section className={s.timeline} aria-label={word(day)}>
         <SectionHeader title={word(day)}
           meta={[formatDay(day), `${list.length} plan${list.length === 1 ? '' : 's'}`].filter(Boolean).join(' · ')}
-          action={<Button variant="ghost" size="regular" iconEnd="chevron-right" onClick={() => setAdding(true)}>Add event</Button>} />
+          action={<Button size="regular" icon="plus" onClick={() => setAdding(true)}>Add event</Button>} />
 
         {/* Changing day slides only the plan, from the side of the day you picked */}
         <SlideSwap value={day} id={day} rank={days.indexOf(day)}>{(d) => {
