@@ -4,7 +4,7 @@ import {
   LinkButton, PageHeader, PageSection, SegmentedControl, Select, Sheet, Tabs, TextArea, TextField, Timeline, Illustration,
   type IllustrationName, COVER_ILLUSTRATIONS, ICON_NAMES, useToast, BottomNav, Skeleton,
   ListItem, ListGroup, SectionHeader, EventCard, TravelConnector, IdeaRow, Tile, QuickAction, MapCard, StatStrip, ProfileCard,
-  OptionCard, SearchField, StepProgress, DestinationHeader, TripHeader, DayCard, CountryModal,
+  OptionCard, Switch, SearchField, StepProgress, DestinationHeader, TripHeader, DayCard, CountryModal,
 } from '../../design/components';
 import { flagUrl } from '../../lib/countries';
 import type { ReactNode } from 'react';
@@ -65,6 +65,7 @@ const icons = ICON_NAMES;
 export function DesignSystem() {
   const [seg, setSeg] = useState<'a' | 'b' | 'c'>('a');
   const [sheet, setSheet] = useState(false);
+  const [on, setOn] = useState(false);
   const [country, setCountry] = useState<string | null>(null);
   const [opt, setOpt] = useState('others');
   const toast = useToast();
@@ -345,7 +346,9 @@ export function DesignSystem() {
             <div className={s.row}>
               <Button variant="secondary" icon="copy" onClick={() => toast({ icon: 'copy', label: 'Address copied' })}>Show a toast</Button>
               <Button variant="secondary" onClick={() => toast({ tone: 'error', label: "Couldn't save. Check your connection" })}>Error toast</Button>
+              <Button variant="secondary" onClick={() => toast({ icon: 'check', label: 'Saved to Portugal', action: { label: 'Undo', onClick: () => {} } })}>Toast with Undo</Button>
             </div>
+            <Switch checked={on} onChange={setOn} label="Also add to Portugal & Spain ideas" hint="Your trip covers Lisbon" />
           </Card>
           <Card><EmptyState illustration="ideas" title="Empty state" message="Explains what goes here and how to start." action={<Button variant="secondary" onClick={() => setSheet(true)}>Open a sheet</Button>} /></Card>
         </Section>
