@@ -2,21 +2,21 @@
 
 A shared vacation planner. Create trips, invite friends, and plan together:
 
-- **Itinerary**: one tab per day with timed plans (flights, stays, transport, food & drink, activities, notes), locations, links/PDFs, optional prices, who's going, and comments.
-- **Ideas board**: anyone can drop ideas and vote; organizers approve an idea and schedule it into a day.
+- **Itinerary**: day by day, with timed plans (flights, stays, transport, food & drink, activities, notes), locations, links and PDFs. Flights show live status (check-in open, on time, delayed, cancelled) once Rove's small server is set up.
+- **Ideas board**: anyone can add ideas (with an optional price) and vote; organizers add the winners to a day.
 - **Saved places**: save a place from a link or a search into your Collections (country → city → category), star favourites, and bring them into a trip's ideas.
-- **Prices**: an optional price on ideas and events, in the currency you booked in, with a conversion to your home currency (rates by ExchangeRate-API).
+- **Prices**: an optional price on ideas only, in its own currency, with a conversion to your home currency (rates by ExchangeRate-API). There is no budgeting.
 - **Info**: weather for your dates (a live forecast within 16 days, otherwise last year's weather on the same dates), local headlines, and a map of your plans.
-- **Cover photos**: pick a photo for each trip; it's shrunk on your device and saved with the trip (free, no Firebase Storage needed).
+- **Cover photos**: a photo of the place from Unsplash (credited to the photographer), or your own photo, shrunk on your device and saved with the trip.
 - **Photos**: links to shared Google Photos or iCloud albums for the trip (those services don't allow embedding, so each album opens in its own app or tab).
 - **People**: invite links, roles (owner / organizer / member), leave or remove people.
-- **Home**: trips grouped into happening now / upcoming / past, travel stats, and a map of places you've been.
+- **Home**: your next trip, your saves by country and what you saved recently. **You** has your travel stats, a map of places you've been, and favourites.
 
 Edits sync live to everyone on the trip. It works on phone, tablet and desktop, has a bold, rounded look inspired by Wise with one emerald brand colour, supports light and dark mode, and meets WCAG 2.2 AA.
 
 ## Stack
 
-React + TypeScript + Vite · Firebase Auth (Google sign-in) + Firestore · GitHub Pages · Open-Meteo (weather), GDELT (news), OpenStreetMap / Leaflet / Nominatim (maps). Everything runs on free tiers with no server code.
+React + TypeScript + Vite · Firebase Auth (Google sign-in) + Firestore · GitHub Pages · Open-Meteo (weather), GDELT (news), OpenStreetMap / Leaflet / Nominatim (maps). Everything runs on free tiers. The one bit of server code is [`server/worker.js`](server/README.md), a free Cloudflare Worker that keeps the Unsplash and flight-status keys secret.
 
 Without Firebase config the app runs in **demo mode**: data stays in your browser's localStorage. Open a second tab, sign in with a different name and paste an invite link to try collaborating.
 
