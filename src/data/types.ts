@@ -16,6 +16,9 @@ export type Profile = {
   currency?: string;
 };
 
+/** An Unsplash photo as stored on a trip: hotlinked URLs and what the credit needs. */
+export type TripPhoto = { id: string; url: string; small: string; color?: string | null; name: string; username: string; downloadLocation: string };
+
 export type Trip = {
   id: string;
   name: string;
@@ -34,6 +37,8 @@ export type Trip = {
   coverColor?: string;
   /** Small JPEG as a data URL (see lib/image.ts), or null for none. */
   coverPhoto?: string | null;
+  /** A photo of the place from Unsplash (handover v2 B4), shown when there's no coverPhoto, with its credit. */
+  cover?: TripPhoto | null;
   /** Which part of the cover photo shows when it's cropped: CSS object-position in % (50/50 = centre). */
   coverPosition?: { x: number; y: number } | null;
   ownerId: string;

@@ -12,6 +12,7 @@ import { hostOf, isPdf, normalizeUrl } from '../../lib/format';
 import { mapsUrl } from '../../lib/geocode';
 import { haptic, confirmAction } from '../../lib/native';
 import { recordView } from '../../lib/recent';
+import { flightTag, updatedAgo, useFlightStatus } from '../../lib/api';
 import { eventType } from '../../lib/categories';
 import { getMapsApp, mapsAppLabel } from '../../lib/prefs';
 import { ActivityForm } from './ActivityForm';
@@ -43,6 +44,10 @@ export function ActivityPage(ctx: TripCtx) {
   const toast = useToast();
   const places = usePlacesById(ctx.activities.flatMap((x) => (x.placeId ? [x.placeId] : [])));
   const itinerary = `/trip/${trip.id}/itinerary${a ? `?day=${a.date}` : ''}`;
+  // Live status for a flight (24 hours out until it lands), and a Warning haptic when it changes to Delayed or Cancelled
+  const live = useFlightStatus(a && eventType(a.category) === 'flight' ? a : undefined);
+  const tag = a && eventType(a.category) === 'flight' ? flightTag(a, live) : undefined;
+  useEffect(() => { if (tag && tag.tone !== 'success' && tag.label !== 'Check-in open') haptic('warning'); }, [tag?.label]); // eslint-disable-line react-hooks/exhaustive-deps
   // Recently viewed: a booking you open (any event but a note)
   useEffect(() => {
     if (a && eventType(a.category) !== 'note') recordView(trip.id, { url: `/trip/${trip.id}/plan/${a.id}`, label: a.title, kind: 'Booking' });
@@ -97,10 +102,14 @@ export function ActivityPage(ctx: TripCtx) {
 
       {/* Figma "Journey detail" for flights and trains; every other type shows its Event card. No price anywhere. */}
       {journey ? (
-        <JourneyDetails mode={type === 'flight' ? 'plane' : 'train'} number={a.ref || undefined}
-          from={{ city: city(a.fromText), time: a.startTime ? formatTime(a.startTime) : '—', date: formatDay(a.date), terminal: code(a.fromText) }}
-          to={{ city: city(a.toText), time: a.endTime ? formatTime(a.endTime) : '—', date: formatDay(a.endDate || a.date), terminal: code(a.toText) }}
-          duration={journeyDuration(a)} footer={a.operator ? `Operated by ${a.operator}` : undefined} />
+        <JourneyDetails mode={type === 'flight' ? 'plane' : 'train'} number={a.ref || undefined} status={tag}
+          from={{ city: city(a.fromText), time: live?.departure?.revised ? live.departure.revised.slice(11, 16) : a.startTime ? formatTime(a.startTime) : '—', date: formatDay(a.date),
+            terminal: [live?.departure?.airport || code(a.fromText), live?.departure?.terminal && `Terminal ${live.departure.terminal}`].filter(Boolean).join(' · ') || undefined }}
+          to={{ city: city(a.toText), time: live?.arrival?.revised ? live.arrival.revised.slice(11, 16) : a.endTime ? formatTime(a.endTime) : '—', date: formatDay(a.endDate || a.date),
+            terminal: [live?.arrival?.airport || code(a.toText), live?.arrival?.terminal && `Terminal ${live.arrival.terminal}`].filter(Boolean).join(' · ') || undefined }}
+          gate={live ? live.departure?.gate ?? '' : undefined} belt={live ? live.arrival?.belt ?? '' : undefined}
+          duration={journeyDuration(a)}
+          footer={[a.operator || live?.airline ? `Operated by ${a.operator || live!.airline}` : '', live ? updatedAgo(live.updatedAt) : ''].filter(Boolean).join(' · ') || undefined} />
       ) : (
         <EventCard {...eventCardProps(a, ctx, true)} to={undefined} favourite={starred} />
       )}

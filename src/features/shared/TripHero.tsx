@@ -1,4 +1,8 @@
+import { useEffect } from 'react';
 import { HeroCard } from '../../design/components';
+import { store } from '../../data';
+import { useMe } from '../../data/hooks';
+import { findCoverPhoto, flightTag, hasApi, photographerUrl, trackCoverDownload, unsplashUrl, useFlightStatus } from '../../lib/api';
 import { personName, useProfiles, useSub } from '../../data/hooks';
 import type { Trip } from '../../data/types';
 import { daysBetween, formatDay, formatTime, today, tripPhase } from '../../lib/dates';
@@ -8,6 +12,16 @@ import { categoryInfo } from '../../lib/categories';
 import { heroCountdown, nextEvent, tripDatesLabel } from '../../lib/trips';
 import { TripCover } from './TripCover';
 
+
+const asked = new Set<string>();
+
+/** What to search Unsplash for: the most specific place ("Lisbon Portugal"; the first city of a multi-city trip). */
+export function coverQuery(trip: Pick<Trip, 'destination' | 'name'>) {
+  const d = trip.destination;
+  if (!d) return trip.name;
+  const parts = d.name.split(',').map((x) => x.trim()).filter(Boolean);
+  return parts.length > 1 ? `${parts[0]} ${parts[parts.length - 1]}` : parts[0];
+}
 
 /**
  * A trip as the Figma "Hero Card", phase-aware on one layout: before the trip, the countdown and the next thing planned;
@@ -33,13 +47,30 @@ export function TripHero({ trip, cover = true, size = 'regular' }: { trip: Trip;
   const flight = activities.find((a) => eventType(a.category) === 'flight' && a.startTime
     && new Date(`${a.date}T${a.startTime}`).getTime() > Date.now() && new Date(`${a.date}T${a.startTime}`).getTime() < soon);
   const abroad = tripCountries(trip, activities);
-  const headsUp = flight
-    ? { icon: 'plane' as const, title: 'Check-in open', meta: [flight.title, flight.ref].filter(Boolean).join(' · '), to: `${base}/plan/${flight.id}` }
+  const live = useFlightStatus(flight);
+  const tag = flight ? flightTag(flight, live) : undefined;
+  const headsUp = flight && tag
+    ? { icon: 'plane' as const, title: tag.label === 'Check-in open' ? 'Check-in open' : `Flight ${tag.label.toLowerCase()}`, meta: [flight.title, flight.ref].filter(Boolean).join(' · '), to: `${base}/plan/${flight.id}` }
     : phase === 'upcoming' && daysBetween(t, trip.startDate) <= 14 && abroad.length > 0
       ? { icon: 'doc' as const, title: 'Check the entry requirements', meta: abroad.map(countryName).join(', '), to: base }
       : undefined;
+  // Unsplash cover: an organizer's Rove fetches one the first time the trip shows without a photo of its own.
+  const me = useMe();
+  const canSet = ['owner', 'editor'].includes(trip.roles[me.uid] ?? '');
+  useEffect(() => {
+    if (!hasApi || !canSet || trip.coverPhoto || trip.cover !== undefined || asked.has(trip.id)) return;
+    asked.add(trip.id);
+    findCoverPhoto(coverQuery(trip)).then((photo) => {
+      store.updateTrip(trip.id, { cover: photo }).catch(() => {});
+      if (photo) trackCoverDownload(photo);
+    });
+  }, [trip.id, trip.coverPhoto, trip.cover, canSet]); // eslint-disable-line react-hooks/exhaustive-deps
+  const photo = !trip.coverPhoto && trip.cover ? {
+    url: size === 'compact' ? trip.cover.small : trip.cover.url,
+    credit: <>Photo by <a href={photographerUrl(trip.cover)} target="_blank" rel="noreferrer">{trip.cover.name}</a> on <a href={unsplashUrl} target="_blank" rel="noreferrer">Unsplash</a></>,
+  } : undefined;
   return (
-    <HeroCard to={base} size={size}
+    <HeroCard to={base} size={size} photo={photo}
       cover={cover ? <TripCover trip={trip} /> : undefined}
       countdown={heroCountdown(trip)}
       title={trip.name}
