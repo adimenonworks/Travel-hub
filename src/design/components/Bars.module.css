@@ -38,11 +38,11 @@
   position: absolute; left: 0; bottom: 0; height: 3px; z-index: 1; pointer-events: none;
   width: calc(var(--w) - 2 * var(--space-default-500));
   transform: translateX(calc(var(--x) + var(--space-default-500)));
-  border-radius: 3px 3px 0 0; background: var(--interactive-selected-ghost-border);
+  border-radius: var(--radius-200) var(--radius-200) 0 0; background: var(--interactive-selected-ghost-border);
 }
 .animate { transition: transform var(--motion-fluid), width var(--motion-fluid); }
 .tab:hover { background: var(--interactive-unselected-ghost-background-hover); }
 .tab:active { background: var(--interactive-unselected-ghost-background-pressed); }
 .tab:focus-visible { outline-offset: -3px; }
 .tab[aria-current='page'] { color: var(--interactive-selected-ghost-text); }
-.count { font-variant-numeric: tabular-nums; min-width: 20px; padding: 2px 6px; border-radius: var(--radius-1000); background: var(--on-light-surface-sunken); font-size: var(--size-body-small); line-height: 1.2; text-align: center; }
+.count { font-variant-numeric: tabular-nums; min-width: 20px; padding: var(--space-default-100) var(--space-default-250); border-radius: var(--radius-1000); background: var(--on-light-surface-sunken); font-size: var(--size-body-small); line-height: 1.2; text-align: center; }
