@@ -165,7 +165,7 @@ export function NewTrip({ open, onClose, onOpenTrip }: { open: boolean; onClose:
           </>
         ) : (
           <>
-            <div className={s.optionGrid} role="group" aria-label="Month">
+            <div className={[s.optionGrid, s.monthGrid].join(' ')} role="group" aria-label="Month">
               {months.map((m) => (
                 <OptionCard key={m} icon="calendar" label={monthLabel(m, { month: 'short', year: m.slice(0, 4) === today().slice(0, 4) ? undefined : 'numeric' })}
                   selected={!!start && start.slice(0, 7) === m} onClick={() => { haptic('light'); pickMonth(m); }} />

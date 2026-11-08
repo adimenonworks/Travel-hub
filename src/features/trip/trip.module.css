@@ -87,6 +87,8 @@
 
 /* New trip flow */
 .optionGrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(calc(130rem / 17), 1fr)); gap: var(--space-default-300); }
+/* Months (Figma "New trip — 2b. Roughly"): three across, fewer as text grows */
+.monthGrid { grid-template-columns: repeat(auto-fit, minmax(calc(96rem / 17), 1fr)); }
 .flowSummary { display: flex; flex-direction: column; gap: var(--space-default-100); }
 .flowSummaryTitle { font: var(--type-heading-2); letter-spacing: -0.01em; color: var(--on-mid-text-primary); }
 .flowSummaryMeta { margin: 0; font: var(--type-body-small); color: var(--on-mid-text-secondary); }
