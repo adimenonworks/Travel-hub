@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { Button, EmptyState, EventCard, IconButton, LinkButton, ListGroup, ListItem, PageHeader, PageSection, Sheet, TextField, useToast } from '../../design/components';
+import { Button, EmptyState, EventCard, IconButton, JourneyDetails, LinkButton, ListGroup, ListItem, PageHeader, PageSection, Sheet, TextField, useToast } from '../../design/components';
+import type { Activity } from '../../data/types';
+import { daysBetween } from '../../lib/dates';
 import { store } from '../../data';
 import { personName, useMe, usePlacesById } from '../../data/hooks';
 import { placeForEvent } from '../saves/starEvent';
@@ -12,14 +14,25 @@ import { haptic, confirmAction } from '../../lib/native';
 import { recordView } from '../../lib/recent';
 import { eventType } from '../../lib/categories';
 import { getMapsApp, mapsAppLabel } from '../../lib/prefs';
-import { Comments } from '../shared/Comments';
-import { MapView } from '../shared/Map';
 import { ActivityForm } from './ActivityForm';
 import { eventCardProps } from './events';
 import type { TripCtx } from './TripPage';
 import s from './trip.module.css';
 
-/** An event's own page (Figma "Event detail"): the Event card, its details, files and links, and comments. */
+/** "1h 20m", "24h 40m", for the Journey details card (across days too). */
+function journeyDuration(a: Activity) {
+  if (!a.startTime || !a.endTime) return undefined;
+  const [h1, m1] = a.startTime.split(':').map(Number), [h2, m2] = a.endTime.split(':').map(Number);
+  const min = (a.endDate && a.endDate > a.date ? daysBetween(a.date, a.endDate) * 1440 : 0) + h2 * 60 + m2 - (h1 * 60 + m1);
+  if (min <= 0) return undefined;
+  return min < 60 ? `${min}m` : `${Math.floor(min / 60)}h${min % 60 ? ` ${min % 60}m` : ''}`;
+}
+
+/**
+ * An event's own page. Flights and trains (with a from and to): Figma "Journey detail" — the Journey details card,
+ * Booking (reference, seats, bags), Files & links (with Manage booking), Notes. Other types: the Event card, then one
+ * List group (address, booking reference, who's going, notes; rows with nothing are hidden), files and links. No price.
+ */
 export function ActivityPage(ctx: TripCtx) {
   const { activityId = '' } = useParams();
   const me = useMe();
@@ -43,7 +56,6 @@ export function ActivityPage(ctx: TripCtx) {
       </>
     );
 
-  const going = a.attendeeIds.includes(me.uid);
   const place = a.placeId ? places[a.placeId] : undefined;
   const starred = !!place?.starredBy?.includes(me.uid);
   const app = getMapsApp();
@@ -64,48 +76,65 @@ export function ActivityPage(ctx: TripCtx) {
       toast({ icon: 'star', label: starred ? 'Removed from favourites' : 'Added to favourites' });
     } catch { toast({ tone: 'error', label: "Couldn't save. Check your connection" }); }
   };
-  const toggle = async (field: 'attendeeIds', on: boolean, label: string) => {
-    haptic('light');
-    try { await store.toggleInArray(trip.id, 'activities', a.id, field, me.uid, on); toast({ icon: 'check', label }); }
-    catch { toast({ tone: 'error', label: "Couldn't save. Check your connection" }); }
-  };
   const goingNames = a.attendeeIds.map((id) => (id === me.uid ? 'you' : personName(profiles, id).split(' ')[0]));
+
+  const journey = type === 'flight' || (type === 'transport' && !!a.fromText && !!a.toText);
+  const city = (t?: string) => (t ?? '').split(',')[0].replace(/\s*\([^)]*\)\s*/g, ' ').trim();
+  const code = (t?: string) => t?.match(/\(([^)]+)\)/)?.[1];
+  const backTo = journey && type === 'flight' ? { to: `/trip/${trip.id}/bookings/flights`, label: 'Flights' } : { to: itinerary, label: 'Itinerary' };
+  const adder = a.createdBy === me.uid ? 'you' : personName(profiles, a.createdBy).split(' ')[0];
+  const copyRef = async (ref: string) => { try { await navigator.clipboard.writeText(ref); toast({ icon: 'copy', label: 'Booking reference copied' }); } catch { /* the reference is selectable */ } };
+  const booking = [
+    a.bookingRef && <ListItem key="ref" icon="copy" title="Booking reference" meta={`${a.bookingRef} · tap to copy`} onClick={() => copyRef(a.bookingRef!)} />,
+    a.seats && <ListItem key="seats" icon="user-add" title="Seats" meta={a.seats} />,
+    a.bags && <ListItem key="bags" icon="info" title="Bags" meta={a.bags} />,
+  ].filter(Boolean);
 
   return (
     <>
-      <PageHeader title={a.title} size="small" back={{ to: itinerary, label: 'Itinerary' }}
+      <PageHeader title={journey ? `${city(a.fromText)} to ${city(a.toText)}` : a.title} size="small" back={backTo}
         action={{ icon: 'pencil', label: 'Edit event', onClick: () => setEditing(true) }} />
 
-      {/* Figma "Event detail": one template for every event type. Event card, then only the rows that have something. */}
-      <EventCard {...eventCardProps(a, ctx, true)} to={undefined}
-        favourite={starred} />
+      {/* Figma "Journey detail" for flights and trains; every other type shows its Event card. No price anywhere. */}
+      {journey ? (
+        <JourneyDetails mode={type === 'flight' ? 'plane' : 'train'} number={a.ref || undefined}
+          from={{ city: city(a.fromText), time: a.startTime ? formatTime(a.startTime) : '—', date: formatDay(a.date), terminal: code(a.fromText) }}
+          to={{ city: city(a.toText), time: a.endTime ? formatTime(a.endTime) : '—', date: formatDay(a.endDate || a.date), terminal: code(a.toText) }}
+          duration={journeyDuration(a)} footer={a.operator ? `Operated by ${a.operator}` : undefined} />
+      ) : (
+        <EventCard {...eventCardProps(a, ctx, true)} to={undefined} favourite={starred} />
+      )}
 
-      <div className={s.planButtons}>
-        <Button block icon={going ? 'check' : 'plus'} variant={going ? 'secondary' : 'primary'} onClick={() => toggle('attendeeIds', !going, going ? 'You’re not going' : 'You’re going')}>{going ? 'You’re going' : 'I’m going'}</Button>
-        {a.category !== 'note' && <Button block variant="secondary" icon="star" onClick={star}>{starred ? 'Favourite' : 'Add to favourites'}</Button>}
-      </div>
+      {!journey && a.category !== 'note' && (
+        <div className={s.planButtons}>
+          <Button block variant="secondary" icon="star" onClick={star}>{starred ? 'Favourite' : 'Add to favourites'}</Button>
+        </div>
+      )}
 
-      <PageSection title="Details">
+      {!journey && (
         <ListGroup label="Details">
-          {type === 'flight' && a.ref && <ListItem icon="plane" title="Flight number" meta={<span className={s.selectable}>{a.ref}</span>} />}
-          {a.fromText && a.toText && <ListItem icon="pin" title={type === 'flight' ? 'Departs' : 'From'} meta={`${a.fromText}${a.startTime ? ` · ${formatDay(a.date)}, ${formatTime(a.startTime)}` : ''}`} href={mapsUrl(a.fromText, a.location, app)} label={`From ${a.fromText}: open in ${mapsAppLabel(app)}`} />}
-          {a.fromText && a.toText && <ListItem icon="pin" title={type === 'flight' ? 'Arrives' : 'To'} meta={`${a.toText}${a.endTime ? ` · ${formatDay(a.endDate || a.date)}, ${formatTime(a.endTime)}` : ''}`} href={mapsUrl(a.toText, a.to ?? null, app)} label={`To ${a.toText}: open in ${mapsAppLabel(app)}`} />}
           {type === 'stay' && a.endDate && <ListItem icon="calendar" title="Check-in and check-out" meta={`${formatDay(a.date)}${a.startTime ? `, ${formatTime(a.startTime)}` : ''} → ${formatDay(a.endDate)}${a.endTime ? `, ${formatTime(a.endTime)}` : ''}`} />}
-          {where && !(a.fromText && a.toText) && <ListItem icon="pin" title="Address" meta={where} href={mapsUrl(where, a.location, app)} label={`${where}: open in ${mapsAppLabel(app)}`} trailing={mapsAppLabel(app)} />}
-          <ListItem icon="people" title="Who’s going" meta={a.attendeeIds.length ? `${a.attendeeIds.length} of ${trip.memberIds.length}: ${goingNames.join(', ')}` : 'No one has said yet'} />
-          {a.notes && <ListItem icon="pencil" title={type === 'note' ? 'More' : 'Notes'} meta={<span className={s.selectable}>{a.notes}</span>} />}
+          {where && <ListItem icon="pin" title="Address" meta={where} href={mapsUrl(where, a.location, app)} label={`${where}: open in ${mapsAppLabel(app)}`} trailing={mapsAppLabel(app)} />}
+          {booking}
+          {a.attendeeIds.length > 0 && <ListItem icon="people" title="Who’s going" meta={`${a.attendeeIds.length} of ${trip.memberIds.length}: ${goingNames.join(', ')}`} />}
+          {a.notes && <ListItem icon="notebook" title={type === 'note' ? 'More' : 'Notes'} meta={<span className={s.selectable}>{`${a.notes} · added by ${adder}`}</span>} />}
         </ListGroup>
-        {a.location && <div className={s.planMap}><MapView pins={[{ lat: a.location.lat, lng: a.location.lng, label: a.fromText || where || a.title }, ...(a.to ? [{ lat: a.to.lat, lng: a.to.lng, label: a.toText || a.title }] : [])]} zoom={a.to ? undefined : 15} height={180} /></div>}
-      </PageSection>
+      )}
 
-      <PageSection title="Files & links" meta="Tickets, bookings and PDFs" action={<Button variant="ghost" size="regular" iconEnd="chevron-right" onClick={() => setAddingDoc(true)}>Add</Button>}>
-        {a.links.length > 0 ? (
+      {journey && booking.length > 0 && (
+        <PageSection title="Booking" meta="From your confirmation email">
+          <ListGroup label="Booking">{booking}</ListGroup>
+        </PageSection>
+      )}
+
+      <PageSection title="Files & links" action={<Button variant="ghost" size="regular" iconEnd="chevron-right" onClick={() => setAddingDoc(true)}>Add</Button>}>
+        {a.links.length > 0 || a.manageUrl ? (
           <ListGroup label="Files and links">
             {a.links.map((l, i) => {
               const name = l.label || hostOf(l.url);
               return (
                 <div key={i} className={s.docRow}>
-                  <ListItem icon={isPdf(l.url) ? 'doc' : 'link'} title={name} meta={`${hostOf(l.url)}${l.emailUrl ? ' · from email' : ''}`}
+                  <ListItem icon={isPdf(l.url) ? 'doc' : 'link'} title={name} meta={`${isPdf(l.url) ? 'PDF' : hostOf(l.url)}${l.emailUrl ? ' · from email' : ''}`}
                     trailing={isPdf(l.url) ? 'PDF' : undefined} href={l.url} label={`${name} (opens in a new tab)`}
                     onClick={() => recordView(trip.id, { url: l.url, kind: isPdf(l.url) ? 'PDF' : 'Link', label: name, meta: a.title })} />
                   {l.emailUrl && <LinkButton href={l.emailUrl} size="regular" variant="ghost" icon="mail" label={`Open the email for ${name}`} />}
@@ -113,13 +142,18 @@ export function ActivityPage(ctx: TripCtx) {
                 </div>
               );
             })}
+            {a.manageUrl && <ListItem icon="arrow-up-right" title="Manage booking" meta="Link from your confirmation email" href={a.manageUrl} label="Manage booking (opens in a new tab)" />}
           </ListGroup>
         ) : <p className="t-body-small t-secondary">Nothing attached yet. Add a ticket, confirmation or booking link.</p>}
       </PageSection>
 
-      <PageSection title="Comments">
-        <Comments tripId={trip.id} targetId={a.id} comments={ctx.comments} profiles={profiles} />
-      </PageSection>
+      {journey && a.notes && (
+        <PageSection title="Notes" action={<Button variant="ghost" size="regular" iconEnd="chevron-right" onClick={() => setEditing(true)}>Edit</Button>}>
+          <ListGroup label="Notes">
+            <ListItem icon="pencil" title={a.notes.split('\n')[0]} meta={[a.notes.split('\n').slice(1).join(' '), `added by ${adder}`].filter(Boolean).join(' · ')} />
+          </ListGroup>
+        </PageSection>
+      )}
 
       <ActivityForm open={editing} trip={trip} date={a.date} activity={a} onClose={() => setEditing(false)} />
       <DocumentForm open={addingDoc} onClose={() => setAddingDoc(false)}

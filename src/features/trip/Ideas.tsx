@@ -14,7 +14,6 @@ import { priceOf, priceText } from '../../lib/currency';
 import { recordView } from '../../lib/recent';
 import { hostOf, isPdf } from '../../lib/format';
 import { PriceField, PriceWithConversion, fromPriceDraft, toPriceDraft, type PriceDraft } from '../shared/Price';
-import { Comments } from '../shared/Comments';
 import { LinkChips, LinkEditor, cleanLinks } from '../shared/Links';
 import { ActivityForm } from './ActivityForm';
 import type { TripCtx } from './TripPage';
@@ -191,7 +190,6 @@ function IdeaSheet({ idea, place, ctx, onClose, onEdit, onSchedule }: { idea: Id
       )}
       {ctx.canManage && idea.status === 'rejected' && <Button variant="secondary" block onClick={() => setStatus('open', 'Idea back to decide')}>Back to “To decide”</Button>}
       {canEdit && <Button variant="ghost" icon="pencil" onClick={onEdit}>Edit idea</Button>}
-      <Comments tripId={ctx.trip.id} targetId={idea.id} comments={ctx.comments} profiles={ctx.profiles} />
     </Sheet>
   );
 }

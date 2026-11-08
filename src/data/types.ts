@@ -83,6 +83,13 @@ export type Activity = {
   to?: Place | null;
   /** Flight number (Flight). */
   ref?: string;
+  /** From the booking (forwarded confirmation emails, later; shown only when present): reference, seats, bags, the
+   *  airline or train operator, and the "Manage booking" link from the email. */
+  bookingRef?: string;
+  seats?: string;
+  bags?: string;
+  operator?: string;
+  manageUrl?: string;
   createdBy: string;
   createdAt: number;
 };

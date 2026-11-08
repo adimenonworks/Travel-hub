@@ -49,10 +49,11 @@ export function formatRange(start: string, end: string) {
   return `${a} – ${b}`;
 }
 
+/** A time as Figma shows it everywhere: 24-hour "08:30", "22:15". */
 export function formatTime(t: string) {
   if (!t) return '';
   const [h, m] = t.split(':').map(Number);
-  return new Date(2000, 0, 1, h, m).toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' });
+  return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
 }
 
 export type TripPhase = 'upcoming' | 'current' | 'past';
