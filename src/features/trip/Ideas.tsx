@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { Button, EmptyState, IdeaRow, LinkButton, ListGroup, ListItem, SectionHeader, SegmentedControl, Select, Sheet, TextArea, TextField, useToast } from '../../design/components';
+import { Button, EmptyState, IdeaRow, LinkButton, ListGroup, ListItem, PageSection, SectionHeader, SegmentedControl, Select, Sheet, TextArea, TextField, useToast } from '../../design/components';
 import { store } from '../../data';
 import { personName, useMe, usePlaces, usePlacesById } from '../../data/hooks';
 import type { Category, Idea, LinkItem, PlaceCategory, SavedPlace } from '../../data/types';
@@ -28,6 +28,8 @@ const ups = (i: Idea) => Object.keys(i.votes ?? {}).length;
  * Passed segments, then a List group of Idea rows sorted by votes (the leader gets a "Most votes" tag). Tapping a
  * row opens the idea: its notes, links and comments, and (for organizers) "Add to a day" or "Pass".
  */
+const LINKS = 'Links & notes';
+
 export function Ideas(ctx: TripCtx) {
   const { trip, ideas } = ctx;
   const me = useMe();
@@ -65,7 +67,7 @@ export function Ideas(ctx: TripCtx) {
   return (
     <>
       <SectionHeader title="Ideas board" meta={ctx.canManage ? 'Vote, then add the winners to a day' : 'Vote for the ones you like; organizers add the winners to a day'}
-        action={<Button size="regular" icon="plus" onClick={() => setAdding(true)}>Add idea</Button>} />
+        action={<Button size="regular" icon="lightbulb" onClick={() => setAdding(true)}>Add idea</Button>} />
       <SegmentedControl label="Show ideas" block value={filter} onChange={setFilter} options={[
         { value: 'open', label: `To decide · ${count('open')}` },
         { value: 'approved', label: `Planned · ${count('approved')}` },
@@ -75,20 +77,25 @@ export function Ideas(ctx: TripCtx) {
         <EmptyState illustration="ideas" title={filter === 'open' ? 'No ideas to decide on' : 'Nothing here yet'}
           message={filter === 'open' ? 'Saw a great restaurant or tour? Add it so everyone can vote.' : undefined} />
       ) : (
-        <ListGroup label="Ideas">
-          {shown.map((i) => {
-            const place = i.placeId ? places[i.placeId] : undefined;
-            const cat = categoryInfo(i.category);
-            const kind = place ? [place.kind || placeCategory(place.category).one, place.city].filter(Boolean).join(' · ') : cat.label;
-            const meta = [kind, priceOf(i, trip) ? priceText(priceOf(i, trip)!) : '', i.createdBy === me.uid ? 'you' : personName(ctx.profiles, i.createdBy).split(' ')[0]].filter(Boolean).join(' · ');
-            return (
-              <IdeaRow key={i.id} title={place?.name ?? i.title} meta={meta} icon={place ? placeCategory(place.category).icon : cat.icon}
-                tag={i.id === top ? { icon: 'star', label: 'Most votes' } : undefined}
-                vote={{ count: ups(i), voted: !!i.votes?.[me.uid], onClick: () => vote(i) }}
-                onClick={() => { setViewing(i); if (place) recordView(trip.id, { url: `/trip/${trip.id}/ideas?idea=${i.id}`, label: place.name, kind: 'Place' }); }} />
-            );
-          })}
-        </ListGroup>
+        // Grouped by the Place's city (most-voted first inside each), then Links & notes for ideas with no place
+        groupBy(shown, (i) => (i.placeId && places[i.placeId] ? cityOf(places[i.placeId]) : LINKS)).sort((x, y) => (x[0] === LINKS ? 1 : y[0] === LINKS ? -1 : 0)).map(([city, list]) => (
+          <PageSection key={city} title={city} meta={`${list.length} idea${list.length === 1 ? '' : 's'}`}>
+            <ListGroup label={city}>
+              {list.map((i) => {
+                const place = i.placeId ? places[i.placeId] : undefined;
+                const cat = categoryInfo(i.category);
+                const kind = place ? [place.kind || placeCategory(place.category).one, place.city].filter(Boolean).join(' · ') : cat.label;
+                const meta = [kind, priceOf(i, trip) ? priceText(priceOf(i, trip)!) : '', i.createdBy === me.uid ? 'you' : personName(ctx.profiles, i.createdBy).split(' ')[0]].filter(Boolean).join(' · ');
+                return (
+                  <IdeaRow key={i.id} title={place?.name ?? i.title} meta={meta} icon={place ? placeCategory(place.category).icon : i.links.length ? 'link' : cat.icon}
+                    tag={i.id === top ? { icon: 'star', label: 'Most votes' } : undefined}
+                    vote={{ count: ups(i), voted: !!i.votes?.[me.uid], onClick: () => vote(i) }}
+                    onClick={() => { setViewing(i); if (place) recordView(trip.id, { url: `/trip/${trip.id}/ideas?idea=${i.id}`, label: place.name, kind: 'Place' }); }} />
+                );
+              })}
+            </ListGroup>
+          </PageSection>
+        ))
       )}
       <AddIdeaSheet open={adding} ctx={ctx} onClose={() => setAdding(false)} onNew={() => { setAdding(false); setEditing('new'); }} />
       <IdeaSheet idea={live} place={live?.placeId ? places[live.placeId] : undefined} ctx={ctx} onClose={() => setViewing(null)}
