@@ -9,6 +9,7 @@ import { usePlaceMarks } from '../saves/placeMarks';
 import { daysBetween, today, tripPhase } from '../../lib/dates';
 import { shrinkPhoto } from '../../lib/image';
 import { MAPS_APPS, getMapsApp, setMapsApp, type MapsApp } from '../../lib/prefs';
+import { appVersion } from '../../lib/native';
 import { applyTheme, getTheme, type ThemePref } from '../../lib/theme';
 import { Content } from '../../app/Shell';
 import { CURRENCIES } from '../../lib/format';
@@ -59,6 +60,8 @@ export function ProfilePage() {
   };
   const name = profile?.name || me.name;
   const home = useHomeCurrency();
+  const [version, setVersion] = useState('');
+  useEffect(() => { appVersion().then(setVersion); }, []);
   const themeLabel = { auto: 'Automatic', light: 'Light', dark: 'Dark' }[theme];
 
   return (
@@ -77,15 +80,15 @@ export function ProfilePage() {
         <div className={s.map}><MapView pins={pins} height={200} /></div>
       </PageSection>
 
-      <PageSection title="Favourite places" meta="Places you've starred"
-        action={favourites.length > 0 ? <LinkButton to="/profile/favourites" variant="ghost" size="regular" iconEnd="chevron-right">See all</LinkButton> : undefined}>
+      <PageSection title="Favourite places" meta="Starred from your trips"
+        action={favourites.length > 0 ? <LinkButton to="/profile/favourites" variant="ghost" size="regular" iconEnd="chevron-right">{`See all ${favourites.length}`}</LinkButton> : undefined}>
         {favourites.length === 0
           ? <ListGroup><ListItem icon="star" title="No favourites yet" meta="Star a saved place, or an idea or event on a trip, and it shows here." /></ListGroup>
           : (
             <ListGroup label="Favourite places">
               {favourites.slice(0, 3).map((p) => (
                 <PlaceRow key={p.id} place={p} visited={beenTo.has(p.id)} starred onClick={() => setOpenPlace(p.id)}
-                  meta={[placeCategory(p.category).one, p.city, p.countryCode ? countryName(p.countryCode) : null].filter(Boolean).join(' · ')} />
+                  meta={[p.city, p.countryCode ? countryName(p.countryCode) : null].filter(Boolean).join(' · ') || placeCategory(p.category).one} />
               ))}
             </ListGroup>
           )}
@@ -102,6 +105,7 @@ export function ProfilePage() {
       </PageSection>
 
       <Button variant="destructive" block iconEnd="signout" onClick={() => store.signOut()}>Sign out</Button>
+      <p className={['t-body-small t-secondary', s.version].join(' ')}>{version}</p>
 
       <Sheet open={open === 'profile'} title="Your profile" subtitle="What people on your trips see" onClose={() => setOpen(null)}>
         <ProfileEditor uid={me.uid} name={name} photo={profile ? profile.photo : me.photo} />

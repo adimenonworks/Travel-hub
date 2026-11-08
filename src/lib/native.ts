@@ -108,3 +108,11 @@ export function confirmAction(message: string): boolean {
   haptic('warning');
   return window.confirm(message);
 }
+
+/** "Rove 1.0 (12)": the app's version and build on iPhone (from the app itself), else the web build's version. */
+export async function appVersion(): Promise<string> {
+  if (isNativeApp) {
+    try { const { App } = await import('@capacitor/app'); const i = await App.getInfo(); return `Rove ${i.version} (${i.build})`; } catch { /* fall through */ }
+  }
+  return `Rove ${__APP_VERSION__} (web)`;
+}
