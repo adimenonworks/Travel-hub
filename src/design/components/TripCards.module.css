@@ -82,8 +82,10 @@
 /* Figma "Journey details card": the grey container, 20 padding, 16 between parts, dashed dividers */
 .journey { display: flex; flex-direction: column; gap: var(--space-default-500); padding: var(--space-default-600); border-radius: var(--radius-600); background: var(--on-light-surface-secondary); }
 .journeyTags { display: flex; justify-content: space-between; align-items: center; gap: var(--space-default-300); flex-wrap: wrap; }
-.journeyTimes { display: flex; align-items: center; justify-content: space-between; gap: var(--space-default-400); }
-.journeyEnd { display: flex; flex-direction: column; gap: var(--space-default-200); min-width: 0; }
+.journeyTimes { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-default-400); } /* with large text the arrival wraps under the departure */
+.journeyEnd { display: flex; flex-direction: column; gap: var(--space-default-200); min-width: 0; max-width: 100%; }
+.journeyEnd > span { overflow-wrap: anywhere; }
+.journeyTime { white-space: nowrap; }
 .journeyEndTo { align-items: flex-end; text-align: right; }
 .journeyCity { font: var(--type-body); color: var(--on-light-text-secondary); }
 .journeyTime { font: var(--type-heading-1); letter-spacing: -0.01em; color: var(--on-light-text-primary); font-variant-numeric: tabular-nums; }

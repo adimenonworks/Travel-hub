@@ -63,7 +63,7 @@
 .albumLink { color: inherit; text-decoration: none !important; }
 .albumLink::after { content: ''; position: absolute; inset: 0; border-radius: var(--radius-600); } /* the whole card opens the album */
 .albumEdit { position: relative; z-index: 1; }
-.albumHelp { display: flex; flex-direction: column; gap: var(--space-default-300); padding: var(--space-default-500) var(--space-default-600); border-radius: var(--radius-600); background: var(--on-light-surface-sunken); font-size: var(--size-body-small); line-height: 1.5; color: var(--on-light-text-secondary); }
+.albumHelp { display: flex; flex-direction: column; gap: var(--space-default-300); padding: var(--space-default-500) var(--space-default-600); border-radius: var(--radius-600); background: var(--on-light-surface-sunken); font: var(--type-body-small); color: var(--on-light-text-secondary); }
 .albumHelp b { color: var(--on-light-text-primary); font-weight: var(--weight-semibold); }
 
 /* Idea Card buttons (Figma "Buttons"): Deny | Approve, equal halves, 12 apart, 8 below the votes row (24 in all with the card gap) */

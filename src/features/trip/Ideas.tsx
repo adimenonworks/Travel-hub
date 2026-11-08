@@ -66,7 +66,7 @@ export function Ideas(ctx: TripCtx) {
 
   return (
     <>
-      <SectionHeader title="Ideas board" meta={ctx.canManage ? 'Vote, then add the winners to a day' : 'Vote for the ones you like; organizers add the winners to a day'}
+      <SectionHeader title="Ideas board"
         action={<Button size="regular" icon="lightbulb" onClick={() => setAdding(true)}>Add idea</Button>} />
       <SegmentedControl label="Show ideas" block value={filter} onChange={setFilter} options={[
         { value: 'open', label: `To decide · ${count('open')}` },

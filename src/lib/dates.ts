@@ -40,13 +40,15 @@ export function formatDay(d: string, opts: Intl.DateTimeFormatOptions = { weekda
   return parseDay(d).toLocaleDateString(undefined, opts);
 }
 
+/** A date range as Figma writes it: "2 – 11 Nov", "28 Oct – 3 Nov", "20 Mar – 3 Apr 2027" (the year only when it isn't this year).
+ *  The day/month order follows the phone's region ("Nov 2 – 11" in the US). */
 export function formatRange(start: string, end: string) {
   const s = parseDay(start);
   const e = parseDay(end);
-  const sameYear = s.getFullYear() === e.getFullYear();
-  const a = s.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: sameYear ? undefined : 'numeric' });
-  const b = e.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
-  return `${a} – ${b}`;
+  const thisYear = s.getFullYear() === e.getFullYear() && s.getFullYear() === new Date().getFullYear();
+  const f = new Intl.DateTimeFormat(undefined, { month: 'short', day: 'numeric', year: thisYear ? undefined : 'numeric' });
+  // Intl joins with an en dash and no spaces in some regions ("2–11 Nov"); Figma puts a space either side.
+  return f.formatRange(s, e).replace(/\s*[–-]\s*/, ' – ');
 }
 
 /** A time as Figma shows it everywhere: 24-hour "08:30", "22:15". */

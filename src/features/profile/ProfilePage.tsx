@@ -18,6 +18,9 @@ import { CityPicker } from '../shared/CityPicker';
 import { MapView } from '../shared/Map';
 import s from './Profile.module.css';
 
+/** "Australian dollar" for AUD, as Figma's Currency row shows it. */
+const currencyName = (code: string) => { try { const n = new Intl.DisplayNames(undefined, { type: 'currency' }).of(code); return n ? n[0].toUpperCase() + n.slice(1) : code; } catch { return code; } };
+
 type Open = 'profile' | 'home' | 'maps' | 'appearance' | 'currency' | null;
 
 /**
@@ -98,7 +101,7 @@ export function ProfilePage() {
       <PageSection title="Settings">
         <ListGroup label="Settings">
           <ListItem icon="home" title="Home city" meta={profile?.home?.name ?? 'Not set'} onClick={() => setOpen('home')} />
-          <ListItem icon="wallet" title="Currency" meta={home} onClick={() => setOpen('currency')} />
+          <ListItem icon="wallet" title="Currency" meta={home ? `${currencyName(home)} (${home})` : undefined} onClick={() => setOpen('currency')} />
           <ListItem icon="map" title="Maps app" meta={MAPS_APPS.find((m) => m.value === maps)?.label} onClick={() => setOpen('maps')} />
           <ListItem icon="sun" title="Appearance" meta={themeLabel} onClick={() => setOpen('appearance')} />
         </ListGroup>

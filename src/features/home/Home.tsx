@@ -64,7 +64,8 @@ export function Home() {
       )}
 
       {recent.length > 0 && (
-        <PageSection title="Recently saved">
+        <PageSection title="Recently saved"
+          action={<LinkButton to="/trips?show=saved" variant="ghost" size="regular" iconEnd="chevron-right">See all</LinkButton>}>
           <ListGroup label="Recently saved">
             {recent.map((p) => (
               <PlaceRow key={p.id} place={p} visited={visited.has(p.id)} starred={starred(p)} onClick={() => setOpen(p.id)} trailing={timeAgo(p.createdAt)}

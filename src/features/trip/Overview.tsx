@@ -26,10 +26,13 @@ export function Overview(ctx: TripCtx) {
   const next = nextEvent(activities);
   const [country, setCountry] = useState<string | null>(null);
   const docs = activities.reduce((n, a) => n + a.links.length, 0);
-  const countries = tripCountries(trip, activities);
   const recent = useRecentViews(trip.id);
   const me = useMe();
   const home = useProfile(me.uid)?.home ?? null;
+  // Good to know is about where you're going: your home country (a flight out of Melbourne) is left out, unless the whole trip is at home.
+  const homeCode = home ? countryCodeOf(home) : null;
+  const all = tripCountries(trip, activities);
+  const countries = all.some((c) => c !== homeCode) ? all.filter((c) => c !== homeCode) : all;
   // A spot on the trip in the chosen country, for its local time
   const spots: Place[] = [trip.destination, ...activities.flatMap((a) => [a.location, a.to])].filter((p): p is Place => !!p);
   const spot = country ? spots.find((p) => countryCodeOf(p) === country) ?? null : null;
