@@ -66,7 +66,8 @@ export function SwipeRow({ actions, children }: { actions: SwipeAction[]; childr
 
   return (
     <div ref={row} className={s.row} data-no-tab-swipe="">
-      <div className={s.actions} style={{ width }} aria-hidden={!open || undefined} inert={!open || undefined}>
+      {/* Hidden until the row moves, so they never show at the card's rounded corners */}
+      <div className={s.actions} style={{ width, visibility: dx < 0 ? 'visible' : 'hidden' }} aria-hidden={!open || undefined} inert={!open || undefined}>
         {actions.map((a) => (
           <button key={a.label} type="button" className={`${s.action} ${s[a.tone]}`}
             onClick={() => { setOpen(false); setDx(0); a.onClick(); }}>
