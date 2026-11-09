@@ -1,12 +1,12 @@
 import { useLayoutEffect, useRef, useState } from 'react';
-import { useLocation, useNavigationType, type NavigateFunction } from 'react-router-dom';
+import { useLocation, useNavigationType, type Location, type NavigateFunction } from 'react-router-dom';
 
 /**
  * How screens change, like an iPhone app:
  * - opening something (a link, a card) slides the new screen in from the right;
  * - a back button slides the previous screen back in from the left;
  * - the Bottom Nav cross-fades quickly between tabs (no haptic: navigation is silent), and each tab keeps its own scroll position;
- * - the phone's own swipe-back switches instantly (iOS animates that itself).
+ * - swiping in from the left edge drags this screen away over the previous one (SwipeBack in Shell.tsx), like iOS.
  * Each screen also remembers its scroll position, and going back returns you there.
  */
 type Kind = 'push' | 'back' | 'tab' | 'none';
@@ -69,4 +69,21 @@ export function useScreenTransition(): Kind {
     requestAnimationFrame(tick);
   }, [location.key, location.pathname, key, navType]);
   return kind;
+}
+
+/**
+ * The screens behind this one (by history position), so the edge swipe can draw the previous screen under the
+ * current one while it's dragged. Updated on every navigation.
+ */
+const stack: Location[] = [];
+export function rememberLocation(loc: Location) {
+  const idx = (window.history.state as { idx?: number } | null)?.idx ?? 0;
+  stack[idx] = loc;
+  stack.length = idx + 1;
+}
+/** The previous screen and where it was scrolled to, or null when there's nothing to go back to. */
+export function previousScreen(): { location: Location; scrollY: number } | null {
+  const idx = (window.history.state as { idx?: number } | null)?.idx ?? 0;
+  const loc = idx > 0 ? stack[idx - 1] : undefined;
+  return loc ? { location: loc, scrollY: scrolls.get(loc.key) ?? 0 } : null;
 }

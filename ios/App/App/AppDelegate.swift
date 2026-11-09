@@ -49,8 +49,9 @@ class RoveViewController: CAPBridgeViewController {
     override func capacitorDidLoad() {
         super.capacitorDidLoad()
         guard let webView = webView else { return }
-        // Swipe from the left edge to go back (and from the right to go forward), like any iPhone app.
-        webView.allowsBackForwardNavigationGestures = true
+        // Swipe back is drawn by the app itself (src/app/SwipeBack.tsx), which shows the real previous screen under
+        // the one being dragged. The web view's own swipe would show a blank snapshot instead, so it's off.
+        webView.allowsBackForwardNavigationGestures = false
         // The page canvas colour in light and dark mode (on-light/surface/primary: neutral 0 / neutral 1000), so nothing flashes white before the app draws.
         let canvas = UIColor { traits in
             traits.userInterfaceStyle == .dark

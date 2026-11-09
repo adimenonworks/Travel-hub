@@ -75,6 +75,9 @@ export function Tabs({ items, label, className }: { items: TabItem[]; label: str
       if (!cur) return setLine(null);
       const box = el.getBoundingClientRect(), r = cur.getBoundingClientRect();
       setLine((prev) => ({ x: r.left - box.left + el.scrollLeft, w: r.width, ready: prev !== null }));
+      // Keep the current tab in view when the bar scrolls sideways (e.g. People after a swipe on a narrow phone)
+      if (r.left < box.left) el.scrollTo({ left: el.scrollLeft + r.left - box.left - 16, behavior: 'smooth' });
+      else if (r.right > box.right) el.scrollTo({ left: el.scrollLeft + r.right - box.right + 16, behavior: 'smooth' });
     };
     measure();
     const ro = new ResizeObserver(measure);

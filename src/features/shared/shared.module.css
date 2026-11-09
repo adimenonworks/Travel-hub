@@ -32,11 +32,26 @@
 .suggestItem { display: block; width: 100%; text-align: left; padding: var(--space-default-400) var(--space-default-500); background: none; border: 0; border-radius: var(--radius-1000); min-height: var(--size-tap); }
 .suggestItem:hover, .suggestItem[aria-selected='true'] { background: var(--interactive-button-ghost-background-hover); }
 
-.comments { display: flex; flex-direction: column; gap: var(--space-default-400); padding-top: var(--space-default-300); border-top: 1px solid var(--on-light-divider-default); }
-.comment { display: flex; gap: var(--space-default-300); align-items: flex-start; }
-.bubble { background: var(--on-light-surface-secondary); border-radius: var(--radius-600); padding: var(--space-default-300) var(--space-default-500); font-size: var(--size-body-small); line-height: 1.5; min-width: 0; overflow-wrap: anywhere; }
-.bubbleMeta { font-size: var(--size-body-small); color: var(--on-light-text-secondary); }
-.commentForm { display: flex; gap: var(--space-default-300); align-items: center; }
+.comments { display: flex; flex-direction: column; gap: var(--space-default-500); }
+/* Messages-style thread: theirs on the left (avatar at the top of the bubble), yours on the right in deep green */
+.thread { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: var(--space-default-400); }
+.message { display: flex; gap: var(--space-default-300); align-items: flex-start; }
+.theirs .messageBody { align-items: flex-start; }
+.mine { justify-content: flex-end; }
+.mine .messageBody { align-items: flex-end; }
+.messageBody { display: flex; flex-direction: column; gap: var(--space-default-200); max-width: 80%; min-width: 0; }
+.messageMeta { font: var(--type-body-small); color: var(--on-light-text-secondary); padding: 0 var(--space-default-300); }
+.messageRow { display: flex; align-items: center; gap: var(--space-default-200); min-width: 0; }
+.bubble {
+  margin: 0; min-width: 0; overflow-wrap: anywhere; white-space: pre-wrap;
+  padding: var(--space-default-300) var(--space-default-500); border-radius: var(--radius-600);
+  font: var(--type-body); background: var(--on-light-surface-secondary); color: var(--on-light-text-primary);
+}
+.theirs .bubble { border-top-left-radius: var(--radius-200); } /* the corner by the avatar, like a speech tail */
+.mine .bubble { background: var(--interactive-selected-primary-background); color: var(--interactive-selected-primary-text); border-bottom-right-radius: var(--radius-200); }
+/* Writing a comment: while the keyboard is up the box stays on top of it */
+.composer { display: flex; gap: var(--space-default-300); align-items: center; background: var(--on-light-surface-primary); }
+.composerTyping { position: sticky; bottom: calc(var(--keyboard-height, 0px) + var(--space-default-300)); z-index: 5; padding: var(--space-default-300) 0; }
 .commentInput { flex: 1; min-height: var(--size-tap); border-radius: var(--radius-1000); border: 1px solid var(--on-light-border-bold); background: var(--on-light-surface-primary); padding: 0 var(--space-default-500); font-size: var(--size-body-small); outline: none; min-width: 0; }
 .commentInput::placeholder { color: var(--input-field-placeholder); opacity: 1; }
 .commentInput:hover { border-color: var(--on-light-border-bold); }

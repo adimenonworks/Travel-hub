@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
+import { nextTransition } from '../../app/navigation';
 import { Button, EmptyState, EventCard, IconButton, JourneyDetails, LinkButton, ListGroup, ListItem, PageHeader, PageSection, Sheet, TextField, useToast } from '../../design/components';
 import type { Activity } from '../../data/types';
 import { daysBetween } from '../../lib/dates';
@@ -9,7 +10,9 @@ import { placeForEvent } from '../saves/starEvent';
 import type { LinkItem } from '../../data/types';
 import { formatDay, formatTime } from '../../lib/dates';
 import { hostOf, isPdf, normalizeUrl } from '../../lib/format';
-import { mapsUrl } from '../../lib/geocode';
+import { mapsUrl, uberUrl } from '../../lib/geocode';
+import { MapView } from '../shared/Map';
+import { Comments } from '../shared/Comments';
 import { haptic, confirmAction } from '../../lib/native';
 import { recordView } from '../../lib/recent';
 import { flightTag, updatedAgo, useFlightStatus } from '../../lib/api';
@@ -36,6 +39,7 @@ function journeyDuration(a: Activity) {
  */
 export function ActivityPage(ctx: TripCtx) {
   const { activityId = '' } = useParams();
+  const navigate = useNavigate();
   const me = useMe();
   const { trip, profiles } = ctx;
   const a = ctx.activities.find((x) => x.id === activityId);
@@ -111,19 +115,37 @@ export function ActivityPage(ctx: TripCtx) {
           duration={journeyDuration(a)}
           footer={[a.operator || live?.airline ? `Operated by ${a.operator || live!.airline}` : '', live ? updatedAgo(live.updatedAt) : ''].filter(Boolean).join(' · ') || undefined} />
       ) : (
-        <EventCard {...eventCardProps(a, ctx, true)} to={undefined} favourite={starred} />
+        <EventCard {...eventCardProps(a, ctx, true)} {...(type !== 'note' && where ? { place: undefined } : {})} to={undefined} favourite={starred} />
       )}
 
       {!journey && a.category !== 'note' && (
-        <div className={s.planButtons}>
-          <Button block variant="secondary" icon="star" onClick={star}>{starred ? 'Favourite' : 'Add to favourites'}</Button>
-        </div>
+        <Button block size="regular" variant="secondary" icon="star" onClick={star}>{starred ? 'Favourite' : 'Add to favourites'}</Button>
       )}
 
-      {!journey && (
+      {/* Figma "Event detail — Location": the map, the address and the two ways to get there, together in one card */}
+      {!journey && where && (
+        <PageSection title="Location">
+          <div className={s.whereCard}>
+            {a.location && (
+              <div className={s.whereMap}>
+                <MapView pins={[{ lat: a.location.lat, lng: a.location.lng, label: a.title }]} center={a.location} zoom={15} height={160} />
+              </div>
+            )}
+            <div className={s.whereText}>
+              <span className="t-heading-3">{where.split(',')[0]}</span>
+              {where.includes(',') && <span className="t-body t-secondary">{where.split(',').slice(1).join(',').trim()}</span>}
+            </div>
+            <div className={s.whereButtons}>
+              <LinkButton href={mapsUrl(where, a.location, app)} variant="secondary" icon="map" label={`Directions to ${where} in ${mapsAppLabel(app)}`}>{mapsAppLabel(app)}</LinkButton>
+              <LinkButton href={uberUrl(where, a.location)} variant="secondary" icon="car" label={`Get an Uber to ${where}`}>Uber</LinkButton>
+            </div>
+          </div>
+        </PageSection>
+      )}
+
+      {!journey && ((type === 'stay' && a.endDate) || booking.length > 0 || a.attendeeIds.length > 0 || a.notes) && (
         <ListGroup label="Details">
           {type === 'stay' && a.endDate && <ListItem icon="calendar" title="Check-in and check-out" meta={`${formatDay(a.date)}${a.startTime ? `, ${formatTime(a.startTime)}` : ''} → ${formatDay(a.endDate)}${a.endTime ? `, ${formatTime(a.endTime)}` : ''}`} />}
-          {where && <ListItem icon="pin" title="Address" meta={where} href={mapsUrl(where, a.location, app)} label={`${where}: open in ${mapsAppLabel(app)}`} trailing={mapsAppLabel(app)} />}
           {booking}
           {a.attendeeIds.length > 0 && <ListItem icon="people" title="Who’s going" meta={`${a.attendeeIds.length} of ${trip.memberIds.length}: ${goingNames.join(', ')}`} />}
           {a.notes && <ListItem icon="notebook" title={type === 'note' ? 'More' : 'Notes'} meta={<span className={s.selectable}>{`${a.notes} · added by ${adder}`}</span>} />}
@@ -164,7 +186,12 @@ export function ActivityPage(ctx: TripCtx) {
         </PageSection>
       )}
 
-      <ActivityForm open={editing} trip={trip} date={a.date} activity={a} onClose={() => setEditing(false)} />
+      <PageSection title="Comments">
+        <Comments tripId={trip.id} targetId={a.id} comments={ctx.comments} profiles={profiles} />
+      </PageSection>
+
+      <ActivityForm open={editing} trip={trip} date={a.date} activity={a} onClose={() => setEditing(false)}
+        onDeleted={(gone) => { nextTransition('back'); navigate(`/trip/${trip.id}/itinerary?day=${gone.date}`, { replace: true }); }} />
       <DocumentForm open={addingDoc} onClose={() => setAddingDoc(false)}
         onAdd={async (d) => {
           try { await store.updateSub(trip.id, 'activities', a.id, { links: [...a.links, d] }); toast({ icon: 'check', label: 'Added' }); }

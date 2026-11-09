@@ -244,7 +244,7 @@
   /* Page layout (code only: how the Layout tokens are used for the page frame, by screen width) */
   --space-gutter: var(--space-default-700);   /* page side margin (24) */
   --space-inset: var(--space-default-600);    /* padding inside cards and rows */
-  --space-stack: var(--space-default-800);      /* gap between sections */
+  --space-stack: var(--space-default-900);      /* gap between sections (40); inside a section, 16 */
   --space-page-top: var(--space-default-950);   /* space above the page title */
 
   /* Typography (Figma "Typography" collection, its one mode). Sizes follow the iPhone text setting (see base.css).
@@ -264,7 +264,7 @@
   --elevation-floating-bar: var(--shadow-raised);
 
   /* Sizing and motion (code only) */
-  --size-tap: 44px; --size-control: 48px; --size-control-sm: 40px; --size-tab-bar: calc(64rem / 17); /* Bottom Nav height, growing with text size */ --size-content-max: 480px; /* phone width: on a computer the test site shows a centred phone column */
+  --size-tap: 44px; --size-control: 48px; --size-control-sm: 32px; /* Button Regular (Wise's small button) */ --size-tab-bar: calc(64rem / 17); /* Bottom Nav height, growing with text size */ --size-content-max: 480px; /* phone width: on a computer the test site shows a centred phone column */
   --motion-fast: var(--duration-fast) var(--ease-standard);
   --motion-base: var(--duration-base) var(--ease-standard);
   --motion-sheet: var(--duration-sheet) var(--ease-spring);

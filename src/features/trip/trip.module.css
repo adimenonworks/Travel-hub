@@ -11,6 +11,12 @@
   padding: var(--space-default-400) var(--space-gutter);
   background: var(--on-light-surface-primary);
 }
+/* While stuck, the tabs sit just under the status bar; this fills the status bar strip above them too,
+   so the day cards and events never show through behind the clock and battery. */
+.sectionNav::before {
+  content: ''; position: absolute; left: 0; right: 0; bottom: 100%;
+  height: calc(env(safe-area-inset-top) + 1px); background: inherit; pointer-events: none;
+}
 
 /* The tab's content */
 .tabPanel { display: flex; flex-direction: column; gap: var(--space-stack); }
@@ -26,7 +32,7 @@
 }
 .days::-webkit-scrollbar { display: none; }
 
-.itinLayout { display: flex; flex-direction: column; gap: var(--space-default-800); } /* 32 from the day cards to the day's plan */
+.itinLayout { display: flex; flex-direction: column; gap: var(--space-stack); } /* 40 from the day cards to the day's plan */
 
 /* The day's plan */
 .timeline { display: flex; flex-direction: column; gap: var(--space-default-500); }
@@ -45,9 +51,6 @@
 /* A plan's own page */
 
 /* People */
-.inviteActions { display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-default-400); margin-top: var(--space-default-400); }
-.inviteRow { display: flex; gap: var(--space-default-300); align-items: center; align-self: stretch; }
-.inviteUrl { -webkit-user-select: text; user-select: text; -webkit-touch-callout: default; flex: 1; min-width: 0; font-family: var(--font-mono); font-size: var(--size-body-small); min-height: var(--size-control); line-height: var(--size-control); padding: 0 var(--space-default-600); background: var(--on-light-surface-primary); border: 1px solid var(--on-light-border-bold); border-radius: var(--radius-1000); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .dangerZone { display: flex; gap: var(--space-default-400); flex-wrap: wrap; }
 
 /* Photos */
@@ -86,6 +89,8 @@
 .selectable { -webkit-user-select: text; user-select: text; -webkit-touch-callout: default; white-space: pre-wrap; }
 
 /* New trip flow */
+/* "Add end time": a chip lined up with the time field beside it (the field's label row, then the control) */
+.endChip { align-self: end; display: flex; align-items: center; min-height: var(--size-control); }
 .optionGrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(calc(130rem / 17), 1fr)); gap: var(--space-default-300); }
 /* Months (Figma "New trip — 2b. Roughly"): three across, fewer as text grows */
 .monthGrid { grid-template-columns: repeat(auto-fit, minmax(calc(96rem / 17), 1fr)); }
@@ -96,16 +101,26 @@
 .onDarkGhost[class] { color: var(--on-dark-text-primary); }
 
 .flowSection { display: flex; flex-direction: column; gap: var(--space-default-400); padding-top: var(--space-default-300); }
-.tick { display: inline-flex; align-items: center; gap: var(--space-default-100); color: var(--on-light-text-primary); font: var(--type-body-small); }
-.tick svg { color: var(--on-light-icon-brand); }
 
 .addSection { display: flex; flex-direction: column; gap: var(--space-default-300); }
 .ideaImage { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; border-radius: var(--radius-500); }
 
 /* New trip flow: a section title on the emerald screen, the date-mode chips, and the Skip link under the footer button */
 .flowSection { display: flex; flex-direction: column; gap: var(--space-default-400); }
-.flowSectionTitle { margin: 0; font: var(--type-heading-2); letter-spacing: -0.01em; color: var(--on-mid-text-primary); }
+.flowSectionTitle { display: flex; align-items: center; margin: 0; font: var(--type-heading-2); letter-spacing: -0.01em; color: var(--on-mid-text-primary); }
 .flowChips { display: flex; flex-wrap: wrap; gap: var(--space-default-300); }
 .flowSkip { color: var(--on-mid-text-primary); }
 /* Lists on the emerald flow screens are white with grey icon circles (Figma New trip): the two surfaces swap */
-.flowList { --on-light-surface-secondary: var(--interactive-unselected-primary-background); --on-light-surface-primary: var(--on-light-surface-sunken); }
+
+/* Event detail, Location: one grey card with the map (inner corners 24 − 8 = 16), the address, then the buttons */
+.whereCard { display: flex; flex-direction: column; gap: var(--space-default-500); padding: var(--space-default-300); padding-bottom: var(--space-default-500); border-radius: var(--radius-600); background: var(--on-light-surface-secondary); }
+.whereMap { border-radius: var(--radius-500); overflow: hidden; }
+.whereText { display: flex; flex-direction: column; gap: var(--space-default-200); padding: 0 var(--space-default-300); }
+.whereButtons { display: flex; flex-wrap: wrap; gap: var(--space-default-300); padding: 0 var(--space-default-300); }
+.whereButtons > * { flex: 1 1 calc(120rem / 17); }
+
+/* New trip step 4: a city's places drop down under it (indented), each ticked to come along */
+.flowDropdown { display: flex; flex-direction: column; padding-left: var(--space-default-700); }
+.flowFlag { width: calc(20rem / 17); height: calc(20rem / 17); border-radius: var(--radius-1000); object-fit: cover; margin-right: var(--space-default-300); flex: none; }
+.flowFootnote { margin: 0; text-align: center; font: var(--type-body-small); color: var(--on-mid-text-secondary); }
+.flipped { transform: rotate(180deg); }

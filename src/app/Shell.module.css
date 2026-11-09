@@ -1,4 +1,9 @@
 .shell { min-height: 100dvh; }
+/* The status bar strip (clock, battery) stays the page colour, like a native app's bar: content scrolls under it, never through it */
+.shell::before {
+  content: ''; position: fixed; z-index: 90; top: 0; left: 0; right: 0; height: env(safe-area-inset-top);
+  background: var(--on-light-surface-primary); pointer-events: none;
+}
 
 
 .main { min-width: 0; padding-top: env(safe-area-inset-top); overflow-x: clip; /* a screen sliding in never makes the page scroll sideways */ }
@@ -22,3 +27,12 @@
 }
 
 .demo { max-width: calc(var(--size-content-max) + 2 * var(--space-gutter)); margin: var(--space-default-500) auto 0; padding: 0 var(--space-gutter); }
+
+/* Swipe back (SwipeBack.tsx): the current screen slides right with the finger over the previous screen, which sits
+   underneath, a little to the left and dimmed, the way iOS does it. */
+.front { position: relative; z-index: 1; min-height: 100dvh; background: var(--on-light-surface-primary); }
+.dragged { box-shadow: var(--shadow-overlay); will-change: transform; }
+.under { position: fixed; inset: 0; z-index: 0; overflow: hidden; background: var(--on-light-surface-primary); }
+.underPage { position: absolute; top: 0; left: 0; right: 0; will-change: transform; }
+.underDim { position: absolute; inset: 0; background: var(--overlay-scrim); opacity: 0.4; pointer-events: none; }
+.settling { transition: transform 220ms var(--ease-fluid), opacity 220ms var(--ease-fluid); }

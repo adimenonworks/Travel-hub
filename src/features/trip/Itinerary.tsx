@@ -1,10 +1,11 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { Button, DayCard, EmptyState, EventCard, SectionHeader, Timeline, TravelConnector, type EventState } from '../../design/components';
+import { Button, DayCard, EmptyState, EventCard, SectionHeader, SwipeRow, Timeline, TravelConnector, useToast, type EventState } from '../../design/components';
 import { useMe, usePlacesById } from '../../data/hooks';
 import type { Activity } from '../../data/types';
 import { dayWord, formatDay, formatTime, parseDay, today, tripDays } from '../../lib/dates';
-import { haptic } from '../../lib/native';
+import { confirmAction, haptic } from '../../lib/native';
+import { store } from '../../data';
 import { travelEstimate } from '../../lib/trips';
 import { SlideSwap } from '../shared/SlideSwap';
 import { ActivityForm } from './ActivityForm';
@@ -40,6 +41,13 @@ export function Itinerary(ctx: TripCtx) {
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const [adding, setAdding] = useState(false);
+  const [editing, setEditing] = useState<Activity | null>(null);
+  const toast = useToast();
+  const remove = async (a: Activity) => {
+    if (!confirmAction(`Delete "${a.title}"?`)) return;
+    try { await store.deleteSub(trip.id, 'activities', a.id); toast({ icon: 'trash', label: 'Event deleted' }); }
+    catch { toast({ tone: 'error', label: "Couldn't delete. Check your connection" }); }
+  };
 
   // What's on each day (a Stay counts on its check-in and check-out days).
   const byDay = useMemo(() => Object.fromEntries(days.map((d) => [d, eventsOn(activities, d)])), [activities, trip.startDate, trip.endDate]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -92,11 +100,22 @@ export function Itinerary(ctx: TripCtx) {
                   <div key={`${a.id}-${e.part ?? ''}`} className={s.timelineItem}>
                     {trip2 && <TravelConnector label={trip2.label} icon={trip2.icon} />}
                     {showNow && n === nextIndex && nowLine}
-                    <EventCard {...eventCardProps(e, ctx)} state={state} favourite={!!(a.placeId && places[a.placeId]?.starredBy?.includes(me.uid))}
-                      extras={state === 'next' ? [
-                        { icon: 'info', label: `Next · ${startsIn(e)}` },
-                        ...(a.attendeeIds.length > 0 ? [{ icon: 'people' as const, label: a.attendeeIds.includes(me.uid) && a.attendeeIds.length === 1 ? 'You’re going' : `${a.attendeeIds.length} of ${trip.memberIds.length} going` }] : []),
-                      ] : undefined} />
+                    {(() => {
+                      const card = (
+                        <EventCard {...eventCardProps(e, ctx)} state={state} favourite={!!(a.placeId && places[a.placeId]?.starredBy?.includes(me.uid))}
+                          extras={state === 'next' ? [
+                            { icon: 'info', label: `Next · ${startsIn(e)}` },
+                            ...(a.attendeeIds.length > 0 ? [{ icon: 'people' as const, label: a.attendeeIds.includes(me.uid) && a.attendeeIds.length === 1 ? 'You’re going' : `${a.attendeeIds.length} of ${trip.memberIds.length} going` }] : []),
+                          ] : undefined} />
+                      );
+                      // Swipe left (like Mail) for Edit and Delete; only organizers can change the itinerary
+                      return ctx.canManage ? (
+                        <SwipeRow actions={[
+                          { label: 'Edit', icon: 'pencil', tone: 'neutral', onClick: () => setEditing(a) },
+                          { label: 'Delete', icon: 'trash', tone: 'destructive', onClick: () => remove(a) },
+                        ]}>{card}</SwipeRow>
+                      ) : card;
+                    })()}
                   </div>
                 );
               })}
@@ -107,6 +126,7 @@ export function Itinerary(ctx: TripCtx) {
       </section>
 
       <ActivityForm open={adding} trip={trip} date={day} onClose={() => setAdding(false)} />
+      <ActivityForm open={!!editing} trip={trip} date={editing?.date ?? day} activity={editing ?? undefined} onClose={() => setEditing(null)} />
     </div>
   );
 }

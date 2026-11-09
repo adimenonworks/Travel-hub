@@ -6,17 +6,18 @@ import s from './Button.module.css';
 
 /** Figma Button "Variant". Inverse is the deep emerald button for brand surfaces; Neutral the dark grey one; Tertiary is outlined. */
 export type ButtonVariant = 'primary' | 'secondary' | 'destructive' | 'inverse' | 'neutral' | 'tertiary' | 'ghost';
-/** Figma Button "Size": Large is 48px tall (Label, 24px icons), Regular 32px (Label small, 16px icons, still a 44px tap area). */
+/** Figma Button "Size": Regular is 32px (Label, 16px icons, still a 44px tap area) and the default; Large is 48px (Label, 24px icons), the default for full-width (block) buttons. */
 export type ButtonSize = 'regular' | 'large';
 
 type Look = { variant?: ButtonVariant; size?: ButtonSize; block?: boolean; /** Leading icon */ icon?: IconName; /** Trailing icon */ iconEnd?: IconName;
   /** Working on it: the trailing icon becomes a small spinner (e.g. Create my trip, then the screen floods green) */ loading?: boolean };
 
-const cls = ({ variant = 'primary', size = 'large', block }: Look, iconOnly: boolean, extra?: string) =>
-  [s.button, s[variant], s[size], block && s.block, iconOnly && s.iconOnly, extra].filter(Boolean).join(' ');
+const sizeOf = (size: ButtonSize | undefined, block?: boolean): ButtonSize => size ?? (block ? 'large' : 'regular');
+const cls = ({ variant = 'primary', size, block }: Look, iconOnly: boolean, extra?: string) =>
+  [s.button, s[variant], s[sizeOf(size, block)], block && s.block, iconOnly && s.iconOnly, extra].filter(Boolean).join(' ');
 
-function Body({ icon, iconEnd, size = 'large', loading, children }: Look & { children?: ReactNode }) {
-  const px = size === 'regular' ? 16 : 24;
+function Body({ icon, iconEnd, size, block, loading, children }: Look & { children?: ReactNode }) {
+  const px = sizeOf(size, block) === 'regular' ? 16 : 24;
   return (
     <>
       {icon && <Icon name={icon} size={px} className={s.glyph} />}
@@ -29,7 +30,7 @@ function Body({ icon, iconEnd, size = 'large', loading, children }: Look & { chi
 export function Button({ variant, size, block, icon, iconEnd, loading, children, className, type = 'button', ...rest }: ButtonHTMLAttributes<HTMLButtonElement> & Look) {
   return (
     <button type={type} className={cls({ variant, size, block }, !children, className)} aria-busy={loading || undefined} {...rest}>
-      <Body icon={icon} iconEnd={iconEnd} size={size} loading={loading}>{children}</Body>
+      <Body icon={icon} iconEnd={iconEnd} size={size} block={block} loading={loading}>{children}</Body>
     </button>
   );
 }
@@ -44,7 +45,7 @@ export function LinkButton({ to, href, variant, size, block, icon, iconEnd, labe
   /** Leave out for an icon-only link (then `icon` and `label` are required). */ children?: ReactNode;
 } & ({ to: string; href?: never } | { href: string; to?: never })) {
   const c = cls({ variant, size, block }, !children);
-  const body = <Body icon={icon} iconEnd={iconEnd} size={size}>{children}</Body>;
+  const body = <Body icon={icon} iconEnd={iconEnd} size={size} block={block}>{children}</Body>;
   if (href) return <a href={href} target="_blank" rel="noreferrer" className={c} aria-label={label && `${label} (opens in a new tab)`}>{body}<span className="visually-hidden"> (opens in a new tab)</span></a>;
   return <Link to={to!} className={c} aria-label={label} onClick={onClick}>{body}</Link>;
 }
@@ -57,8 +58,9 @@ export type IconButtonTone = 'secondary' | 'ghost' | 'on-brand' | 'brand';
  * Secondary is the neutral grey circle, Ghost is clear; On brand sits on the bright emerald flow screens.
  * `label` is required: it's what screen readers announce.
  */
-export function IconButton({ icon, label, tone, variant, state, className, type = 'button', ...rest }: Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'size'> & {
+export function IconButton({ icon, label, tone, variant, state, small, className, type = 'button', ...rest }: Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'size'> & {
   icon: IconName; label: string; tone?: IconButtonTone;
+  /** Figma Icon button Size=Small: a 32px circle with a 16px icon (still a 44px tap area), e.g. deleting a comment */ small?: boolean;
   /** @deprecated use tone */ variant?: 'secondary' | 'ghost';
   /** @deprecated Figma has one size (40px); ignored */ size?: ButtonSize;
   /** Show the filled icon (e.g. a starred event) */ state?: 'default' | 'filled';
@@ -66,8 +68,8 @@ export function IconButton({ icon, label, tone, variant, state, className, type 
   const t = tone ?? variant ?? 'ghost';
   delete (rest as { size?: unknown }).size;
   return (
-    <button type={type} className={[s.iconButton, s[`icon-${t}`], className].filter(Boolean).join(' ')} aria-label={label} title={label} {...rest}>
-      <Icon name={icon} size={24} state={state} className={s.glyph} />
+    <button type={type} className={[s.iconButton, small && s.iconSmall, s[`icon-${t}`], className].filter(Boolean).join(' ')} aria-label={label} title={label} {...rest}>
+      <Icon name={icon} size={small ? 16 : 24} state={state} className={s.glyph} />
     </button>
   );
 }

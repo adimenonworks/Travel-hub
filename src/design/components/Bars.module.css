@@ -8,7 +8,7 @@
 .titleText { flex: 1; display: flex; flex-direction: column; gap: var(--space-default-400); min-width: 0; } /* 12 between title and subtitle */
 .title { font: var(--type-display); letter-spacing: -0.01em; overflow-wrap: break-word; hyphens: auto; color: var(--on-light-text-brand); } /* Title Large: Display (48) */
 .titleSmall { font: var(--type-heading-1); letter-spacing: -0.01em; } /* Title small: Heading 1 (28) */
-.fit { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.fit { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding-block: 0.12em; margin-block: -0.12em; } /* room for descenders (g, p, y) that the 1.0 line height would clip */
 .fitSmaller { font-size: var(--size-heading-1); } /* same display font, Heading 1 size, when the line still does not fit */
 .subtitle { color: var(--on-light-text-secondary); font: var(--type-label); } /* Label */
 .actions { flex: none; display: flex; align-items: center; gap: var(--space-default-400); }

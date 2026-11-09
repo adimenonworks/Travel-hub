@@ -40,8 +40,10 @@ export function ListItem({ title, meta, trailing, icon, media, size = 'default',
 }
 
 /** Figma "List group": the rounded white container (24px corners, subtle border) that stacks List items. */
-export function ListGroup({ children, label, className }: { children: ReactNode; label?: string; className?: string }) {
-  return <div role="list" aria-label={label} className={[s.group, className].filter(Boolean).join(' ')}>{children}</div>;
+/** Figma "List group". Tone=Dark is the deep green variant for the bright green flow screens (New trip): white text,
+ *  icons on sunken circles. The default (grey) is unchanged everywhere else. */
+export function ListGroup({ children, label, className, tone = 'default' }: { children: ReactNode; label?: string; className?: string; tone?: 'default' | 'dark' }) {
+  return <div role="list" aria-label={label} className={[s.group, tone === 'dark' && `surface-dark ${s.groupDark}`, className].filter(Boolean).join(' ')}>{children}</div>;
 }
 
 /** Figma "Section header": Heading 2 title, optional Body small meta under it, optional Ghost action (e.g. "See all ›"). */
@@ -77,8 +79,12 @@ export type EventState = 'default' | 'next' | 'done';
  * the title (Heading 3), time · place (Body), an optional amount; Journey adds the from → to times; Extras show tags.
  * Next has the brand border; Done fades the content. The whole card opens the event.
  */
-export function EventCard({ title, time, place, amount, icon, layout = 'standard', state = 'default', journey, extras, status, favourite, to, onClick }: {
+export function EventCard({ title, time, timeIcon = 'clock', place, placeIcon = 'pin', amount, icon, layout = 'standard', state = 'default', journey, extras, status, favourite, to, onClick }: {
   title: string; time?: string; place?: string; amount?: string; icon: IconName;
+  /** Figma Event card: the time and the place sit on their own lines, each after a small icon. The place's icon is a pin
+   *  unless it isn't a place (a note's text, a stay's nights): pass null for no icon. */
+  placeIcon?: IconName | null;
+  /** The time line's icon; null when that line isn't a time (a flight's number). */ timeIcon?: IconName | null;
   /** Figma "Favourite": a filled star after the title (the event's Place is starred). */
   favourite?: boolean;
   layout?: 'standard' | 'journey' | 'note'; state?: EventState;
@@ -98,13 +104,8 @@ export function EventCard({ title, time, place, amount, icon, layout = 'standard
         <span className={s.eventHeader}>
           <span className={s.eventText}>
             <span className={s.eventTitleRow}><span className={s.eventTitle}>{title}</span>{favourite && <Icon name="star" size={16} state="filled" />}</span>
-            {(time || place) && (
-              <span className={s.eventMeta}>
-                {time && <span className={s.eventTime}>{time}</span>}
-                {time && place && <span className={s.dot}>·</span>}
-                {place && <span className={s.eventPlace}>{place}</span>}
-              </span>
-            )}
+            {time && <span className={s.eventLine}>{timeIcon && <Icon name={timeIcon} size={16} />}<span className={s.eventTime}>{time}</span></span>}
+            {place && <span className={s.eventLine}>{placeIcon && <Icon name={placeIcon} size={16} />}<span className={s.eventPlace}>{place}</span></span>}
           </span>
           {(amount || status) && (
             <span className={s.eventTrailing}>
