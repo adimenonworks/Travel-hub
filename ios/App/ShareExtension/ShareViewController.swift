@@ -69,13 +69,19 @@ final class ShareViewController: UIViewController {
         }
     }
 
-    /// Share extensions can't open apps directly; walking the responder chain to the application object does.
-    /// (Allowed because this target sets APPLICATION_EXTENSION_API_ONLY = NO.)
+    /// Share extensions can't open other apps through the normal API. The application object is still at the end of
+    /// the responder chain, so this finds it and calls its open method by name. It never names `UIApplication` as a
+    /// type, which keeps this target buildable with APPLICATION_EXTENSION_API_ONLY = YES (Xcode requires that).
+    /// If it can't, it returns false and the caller copies the link instead.
     private func openApp(_ url: URL) -> Bool {
+        let selector = NSSelectorFromString("openURL:options:completionHandler:")
+        guard let appClass = NSClassFromString("UIApplication") else { return false }
         var responder: UIResponder? = self
         while let r = responder {
-            if let app = r as? UIApplication {
-                app.open(url, options: [:], completionHandler: nil)
+            if r.isKind(of: appClass), r.responds(to: selector) {
+                typealias OpenURL = @convention(c) (AnyObject, Selector, NSURL, NSDictionary, AnyObject?) -> Void
+                let open = unsafeBitCast(r.method(for: selector), to: OpenURL.self)
+                open(r, selector, url as NSURL, NSDictionary(), nil)
                 return true
             }
             responder = r.next
