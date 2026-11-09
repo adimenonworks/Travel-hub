@@ -1,7 +1,9 @@
 name: Deploy site
 
+# The website is retired: Rove is an iPhone app now. Merging into Main only saves the code.
+# The site stays up (frozen) because invite links from the app open its join page.
+# To republish it by hand: GitHub → Actions → Deploy site → Run workflow.
 on:
-  push:
   workflow_dispatch:
 
 permissions:

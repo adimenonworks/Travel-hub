@@ -2,15 +2,15 @@
 
 A collaborative vacation planner. People create trips, invite others with a link, and plan together: day-by-day itinerary, ideas board with voting, saved places (Collections), weather/news/map, and a home dashboard with a visited-places map.
 
-- **Platform:** an **iPhone app** (Capacitor: the built web app inside a native iOS shell, `ios/`, bundle ID `com.adimenon.rove`). The website is deprecated: it still deploys and works as a test link, but nothing is designed or checked for desktop any more. Android later.
-- **Test link (old live site):** https://adimenonworks.github.io/Travel-hub/
+- **Platform:** an **iPhone app** (Capacitor: the built web app inside a native iOS shell, `ios/`, bundle ID `com.adimenon.rove`). The website is retired: it no longer deploys (the owner asked for the app only) and stays up frozen at the 9 Nov 2026 version only because invite links from the app open its join page (`PUBLIC_SITE`); later, a Universal Link should open the app instead. Nothing is designed or checked for desktop. Android later.
+- **Old website (frozen, used for invite links):** https://adimenonworks.github.io/Travel-hub/
 - **Owner:** learning to build apps. Explain what you change and why in plain language, and add a one-line explanation in brackets for any jargon.
 
 ## Publishing
 
-- Any push to the repo's **default branch** builds and deploys automatically (`.github/workflows/deploy.yml`, about 1 minute). Other branches build nothing.
+- Merging into the repo's **default branch** (`Main`) saves the code; nothing deploys. The app is built from Main on the owner's Mac (`npm run ios`, then run from Xcode). The website deploy (`.github/workflows/deploy.yml`) runs only by hand (Actions → Deploy site → Run workflow); don't run it unless the owner asks, or a change to the invite/join page must reach people who don't have the app.
 - **Always keep a backup of unpushed work.** GitHub access has failed before (account suspended). Whenever there are commits not yet on GitHub, keep the backup page up to date after every commit batch: a `git bundle` of everything since the last commit that is on GitHub (base64 text, since binaries aren't accepted) plus a `git format-patch` text file, published as a private Artifact with restore steps (the current one: https://claude.ai/artifact/EeFup9UiZnWWesHfYeU2zZ; update it in place). Verify the bundle restores to the same HEAD before saying it's backed up.
-- A change is only live once it's on the default branch. **Publish every change by default**: once the build and checks pass and nothing needs the owner's attention (a rules re-publish, a decision, a known problem), open a PR, merge it and confirm the workflow run is green, without asking first. If something does need their attention, ask before publishing.
+- A change is only done once it's on the default branch. **Merge every change by default**: once the build and checks pass and nothing needs the owner's attention (a rules re-publish, a decision, a known problem), open a PR and merge it, without asking first; then tell the owner to pull Main and rebuild the app in Xcode to see it on the phone. If something does need their attention, ask before publishing.
 - Optional second host: Firebase Hosting at https://travel-hub-a1aa2.web.app runs only if the `FIREBASE_SERVICE_ACCOUNT` repo secret exists (see README).
 
 ## Stack
