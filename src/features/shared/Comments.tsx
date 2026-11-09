@@ -59,7 +59,7 @@ export function Comments({ tripId, targetId, comments, profiles }: { tripId: str
           onFocus={() => setTyping(true)} onBlur={() => setTyping(false)}
           onChange={(e) => setText(e.target.value)}
           onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); send(); } }} />
-        <IconButton icon="chat" tone="brand" label="Send comment" onClick={send} disabled={!text.trim()} />
+        <IconButton icon="send" tone="brand" label="Send comment" onClick={send} disabled={!text.trim()} />
       </div>
     </div>
   );

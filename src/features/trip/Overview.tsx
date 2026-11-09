@@ -11,6 +11,7 @@ import { nextEvent } from '../../lib/trips';
 import { isInApp, recordView, useRecentViews, type ViewKind } from '../../lib/recent';
 import { eventCardProps } from './events';
 import type { TripCtx } from './TripPage';
+import { unreadCount, unreadTag, useReads } from '../../lib/reads';
 import s from './trip.module.css';
 
 const KIND_ICON: Record<ViewKind, IconName> = { PDF: 'doc', Email: 'mail', Link: 'link', Booking: 'ticket', Place: 'pin' };
@@ -28,6 +29,7 @@ export function Overview(ctx: TripCtx) {
   const docs = activities.reduce((n, a) => n + a.links.length, 0);
   const recent = useRecentViews(trip.id);
   const me = useMe();
+  const reads = useReads(me.uid);
   const home = useProfile(me.uid)?.home ?? null;
   // Good to know is about where you're going: your home country (a flight out of Melbourne) is left out, unless the whole trip is at home.
   const homeCode = home ? countryCodeOf(home) : null;
@@ -42,7 +44,7 @@ export function Overview(ctx: TripCtx) {
 
       <PageSection title="Next stop" action={<LinkButton to={`${base}/itinerary`} variant="ghost" size="regular" iconEnd="chevron-right">Itinerary</LinkButton>}>
         {next
-          ? <EventCard {...eventCardProps(next, ctx, true)} state="next" />
+          ? <EventCard {...eventCardProps(next, ctx, true)} state="next" extras={unreadTag(unreadCount(reads, me.uid, next.id, ctx.comments))} />
           : <ListGroup><ListItem icon="calendar" title="Nothing planned yet" meta="Add events to the itinerary and the next one shows here." to={`${base}/itinerary`} /></ListGroup>}
       </PageSection>
 

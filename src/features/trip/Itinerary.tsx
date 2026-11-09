@@ -5,6 +5,7 @@ import { useMe, usePlacesById } from '../../data/hooks';
 import type { Activity } from '../../data/types';
 import { dayWord, formatDay, formatTime, parseDay, today, tripDays } from '../../lib/dates';
 import { confirmAction, haptic } from '../../lib/native';
+import { unreadCount, unreadTag, useReads } from '../../lib/reads';
 import { store } from '../../data';
 import { travelEstimate } from '../../lib/trips';
 import { SlideSwap } from '../shared/SlideSwap';
@@ -55,6 +56,7 @@ export function Itinerary(ctx: TripCtx) {
   const word = (d: string) => dayWord(d, trip.startDate, t);
   const list: DayEntry[] = byDay[day] ?? [];
   const me = useMe();
+  const reads = useReads(me.uid);
   const places = usePlacesById(activities.flatMap((x) => (x.placeId ? [x.placeId] : [])));
   const nowLine = <Timeline time={formatTime(now)} />;
   const startsIn = (e: DayEntry) => {
@@ -103,10 +105,13 @@ export function Itinerary(ctx: TripCtx) {
                     {(() => {
                       const card = (
                         <EventCard {...eventCardProps(e, ctx)} state={state} favourite={!!(a.placeId && places[a.placeId]?.starredBy?.includes(me.uid))}
-                          extras={state === 'next' ? [
-                            { icon: 'info', label: `Next · ${startsIn(e)}` },
-                            ...(a.attendeeIds.length > 0 ? [{ icon: 'people' as const, label: a.attendeeIds.includes(me.uid) && a.attendeeIds.length === 1 ? 'You’re going' : `${a.attendeeIds.length} of ${trip.memberIds.length} going` }] : []),
-                          ] : undefined} />
+                          extras={[
+                            ...(state === 'next' ? [
+                              { icon: 'info' as const, label: `Next · ${startsIn(e)}` },
+                              ...(a.attendeeIds.length > 0 ? [{ icon: 'people' as const, label: a.attendeeIds.includes(me.uid) && a.attendeeIds.length === 1 ? 'You’re going' : `${a.attendeeIds.length} of ${trip.memberIds.length} going` }] : []),
+                            ] : []),
+                            ...unreadTag(unreadCount(reads, me.uid, a.id, ctx.comments)),
+                          ]} />
                       );
                       // Swipe left (like Mail) for Edit and Delete; only organizers can change the itinerary
                       return ctx.canManage ? (

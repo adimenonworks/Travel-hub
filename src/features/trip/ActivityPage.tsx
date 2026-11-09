@@ -15,6 +15,7 @@ import { MapView } from '../shared/Map';
 import { Comments } from '../shared/Comments';
 import { haptic, confirmAction } from '../../lib/native';
 import { recordView } from '../../lib/recent';
+import { markRead } from '../../lib/reads';
 import { flightTag, updatedAgo, useFlightStatus } from '../../lib/api';
 import { eventType } from '../../lib/categories';
 import { getMapsApp, mapsAppLabel } from '../../lib/prefs';
@@ -52,6 +53,9 @@ export function ActivityPage(ctx: TripCtx) {
   const live = useFlightStatus(a && eventType(a.category) === 'flight' ? a : undefined);
   const tag = a && eventType(a.category) === 'flight' ? flightTag(a, live) : undefined;
   useEffect(() => { if (tag && tag.tone !== 'success' && tag.label !== 'Check-in open') haptic('warning'); }, [tag?.label]); // eslint-disable-line react-hooks/exhaustive-deps
+  // The event's chat counts as read while its page is open (and again as new messages arrive)
+  const chatSize = ctx.comments.filter((c) => c.targetId === activityId).length;
+  useEffect(() => { if (activityId) markRead(me.uid, activityId); }, [activityId, chatSize, me.uid]);
   // Recently viewed: a booking you open (any event but a note)
   useEffect(() => {
     if (a && eventType(a.category) !== 'note') recordView(trip.id, { url: `/trip/${trip.id}/plan/${a.id}`, label: a.title, kind: 'Booking' });

@@ -9,6 +9,8 @@ import { BOOKING_GROUPS, eventType } from '../../lib/categories';
 import { byTime } from './Itinerary';
 import { eventCardProps } from './events';
 import type { TripCtx } from './TripPage';
+import { unreadCount, unreadTag, useReads } from '../../lib/reads';
+import { useMe } from '../../data/hooks';
 import s from './trip.module.css';
 
 /**
@@ -19,6 +21,8 @@ import s from './trip.module.css';
 export function Bookings(ctx: TripCtx) {
   const { group = '' } = useParams();
   const { trip, activities } = ctx;
+  const me = useMe();
+  const reads = useReads(me.uid);
   const back = { to: `/trip/${trip.id}`, label: 'Overview' };
 
   if (group === 'documents') {
@@ -54,7 +58,7 @@ export function Bookings(ctx: TripCtx) {
       {list.length === 0 ? <EmptyState illustration="calendar" title={`No ${g.many} yet`} message={`Add an event to the itinerary and choose its type, and it shows here.`} /> : days.map((d) => (
         <PageSection key={d} title={formatDay(d)}>
           <div className={s.eventList}>
-            {list.filter((a) => a.date === d).map((a) => <EventCard key={a.id} {...eventCardProps(a, ctx)} />)}
+            {list.filter((a) => a.date === d).map((a) => <EventCard key={a.id} {...eventCardProps(a, ctx)} extras={unreadTag(unreadCount(reads, me.uid, a.id, ctx.comments))} />)}
           </div>
         </PageSection>
       ))}
