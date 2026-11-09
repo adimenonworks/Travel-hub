@@ -4,6 +4,7 @@ import { BottomNav, Notification, ToastProvider, type NavTab } from '../design/c
 import { store } from '../data';
 import { screenKey, useScreenTransition } from './navigation';
 import { SwipeBack } from './SwipeBack';
+import { ChatAlerts } from './ChatAlerts';
 import { NewTrip } from '../features/trip/NewTrip';
 import { SaveSheet, type SaveRequest } from '../features/saves/SaveSheet';
 import { onSharedLink } from '../lib/native';
@@ -40,6 +41,7 @@ export function Shell({ children }: { children: ReactNode }) {
     <NewTripContext.Provider value={newTrip}>
       <SaveContext.Provider value={setSaving}>
       <ToastProvider>
+      <ChatAlerts />
       <div className={s.shell}>
         <SwipeBack routes={<div className={[s.main, showNav && s.withNav].filter(Boolean).join(' ')}>{children}</div>}>
           <main id="main" className={[s.main, showNav && s.withNav].filter(Boolean).join(' ')}>
