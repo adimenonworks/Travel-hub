@@ -19,7 +19,10 @@ const OFFICIAL_ENTRY: Record<string, string> = {
   in: 'https://indianvisaonline.gov.in/',
   it: 'https://vistoperitalia.esteri.it/',
   jp: 'https://www.mofa.go.jp/j_info/visit/visa/index.html',
+  kh: 'https://www.evisa.gov.kh/',
   kr: 'https://www.k-eta.go.kr/',
+  la: 'https://laoevisa.gov.la/',
+  lk: 'https://eta.gov.lk/',
   my: 'https://www.imi.gov.my/',
   mx: 'https://www.inm.gob.mx/',
   nl: 'https://www.netherlandsworldwide.nl/',
@@ -55,8 +58,9 @@ export function entryRules(code: string, home?: string): { url: string; official
 
 /** Each country's currency (ISO 4217), for the Country sheet's "Currency" row. */
 const CURRENCY: Record<string, string> = {
-  ...Object.fromEntries(['at', 'be', 'cy', 'de', 'ee', 'es', 'fi', 'fr', 'gr', 'hr', 'ie', 'it', 'lt', 'lu', 'lv', 'mt', 'nl', 'pt', 'si', 'sk', 'mc', 'me', 'ad', 'sm', 'va'].map((c) => [c, 'EUR'])),
-  ae: 'AED', ar: 'ARS', au: 'AUD', bg: 'BGN', br: 'BRL', ca: 'CAD', ch: 'CHF', cl: 'CLP', cn: 'CNY', co: 'COP', cr: 'CRC', cz: 'CZK',
+  // Eurozone, plus the micro-states and Montenegro that use the euro. Bulgaria joined on 1 Jan 2026.
+  ...Object.fromEntries(['at', 'be', 'bg', 'cy', 'de', 'ee', 'es', 'fi', 'fr', 'gr', 'hr', 'ie', 'it', 'lt', 'lu', 'lv', 'mt', 'nl', 'pt', 'si', 'sk', 'mc', 'me', 'ad', 'sm', 'va'].map((c) => [c, 'EUR'])),
+  ae: 'AED', ar: 'ARS', au: 'AUD', br: 'BRL', ca: 'CAD', ch: 'CHF', cl: 'CLP', cn: 'CNY', co: 'COP', cr: 'CRC', cz: 'CZK',
   dk: 'DKK', eg: 'EGP', fj: 'FJD', gb: 'GBP', hk: 'HKD', hu: 'HUF', id: 'IDR', il: 'ILS', in: 'INR', is: 'ISK', jo: 'JOD', jp: 'JPY',
   ke: 'KES', kh: 'KHR', kr: 'KRW', la: 'LAK', lk: 'LKR', ma: 'MAD', mv: 'MVR', mx: 'MXN', my: 'MYR', no: 'NOK', np: 'NPR', nz: 'NZD',
   pe: 'PEN', ph: 'PHP', pl: 'PLN', qa: 'QAR', ro: 'RON', rs: 'RSD', sa: 'SAR', se: 'SEK', sg: 'SGD', th: 'THB', tr: 'TRY', tw: 'TWD',
@@ -73,13 +77,18 @@ export function currencyLabel(code: string): string | undefined {
 }
 
 const offsets = new Map<string, Promise<number | null>>();
-/** A place's offset from UTC in seconds, from Open-Meteo (free, no key; it works the time zone out from the spot). */
+/**
+ * A place's offset from UTC in seconds, from Open-Meteo (free, no key; it works the time zone out from the spot).
+ * Successful lookups are cached; failed ones are dropped so the next call retries.
+ */
 export function utcOffset(lat: number, lng: number): Promise<number | null> {
   const key = `${lat.toFixed(2)},${lng.toFixed(2)}`;
   if (!offsets.has(key)) {
     offsets.set(key, fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&timezone=auto&forecast_days=1&current=temperature_2m`)
-      .then((r) => r.json()).then((j: { utc_offset_seconds?: number }) => (typeof j.utc_offset_seconds === 'number' ? j.utc_offset_seconds : null))
-      .catch(() => null));
+      .then((r) => r.json())
+      .then((j: { utc_offset_seconds?: number }) => (typeof j.utc_offset_seconds === 'number' ? j.utc_offset_seconds : null))
+      .catch(() => null)
+      .then((v) => { if (v === null) offsets.delete(key); return v; }));
   }
   return offsets.get(key)!;
 }
