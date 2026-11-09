@@ -1,0 +1,23 @@
+/* Figma "Swipe actions": the row slides left over its actions. Actions are full-height rounded blocks with the card's
+   corner radius, 8 apart, each an icon over a Label small. */
+.row { position: relative; }
+.actions {
+  position: absolute; top: 0; right: 0; bottom: 0;
+  display: flex; gap: var(--space-default-300); padding-left: var(--space-default-300);
+}
+.action {
+  flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--space-default-200);
+  min-width: var(--size-tap); padding: var(--space-default-300); border: 0; border-radius: var(--radius-600);
+  font: var(--type-label-small); cursor: pointer;
+  transition: background var(--motion-fast), transform var(--motion-release);
+}
+.action:active { transform: scale(0.96); transition: transform var(--motion-press); }
+.neutral { background: var(--interactive-button-secondary-background); color: var(--interactive-button-secondary-text); }
+.neutral:active { background: var(--interactive-button-secondary-background-pressed); }
+.destructive { background: var(--interactive-button-destructive-background); color: var(--interactive-button-destructive-text); }
+.destructive:active { background: var(--interactive-button-destructive-background-pressed); }
+
+/* Up and down still scroll the page; sideways belongs to the row */
+.front { position: relative; touch-action: pan-y; transition: transform var(--duration-base) var(--ease-fluid); }
+.dragging { transition: none; }
+@media (prefers-reduced-motion: reduce) { .front { transition-duration: 1ms; } }

@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { BottomNav, Notification, ToastProvider, type NavTab } from '../design/components';
 import { store } from '../data';
 import { screenKey, useScreenTransition } from './navigation';
+import { SwipeBack } from './SwipeBack';
 import { NewTrip } from '../features/trip/NewTrip';
 import { SaveSheet, type SaveRequest } from '../features/saves/SaveSheet';
 import { onSharedLink } from '../lib/native';
@@ -40,14 +41,16 @@ export function Shell({ children }: { children: ReactNode }) {
       <SaveContext.Provider value={setSaving}>
       <ToastProvider>
       <div className={s.shell}>
-        <main id="main" className={[s.main, showNav && s.withNav].filter(Boolean).join(' ')}>
-          {store.mode === 'demo' && (
-            <div className={s.demo}>
-              <Notification state="warning">Demo mode: data is saved only in this browser. Connect Firebase to share trips with friends (see README).</Notification>
-            </div>
-          )}
-          <div key={screenKey(pathname)} className={transition === 'none' ? undefined : s[transition]}>{children}</div>
-        </main>
+        <SwipeBack routes={<div className={[s.main, showNav && s.withNav].filter(Boolean).join(' ')}>{children}</div>}>
+          <main id="main" className={[s.main, showNav && s.withNav].filter(Boolean).join(' ')}>
+            {store.mode === 'demo' && (
+              <div className={s.demo}>
+                <Notification state="warning">Demo mode: data is saved only in this browser. Connect Firebase to share trips with friends (see README).</Notification>
+              </div>
+            )}
+            <div key={screenKey(pathname)} className={transition === 'none' ? undefined : s[transition]}>{children}</div>
+          </main>
+        </SwipeBack>
         {showNav && <BottomNav tabs={tabs} />}
         <NewTrip open={creating} onClose={() => setCreating(false)} onOpenTrip={(id) => navigate(`/trip/${id}`)} />
         <SaveSheet request={saving} onClose={() => setSaving(null)} />

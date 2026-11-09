@@ -14,3 +14,4 @@ export { ListItem, ListGroup, SectionHeader, PageSection, EventCard, TravelConne
 export { ToastProvider, useToast } from './Toast';
 export { CountryModal } from './CountryModal';
 export { FlowScreen, CelebrationScreen, Calendar } from './Flow';
+export { SwipeRow, type SwipeAction } from './SwipeRow';

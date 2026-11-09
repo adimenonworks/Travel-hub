@@ -1,10 +1,10 @@
-import { useEffect, useState } from 'react';
+import { Fragment, useEffect, useState } from 'react';
 import { Button, Calendar, CelebrationScreen, Chip, FlowScreen, Icon, Illustration, ListGroup, ListItem, OptionCard, SearchField, useToast } from '../../design/components';
 import { useCountries, placeCounts } from '../saves/Collections';
 import { store } from '../../data';
 import type { Place, Trip } from '../../data/types';
 import { useMe, usePlaces } from '../../data/hooks';
-import { cityOf, eventCategoryOf, groupBy } from '../../lib/places';
+import { cityOf, eventCategoryOf, groupBy, placeCategory } from '../../lib/places';
 import { addDays, daysBetween, formatDay, today } from '../../lib/dates';
 import { countryCodeOf, countryName, flagUrl } from '../../lib/countries';
 import { searchCities } from '../../lib/geocode';
@@ -33,26 +33,29 @@ export function NewTrip({ open, onClose, onOpenTrip }: { open: boolean; onClose:
   const [dateMode, setDateMode] = useState<'exact' | 'month'>('exact');
   const [busy, setBusy] = useState(false);
   const [created, setCreated] = useState<{ id: string; name: string; start: string; brought?: number } | null>(null);
-  /** Cities left out on step 4 (every matching city comes along unless unticked). */
-  const [leftBehind, setLeftBehind] = useState<string[]>([]);
+  /** Step 4: the saved places chosen to come along (none until you pick), and the city whose places are showing. */
+  const [picked, setPicked] = useState<string[]>([]);
+  const [openGroup, setOpenGroup] = useState<string | null>(null);
   const toast = useToast();
-  // Your saved Places in the destination's country, by city: what step 4 offers.
+  // Step 4 offers your saved Places by country (the trip's country first, then the most saved), then by city,
+  // with each country's links and notes as one more group.
   const places = usePlaces() ?? [];
   const me = useMe();
   const code = countryCodeOf(place);
-  const matching = code ? places.filter((p) => p.ownerId === me.uid && p.countryCode === code) : [];
-  // Places by city, then the country's Links & notes as one more row
-  const cities = [
-    ...groupBy(matching.filter((p) => (p.type ?? 'place') === 'place'), cityOf).sort((a, b) => b[1].length - a[1].length),
-    ...(matching.some((p) => (p.type ?? 'place') !== 'place') ? [['Links & notes', matching.filter((p) => (p.type ?? 'place') !== 'place')] as [string, typeof matching]] : []),
-  ];
-  const groupOf = (p: (typeof matching)[number]) => ((p.type ?? 'place') === 'place' ? cityOf(p) : 'Links & notes');
+  const mine = places.filter((p) => p.ownerId === me.uid && p.countryCode);
+  const groupOf = (p: (typeof mine)[number]) => ((p.type ?? 'place') === 'place' ? cityOf(p) : 'Links & notes');
+  const byCountry = groupBy(mine, (p) => p.countryCode!)
+    .sort((a, b) => (a[0] === code ? -1 : b[0] === code ? 1 : b[1].length - a[1].length))
+    .map(([c, list]) => ({
+      code: c, list,
+      groups: groupBy(list, groupOf).sort((a, b) => (a[0] === 'Links & notes' ? 1 : b[0] === 'Links & notes' ? -1 : b[1].length - a[1].length)),
+    }));
   const savedCountries = (useCountries() ?? []).filter((c) => c.code);
-  const steps = cities.length ? 4 : 3;
+  const steps = byCountry.length ? 4 : 3;
 
   useEffect(() => {
     if (!open) return;
-    setStep(1); setPlace(null); setStart(''); setEnd(''); setCompany(null); setBusy(false); setCreated(null); setLeftBehind([]); setDateMode('exact');
+    setStep(1); setPlace(null); setStart(''); setEnd(''); setCompany(null); setBusy(false); setCreated(null); setPicked([]); setOpenGroup(null); setDateMode('exact');
   }, [open]);
   if (!open) return null;
 
@@ -68,7 +71,7 @@ export function NewTrip({ open, onClose, onOpenTrip }: { open: boolean; onClose:
         coverPhoto: null, coverPosition: null,
       });
       // "Bring your saves?": each chosen Place becomes an Idea that points at it.
-      const bring = bringSaves ? matching.filter((p) => !leftBehind.includes(groupOf(p))) : [];
+      const bring = bringSaves ? mine.filter((p) => picked.includes(p.id)) : [];
       await Promise.all(bring.map((p) => store.addSub(id, 'ideas', { title: p.name, category: eventCategoryOf(p.category), notes: '', links: [], votes: {}, status: 'open', placeId: p.id })));
       haptic('success');
       setCreated({ id, name: city, start, brought: bring.length });
@@ -99,8 +102,8 @@ export function NewTrip({ open, onClose, onOpenTrip }: { open: boolean; onClose:
         subtitle={[created.brought ? `Trip created. ${created.brought} idea${created.brought === 1 ? '' : 's'} came with you.` : 'Trip created.',
           company === 'others' ? 'Share the invite link so everyone can plan with you.' : 'Add your plans, ideas and bookings as they come.'].join(' ')}
         number={until} numberLabel={until === 1 ? 'day to go' : 'days to go'}
-        primary={<Button iconEnd="chevron-right" onClick={() => { onClose(); onOpenTrip(created.id); }}>Open my trip</Button>}
-        secondary={<Button variant="ghost" className={s.onDarkGhost} onClick={() => invite(created.id, created.name)}>Share with friends</Button>} />
+        primary={<Button size="large" iconEnd="chevron-right" onClick={() => { onClose(); onOpenTrip(created.id); }}>Open my trip</Button>}
+        secondary={<Button size="large" variant="ghost" className={s.onDarkGhost} onClick={() => invite(created.id, created.name)}>Share with friends</Button>} />
     );
   }
 
@@ -112,23 +115,22 @@ export function NewTrip({ open, onClose, onOpenTrip }: { open: boolean; onClose:
   if (step === 1)
     return (
       <FlowScreen step={1} of={steps} stepKey={1} title="Where to next?" subtitle="Pick a place you’ve saved, or search anywhere." onClose={onClose}
-        footer={<Button variant="inverse" iconEnd="chevron-right" disabled={!place} onClick={() => next(2)}>{place ? `Plan ${city}` : 'Pick a place'}</Button>}>
-        <DestinationSearch value={place} onPick={(p) => { haptic('selection'); setPlace(p); setLeftBehind([]); }} />
+        footer={<Button size="large" variant="inverse" iconEnd="chevron-right" disabled={!place} onClick={() => next(2)}>{place ? `Plan ${city}` : 'Pick a place'}</Button>}>
+        <DestinationSearch value={place} onPick={(p) => { haptic('selection'); setPlace(p); }} />
         {savedCountries.length > 0 && (
           <section className={s.flowSection} aria-labelledby="from-saved">
             <h2 className={s.flowSectionTitle} id="from-saved">From your saved places</h2>
-            <div className={s.flowList}>
-            <ListGroup label="From your saved places">
+                        <ListGroup tone="dark" label="From your saved places">
               {savedCountries.map((c) => {
                 const at = c.places.find((p) => p.lat != null && p.lng != null);
                 const picked = countryCodeOf(place) === c.code && place?.name === c.name;
                 return (
                   <ListItem key={c.code} round media={<img src={c.flag} alt="" className={s.flagThumb} />} title={c.name} meta={placeCounts(c.places)}
                     trailing={picked ? 'Selected' : undefined} label={`${c.name}${picked ? ', selected' : ''}`}
-                    onClick={() => { haptic('selection'); setPlace({ name: c.name, lat: at?.lat ?? 0, lng: at?.lng ?? 0, country: c.name, countryCode: c.code }); setLeftBehind([]); }} />
+                    onClick={() => { haptic('selection'); setPlace({ name: c.name, lat: at?.lat ?? 0, lng: at?.lng ?? 0, country: c.name, countryCode: c.code }); }} />
                 );
               })}
-            </ListGroup></div>
+            </ListGroup>
           </section>
         )}
       </FlowScreen>
@@ -144,7 +146,7 @@ export function NewTrip({ open, onClose, onOpenTrip }: { open: boolean; onClose:
   if (step === 2)
     return (
       <FlowScreen step={2} of={steps} stepKey={2} title="When are you going?" subtitle="Roughly is fine. You can change it later." onClose={onClose}
-        footer={<Button variant="inverse" iconEnd="chevron-right" disabled={!start || !end} onClick={() => next(3)}>
+        footer={<Button size="large" variant="inverse" iconEnd="chevron-right" disabled={!start || !end} onClick={() => next(3)}>
           {!start || !end ? (dateMode === 'month' ? 'Pick a month' : 'Pick your dates') : dateMode === 'month' ? `Continue · ${monthLabel(start.slice(0, 7), { month: 'long' })}` : `Continue · ${nDays} day${nDays === 1 ? '' : 's'}`}
         </Button>}>
         <div className={s.flowChips} role="group" aria-label="How sure are you?">
@@ -186,7 +188,7 @@ export function NewTrip({ open, onClose, onOpenTrip }: { open: boolean; onClose:
     return (
       <FlowScreen step={3} of={steps} stepKey={3} title="Who’s coming?" subtitle="Everyone you add can see and edit the plan." onClose={onClose}
         footer={<>
-          <Button variant="inverse" iconEnd="chevron-right" loading={busy && steps !== 4} disabled={busy} onClick={create3}>{steps === 4 ? 'Continue' : createLabel}</Button>
+          <Button size="large" variant="inverse" iconEnd="chevron-right" loading={busy && steps !== 4} disabled={busy} onClick={create3}>{steps === 4 ? 'Continue' : createLabel}</Button>
           <Button variant="ghost" className={s.flowSkip} disabled={busy} onClick={() => { setCompany('me'); create3(); }}>Skip for now</Button>
         </>}>
         <div className={s.optionGrid}>
@@ -194,40 +196,62 @@ export function NewTrip({ open, onClose, onOpenTrip }: { open: boolean; onClose:
           <OptionCard icon="people" label="With others" selected={company === 'others'} onClick={() => { haptic('light'); setCompany('others'); }} />
         </div>
         {company === 'others' && (
-          <div className={s.flowList}>
-          <ListGroup label="Invited">
+                    <ListGroup tone="dark" label="Invited">
             <ListItem icon="person" title="You" meta="Owner" />
             <ListItem icon="link" title="Share an invite link" meta="Next, once your trip is made. Anyone with it can join for 14 days." />
-          </ListGroup></div>
+          </ListGroup>
         )}
       </FlowScreen>
     );
 
-  // Step 4: "Bring your saves?" — the cities you've saved Places in, in this country; untick one to leave it out.
-  const kept = matching.filter((p) => !leftBehind.includes(groupOf(p))).length;
+  // Step 4 (Figma "New trip — 4. Bring your saves?"): nothing comes along until you pick it. Tap a city to open it and
+  // tick places, or "All" for the whole city. Skipping is fine: Ideas → Add idea → From saved brings them in later.
+  const toggle = (ids: string[], on: boolean) => setPicked((x) => (on ? [...new Set([...x, ...ids])] : x.filter((y) => !ids.includes(y))));
   return (
-    <FlowScreen step={4} of={4} stepKey={4} title={`Bring your ${countryName(code!)} saves?`} subtitle="They’ll wait in Ideas until you add them to a day." onClose={onClose}
+    <FlowScreen step={4} of={4} stepKey={4} title="Bring your saves?" subtitle="Pick places you've saved to add to this trip's Ideas." onClose={onClose}
       footer={<>
-        <Button variant="inverse" iconEnd="chevron-right" loading={busy} disabled={busy} onClick={() => create()}>{createLabel}</Button>
+        <Button size="large" variant="inverse" iconEnd="chevron-right" loading={busy} disabled={busy} onClick={() => create()}>
+          {picked.length ? `${createLabel} · ${picked.length} save${picked.length === 1 ? '' : 's'}` : createLabel}
+        </Button>
         <Button variant="ghost" className={s.flowSkip} disabled={busy} onClick={() => create(false)}>Skip for now</Button>
+        <p className={s.flowFootnote}>You can bring saves in any time from your trip's Ideas.</p>
       </>}>
-      <div className={s.flowList}>
-      <ListGroup label="Saved places by city">
-        {cities.map(([c, list]) => {
-          const on = !leftBehind.includes(c);
-          return (
-            <ListItem key={c} icon={c === 'Links & notes' ? 'link' : 'pin'} title={c}
-              meta={list.slice(0, 3).map((p) => p.name).join(', ') + (list.length > 3 ? ` +${list.length - 3}` : '')}
-              trailing={<span className={s.tick}>{list.length}{on && <Icon name="check" size={16} />}</span>}
-              onClick={() => { haptic('selection'); setLeftBehind((x) => (on ? [...x, c] : x.filter((y) => y !== c))); }}
-              label={`${c}, ${list.length} saved places, ${on ? 'coming with you' : 'left out'}`} />
-          );
-        })}
-      </ListGroup></div>
-      <div className={s.flowSummary}>
-        <span className={s.flowSummaryTitle}>{kept} of {matching.length} selected</span>
-        <span className={s.flowSummaryMeta}>Untick a city to leave it behind.</span>
-      </div>
+      {byCountry.map((c) => (
+        <section key={c.code} className={s.flowSection} aria-labelledby={`saves-${c.code}`}>
+          <h2 className={s.flowSectionTitle} id={`saves-${c.code}`}>
+            {flagUrl(c.code) && <img src={flagUrl(c.code)} alt="" className={s.flowFlag} />}{countryName(c.code)}
+          </h2>
+          <ListGroup tone="dark" label={`Saved places in ${countryName(c.code)}`}>
+            {c.groups.map(([g, list]) => {
+              const key = `${c.code}/${g}`, open = openGroup === key;
+              const ids = list.map((p) => p.id), n = ids.filter((id) => picked.includes(id)).length;
+              return (
+                <Fragment key={key}>
+                  <ListItem icon={g === 'Links & notes' ? 'link' : 'pin'} title={g}
+                    meta={n ? `${n} of ${list.length} chosen` : `${list.length} saved`}
+                    trailing={<Icon name="chevron-down" size={16} className={open ? s.flipped : undefined} />}
+                    onClick={() => { haptic('selection'); setOpenGroup(open ? null : key); }}
+                    label={`${g}, ${list.length} saved, ${n} chosen. ${open ? 'Hide' : 'Show'} places`} />
+                  {open && (
+                    <div className={s.flowDropdown}>
+                      <ListItem size="compact" icon={n === list.length ? 'check' : 'plus'} title={`All of ${g === 'Links & notes' ? 'these' : g}`}
+                        onClick={() => { haptic('light'); toggle(ids, n !== list.length); }} label={`All of ${g}, ${n === list.length ? 'chosen' : 'not chosen'}`} />
+                      {list.map((p) => {
+                        const on = picked.includes(p.id);
+                        return (
+                          <ListItem key={p.id} size="compact" icon={on ? 'check' : placeCategory(p.category).icon} title={p.name}
+                            trailing={on ? 'Chosen' : undefined}
+                            onClick={() => { haptic('light'); toggle([p.id], !on); }} label={`${p.name}, ${on ? 'chosen' : 'not chosen'}`} />
+                        );
+                      })}
+                    </div>
+                  )}
+                </Fragment>
+              );
+            })}
+          </ListGroup>
+        </section>
+      ))}
     </FlowScreen>
   );
 }
@@ -251,8 +275,7 @@ function DestinationSearch({ value, onPick }: { value: Place | null; onPick: (p:
       <SearchField label="Search a country or city" placeholder="Search a country or city" value={text} onChange={(e) => setText(e.target.value)} autoFocus />
       {error && <p className={s.flowSummaryMeta} role="alert">City search isn’t working right now. Check your connection and try again.</p>}
       {shown.length > 0 && (
-        <div className={s.flowList}>
-        <ListGroup label="Places">
+                <ListGroup tone="dark" label="Places">
           {shown.map((p) => {
             const code = countryCodeOf(p);
             const picked = value?.name === p.name && value.lat === p.lat;
@@ -263,7 +286,7 @@ function DestinationSearch({ value, onPick }: { value: Place | null; onPick: (p:
                 label={`${p.name}${picked ? ', selected' : ''}`} />
             );
           })}
-        </ListGroup></div>
+        </ListGroup>
       )}
     </>
   );

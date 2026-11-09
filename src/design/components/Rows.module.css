@@ -33,6 +33,10 @@
   border-radius: var(--radius-600);
   background: var(--on-light-surface-secondary);
 }
+/* Tone=Dark: deep green with the icon circles sunken, as on the Event card's Next state */
+.groupDark { background: var(--on-dark-surface-brand); }
+.groupDark .thumb { background: var(--on-dark-surface-sunken); }
+.groupDark > .pressable:hover { background: var(--on-dark-surface-sunken); }
 /* A pressed row tints out to the group's padding */
 .group > .pressable { margin: 0 calc(-1 * var(--space-default-500)); padding-left: var(--space-default-500); padding-right: var(--space-default-500); width: calc(100% + 2 * var(--space-default-500)); border-radius: var(--radius-500); }
 .group > .pressable:hover { background: var(--interactive-unselected-ghost-background-hover); }
@@ -62,8 +66,10 @@
 .eventBody { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: var(--space-default-400); }
 .eventHeader { display: flex; gap: var(--space-default-300); align-items: flex-start; }
 .eventText { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: var(--space-default-200); }
-.eventTitle { font: var(--type-heading-3); letter-spacing: -0.02em; color: var(--on-light-text-primary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.eventMeta { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0 var(--space-default-200); font: var(--type-body); }
+.eventTitle { font: var(--type-heading-3); line-height: 1.25; letter-spacing: -0.02em; color: var(--on-light-text-primary); overflow-wrap: anywhere; } /* wraps rather than cutting off (a 1.0 line height would clip descenders) */
+/* Time and place: a line each, after a small subtle icon (16px box, 12px glyph) */
+.eventLine { display: flex; align-items: flex-start; gap: var(--space-default-200); font: var(--type-body); }
+.eventLine svg { flex: none; margin-top: calc((1.5em - 16px) / 2); color: var(--on-light-icon-secondary); }
 .eventTime { color: var(--on-light-text-primary); }
 .eventPlace { color: var(--on-light-text-secondary); min-width: 0; overflow-wrap: anywhere; }
 .eventTrailing { flex: none; display: flex; flex-direction: column; align-items: flex-end; gap: var(--space-default-100); }
@@ -74,7 +80,7 @@
 .routeTimes { display: flex; align-items: center; gap: var(--space-default-300); }
 .routeEnd { flex: none; display: flex; flex-direction: column; gap: var(--space-default-100); }
 .routeEndTo { align-items: flex-end; text-align: right; }
-.routeTime { font: var(--type-heading-2); letter-spacing: -0.01em; color: var(--on-light-text-primary); font-variant-numeric: tabular-nums; }
+.routeTime { font: var(--type-heading-3); letter-spacing: -0.02em; color: var(--on-light-text-primary); font-variant-numeric: tabular-nums; }
 .routePlace { font: var(--type-body-small); color: var(--on-light-text-secondary); }
 .routeMid { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; align-items: center; gap: var(--space-default-200); }
 .routeLine { display: flex; align-items: center; gap: var(--space-default-200); width: 100%; color: var(--on-light-icon-secondary); }

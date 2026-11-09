@@ -4,18 +4,17 @@ import { Avatar, Button, Card, Illustration, ListGroup, ListItem, SectionHeader,
 import { store } from '../../data';
 import { personName, useMe } from '../../data/hooks';
 import type { TripCtx } from './TripPage';
-import s from './trip.module.css';
 import { isNativeApp, PUBLIC_SITE, shareLink, confirmAction } from '../../lib/native';
 
 /** Trip "People" tab (Figma "Trip — People"): the travellers as a List group (the owner can tap someone to change their role or remove them), then the invite card. */
 export function People({ trip, profiles, canManage, isOwner }: TripCtx) {
   const me = useMe();
   const navigate = useNavigate();
-  const [link, setLink] = useState('');
   const toast = useToast();
   const [busy, setBusy] = useState(false);
 
-  // "Invite to trip" makes a link and opens the share sheet straight away (or copies it where there's no share sheet).
+  // "Add people" makes a fresh link and opens the share sheet straight away (or copies it where there's no share sheet).
+  // The link itself is never shown on the page: it's long, and the share sheet is where it's used.
   const makeLink = async () => {
     setBusy(true);
     try {
@@ -23,15 +22,14 @@ export function People({ trip, profiles, canManage, isOwner }: TripCtx) {
       // Inside the iPhone app the page address is capacitor://localhost, which nobody else can open, so invite links
       // point at the public site; in a browser they point at wherever this copy of the site is running.
       const url = `${isNativeApp ? PUBLIC_SITE : location.origin + location.pathname}#/join/${code}`;
-      setLink(url);
       return url;
     } finally {
       setBusy(false);
     }
   };
-  const share = async (url = link) => {
+  const share = async (url: string) => {
     if (await shareLink({ title: `Join ${trip.name}`, text: `Join our trip "${trip.name}" on Rove`, url })) return;
-    try { await navigator.clipboard.writeText(url); toast({ icon: 'copy', label: 'Invite link copied' }); } catch { /* the link is on screen to copy by hand */ }
+    try { await navigator.clipboard.writeText(url); toast({ icon: 'copy', label: 'Invite link copied' }); } catch { toast({ tone: 'error', label: "Couldn't share the link. Try again" }); }
   };
   const invite = async () => {
     const url = await makeLink();
@@ -69,16 +67,6 @@ export function People({ trip, profiles, canManage, isOwner }: TripCtx) {
         <Card media={<Illustration name="friends" size={120} />}>
           <h2 className="t-heading-2">The more the merrier</h2>
           <p className="t-body-small t-secondary">Tap Add people to get a link for friends to plan this trip with you. Anyone with the link can join for the next 14 days after signing in.</p>
-          {/* "Add people" (in the section header) makes the link; once there is one it shows here to share again */}
-          {link && (
-            <div className={s.inviteActions}>
-              <div className={s.inviteRow}>
-                <div className={s.inviteUrl} title={link}>{link}</div>
-                <Button icon="share" onClick={() => share()}>Share</Button>
-              </div>
-              <Button variant="ghost" size="regular" onClick={makeLink} disabled={busy}>Make a new link</Button>
-            </div>
-          )}
         </Card>
       )}
 

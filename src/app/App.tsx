@@ -7,7 +7,7 @@ import { Home } from '../features/home/Home';
 import { Trips } from '../features/home/Trips';
 import { Join } from '../features/trip/Join';
 import { TripPage } from '../features/trip/TripPage';
-import { CountryCollection, Favourites } from '../features/saves/Collections';
+import { CountryCollection, Favourites, FavouriteCategory } from '../features/saves/Collections';
 import { ProfilePage } from '../features/profile/ProfilePage';
 import { Shell } from './Shell';
 
@@ -34,6 +34,7 @@ function Routed() {
         <Route path="/join/:code" element={<Join />} />
         <Route path="/profile" element={<ProfilePage />} />
         <Route path="/profile/favourites" element={<Favourites />} />
+        <Route path="/profile/favourites/:category" element={<FavouriteCategory />} />
         <Route path="/profile/collections/*" element={<Navigate to="/profile/favourites" replace />} />
         <Route path="/saved/:country" element={<CountryCollection />} />
         <Route path="/design" element={<Suspense fallback={null}><DesignSystem /></Suspense>} />

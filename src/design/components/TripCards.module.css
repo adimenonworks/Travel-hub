@@ -42,29 +42,26 @@
 .goingLink { text-decoration: none !important; display: inline-flex; position: relative; }
 .goingLink::after { content: ''; position: absolute; inset: -8px -2px; }
 
-/* Figma "Day Card": 24 corners, the date (Display tiny) over the weekday. Unselected: ghost with a border.
-   Selected: brand (selected primary), scaled up with a spring; the cards either side move aside by the amount it
-   grew, so nothing overlaps. Every card is the same width, which makes that amount known. Transform only. */
+/* Figma "Day Card": 24 corners, the date (Display tiny) over the weekday. Unselected: ghost with a border, 64 wide.
+   Selected: brand (selected primary) and wider (88), so it pushes the cards beside it aside; picking another day
+   widens that one as this one narrows, a smooth, gentle push (400ms, no bounce). */
 .day {
-  --day-grow: 1.1;
   flex: none; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--space-default-100);
   width: calc(64rem / 17); min-height: calc(84rem / 17);
   padding: var(--space-default-400) var(--space-default-200); border-radius: var(--radius-600);
   background: var(--interactive-unselected-ghost-background); color: var(--interactive-unselected-ghost-text);
   border: 1px solid var(--interactive-unselected-ghost-border);
   cursor: pointer; scroll-snap-align: start;
-  transition: background var(--motion-fast), color var(--motion-fast), transform var(--duration-base) var(--ease-standard);
+  transition: background var(--motion-fast), color var(--motion-fast), border-color var(--motion-fast), width var(--duration-slow) var(--ease-fluid), transform var(--motion-release);
 }
 .day:hover { background: var(--interactive-unselected-ghost-background-hover); }
 .daySelected {
+  width: calc(88rem / 17);
   border-color: transparent; background: var(--interactive-selected-primary-background); color: var(--interactive-selected-primary-text);
-  transform: scale(var(--day-grow)); transition: background var(--motion-fast), color var(--motion-fast), transform var(--duration-base) var(--ease-bounce);
 }
 .daySelected:hover { background: var(--interactive-selected-primary-background-hover); }
-.day:has(~ .daySelected) { transform: translateX(calc((1 - var(--day-grow)) * calc(64rem / 17) / 2)); }
-.daySelected ~ .day { transform: translateX(calc((var(--day-grow) - 1) * calc(64rem / 17) / 2)); }
 .day:active { transform: scale(0.97); transition: transform var(--motion-press); }
-.daySelected:active { transform: scale(calc(var(--day-grow) - 0.03)); }
+@media (prefers-reduced-motion: reduce) { .day { transition: background var(--motion-fast), color var(--motion-fast), border-color var(--motion-fast); } }
 .dayNum { font: var(--type-display-tiny); letter-spacing: -0.01em; }
 .dayWord { font: var(--type-label-small); white-space: nowrap; }
 @media (prefers-reduced-motion: reduce) { .day, .daySelected { transition: background var(--motion-fast), color var(--motion-fast); } }

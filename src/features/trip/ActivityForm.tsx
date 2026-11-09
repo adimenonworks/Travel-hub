@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Button, FieldRow, OptionCard, Select, Sheet, TextArea, TextField, useToast } from '../../design/components';
+import { Button, Chip, FieldRow, OptionCard, Select, Sheet, TextArea, TextField, useToast } from '../../design/components';
 import { store } from '../../data';
 import { useMe } from '../../data/hooks';
 import type { Activity, Category, LinkItem, Place, Trip } from '../../data/types';
@@ -50,8 +50,9 @@ const city = (s: string) => s.split(',')[0].replace(/\s*\([^)]*\)\s*/g, ' ').tri
  * time · Note: text and an optional time (the only type without a place). Events have no price: prices live on Ideas.
  * `draft` prefills a new one (e.g. from an idea added to a day); `onCreated` gets the new id.
  */
-export function ActivityForm({ open, trip, date, activity, draft, onClose, onCreated }: {
+export function ActivityForm({ open, trip, date, activity, draft, onClose, onCreated, onDeleted }: {
   open: boolean; trip: Trip; date: string; activity?: Activity; draft?: ActivityDraft; onClose: () => void; onCreated?: (id: string) => void;
+  /** After a delete: e.g. the event's own page goes back to its day in the itinerary */ onDeleted?: (a: Activity) => void;
 }) {
   const me = useMe();
   const toast = useToast();
@@ -59,6 +60,9 @@ export function ActivityForm({ open, trip, date, activity, draft, onClose, onCre
   const [busy, setBusy] = useState(false);
   useEffect(() => { if (open) setF(toForm(activity ?? draft, date, !!(activity ?? draft))); }, [open, activity, draft, date]);
   const set = (p: Partial<Form>) => setF((x) => ({ ...x, ...p }));
+  // Food & drink and activities have an end time only when asked for: "Add end time" turns into the field
+  const [withEnd, setWithEnd] = useState(false);
+  useEffect(() => { if (open) setWithEnd(!!(activity ?? draft)?.endTime); }, [open, activity, draft]);
   const days = tripDays(trip.startDate, trip.endDate);
   const type = f.type;
 
@@ -99,7 +103,7 @@ export function ActivityForm({ open, trip, date, activity, draft, onClose, onCre
         category,
         date: f.date,
         startTime: f.startTime,
-        endTime: f.endTime,
+        endTime: (type === 'food' || type === 'activity') && !withEnd ? '' : f.endTime,
         locationText: placeText,
         location,
         notes: f.notes.trim(),
@@ -131,6 +135,7 @@ export function ActivityForm({ open, trip, date, activity, draft, onClose, onCre
       await store.deleteSub(trip.id, 'activities', activity.id);
       toast({ icon: 'trash', label: 'Event deleted' });
       onClose();
+      onDeleted?.(activity);
     } catch {
       toast({ tone: 'error', label: "Couldn't delete. Check your connection" });
     }
@@ -156,7 +161,7 @@ export function ActivityForm({ open, trip, date, activity, draft, onClose, onCre
   );
 
   return (
-    <Sheet open={open} title={activity ? `Edit ${label?.toLowerCase() ?? 'event'}` : type ? `Add ${label === 'Food & drink' ? 'food & drink' : `a ${label?.toLowerCase()}`}` : 'Add to itinerary'}
+    <Sheet open={open} title={activity ? `Edit ${label?.toLowerCase() ?? 'event'}` : type ? `Add ${label === 'Food & drink' ? 'food & drink' : `${/^[aeiou]/i.test(label ?? '') ? 'an' : 'a'} ${label?.toLowerCase()}`}` : 'Add to itinerary'}
       subtitle={!type ? 'What are you adding?' : undefined}
       onClose={onClose} onSubmit={type ? submit : undefined} submitLabel={activity ? 'Save' : 'Add'} submitDisabled={!valid || busy}>
       {!type ? (
@@ -215,9 +220,13 @@ export function ActivityForm({ open, trip, date, activity, draft, onClose, onCre
             <>
               <TextField label="Place" placeholder={type === 'food' ? 'Cervejaria Ramiro, Lisbon' : 'Belém Tower, Lisbon'} value={f.locationText} onChange={(e) => set({ locationText: e.target.value })}
                 hint="Its name, or an address. A place in a new country adds it to the trip." />
+              {daySelect('Day', f.date, (v) => set({ date: v }))}
+              {/* Figma "Add event — end time": the chip sits where the end time goes, and becomes that field when tapped */}
               <FieldRow>
-                {daySelect('Day', f.date, (v) => set({ date: v }))}
-                <TextField label="Time" type="time" value={f.startTime} onChange={(e) => set({ startTime: e.target.value })} />
+                <TextField label={withEnd ? 'Starts' : 'Time'} type="time" value={f.startTime} onChange={(e) => set({ startTime: e.target.value })} />
+                {withEnd
+                  ? <TextField label="Ends (optional)" type="time" value={f.endTime} autoFocus={!f.endTime} onChange={(e) => set({ endTime: e.target.value })} />
+                  : <span className={s.endChip}><Chip icon="plus" onClick={() => { haptic('light'); setWithEnd(true); }}>Add end time</Chip></span>}
               </FieldRow>
             </>
           )}

@@ -1,6 +1,7 @@
-import { useLayoutEffect, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { Navigate, Route, Routes, useLocation, useMatch, useNavigate, useParams, type Location } from 'react-router-dom';
 import { savedScroll } from '../../app/navigation';
+import { haptic } from '../../lib/native';
 import { SlideSwap } from '../shared/SlideSwap';
 import { EmptyState, LinkButton, PageSkeleton, Tabs, TripHeader, type TabItem } from '../../design/components';
 import { useMe, useProfiles, useRole, useSub, useTrip } from '../../data/hooks';
@@ -126,6 +127,7 @@ const TAB_ORDER = ['', 'itinerary', 'ideas', 'photos', 'people'];
  */
 function TabPanels({ location, section, children }: { location: Location; section: string; children: (loc: Location) => React.ReactNode }) {
   const box = useRef<HTMLDivElement>(null);
+  useTabSwipe(box, section, location.pathname);
   const shown = useRef(location.pathname);
   useLayoutEffect(() => {
     if (shown.current === location.pathname) return;
@@ -145,4 +147,45 @@ function TabPanels({ location, section, children }: { location: Location; sectio
       <SlideSwap value={location} id={location.pathname} rank={TAB_ORDER.indexOf(section)} className={s.tabPanel}>{children}</SlideSwap>
     </div>
   );
+}
+
+/**
+ * Swipe across a trip's tab content to go to the next or previous tab (the panel then slides as when a tab is tapped).
+ * A swipe counts when it's mostly sideways, at least 64px and quick; it doesn't start on anything that has its own
+ * sideways gesture: an event row (swipe actions), a strip that scrolls sideways (days, chips, the tab bar), a map,
+ * a form field, or the screen's left edge (iOS swipe back).
+ */
+function useTabSwipe(box: React.RefObject<HTMLDivElement | null>, section: string, pathname: string) {
+  const navigate = useNavigate();
+  useEffect(() => {
+    const el = box.current;
+    if (!el) return;
+    const base = pathname.slice(0, pathname.length - (section ? section.length + 1 : 0));
+    let start: { x: number; y: number; t: number } | null = null;
+    const ownSideways = (t: EventTarget | null) => {
+      for (let n = t as HTMLElement | null; n && n !== el; n = n.parentElement) {
+        if (n.matches('[data-no-tab-swipe], input, textarea, select, .leaflet-container, [role=dialog]')) return true;
+        const st = getComputedStyle(n);
+        if (/(auto|scroll)/.test(st.overflowX) && n.scrollWidth > n.clientWidth + 1) return true;
+      }
+      return false;
+    };
+    const down = (e: TouchEvent) => {
+      const p = e.touches[0];
+      start = e.touches.length === 1 && p.clientX > 24 && !ownSideways(e.target) ? { x: p.clientX, y: p.clientY, t: Date.now() } : null;
+    };
+    const up = (e: TouchEvent) => {
+      if (!start) return;
+      const p = e.changedTouches[0], dx = p.clientX - start.x, dy = p.clientY - start.y, ms = Date.now() - start.t;
+      start = null;
+      if (Math.abs(dx) < 64 || Math.abs(dx) < Math.abs(dy) * 1.5 || ms > 600) return;
+      const i = TAB_ORDER.indexOf(section) + (dx < 0 ? 1 : -1);
+      if (i < 0 || i >= TAB_ORDER.length) return;
+      haptic('selection');
+      navigate(TAB_ORDER[i] ? `${base}/${TAB_ORDER[i]}` : base);
+    };
+    el.addEventListener('touchstart', down, { passive: true });
+    el.addEventListener('touchend', up, { passive: true });
+    return () => { el.removeEventListener('touchstart', down); el.removeEventListener('touchend', up); };
+  }, [box, section, pathname, navigate]);
 }

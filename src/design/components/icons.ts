@@ -1,5 +1,5 @@
 /* Generated from Uicons Rounded (Flaticon) — the same glyphs as the Figma ".Icon styles" set.
- * Glyphs are drawn on a 24px grid; the Icon component insets them to an 18px box (2px for 16px icons), as in Figma.
+ * Glyphs are drawn on a 24px grid; the Icon component sizes them as in Figma: a 12px glyph in a 16px icon, 16px in a 24px icon.
  * Default = Regular Rounded (line), Filled = Solid Rounded. `fit: true` means the path is already inset (copied from Figma). */
 export const LINE = {
   'plus': { d: 'M23.04 10.96H13.04V0.96Q13.04 0.56 12.72 0.28Q12.4 0 12 0Q11.6 0 11.28 0.28Q10.96 0.56 10.96 0.96V10.96H1.04Q0.56 11.04 0.28 11.32Q0 11.6 0 12Q0 12.4 0.28 12.72Q0.56 13.04 0.96 13.04H11.04V22.96Q11.04 23.44 11.32 23.72Q11.6 24 12 24Q12.4 24 12.68 23.72Q12.96 23.44 12.96 22.96V12.96H23.04Q23.44 13.04 23.72 12.72Q24 12.4 24 12Q24 11.6 23.72 11.28Q23.44 10.96 23.04 10.96Z' },

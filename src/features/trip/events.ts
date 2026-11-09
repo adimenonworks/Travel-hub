@@ -58,7 +58,8 @@ export function eventCardProps(input: Activity | DayEntry, ctx: TripCtx, showDay
   const type = eventType(a.category);
   const info = categoryInfo(a.category);
   const day = (d: string) => (d === today() ? 'Today' : formatDay(d));
-  const range = a.startTime ? `${formatTime(a.startTime)}${a.endTime ? ` – ${formatTime(a.endTime)}` : ''}` : undefined;
+  // "08:30 – 10:00"; with only a start, "17:30 onwards" (a note's time is a moment, so it stays "07:30")
+  const range = a.startTime ? `${formatTime(a.startTime)}${a.endTime ? ` – ${formatTime(a.endTime)}` : type === 'note' ? '' : ' onwards'}` : undefined;
   const base = {
     title: a.title, icon: info.icon,
     to: `/trip/${ctx.trip.id}/plan/${a.id}`,
@@ -68,7 +69,7 @@ export function eventCardProps(input: Activity | DayEntry, ctx: TripCtx, showDay
   if (type === 'flight')
     return {
       ...base, layout: 'journey' as const,
-      time: withDay(a.ref || undefined), place: undefined,
+      time: withDay(a.ref || undefined), timeIcon: null, place: undefined,
       journey: {
         fromTime: a.startTime ? formatTime(a.startTime) : '—', fromPlace: stop(a.fromText),
         toTime: a.endTime ? `${formatTime(a.endTime)}${a.endDate && a.endDate > a.date ? ` +${daysBetween(a.date, a.endDate)}` : ''}` : '—',
@@ -92,10 +93,11 @@ export function eventCardProps(input: Activity | DayEntry, ctx: TripCtx, showDay
         title: `${e.part === 'in' ? 'Check in' : 'Check out'} · ${a.title}`,
         time: entryTime(e) ? formatTime(entryTime(e)) : undefined,
         place: e.part === 'in' ? `${nights} night${nights === 1 ? '' : 's'}` : short(a.locationText || a.location?.name),
+        placeIcon: e.part === 'in' ? null : undefined,
       };
-    return { ...base, layout: 'standard' as const, time: `${formatDay(a.date)} → ${formatDay(a.endDate!)}`, place: `${nights} night${nights === 1 ? '' : 's'}` };
+    return { ...base, layout: 'standard' as const, time: `${formatDay(a.date)} → ${formatDay(a.endDate!)}`, place: `${nights} night${nights === 1 ? '' : 's'}`, placeIcon: null };
   }
   if (type === 'note')
-    return { ...base, layout: 'note' as const, time: withDay(range), place: a.notes.split('\n')[0] || undefined };
+    return { ...base, layout: 'note' as const, time: withDay(range), place: a.notes.split('\n')[0] || undefined, placeIcon: null };
   return { ...base, layout: 'standard' as const, time: withDay(range), place: short(a.locationText || a.location?.name) };
 }
