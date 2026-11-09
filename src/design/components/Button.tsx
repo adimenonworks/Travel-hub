@@ -9,26 +9,27 @@ export type ButtonVariant = 'primary' | 'secondary' | 'destructive' | 'inverse' 
 /** Figma Button "Size": Large is 48px tall (Label, 24px icons), Regular 32px (Label small, 16px icons, still a 44px tap area). */
 export type ButtonSize = 'regular' | 'large';
 
-type Look = { variant?: ButtonVariant; size?: ButtonSize; block?: boolean; /** Leading icon */ icon?: IconName; /** Trailing icon */ iconEnd?: IconName };
+type Look = { variant?: ButtonVariant; size?: ButtonSize; block?: boolean; /** Leading icon */ icon?: IconName; /** Trailing icon */ iconEnd?: IconName;
+  /** Working on it: the trailing icon becomes a small spinner (e.g. Create my trip, then the screen floods green) */ loading?: boolean };
 
 const cls = ({ variant = 'primary', size = 'large', block }: Look, iconOnly: boolean, extra?: string) =>
   [s.button, s[variant], s[size], block && s.block, iconOnly && s.iconOnly, extra].filter(Boolean).join(' ');
 
-function Body({ icon, iconEnd, size = 'large', children }: Look & { children?: ReactNode }) {
+function Body({ icon, iconEnd, size = 'large', loading, children }: Look & { children?: ReactNode }) {
   const px = size === 'regular' ? 16 : 24;
   return (
     <>
       {icon && <Icon name={icon} size={px} className={s.glyph} />}
       {children}
-      {iconEnd && <Icon name={iconEnd} size={px} className={s.glyph} />}
+      {loading ? <span className={s.spinner} style={{ width: px, height: px }} aria-hidden="true" /> : iconEnd && <Icon name={iconEnd} size={px} className={s.glyph} />}
     </>
   );
 }
 
-export function Button({ variant, size, block, icon, iconEnd, children, className, type = 'button', ...rest }: ButtonHTMLAttributes<HTMLButtonElement> & Look) {
+export function Button({ variant, size, block, icon, iconEnd, loading, children, className, type = 'button', ...rest }: ButtonHTMLAttributes<HTMLButtonElement> & Look) {
   return (
-    <button type={type} className={cls({ variant, size, block }, !children, className)} {...rest}>
-      <Body icon={icon} iconEnd={iconEnd} size={size}>{children}</Body>
+    <button type={type} className={cls({ variant, size, block }, !children, className)} aria-busy={loading || undefined} {...rest}>
+      <Body icon={icon} iconEnd={iconEnd} size={size} loading={loading}>{children}</Body>
     </button>
   );
 }
@@ -48,11 +49,12 @@ export function LinkButton({ to, href, variant, size, block, icon, iconEnd, labe
   return <Link to={to!} className={c} aria-label={label} onClick={onClick}>{body}</Link>;
 }
 
-export type IconButtonTone = 'secondary' | 'ghost' | 'on-brand';
+/** Figma Icon button tones, plus 'brand': the Page Header's action, a Figma Button (Secondary) with only an icon. */
+export type IconButtonTone = 'secondary' | 'ghost' | 'on-brand' | 'brand';
 
 /**
  * Figma "Icon button" (Tone Secondary / Ghost / On brand): a 40px circle with a 24px icon, inside a 44px tap area.
- * Secondary and Ghost share the Button's colour tokens; On brand sits on the bright emerald flow screens.
+ * Secondary is the neutral grey circle, Ghost is clear; On brand sits on the bright emerald flow screens.
  * `label` is required: it's what screen readers announce.
  */
 export function IconButton({ icon, label, tone, variant, state, className, type = 'button', ...rest }: Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'size'> & {

@@ -1,15 +1,20 @@
+import { useEffect, useState } from 'react';
 import { LinkButton } from './Button';
 import { ListGroup, ListItem, SectionHeader } from './Rows';
 import { Sheet } from './Sheet';
-import { emergencyFor, ENTRY_INFO_URL } from '../../lib/emergency';
+import { emergencyFor } from '../../lib/emergency';
 import { countryName } from '../../lib/countries';
+import { currencyLabel, entryRules, timeDifference, utcOffset } from '../../lib/entry';
+
+type Spot = { name: string; lat: number; lng: number; countryCode?: string };
 
 /**
- * Figma "Country sheet": quick info about a country, opened from its Chip (Hero Card, Trip header) or the Overview's
- * "Good to know". Emergency numbers you can tap to call, and where to check entry requirements (they depend on your
- * passport, so it links to an official checker). Only countries we're sure of have numbers (src/lib/emergency.ts).
+ * Figma "Country sheet", opened from the Overview's "Good to know". Emergency: the numbers, tap to call (only countries
+ * we're sure of, src/lib/emergency.ts). Before you go: Entry requirements (the destination's official government site,
+ * never a third party; else your own government's advice), Local time compared with your home city, and the Currency.
+ * `place`: a city in that country on the trip (for the local time); `home`: your home city.
  */
-export function CountryModal({ code, onClose }: { code: string | null; onClose: () => void }) {
+export function CountryModal({ code, onClose, place, home }: { code: string | null; onClose: () => void; place?: Spot | null; home?: Spot | null }) {
   const name = code ? countryName(code) : '';
   const e = code ? emergencyFor(code) : undefined;
   const rows: { title: string; meta: string; n: string }[] = !e ? [] : e.general
@@ -19,6 +24,20 @@ export function CountryModal({ code, onClose }: { code: string | null; onClose: 
         e.ambulance && { title: 'Ambulance', meta: e.ambulance === e.fire ? 'Ambulance and fire' : 'Medical emergency', n: e.ambulance },
         e.fire && e.fire !== e.ambulance && { title: 'Fire', meta: 'Fire brigade', n: e.fire },
       ].filter((r): r is { title: string; meta: string; n: string } => !!r);
+  const entry = code ? entryRules(code, home?.countryCode) : null;
+  const money = code ? currencyLabel(code) : undefined;
+  const [diff, setDiff] = useState<string | null>(null);
+  useEffect(() => {
+    setDiff(null);
+    if (!code || !place || !home) return;
+    let live = true;
+    Promise.all([utcOffset(place.lat, place.lng), utcOffset(home.lat, home.lng)]).then(([a, b]) => {
+      if (!live || a == null || b == null) return;
+      const d = timeDifference(a, b);
+      setDiff(`${place.name.split(',')[0]} · ${d.text} ${home.name.split(',')[0]}`);
+    });
+    return () => { live = false; };
+  }, [code, place?.lat, place?.lng, home?.lat, home?.lng]); // eslint-disable-line react-hooks/exhaustive-deps
   return (
     <Sheet open={!!code} title={name} subtitle="Good to know before and during your trip" onClose={onClose}>
       <SectionHeader title="Emergency" meta={e?.note} />
@@ -29,9 +48,12 @@ export function CountryModal({ code, onClose }: { code: string | null; onClose: 
       </ListGroup>
       <SectionHeader title="Before you go" />
       <ListGroup label="Before you go">
-        <ListItem icon="doc" title="Entry requirements" meta="Depend on your passport — opens an official checker" href={ENTRY_INFO_URL} label="Entry requirements (opens an official checker)" />
+        {entry && <ListItem icon="doc" title="Entry requirements" meta={entry.official ? `Official ${name} government site` : entry.label}
+          href={entry.url} label={`Entry requirements for ${name} (opens in a new tab)`} />}
+        {diff && <ListItem icon="time" title="Local time" meta={diff} />}
+        {money && <ListItem icon="wallet" title="Currency" meta={money} />}
       </ListGroup>
-      <LinkButton href={ENTRY_INFO_URL} block iconEnd="arrow-up-right">Check entry requirements</LinkButton>
+      {entry && <LinkButton href={entry.url} block iconEnd="arrow-up-right">{entry.official ? 'Official entry rules' : 'Check entry rules'}</LinkButton>}
     </Sheet>
   );
 }

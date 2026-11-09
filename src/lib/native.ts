@@ -72,3 +72,47 @@ export function haptic(kind: Haptic) {
     } catch { /* no haptics on this device */ }
   });
 }
+
+/**
+ * Links shared to Rove from another app. The iPhone share extension (ios/App/ShareExtension) opens
+ * rove://save?url=<link>; the test site accepts the same at #/save?url=<link>. Calls back with each link.
+ */
+export function onSharedLink(cb: (url: string) => void): () => void {
+  const take = (raw: string) => {
+    try {
+      const u = new URL(raw);
+      const link = u.searchParams.get('url');
+      if (u.protocol === 'rove:' && link) cb(link);
+    } catch { /* not ours */ }
+  };
+  // On the website (and for testing): #/save?url=…
+  const fromHash = () => {
+    const m = location.hash.match(/^#\/save\?(.*)$/);
+    const link = m && new URLSearchParams(m[1]).get('url');
+    if (link) { cb(link); history.replaceState(null, '', `${location.pathname}#/`); }
+  };
+  fromHash();
+  window.addEventListener('hashchange', fromHash);
+  let remove: (() => void) | undefined;
+  if (isNativeApp) {
+    import('@capacitor/app').then(({ App }) => {
+      App.getLaunchUrl().then((r) => r?.url && take(r.url)).catch(() => {});
+      App.addListener('appUrlOpen', (e) => take(e.url)).then((h) => { remove = () => h.remove(); });
+    });
+  }
+  return () => { window.removeEventListener('hashchange', fromHash); remove?.(); };
+}
+
+/** A destructive confirmation (delete, remove, leave) with the Warning haptic first, as in the Figma Haptics map. */
+export function confirmAction(message: string): boolean {
+  haptic('warning');
+  return window.confirm(message);
+}
+
+/** "Rove 1.0 (12)": the app's version and build on iPhone (from the app itself), else the web build's version. */
+export async function appVersion(): Promise<string> {
+  if (isNativeApp) {
+    try { const { App } = await import('@capacitor/app'); const i = await App.getInfo(); return `Rove ${i.version} (${i.build})`; } catch { /* fall through */ }
+  }
+  return `Rove ${__APP_VERSION__} (web)`;
+}

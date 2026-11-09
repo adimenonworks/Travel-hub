@@ -1,4 +1,5 @@
 import { useLayoutEffect, useRef, useState, type CSSProperties } from 'react';
+import { haptic } from '../../lib/native';
 import s from './SegmentedControl.module.css';
 
 type Option<T extends string> = { value: T; label: string };
@@ -23,7 +24,8 @@ export function SegmentedControl<T extends string>({ options, value, onChange, b
       const cur = el.querySelector<HTMLElement>('[aria-checked="true"]');
       if (!cur) return setPill(null);
       const box = el.getBoundingClientRect(), r = cur.getBoundingClientRect();
-      setPill((prev) => ({ x: r.left - box.left + el.scrollLeft, w: r.width, ready: prev !== null }));
+      // The pill sits inside the border, so measure from the padding box (clientLeft is the border width).
+      setPill((prev) => ({ x: r.left - box.left - el.clientLeft + el.scrollLeft, w: r.width, ready: prev !== null }));
     };
     measure();
     const ro = new ResizeObserver(measure);
@@ -37,7 +39,7 @@ export function SegmentedControl<T extends string>({ options, value, onChange, b
       {pill && <span className={[s.thumb, pill.ready && s.animate].filter(Boolean).join(' ')} aria-hidden="true"
         style={{ '--x': `${pill.x}px`, '--w': `${pill.w}px` } as CSSProperties} />}
       {options.map((o) => (
-        <button key={o.value} type="button" role="radio" aria-checked={o.value === value} className={s.option} onClick={() => onChange(o.value)}>
+        <button key={o.value} type="button" role="radio" aria-checked={o.value === value} className={s.option} onClick={() => { if (o.value !== value) haptic('selection'); onChange(o.value); }}>
           {o.label}
         </button>
       ))}

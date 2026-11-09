@@ -70,3 +70,34 @@ button { cursor: pointer; }
 .leaflet-container, .leaflet-container .leaflet-control-attribution { font-size: var(--size-body-small); }
 
 input, textarea, [contenteditable], .selectable { -webkit-user-select: text; user-select: text; -webkit-touch-callout: default; }
+
+/* Deep green surface (Figma on-dark/surface/brand): Event card Next, Stat strip, accent Card, initials Avatars.
+   Everything inside that asks for an on-light token gets the on-dark token of the same name (the sets match 1:1). */
+.surface-dark {
+  background: var(--on-dark-surface-brand);
+  color: var(--on-dark-text-primary);
+  --on-light-surface-primary: var(--on-dark-surface-primary);
+  --on-light-surface-secondary: var(--on-dark-surface-secondary);
+  --on-light-surface-brand: var(--on-dark-surface-brand);
+  --on-light-surface-sunken: var(--on-dark-surface-sunken);
+  --on-light-text-primary: var(--on-dark-text-primary);
+  --on-light-text-secondary: var(--on-dark-text-secondary);
+  --on-light-text-brand: var(--on-dark-text-brand);
+  --on-light-link-default: var(--on-dark-link-default);
+  --on-light-link-hover: var(--on-dark-link-hover);
+  --on-light-link-pressed: var(--on-dark-link-pressed);
+  --on-light-icon-primary: var(--on-dark-icon-primary);
+  --on-light-icon-secondary: var(--on-dark-icon-secondary);
+  --on-light-icon-brand: var(--on-dark-icon-brand);
+  --on-light-border-subtle: var(--on-dark-border-subtle);
+  --on-light-border-bold: var(--on-dark-border-bold);
+  --on-light-border-focus: var(--on-dark-border-focus);
+  --on-light-border-brand: var(--on-dark-border-brand);
+  --on-light-divider-default: var(--on-dark-divider-default);
+  --on-light-status-success: var(--on-dark-status-success);
+  --on-light-status-success-subtle: var(--on-dark-status-success-subtle);
+  --on-light-status-warning: var(--on-dark-status-warning);
+  --on-light-status-warning-subtle: var(--on-dark-status-warning-subtle);
+  --on-light-status-error: var(--on-dark-status-error);
+  --on-light-status-error-subtle: var(--on-dark-status-error-subtle);
+}

@@ -10,7 +10,7 @@ type Press = { to?: string; href?: string; onClick?: () => void; label?: string 
 /** Renders as a link, an external link, a button or a plain element, so every row and card can be tapped the same way. */
 function Pressable({ to, href, onClick, label, className, children, role }: Press & { className: string; children: ReactNode; role?: string }) {
   if (to) return <Link to={to} className={`${className} ${s.pressable}`} aria-label={label} role={role}>{children}</Link>;
-  if (href) return <a href={href} target="_blank" rel="noreferrer" className={`${className} ${s.pressable}`} aria-label={label} role={role}>{children}</a>;
+  if (href) return <a href={href} target="_blank" rel="noreferrer" onClick={onClick} className={`${className} ${s.pressable}`} aria-label={label} role={role}>{children}</a>;
   if (onClick) return <button type="button" onClick={onClick} className={`${className} ${s.pressable}`} aria-label={label} role={role}>{children}</button>;
   return <div className={className} role={role}>{children}</div>;
 }
@@ -77,8 +77,10 @@ export type EventState = 'default' | 'next' | 'done';
  * the title (Heading 3), time · place (Body), an optional amount; Journey adds the from → to times; Extras show tags.
  * Next has the brand border; Done fades the content. The whole card opens the event.
  */
-export function EventCard({ title, time, place, amount, icon, layout = 'standard', state = 'default', journey, extras, status, to, onClick }: {
+export function EventCard({ title, time, place, amount, icon, layout = 'standard', state = 'default', journey, extras, status, favourite, to, onClick }: {
   title: string; time?: string; place?: string; amount?: string; icon: IconName;
+  /** Figma "Favourite": a filled star after the title (the event's Place is starred). */
+  favourite?: boolean;
   layout?: 'standard' | 'journey' | 'note'; state?: EventState;
   journey?: { fromTime: string; fromPlace?: string; duration?: string; toTime: string; toPlace?: string; mode?: IconName };
   /** Figma "Show extras": Tag 1, Tag 2 */
@@ -87,15 +89,15 @@ export function EventCard({ title, time, place, amount, icon, layout = 'standard
   status?: string;
   to?: string; onClick?: () => void;
 }) {
-  const cls = [s.event, s[`event-${layout}`], s[`event-${state}`]].filter(Boolean).join(' ');
+  const cls = [s.event, s[`event-${layout}`], s[`event-${state}`], state === 'next' && 'surface-dark'].filter(Boolean).join(' ');
   const stateText = state === 'next' ? ', up next' : state === 'done' ? ', done' : '';
   return (
-    <Pressable to={to} onClick={onClick} className={cls} label={`${title}${time ? `, ${time}` : ''}${place ? `, ${place}` : ''}${amount ? `, ${amount}` : ''}${stateText}`}>
+    <Pressable to={to} onClick={onClick} className={cls} label={`${title}${favourite ? ', favourite' : ''}${time ? `, ${time}` : ''}${place ? `, ${place}` : ''}${amount ? `, ${amount}` : ''}${stateText}`}>
       <span className={s.eventIcon} aria-hidden="true"><Icon name={icon} size={24} /></span>
       <span className={s.eventBody} aria-hidden="true">
         <span className={s.eventHeader}>
           <span className={s.eventText}>
-            <span className={s.eventTitle}>{title}</span>
+            <span className={s.eventTitleRow}><span className={s.eventTitle}>{title}</span>{favourite && <Icon name="star" size={16} state="filled" />}</span>
             {(time || place) && (
               <span className={s.eventMeta}>
                 {time && <span className={s.eventTime}>{time}</span>}
@@ -159,7 +161,7 @@ export function IdeaRow({ title, meta, icon, tag, vote, onClick }: {
         <span className={s.itemText}>
           <span className={s.itemTitle}>{title}</span>
           {meta && <span className={s.itemMeta}>{meta}</span>}
-          {tag && <span className={s.ideaTag}><Badge tone="success" icon={tag.icon}>{tag.label}</Badge></span>}
+          {tag && <span className={s.ideaTag}><Badge tone="neutral" icon={tag.icon}>{tag.label}</Badge></span>}
         </span>
       </Pressable>
       <VoteButton count={vote.count} voted={vote.voted} onClick={vote.onClick}
@@ -237,8 +239,8 @@ export function ProfileCard({ name, email, photo, avatar, ...press }: Press & { 
   );
 }
 
-/** Figma "Option card" (Selected No / Yes): a big tappable choice with an icon and a Heading 3 label. */
-export function OptionCard({ icon, label, selected, onClick }: { icon: IconName; label: string; selected: boolean; onClick: () => void }) {
+/** Figma "Option card" (Selected No / Yes): a big tappable choice with an icon and a Heading 3 label. Leave `selected` out when it's a one-tap choice (e.g. the add-event picker), not a toggle. */
+export function OptionCard({ icon, label, selected, onClick }: { icon: IconName; label: string; selected?: boolean; onClick: () => void }) {
   return (
     <button type="button" className={[s.option, selected && s.optionSelected].filter(Boolean).join(' ')} aria-pressed={selected} onClick={onClick}>
       <Icon name={icon} size={24} />
@@ -271,9 +273,10 @@ export function StepProgress({ step, of = 4 }: { step: number; of?: number }) {
 }
 
 /** Figma "Destination header" (4 tones): flag, title and meta on an accent surface, and one Inverse button. */
-export function DestinationHeader({ tone, flag, title, meta, action }: { tone: 'orange' | 'green' | 'yellow' | 'pink'; flag: ReactNode; title: string; meta?: ReactNode; action?: ReactNode }) {
+/** Figma "Destination header": a flag in a white circle, "24 saves · 3 cities" and who saved. Tone Neutral (grey) on screens. */
+export function DestinationHeader({ tone = 'neutral', flag, title, meta, action }: { tone?: 'neutral' | 'orange' | 'green' | 'yellow' | 'pink'; flag: ReactNode; title: string; meta?: ReactNode; action?: ReactNode }) {
   return (
-    <section className={[s.destination, s[`tile-${tone}`]].join(' ')}>
+    <section className={[s.destination, tone === 'neutral' ? s.destinationNeutral : s[`tile-${tone}`]].join(' ')}>
       <div className={s.destinationTop}>
         <span className={s.destinationFlag} aria-hidden="true">{flag}</span>
         <span className={s.itemText}>

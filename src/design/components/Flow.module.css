@@ -21,7 +21,7 @@
 @keyframes stepIn { from { opacity: 0; transform: translateX(24px); } }
 
 /* Figma "Celebration screen": deep emerald, centred, 96 top */
-.celebrate { position: fixed; inset: 0; z-index: 160; overflow-y: auto; background: var(--on-dark-surface-brand); color: var(--on-dark-text-primary); animation: flood var(--duration-slow) var(--ease-standard); }
+.celebrate { position: fixed; inset: 0; z-index: 160; overflow-y: auto; background: var(--on-dark-surface-brand); color: var(--on-dark-text-primary); animation: flood calc(var(--duration-base) * 2) var(--ease-standard); } /* 500ms: dark green floods the screen */
 .celebrateInner {
   position: relative; min-height: 100%; max-width: calc(var(--size-content-max) + 2 * var(--space-gutter)); margin: 0 auto;
   display: flex; flex-direction: column; align-items: center; text-align: center; gap: var(--space-default-700);
@@ -67,6 +67,9 @@
 .day:active > span { transform: scale(0.94); transition: transform var(--motion-press); }
 .day:disabled { color: var(--interactive-button-ghost-disabled-foreground); cursor: default; }
 .day-range { background: var(--on-light-surface-brand); color: var(--on-light-text-brand); }
+/* Picking dates: the range sweeps in from the start, one day every 20ms (Figma motion spec) */
+.day-range, .day-end { animation: sweep var(--duration-fast) var(--ease-standard) both; animation-delay: calc(var(--i, 0) * 20ms); }
+@keyframes sweep { from { clip-path: inset(0 100% 0 0); } }
 /* Start / End: the selected-primary pair (Figma uses text/brand + on-dark text, which is under 4.5:1 in dark mode) */
 .day-start, .day-end, .day-single { color: var(--interactive-selected-primary-text); }
 .day-start > span, .day-end > span, .day-single > span { background: var(--interactive-selected-primary-background); }

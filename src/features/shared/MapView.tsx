@@ -22,7 +22,7 @@ export function MapView({ pins, center, zoom = 12, height = 280 }: { pins: MapPi
 
   useEffect(() => {
     if (!el.current) return;
-    const m = L.map(el.current, { scrollWheelZoom: false, attributionControl: true });
+    const m = L.map(el.current, { scrollWheelZoom: false, zoomControl: false, attributionControl: true } /* Figma's map cards have no zoom buttons; pinch to zoom */);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       maxZoom: 19,
       attribution: '&copy; OpenStreetMap',

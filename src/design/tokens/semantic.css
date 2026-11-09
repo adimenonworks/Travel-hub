@@ -52,11 +52,11 @@
   --interactive-button-primary-icon: var(--color-emerald-800);
   --interactive-button-primary-disabled-background: color-mix(in srgb, var(--color-neutral-1000) 5%, transparent);
   --interactive-button-primary-disabled-foreground: color-mix(in srgb, var(--color-neutral-1000) 30%, transparent);
-  --interactive-button-secondary-background: var(--color-neutral-100);
-  --interactive-button-secondary-background-hover: var(--color-neutral-50);
-  --interactive-button-secondary-background-pressed: var(--color-neutral-300);
-  --interactive-button-secondary-text: var(--color-neutral-800);
-  --interactive-button-secondary-icon: var(--color-neutral-800);
+  --interactive-button-secondary-background: var(--color-emerald-100);
+  --interactive-button-secondary-background-hover: var(--color-emerald-50);
+  --interactive-button-secondary-background-pressed: var(--color-emerald-200);
+  --interactive-button-secondary-text: var(--color-emerald-800);
+  --interactive-button-secondary-icon: var(--color-emerald-800);
   --interactive-button-secondary-disabled-background: color-mix(in srgb, var(--color-neutral-1000) 5%, transparent);
   --interactive-button-secondary-disabled-foreground: color-mix(in srgb, var(--color-neutral-1000) 30%, transparent);
   --interactive-button-ghost-background: transparent;
@@ -100,7 +100,7 @@
   --interactive-button-inverse-brand-icon: var(--color-emerald-200);
   --interactive-button-inverse-brand-disabled-background: color-mix(in srgb, var(--color-neutral-1000) 5%, transparent);
   --interactive-button-inverse-brand-disabled-foreground: color-mix(in srgb, var(--color-neutral-1000) 30%, transparent);
-  --tag-neutral-background: var(--color-neutral-100);
+  --tag-neutral-background: var(--color-neutral-0);
   --tag-neutral-text: var(--color-neutral-1000);
   --tag-neutral-icon: var(--color-neutral-1000);
   --tag-brand-bold-background: var(--color-emerald-300);
@@ -252,7 +252,7 @@
   --font-family: var(--font-manrope);
   --font-display: var(--font-poppins);
   --weight-regular: 400; --weight-medium: 500; --weight-semibold: 600; --weight-bold: 700; --weight-black: 900;
-  --size-display: min(calc(48rem / 17), 67px); --size-display-secondary: min(calc(40rem / 17), 56px); --size-heading-1: min(calc(28rem / 17), 39px); --size-heading-2: min(calc(20rem / 17), 28px); --size-heading-3: min(calc(18rem / 17), 25px); --size-display-tiny: min(calc(32rem / 17), 45px);
+  --size-display: min(calc(48rem / 17), 67px); --size-display-secondary: min(calc(40rem / 17), 56px); --size-heading-1: min(calc(28rem / 17), 39px); --size-heading-2: min(calc(20rem / 17), 28px); --size-heading-3: min(calc(16rem / 17), 22px); --size-display-tiny: min(calc(32rem / 17), 45px);
   --size-body: calc(14rem / 17); --size-body-small: calc(12rem / 17);
 
   /* Effects (Figma effect styles) */

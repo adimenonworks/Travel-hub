@@ -8,13 +8,14 @@ import {
   initializeFirestore, onSnapshot, persistentLocalCache, persistentMultipleTabManager, query, setDoc, updateDoc, where, writeBatch, type DocumentData,
 } from 'firebase/firestore';
 import type { Store } from './store';
-import type { Invite, Profile, SubName, Trip } from './types';
+import type { Invite, LinkPreview, Profile, SavedPlace, SubName, Trip } from './types';
+import { getFunctions, httpsCallable } from 'firebase/functions';
 import { randomCode } from './util';
 import { googleIosClientId, isNativeApp } from '../lib/native';
 
 const SUBS: SubName[] = ['activities', 'ideas', 'expenses', 'comments', 'albums'];
 // Profile fields only their owner may read; they live in users/{uid}/private/places.
-const PRIVATE_FIELDS = ['home', 'homeCity', 'visited'] as const;
+const PRIVATE_FIELDS = ['home', 'homeCity', 'visited', 'currency'] as const;
 const INVITE_DAYS = 14;
 
 // Errors from the sign-in flow that mean "try a full-page redirect instead of a popup".
@@ -190,6 +191,62 @@ export function createFirebaseStore(config: FirebaseOptions): Store {
 
     watchSub(tripId, name, cb) {
       return onSnapshot(collection(db, 'trips', tripId, name), (s) => cb(s.docs.map((d) => withId(d.id, d.data()))));
+    },
+    queueSub(tripId, name, data) {
+      const ref = doc(collection(db, 'trips', tripId, name));
+      const saved = setDoc(ref, { ...data, createdBy: auth.currentUser!.uid, createdAt: Date.now() });
+      return { id: ref.id, saved };
+    },
+    queueTrip(data) {
+      const uid = auth.currentUser!.uid;
+      const ref = doc(collection(db, 'trips'));
+      const saved = setDoc(ref, { ...data, ownerId: uid, memberIds: [uid], roles: { [uid]: 'owner' }, createdAt: Date.now() });
+      return { id: ref.id, saved };
+    },
+    async deleteBudgetData(trip) {
+      const fields = (['totalBudget', 'dailyBudget', 'dayBudgets', 'daySpent'] as const).filter((k) => k in trip);
+      if (fields.length) await updateDoc(doc(db, 'trips', trip.id), Object.fromEntries(fields.map((k) => [k, deleteField()])));
+      const old = await getDocs(collection(db, 'trips', trip.id, 'expenses'));
+      await Promise.all(old.docs.map((d) => deleteDoc(d.ref)));
+    },
+    watchPlaces(uid, cb) {
+      // Two live queries merged: Places you saved, and other people's Places you've starred.
+      let own: SavedPlace[] = [], starred: SavedPlace[] = [];
+      const emit = () => cb([...own, ...starred.filter((p) => !own.some((o) => o.id === p.id))]);
+      const toList = (docs: { id: string; data: () => DocumentData }[]) => docs.map((d) => withId<SavedPlace>(d.id, d.data()));
+      const offOwn = onSnapshot(query(collection(db, 'places'), where('ownerId', '==', uid)), (q) => { own = toList(q.docs); emit(); }, () => { own = []; emit(); });
+      const offStar = onSnapshot(query(collection(db, 'places'), where('starredBy', 'array-contains', uid)), (q) => { starred = toList(q.docs); emit(); }, () => {});
+      return () => { offOwn(); offStar(); };
+    },
+    async getPlaces(ids) {
+      const out: Record<string, SavedPlace> = {};
+      await Promise.all([...new Set(ids)].map(async (id) => {
+        try { const d = await getDoc(doc(db, 'places', id)); if (d.exists()) out[id] = withId<SavedPlace>(id, d.data()); } catch { /* no access or offline */ }
+      }));
+      return out;
+    },
+    addPlace(data) {
+      const ref = doc(collection(db, 'places'));
+      const saved = setDoc(ref, { ...data, ownerId: auth.currentUser!.uid, createdAt: Date.now() });
+      return { id: ref.id, saved };
+    },
+    async updatePlace(id, patch) {
+      await updateDoc(doc(db, 'places', id), patch);
+    },
+    async deletePlace(id) {
+      await deleteDoc(doc(db, 'places', id));
+    },
+    async starPlace(id, uid, on) {
+      await updateDoc(doc(db, 'places', id), { starredBy: on ? arrayUnion(uid) : arrayRemove(uid) });
+    },
+    async readLink(url) {
+      try {
+        // The function runs in Sydney (functions/index.js); it needs the paid (Blaze) plan to be deployed.
+        const call = httpsCallable<{ url: string }, LinkPreview>(getFunctions(app, 'australia-southeast1'), 'readLink', { timeout: 20000 });
+        return (await call({ url })).data;
+      } catch {
+        return null;
+      }
     },
     async addSub(tripId, name, data) {
       const ref = await addDoc(collection(db, 'trips', tripId, name), { ...data, createdBy: auth.currentUser!.uid, createdAt: Date.now() });

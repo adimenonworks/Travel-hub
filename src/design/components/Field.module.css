@@ -30,7 +30,12 @@ select.input {
   padding-right: var(--space-default-950);
 }
 .hint { font: var(--type-label-small); color: var(--input-field-label-subtle); } /* Label small */
-.row { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: var(--space-default-500); }
+.row { display: grid; grid-template-columns: repeat(auto-fit, minmax(calc(150rem / 17), 1fr)); gap: var(--space-default-500); }
 
 /* Compact select: the medium button's height */
 select.compact { min-height: var(--size-tap); padding-left: var(--space-default-500); padding-right: var(--space-default-800); background-position: right var(--space-default-500) center; }  /* text stays 16px: iPhones zoom into fields with smaller text */
+
+/* Leading icon (Figma Text Field "Icon"): 24px, 20 in from the left, the text starts after it with the 12 gap */
+.iconWrap { position: relative; display: block; }
+.leadingIcon { position: absolute; left: var(--space-default-600); top: 50%; transform: translateY(-50%); color: var(--on-light-icon-secondary); pointer-events: none; }
+.withIcon { padding-left: calc(var(--space-default-600) + 24px + var(--space-default-400)); }

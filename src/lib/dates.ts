@@ -40,19 +40,22 @@ export function formatDay(d: string, opts: Intl.DateTimeFormatOptions = { weekda
   return parseDay(d).toLocaleDateString(undefined, opts);
 }
 
+/** A date range as Figma writes it: "2 – 11 Nov", "28 Oct – 3 Nov", "20 Mar – 3 Apr 2027" (the year only when it isn't this year).
+ *  The day/month order follows the phone's region ("Nov 2 – 11" in the US). */
 export function formatRange(start: string, end: string) {
   const s = parseDay(start);
   const e = parseDay(end);
-  const sameYear = s.getFullYear() === e.getFullYear();
-  const a = s.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: sameYear ? undefined : 'numeric' });
-  const b = e.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
-  return `${a} – ${b}`;
+  const thisYear = s.getFullYear() === e.getFullYear() && s.getFullYear() === new Date().getFullYear();
+  const f = new Intl.DateTimeFormat(undefined, { month: 'short', day: 'numeric', year: thisYear ? undefined : 'numeric' });
+  // Intl joins with an en dash and no spaces in some regions ("2–11 Nov"); Figma puts a space either side.
+  return f.formatRange(s, e).replace(/\s*[–-]\s*/, ' – ');
 }
 
+/** A time as Figma shows it everywhere: 24-hour "08:30", "22:15". */
 export function formatTime(t: string) {
   if (!t) return '';
   const [h, m] = t.split(':').map(Number);
-  return new Date(2000, 0, 1, h, m).toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' });
+  return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
 }
 
 export type TripPhase = 'upcoming' | 'current' | 'past';
@@ -68,4 +71,17 @@ export function countdown(start: string, end: string, now = today()): { value: n
   if (now < start) { const n = daysBetween(now, start); return { value: n, label: n === 1 ? 'Day to go' : 'Days to go' }; }
   if (now <= end) { const n = daysBetween(now, end) + 1; return { value: n, label: n === 1 ? 'Day left' : 'Days left' }; }
   return undefined;
+}
+
+/** When something was saved, short, for a row's trailing text: "now", "2h", "Yesterday", "Mon", then "3 Nov". */
+export function timeAgo(ms: number, now = Date.now()) {
+  const min = Math.round((now - ms) / 60000);
+  if (min < 1) return 'now';
+  if (min < 60) return `${min}m`;
+  const then = new Date(ms), d0 = new Date(now);
+  if (toDay(then) === toDay(d0)) return `${Math.round(min / 60)}h`;
+  const days = daysBetween(toDay(then), toDay(d0));
+  if (days === 1) return 'Yesterday';
+  if (days < 7) return then.toLocaleDateString(undefined, { weekday: 'short' });
+  return then.toLocaleDateString(undefined, { day: 'numeric', month: 'short' });
 }

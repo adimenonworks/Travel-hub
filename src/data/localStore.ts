@@ -1,5 +1,5 @@
 import type { Store } from './store';
-import type { Invite, Profile, SubName, Trip, User } from './types';
+import type { Invite, Profile, SavedPlace, SubName, Trip, User } from './types';
 import { randomCode } from './util';
 
 /**
@@ -9,6 +9,7 @@ import { randomCode } from './util';
  */
 type DB = {
   users: Record<string, Profile>;
+  places?: Record<string, SavedPlace>;
   trips: Record<string, Trip>;
   subs: Record<string, Record<string, Record<string, Record<string, unknown>>>>; // tripId -> sub -> id -> doc
   invites: Record<string, Invite>;
@@ -136,6 +137,54 @@ export function createLocalStore(): Store {
 
     watchSub(tripId, name, cb) {
       return watch(() => Object.values(sub(tripId, name)), cb as (v: unknown[]) => void);
+    },
+    queueSub(tripId, name, data) {
+      const id = randomCode(16);
+      sub(tripId, name)[id] = { ...data, id, createdBy: me(), createdAt: Date.now() };
+      save();
+      return { id, saved: Promise.resolve() };
+    },
+    queueTrip(data) {
+      const id = randomCode(16);
+      const uid = me();
+      db.trips[id] = { ...data, id, ownerId: uid, memberIds: [uid], roles: { [uid]: 'owner' }, createdAt: Date.now() };
+      save();
+      return { id, saved: Promise.resolve() };
+    },
+    async deleteBudgetData(trip) {
+      const t = db.trips[trip.id];
+      if (t) { delete t.totalBudget; delete t.dailyBudget; delete t.dayBudgets; delete t.daySpent; }
+      if (db.subs[trip.id]) db.subs[trip.id].expenses = {};
+      save();
+    },
+    watchPlaces(uid, cb) {
+      return watch(() => Object.values(db.places ?? {}).filter((p) => p.ownerId === uid || p.starredBy?.includes(uid)), cb);
+    },
+    async getPlaces(ids) {
+      return Object.fromEntries(ids.flatMap((id) => (db.places?.[id] ? [[id, structuredClone(db.places[id])]] : [])));
+    },
+    addPlace(data) {
+      const id = randomCode(16);
+      (db.places ??= {})[id] = { ...data, id, ownerId: me(), createdAt: Date.now() };
+      save();
+      return { id, saved: Promise.resolve() };
+    },
+    async updatePlace(id, patch) {
+      if (db.places?.[id]) { db.places[id] = { ...db.places[id], ...patch, id }; save(); }
+    },
+    async deletePlace(id) {
+      if (db.places) { delete db.places[id]; save(); }
+    },
+    async starPlace(id, uid, on) {
+      const p = db.places?.[id];
+      if (!p) return;
+      const list = (p.starredBy ?? []).filter((x) => x !== uid);
+      p.starredBy = on ? [...list, uid] : list;
+      save();
+    },
+    // Demo mode has no Cloud Function: the app reads what it can from the link itself (src/lib/links.ts).
+    async readLink() {
+      return null;
     },
     async addSub(tripId, name, data) {
       const id = randomCode(16);

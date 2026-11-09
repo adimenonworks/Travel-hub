@@ -5,7 +5,7 @@ import { store } from '../../data';
 import { personName, useMe } from '../../data/hooks';
 import type { TripCtx } from './TripPage';
 import s from './trip.module.css';
-import { isNativeApp, PUBLIC_SITE, shareLink } from '../../lib/native';
+import { isNativeApp, PUBLIC_SITE, shareLink, confirmAction } from '../../lib/native';
 
 /** Trip "People" tab (Figma "Trip — People"): the travellers as a List group (the owner can tap someone to change their role or remove them), then the invite card. */
 export function People({ trip, profiles, canManage, isOwner }: TripCtx) {
@@ -51,8 +51,8 @@ export function People({ trip, profiles, canManage, isOwner }: TripCtx) {
 
   return (
     <>
-      <SectionHeader title="Travellers" meta={`${members.length} ${members.length === 1 ? 'person' : 'people'}${isOwner && members.length > 1 ? ' · tap someone to change their role' : ''}`}
-        action={canManage ? <Button variant="ghost" size="regular" iconEnd="chevron-right" onClick={invite} disabled={busy}>Invite</Button> : undefined} />
+      <SectionHeader title="Travellers"
+        action={canManage ? <Button size="regular" icon="user-add" onClick={invite} disabled={busy}>Add people</Button> : undefined} />
       <ListGroup label="Travellers">
         {members.map((id) => {
           const name = personName(profiles, id);
@@ -68,27 +68,24 @@ export function People({ trip, profiles, canManage, isOwner }: TripCtx) {
       {canManage && (
         <Card media={<Illustration name="friends" size={120} />}>
           <h2 className="t-heading-2">The more the merrier</h2>
-          <p className="t-body-small t-secondary">Invite friends to plan this trip with you. Anyone with the link can join for the next 14 days after signing in.</p>
-          <div className={s.inviteActions}>
-            {link ? (
-              <>
-                <div className={s.inviteRow}>
-                  <div className={s.inviteUrl} title={link}>{link}</div>
-                  <Button icon="share" onClick={() => share()}>Share</Button>
-                </div>
-                <Button variant="ghost" size="regular" onClick={makeLink} disabled={busy}>Make a new link</Button>
-              </>
-            ) : (
-              <Button size="regular" icon="plus" onClick={invite} disabled={busy}>Invite to trip</Button>
-            )}
-          </div>
+          <p className="t-body-small t-secondary">Tap Add people to get a link for friends to plan this trip with you. Anyone with the link can join for the next 14 days after signing in.</p>
+          {/* "Add people" (in the section header) makes the link; once there is one it shows here to share again */}
+          {link && (
+            <div className={s.inviteActions}>
+              <div className={s.inviteRow}>
+                <div className={s.inviteUrl} title={link}>{link}</div>
+                <Button icon="share" onClick={() => share()}>Share</Button>
+              </div>
+              <Button variant="ghost" size="regular" onClick={makeLink} disabled={busy}>Make a new link</Button>
+            </div>
+          )}
         </Card>
       )}
 
       {/* Deleting the trip lives in Edit trip; here members other than the owner can leave. */}
       {!isOwner && (
         <Button variant="destructive" icon="signout" onClick={async () => {
-          if (!confirm(`Leave "${trip.name}"?`)) return;
+          if (!confirmAction(`Leave "${trip.name}"?`)) return;
           await store.leaveTrip(trip.id, me.uid);
           navigate('/');
         }}>Leave trip</Button>
@@ -96,11 +93,11 @@ export function People({ trip, profiles, canManage, isOwner }: TripCtx) {
 
       <Sheet open={!!person} title={person ? personName(profiles, person) : ''} subtitle="What they can do on this trip" onClose={() => setPerson(null)} onSubmit={saveRole} submitLabel="Save">
         <SegmentedControl label="Role" block value={role} onChange={setRoleDraft} options={[{ value: 'member', label: 'Member' }, { value: 'editor', label: 'Organiser' }]} />
-        <p className="t-body-small t-secondary">Organisers can edit the trip, its budget and the itinerary, and add ideas to days.</p>
+        <p className="t-body-small t-secondary">Organisers can edit the trip and the itinerary, and add ideas to days.</p>
         {person && (
           <Button variant="destructive" icon="trash" onClick={async () => {
             const name = personName(profiles, person);
-            if (!confirm(`Remove ${name} from this trip?`)) return;
+            if (!confirmAction(`Remove ${name} from this trip?`)) return;
             try { await store.removeMember(trip, person); toast({ icon: 'trash', label: `${name} removed` }); setPerson(null); }
             catch { toast({ tone: 'error', label: "Couldn't remove. Check your connection" }); }
           }}>Remove from trip</Button>

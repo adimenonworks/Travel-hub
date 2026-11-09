@@ -34,7 +34,10 @@ export function AvatarStack({ people, max = 3, size = 32 }: { people: { id: stri
   );
 }
 
-/** Figma "Tags" Tone: Neutral, Tint, Category, Success, Warning, Danger. */
+/**
+ * Figma "Tags" Tone: Neutral, Tint, Category, Success, Warning, Danger. Neutral is the default and what the app uses;
+ * Success / Warning / Danger only for a real status. Tint stays in the component but isn't used anywhere.
+ */
 export type BadgeTone = 'neutral' | 'tint' | 'success' | 'warning' | 'danger' | 'category';
 
 /** Figma "Tags": a pill with an optional 16px icon and a Label small label. */
@@ -82,5 +85,23 @@ export function Notification({ state = 'neutral', icon = 'info', label, children
         <div>{children}</div>
       </div>
     </div>
+  );
+}
+
+/**
+ * A switch (on / off), e.g. "Also add to Lisbon ideas" on the Save sheet. The whole row is the control; the track
+ * shows on with the selected-primary colour and a check, so the state never relies on colour alone.
+ */
+export function Switch({ checked, onChange, label, hint }: { checked: boolean; onChange: (on: boolean) => void; label: ReactNode; hint?: ReactNode }) {
+  return (
+    <button type="button" role="switch" aria-checked={checked} className={s.switchRow} onClick={() => onChange(!checked)}>
+      <span className={s.switchText}>
+        <span className={s.switchLabel}>{label}</span>
+        {hint && <span className={s.switchHint}>{hint}</span>}
+      </span>
+      <span className={[s.switchTrack, checked && s.switchOn].filter(Boolean).join(' ')} aria-hidden="true">
+        <span className={s.switchThumb}>{checked && <Icon name="check" size={16} />}</span>
+      </span>
+    </button>
   );
 }

@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { confirmAction } from '../../lib/native';
 import { Button, COVER_ILLUSTRATIONS, EmptyState, IconButton, Illustration, SectionHeader, Sheet, TextField } from '../../design/components';
 import { store } from '../../data';
 import { personName, useMe } from '../../data/hooks';
@@ -22,7 +23,7 @@ export function Photos(ctx: TripCtx) {
   return (
     <>
       <SectionHeader title="Shared albums" meta="Anyone on the trip can add one"
-        action={<Button variant="ghost" size="regular" iconEnd="chevron-right" onClick={() => setEditing('new')}>Add album</Button>} />
+        action={<Button size="regular" icon="camera" onClick={() => setEditing("new")}>Add photos</Button>} />
       {sorted.length === 0 ? (
         <EmptyState illustration="memories" title="No albums yet"
           message="Make a shared album in Google Photos or Apple Photos, then add its link here so everyone can find the pictures." />
@@ -76,7 +77,7 @@ function AlbumForm({ open, tripId, album, canDelete, onClose }: { open: boolean;
     onClose();
   };
   const remove = async () => {
-    if (!album || !confirm(`Remove "${album.title}" from this trip? The album itself isn't deleted.`)) return;
+    if (!album || !confirmAction(`Remove "${album.title}" from this trip? The album itself isn't deleted.`)) return;
     await store.deleteSub(tripId, 'albums', album.id);
     onClose();
   };

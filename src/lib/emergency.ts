@@ -42,6 +42,3 @@ const NUMBERS: Record<string, Emergency> = {
 };
 
 export const emergencyFor = (code: string): Emergency | undefined => NUMBERS[code.toLowerCase()];
-
-/** Entry rules depend on the traveller's passport, so we point to an official, passport-aware source. */
-export const ENTRY_INFO_URL = 'https://www.iatatravelcentre.com/';

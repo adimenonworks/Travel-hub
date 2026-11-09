@@ -1,49 +1,75 @@
 import { useState } from 'react';
-import { CountryModal, EventCard, LinkButton, ListGroup, ListItem, PageSection, Tile } from '../../design/components';
-import { today } from '../../lib/dates';
+import { CountryModal, EventCard, LinkButton, ListGroup, ListItem, PageSection } from '../../design/components';
+import type { IconName } from '../../design/components';
+import { useMe, useProfile } from '../../data/hooks';
+import type { Place } from '../../data/types';
 import { BOOKING_GROUPS, eventType } from '../../lib/categories';
-import { countryName, flagUrl, tripCountries } from '../../lib/countries';
+import { countryCodeOf, countryName, flagUrl, tripCountries } from '../../lib/countries';
+import { timeAgo } from '../../lib/dates';
 import { emergencyFor } from '../../lib/emergency';
 import { nextEvent } from '../../lib/trips';
-import { TripBudget } from './Budget';
+import { isInApp, recordView, useRecentViews, type ViewKind } from '../../lib/recent';
 import { eventCardProps } from './events';
 import type { TripCtx } from './TripPage';
 import s from './trip.module.css';
 
+const KIND_ICON: Record<ViewKind, IconName> = { PDF: 'doc', Email: 'mail', Link: 'link', Booking: 'ticket', Place: 'pin' };
+
 /**
- * Trip "Overview" tab (Figma "Trip — Overview"): the hub. Budget card → Next up → Bookings tiles (a plain count of
- * each kind of event) → Good to know (each country's emergency number and entry requirements).
- * "Recently viewed" arrives with documents.
+ * Trip "Overview" tab (Figma "Trip — Overview"): Next stop (the next event as the deep green Next card) → Bookings (a
+ * list, one row per type with a plain count, each opening that type's list) → Recently viewed (documents, bookings
+ * and places you last opened, on this device) → Good to know (each country's emergency number; opens the Country sheet).
  */
-export function Overview(ctx: TripCtx & { onSetBudget?: () => void }) {
+export function Overview(ctx: TripCtx) {
   const { trip, activities } = ctx;
   const base = `/trip/${trip.id}`;
   const next = nextEvent(activities);
   const [country, setCountry] = useState<string | null>(null);
-  const t = today();
-  const budgetDay = t >= trip.startDate && t <= trip.endDate ? t : trip.startDate;
   const docs = activities.reduce((n, a) => n + a.links.length, 0);
-  const countries = tripCountries(trip, activities);
+  const recent = useRecentViews(trip.id);
+  const me = useMe();
+  const home = useProfile(me.uid)?.home ?? null;
+  // Good to know is about where you're going: your home country (a flight out of Melbourne) is left out, unless the whole trip is at home.
+  const homeCode = home ? countryCodeOf(home) : null;
+  const all = tripCountries(trip, activities);
+  const countries = all.some((c) => c !== homeCode) ? all.filter((c) => c !== homeCode) : all;
+  // A spot on the trip in the chosen country, for its local time
+  const spots: Place[] = [trip.destination, ...activities.flatMap((a) => [a.location, a.to])].filter((p): p is Place => !!p);
+  const spot = country ? spots.find((p) => countryCodeOf(p) === country) ?? null : null;
 
   return (
     <div className={s.overview}>
-      <TripBudget ctx={ctx} day={budgetDay} onSetBudget={ctx.onSetBudget} />
 
-      <PageSection title="Next up" action={<LinkButton to={`${base}/itinerary`} variant="ghost" size="regular" iconEnd="chevron-right">Itinerary</LinkButton>}>
+      <PageSection title="Next stop" action={<LinkButton to={`${base}/itinerary`} variant="ghost" size="regular" iconEnd="chevron-right">Itinerary</LinkButton>}>
         {next
-          ? <EventCard {...eventCardProps(next, ctx, true)} />
+          ? <EventCard {...eventCardProps(next, ctx, true)} state="next" />
           : <ListGroup><ListItem icon="calendar" title="Nothing planned yet" meta="Add events to the itinerary and the next one shows here." to={`${base}/itinerary`} /></ListGroup>}
       </PageSection>
 
-      <PageSection title="Bookings" meta="Your plans, by type">
-        <div className={s.tiles}>
+      <PageSection title="Bookings" meta="Tickets, confirmations and PDFs, by type">
+        <ListGroup label="Bookings">
           {BOOKING_GROUPS.map((g) => {
             const n = activities.filter((a) => eventType(a.category) === g.type).length;
-            return <Tile key={g.key} icon={g.icon} title={g.title} meta={`${n} ${n === 1 ? g.one : g.many}`} to={`${base}/bookings/${g.key}`} />;
+            return <ListItem key={g.key} icon={g.icon} title={g.title} meta={`${n} ${n === 1 ? g.one : g.many}`} to={`${base}/bookings/${g.key}`} />;
           })}
-          <Tile icon="doc" title="Documents" meta={`${docs} ${docs === 1 ? 'file or link' : 'files and links'}`} to={`${base}/bookings/documents`} />
-        </div>
+          <ListItem icon="doc" title="Documents" meta={`${docs} ${docs === 1 ? 'file' : 'files'}`} to={`${base}/bookings/documents`} />
+        </ListGroup>
       </PageSection>
+
+      {recent.length > 0 && (
+        <PageSection title="Recently viewed">
+          <ListGroup label="Recently viewed">
+            {recent.map((v) => {
+              const kind = v.kind ?? 'Link';
+              const trailing = `${kind} · ${timeAgo(v.at)}`;
+              return isInApp(v)
+                ? <ListItem key={v.url} size="compact" icon={KIND_ICON[kind]} title={v.label} trailing={trailing} to={v.url} />
+                : <ListItem key={v.url} size="compact" icon={KIND_ICON[kind]} title={v.label} trailing={trailing} href={v.url} label={`${v.label} (opens in a new tab)`}
+                    onClick={() => recordView(trip.id, { url: v.url, label: v.label, meta: v.meta, kind })} />;
+            })}
+          </ListGroup>
+        </PageSection>
+      )}
 
       {countries.length > 0 && (
         <PageSection title="Good to know" meta="Emergency numbers and entry rules">
@@ -60,7 +86,7 @@ export function Overview(ctx: TripCtx & { onSetBudget?: () => void }) {
           </ListGroup>
         </PageSection>
       )}
-      <CountryModal code={country} onClose={() => setCountry(null)} />
+      <CountryModal code={country} onClose={() => setCountry(null)} place={spot} home={home ? { ...home, countryCode: countryCodeOf(home) } : null} />
     </div>
   );
 }

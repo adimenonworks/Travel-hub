@@ -1,57 +1,82 @@
 import { useSearchParams } from 'react-router-dom';
-import { Button, Card, Illustration, PageHeader, PageSection, PageSkeleton, SegmentedControl } from '../../design/components';
+import { Button, Card, Icon, Illustration, PageHeader, PageSkeleton, SegmentedControl, Tile } from '../../design/components';
 import { useMyTrips } from '../../data/hooks';
+import type { SavedPlace } from '../../data/types';
 import { tripPhase } from '../../lib/dates';
-import { featuredTrip } from '../../lib/trips';
-import { Content, useNewTrip } from '../../app/Shell';
+import { placeCounts, useCountries } from '../saves/Collections';
+import { Content, useNewTrip, useSave } from '../../app/Shell';
 import { TripHero } from '../shared/TripHero';
 import s from './Home.module.css';
+import ss from '../saves/saves.module.css';
 
-type Segment = 'upcoming' | 'past';
+type Segment = 'upcoming' | 'saved' | 'past';
+
+
+/** A country you've saved in, as a Figma "Tile" (Default tone: grey, flag-led, "24 saves · 3 cities"); opens its collection. */
+export function CountryTile({ country }: { country: { code: string; name: string; flag?: string; places: SavedPlace[] }; index?: number }) {
+  return (
+    <Tile tone="default" to={`/saved/${country.code || 'unsorted'}`} title={country.name}
+      media={country.flag ? <img src={country.flag} alt="" /> : <Icon name="lightbulb" size={24} />}
+      meta={placeCounts(country.places)} />
+  );
+}
+
+const SEGMENT_KEY = 'trips:segment';
+const remembered = (): Segment | null => {
+  try { const v = localStorage.getItem(SEGMENT_KEY); return v === 'upcoming' || v === 'saved' || v === 'past' ? v : null; } catch { return null; }
+};
 
 /**
- * Trips tab (Figma "Trips tab — Upcoming"): the library. A Segmented Control (Upcoming · Past; Saved arrives with the
- * saves feature), "Plan a new trip", then the trip that matters now as the Hero Card with its cover and the other
- * trips being planned under it. Past lists finished trips, newest first.
+ * Trips tab: the library. Upcoming · Saved · Past (Upcoming first; the segment you picked is remembered on this device).
+ * Upcoming: a compact Hero Card per trip, soonest first, under "Plan a new trip". Saved: your Collections, one country
+ * Tile each. Past: compact Hero Cards, most recent first.
  */
 export function Trips() {
   const trips = useMyTrips();
   const newTrip = useNewTrip();
+  const openSave = useSave();
   const [params, setParams] = useSearchParams();
-  const segment: Segment = params.get('show') === 'past' ? 'past' : 'upcoming';
-  const all = (trips ?? []).slice().sort((a, b) => a.startDate.localeCompare(b.startDate));
-  const featured = featuredTrip(trips);
-  const planned = all.filter((t) => t !== featured && tripPhase(t.startDate, t.endDate) !== 'past');
-  const past = all.filter((t) => tripPhase(t.startDate, t.endDate) === 'past').reverse();
-  const upcoming = (featured ? 1 : 0) + planned.length;
+  const show = params.get('show');
+  const segment: Segment = show === 'past' || show === 'saved' || show === 'upcoming' ? show : remembered() ?? 'upcoming';
+  const pick = (v: Segment) => {
+    try { localStorage.setItem(SEGMENT_KEY, v); } catch { /* private mode: not remembered */ }
+    setParams(v === 'upcoming' ? {} : { show: v }, { replace: true });
+  };
+  const dated = (trips ?? []).slice().sort((a, b) => a.startDate.localeCompare(b.startDate));
+  const countries = useCountries() ?? [];
+  const upcoming = dated.filter((t) => tripPhase(t.startDate, t.endDate) !== 'past');
+  const past = dated.filter((t) => tripPhase(t.startDate, t.endDate) === 'past').reverse();
 
   return (
     <Content>
       <PageHeader title="Trips" fit />
       {trips === null ? <PageSkeleton bare /> : (
         <div className={s.segments}>
-          <SegmentedControl label="Show trips" block value={segment} onChange={(v) => setParams(v === 'past' ? { show: 'past' } : {}, { replace: true })}
-            options={[{ value: 'upcoming', label: `Upcoming · ${upcoming}` }, { value: 'past', label: `Past · ${past.length}` }]} />
-          <Button block icon="plus" onClick={newTrip}>Plan a new trip</Button>
-          {segment === 'upcoming' ? (
-            upcoming === 0 ? (
-              <Card media={<Illustration name="suitcase" size={120} />} title="No trips coming up"
-                body="Plan one: pick where you’re going and when, then invite the people coming with you." />
-            ) : (
-              <>
-                {featured && <TripHero trip={featured} />}
-                {planned.length > 0 && (
-                  <PageSection title="Being planned" meta={`${planned.length} more ${planned.length === 1 ? 'trip' : 'trips'} coming up`}>
-                    <div className={s.list}>{planned.map((t) => <TripHero key={t.id} trip={t} cover={false} />)}</div>
-                  </PageSection>
-                )}
-              </>
-            )
-          ) : past.length === 0 ? (
-            <Card media={<Illustration name="memories" size={120} />} title="No past trips yet" body="Trips you’ve been on show up here, with their photos." />
+          <SegmentedControl label="Show trips" block value={segment} onChange={pick}
+            options={[{ value: 'upcoming', label: 'Upcoming' }, { value: 'saved', label: 'Saved' }, { value: 'past', label: 'Past' }]} />
+          {segment === 'upcoming' && (upcoming.length === 0 ? (
+            <Card tone="accent" title="No trips planned yet" body="Pick where, when and who. Your saves come with you."
+              actions={<Button block iconEnd="chevron-right" onClick={() => newTrip()}>Plan a trip</Button>} />
           ) : (
-            <div className={s.list}>{past.map((t) => <TripHero key={t.id} trip={t} />)}</div>
-          )}
+            <>
+              <Button block iconEnd="chevron-right" onClick={() => newTrip()}>Plan a new trip</Button>
+              <div className={s.list}>{upcoming.map((t) => <TripHero key={t.id} trip={t} size="compact" />)}</div>
+            </>
+          ))}
+          {segment === 'saved' && (countries.length === 0 ? (
+            <Card media={<Illustration name="map" size={120} />} title="Looks a little empty" body="Save things to organise your future trip"
+              actions={<Button block onClick={() => openSave({ mode: 'link' })}>Save a place</Button>} />
+          ) : (
+            <div className={ss.tileGrid}>
+              {countries.map((c) => <CountryTile key={c.code} country={c} />)}
+              <Tile tone="add" icon="plus" title="New place to go" onClick={() => openSave({ mode: 'link' })} />
+            </div>
+          ))}
+          {segment === 'past' && (past.length === 0 ? (
+            <p className="t-body t-secondary">Trips you’ve taken will show up here</p>
+          ) : (
+            <div className={s.list}>{past.map((t) => <TripHero key={t.id} trip={t} size="compact" />)}</div>
+          ))}
         </div>
       )}
     </Content>

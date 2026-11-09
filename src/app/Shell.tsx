@@ -1,14 +1,19 @@
-import { createContext, useContext, useState, type ReactNode } from 'react';
+import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { BottomNav, Notification, ToastProvider, type NavTab } from '../design/components';
 import { store } from '../data';
 import { screenKey, useScreenTransition } from './navigation';
 import { NewTrip } from '../features/trip/NewTrip';
+import { SaveSheet, type SaveRequest } from '../features/saves/SaveSheet';
+import { onSharedLink } from '../lib/native';
 import s from './Shell.module.css';
 
 /** Opens the full-screen New trip flow from anywhere (Home, Trips). */
 const NewTripContext = createContext<() => void>(() => {});
 export const useNewTrip = () => useContext(NewTripContext);
+/** Opens the Save a place sheet: paste a link or search (Save a place), or a link shared from another app. */
+const SaveContext = createContext<(r: SaveRequest) => void>(() => {});
+export const useSave = () => useContext(SaveContext);
 
 /** Bottom Nav (Figma): Home, Trips (your trips, and each trip's pages) and You. */
 const TABS: NavTab[] = [
@@ -22,6 +27,9 @@ export function Shell({ children }: { children: ReactNode }) {
   const navigate = useNavigate();
   const [creating, setCreating] = useState(false);
   const newTrip = () => setCreating(true);
+  const [saving, setSaving] = useState<SaveRequest | null>(null);
+  // Links shared to Rove from other apps (the iPhone share extension opens rove://save?url=…).
+  useEffect(() => onSharedLink((url) => setSaving({ mode: 'link', url })), []);
   const { pathname } = useLocation();
   const tabs = TABS;
   const showNav = !pathname.startsWith('/join/') && pathname !== '/design';
@@ -29,6 +37,7 @@ export function Shell({ children }: { children: ReactNode }) {
 
   return (
     <NewTripContext.Provider value={newTrip}>
+      <SaveContext.Provider value={setSaving}>
       <ToastProvider>
       <div className={s.shell}>
         <main id="main" className={[s.main, showNav && s.withNav].filter(Boolean).join(' ')}>
@@ -41,8 +50,10 @@ export function Shell({ children }: { children: ReactNode }) {
         </main>
         {showNav && <BottomNav tabs={tabs} />}
         <NewTrip open={creating} onClose={() => setCreating(false)} onOpenTrip={(id) => navigate(`/trip/${id}`)} />
+        <SaveSheet request={saving} onClose={() => setSaving(null)} />
       </div>
       </ToastProvider>
+      </SaveContext.Provider>
     </NewTripContext.Provider>
   );
 }

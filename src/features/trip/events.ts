@@ -1,6 +1,5 @@
 import type { Activity } from '../../data/types';
 import { daysBetween, formatDay, formatTime, today } from '../../lib/dates';
-import { money } from '../../lib/format';
 import { categoryInfo, eventType } from '../../lib/categories';
 import type { TripCtx } from './TripPage';
 
@@ -58,12 +57,10 @@ export function eventCardProps(input: Activity | DayEntry, ctx: TripCtx, showDay
   const a = e.a;
   const type = eventType(a.category);
   const info = categoryInfo(a.category);
-  const cost = a.cost * Math.max(1, a.attendeeIds.length);
   const day = (d: string) => (d === today() ? 'Today' : formatDay(d));
   const range = a.startTime ? `${formatTime(a.startTime)}${a.endTime ? ` – ${formatTime(a.endTime)}` : ''}` : undefined;
   const base = {
     title: a.title, icon: info.icon,
-    amount: cost > 0 && e.part !== 'out' ? money(cost, ctx.trip.currency) : undefined,
     to: `/trip/${ctx.trip.id}/plan/${a.id}`,
   };
   const withDay = (t?: string) => (showDay ? [day(a.date), t].filter(Boolean).join(', ') : t);

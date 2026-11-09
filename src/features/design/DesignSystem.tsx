@@ -1,10 +1,10 @@
 import { useState, type CSSProperties } from 'react';
 import {
-  Avatar, AvatarStack, Badge, BudgetCard, Chip, Notification, Button, Card, EmptyState, FieldRow, HeroCard, Icon, IconButton,
+  Avatar, AvatarStack, Badge, Chip, Notification, Button, Card, EmptyState, FieldRow, HeroCard, Icon, IconButton,
   LinkButton, PageHeader, PageSection, SegmentedControl, Select, Sheet, Tabs, TextArea, TextField, Timeline, Illustration,
   type IllustrationName, COVER_ILLUSTRATIONS, ICON_NAMES, useToast, BottomNav, Skeleton,
   ListItem, ListGroup, SectionHeader, EventCard, TravelConnector, IdeaRow, Tile, QuickAction, MapCard, StatStrip, ProfileCard,
-  OptionCard, SearchField, StepProgress, DestinationHeader, TripHeader, DayCard, CountryModal,
+  OptionCard, Switch, SearchField, StepProgress, DestinationHeader, TripHeader, DayCard, CountryModal,
 } from '../../design/components';
 import { flagUrl } from '../../lib/countries';
 import type { ReactNode } from 'react';
@@ -65,6 +65,7 @@ const icons = ICON_NAMES;
 export function DesignSystem() {
   const [seg, setSeg] = useState<'a' | 'b' | 'c'>('a');
   const [sheet, setSheet] = useState(false);
+  const [on, setOn] = useState(false);
   const [country, setCountry] = useState<string | null>(null);
   const [opt, setOpt] = useState('others');
   const toast = useToast();
@@ -246,27 +247,22 @@ export function DesignSystem() {
             <Chip icon="people">4 going</Chip>
           </div>
           <div className={s.row}>
-            <Badge icon="check">Neutral</Badge><Badge tone="tint" icon="calendar">In 9 days</Badge><Badge tone="category" icon="camera">Category</Badge><Badge tone="success" icon="star">Most votes</Badge><Badge tone="warning">Warning</Badge><Badge tone="danger">Danger</Badge>
+            <Badge icon="calendar">In 9 days</Badge><Badge tone="tint" icon="check">Tint (unused)</Badge><Badge tone="category" icon="camera">Category</Badge><Badge tone="success" icon="check">Success</Badge><Badge tone="warning">Warning</Badge><Badge tone="danger">Danger</Badge>
           </div>
         </Section>
 
-        <Section title="Trip components" footer="Hero Card (phase-aware: countdown, then the next thing), Trip header, Budget card (Planning / During), Day Card, Timeline.">
+        <Section title="Trip components" footer="Hero Card (phase-aware: countdown, then the next thing; Size Compact for lists), Trip header, Day Card, Timeline.">
           <HeroCard cover={<Illustration name={COVER_ILLUSTRATIONS[1]} />} countdown={{ label: 'In 9 days' }} title="Portugal & Spain" meta="Nov 2 – 11 · 10 days"
-            countries={[{ code: 'pt', name: 'Portugal', flag: flagUrl('pt') }, { code: 'es', name: 'Spain', flag: flagUrl('es') }]}
             people={[{ id: 'a', name: 'Alex Menon' }, { id: 'j', name: 'Jo Ma' }, { id: 's', name: 'Sam Lee' }, { id: 'p', name: 'Priya Shah' }]} next={{ icon: 'plane', title: 'Flight to Lisbon', meta: 'Mon 2 Nov, 08:30 · TP1351', to: '/design' }} to="/design" />
-          <HeroCard countdown={{ label: 'Day 3 of 15' }} title="Japan" meta="Mar 20 – Apr 3 · 15 days" countries={[{ code: 'jp', name: 'Japan', flag: flagUrl('jp') }]} people={[{ id: 'a', name: 'Alex Menon' }, { id: 'j', name: 'Jo Ma' }, { id: 's', name: 'Sam Lee' }, { id: 'p', name: 'Priya Shah' }]}
+          <HeroCard countdown={{ label: 'Day 3 of 15' }} title="Japan" meta="Mar 20 – Apr 3 · 15 days" people={[{ id: 'a', name: 'Alex Menon' }, { id: 'j', name: 'Jo Ma' }, { id: 's', name: 'Sam Lee' }, { id: 'p', name: 'Priya Shah' }]}
             next={{ icon: 'lightbulb', title: '24 ideas to sort', meta: 'Brought over from your Japan saves' }} />
+          <HeroCard size="compact" cover={<Illustration name={COVER_ILLUSTRATIONS[2]} />} countdown={{ label: 'In 40 days' }} title="Japan" meta="Dec 17 – 31 · 15 days" to="/design" />
           <TripHeader title="Portugal & Spain" back={{ to: '/design', label: 'Trips' }} action={{ icon: 'pencil', label: 'Edit trip', onClick: () => {} }}
-            meta="Nov 2 – 11 · 10 days · in 9 days" countries={[{ code: 'pt', name: 'Portugal', flag: flagUrl('pt') }]} going={{ label: '4 going', to: '/design' }} />
-          <BudgetCard label="Trip cost so far" amount="€3,160" action={<Button variant="ghost" size="regular" iconEnd="chevron-right">Details</Button>} segments={[
-            { label: 'Flights', value: '€1,330', amount: 1330, color: 'brand' }, { label: 'Stays', value: '€1,410', amount: 1410, color: 'mid' },
-            { label: 'Planned activities & food', value: '€420', amount: 420, color: 'orange' }, { label: 'Spending money left', value: '€840 of €1,260', amount: 840, color: 'empty' }]} />
-          <BudgetCard label="Today" amount="€45 of €80" action={<Button variant="ghost" size="regular" iconEnd="chevron-right">Details</Button>} segments={[
-            { label: 'Planned today', value: '€45', amount: 45, color: 'orange' }, { label: 'Left today', value: '€35', amount: 35, color: 'empty' }, { label: 'Left for the trip', value: '€380', amount: 0, color: 'empty' }]} />
+            meta="2 – 11 Nov · 10 days" />
           <div className={s.row}>
-            <DayCard day={3} month="Nov" word="Today" tag="3 more events" selected onClick={() => {}} />
-            <DayCard day={4} month="Nov" word="Tomorrow" selected={false} onClick={() => {}} />
-            <DayCard day={5} month="Nov" word="Day 4" selected={false} onClick={() => {}} />
+            <DayCard day={3} weekday="Tue" label="Today, Tuesday 3 November" selected onClick={() => {}} />
+            <DayCard day={4} weekday="Wed" label="Tomorrow, Wednesday 4 November" selected={false} onClick={() => {}} />
+            <DayCard day={5} weekday="Thu" label="Day 4, Thursday 5 November" selected={false} onClick={() => {}} />
           </div>
           <Timeline time="12:30" />
         </Section>
@@ -279,7 +275,7 @@ export function DesignSystem() {
           <TravelConnector label="About 20 min by car" icon="car" />
           <EventCard icon="plane" layout="journey" title="Lisbon → Porto" time="TP1946" place="TAP Air Portugal" amount="€89" status="Check-in open" to="/design"
             journey={{ fromTime: '08:30', fromPlace: 'LIS · T1', duration: '55m · direct', toTime: '09:25', toPlace: 'OPO' }} />
-          <EventCard icon="pencil" layout="note" title="Bag drop closes 40 min before" place="Sam has the passports" />
+          <EventCard icon="notebook" layout="note" title="Bag drop closes 40 min before" place="Sam has the passports" />
         </Section>
 
         <Section title="Rows, groups and tiles" footer="Section header, List group of List items (Default / Compact), Idea rows with Vote buttons, Tiles, Quick actions, Map card, Stat strip, Profile Card.">
@@ -310,7 +306,7 @@ export function DesignSystem() {
           <MapCard media={<Illustration name="map" size={72} />} title="See 15 places on a map" meta="Tokyo, Kyoto, Osaka" onClick={() => {}} />
           <StatStrip stats={[{ value: 12, label: 'countries' }, { value: 31, label: 'cities' }, { value: 96, label: 'days away' }]} />
           <ProfileCard name="Alex Menon" email="alex.menon@gmail.com · Google" onClick={() => {}} />
-          <DestinationHeader tone="orange" flag={<img src={flagUrl('jp')} alt="" />} title="24 saves · 3 cities" meta="Saved by you and Sam" action={<Button variant="inverse" block iconEnd="chevron-right">Turn into a trip</Button>} />
+          <DestinationHeader tone="orange" flag={<img src={flagUrl('jp')} alt="" />} title="24 saves · 3 cities" meta="Saved by you and Sam" />
         </Section>
 
         <Section title="Flow" footer="Search field, Option cards and Step progress (shown on the bright emerald Flow screen).">
@@ -350,7 +346,9 @@ export function DesignSystem() {
             <div className={s.row}>
               <Button variant="secondary" icon="copy" onClick={() => toast({ icon: 'copy', label: 'Address copied' })}>Show a toast</Button>
               <Button variant="secondary" onClick={() => toast({ tone: 'error', label: "Couldn't save. Check your connection" })}>Error toast</Button>
+              <Button variant="secondary" onClick={() => toast({ icon: 'check', label: 'Saved to Portugal', action: { label: 'Undo', onClick: () => {} } })}>Toast with Undo</Button>
             </div>
+            <Switch checked={on} onChange={setOn} label="Also add to Portugal & Spain ideas" hint="Your trip covers Lisbon" />
           </Card>
           <Card><EmptyState illustration="ideas" title="Empty state" message="Explains what goes here and how to start." action={<Button variant="secondary" onClick={() => setSheet(true)}>Open a sheet</Button>} /></Card>
         </Section>

@@ -1,19 +1,20 @@
 import { useEffect, useState } from 'react';
-import { Button, FieldRow, ListGroup, ListItem, Select, Sheet, TextArea, TextField, useToast } from '../../design/components';
+import { Button, FieldRow, OptionCard, Select, Sheet, TextArea, TextField, useToast } from '../../design/components';
 import { store } from '../../data';
 import { useMe } from '../../data/hooks';
 import type { Activity, Category, LinkItem, Place, Trip } from '../../data/types';
 import { addDays, dayWord, formatDay, tripDays } from '../../lib/dates';
 import { geocodePlace } from '../../lib/geocode';
 import { EVENT_TYPES, eventType, type EventType } from '../../lib/categories';
-import { haptic } from '../../lib/native';
+import { haptic, confirmAction } from '../../lib/native';
 import { LinkEditor, cleanLinks } from '../shared/Links';
+import s from './trip.module.css';
 
-export type ActivityDraft = Partial<Pick<Activity, 'title' | 'category' | 'notes' | 'cost' | 'links' | 'date' | 'startTime' | 'endTime' | 'locationText'>>;
+export type ActivityDraft = Partial<Pick<Activity, 'title' | 'category' | 'notes' | 'links' | 'date' | 'startTime' | 'endTime' | 'locationText' | 'placeId'>>;
 
 type Form = {
   type: EventType | null; title: string; date: string; endDate: string; startTime: string; endTime: string;
-  locationText: string; fromText: string; toText: string; ref: string; notes: string; cost: string; links: LinkItem[];
+  locationText: string; fromText: string; toText: string; ref: string; notes: string; links: LinkItem[];
 };
 
 const toForm = (a: ActivityDraft | Activity | undefined, date: string, typed: boolean): Form => {
@@ -26,24 +27,27 @@ const toForm = (a: ActivityDraft | Activity | undefined, date: string, typed: bo
     startTime: a?.startTime ?? '',
     endTime: a?.endTime ?? '',
     locationText: a?.locationText ?? '',
-    fromText: full?.fromText ?? '',
+    // A transport with no route (older taxi or tram events) starts from its place.
+    fromText: full?.fromText || (a?.category && eventType(a.category) === 'transport' ? a.locationText ?? '' : ''),
     toText: full?.toText ?? '',
     ref: full?.ref ?? '',
     notes: a?.notes ?? '',
-    cost: a?.cost ? String(a.cost) : '',
     links: a?.links?.length ? a.links : [],
   };
 };
+
+/** Cafés keep the Coffee icon: a Food & drink place whose name says café or coffee. */
+const CAFE = /caf[eé]|coffee|espresso|pastelaria|bakery|patisserie/i;
 
 /** "Lisbon (LIS)" or "Lisbon, Portugal" → "Lisbon", for titles like "Lisbon → Porto". */
 const city = (s: string) => s.split(',')[0].replace(/\s*\([^)]*\)\s*/g, ' ').trim();
 
 /**
- * Add an event by hand, or edit one. Adding starts with a quick list of the six types (Flight, Stay, Transport,
- * Food & drink, Activity, Note); each type then asks only for what it needs:
- * Flight: from, to, departs, arrives, flight number · Stay: place, check-in and check-out (one Stay shows as check-in
- * and check-out in the itinerary) · Transport: from, to, time · Food & drink, Activity: place and time ·
- * Note: text and an optional time (the only type without a place).
+ * Add an event by hand, or edit one. Adding starts with Option cards for the six types (Flight, Stay, Transport,
+ * Food & drink, Activity, Note) inside the Sheet; each type then asks only for what it needs:
+ * Flight: from, to, departs, arrives, flight number · Stay: place, check-in and check-out dates (one booking shows as
+ * check-in and check-out in the itinerary) · Transport: from, to, times · Food & drink: place, time · Activity: place,
+ * time · Note: text and an optional time (the only type without a place). Events have no price: prices live on Ideas.
  * `draft` prefills a new one (e.g. from an idea added to a day); `onCreated` gets the new id.
  */
 export function ActivityForm({ open, trip, date, activity, draft, onClose, onCreated }: {
@@ -62,9 +66,9 @@ export function ActivityForm({ open, trip, date, activity, draft, onClose, onCre
   const valid = !!type && (
     type === 'flight' ? !!(f.fromText.trim() && f.toText.trim())
       : type === 'stay' ? !!(f.locationText.trim() && f.endDate && f.endDate > f.date)
-        : type === 'transport' ? !!((f.fromText.trim() && f.toText.trim()) || (f.title.trim() && f.locationText.trim()))
+        : type === 'transport' ? !!f.fromText.trim()
           : type === 'note' ? !!f.title.trim()
-            : !!(f.title.trim() && f.locationText.trim()));
+            : !!f.locationText.trim());
 
   const submit = async () => {
     if (!type || !valid) return;
@@ -76,22 +80,29 @@ export function ActivityForm({ open, trip, date, activity, draft, onClose, onCre
       // A journey's place is where it leaves from; it also remembers where it arrives (its country joins the trip's chips).
       const from = journey ? await find(f.fromText, activity?.fromText, activity?.location, type === 'flight' ? null : trip.destination) : null;
       const to = journey ? await find(f.toText, activity?.toText, activity?.to, type === 'flight' ? null : trip.destination) : null;
-      const placeText = journey ? f.fromText.trim() : type === 'note' ? '' : f.locationText.trim();
+      const placeText = type === 'transport' || journey ? f.fromText.trim() : type === 'note' ? '' : f.locationText.trim();
       const location = journey ? from
         : !placeText ? null
           : placeText === (activity?.locationText ?? '') && activity?.location ? activity.location : await geocodePlace(placeText, trip.destination);
-      const title = f.title.trim()
-        || (journey ? `${city(f.fromText)} → ${city(f.toText)}` : type === 'stay' ? city(f.locationText) : '');
+      // Titles come from the places. An event (or idea) keeps its own title while its place is unchanged.
+      const src = activity ?? draft;
+      const keep = src?.title && placeText === (src.locationText ?? '').trim() ? src.title : '';
+      const title = type === 'note' ? f.title.trim()
+        : journey ? `${city(f.fromText)} → ${city(f.toText)}`
+          : keep || (type === 'transport' ? `Transport from ${city(placeText)}` : city(placeText));
+      // Food & drink keeps a café or bar icon it already had; a new one called "… Café" gets the Coffee icon.
+      const category: Category = type !== 'food' ? type
+        : src?.category && eventType(src.category) === 'food' && src.category !== 'food' ? src.category
+          : CAFE.test(placeText) ? 'cafe' : 'food';
       const data: Partial<Activity> & { category: Category } = {
         title,
-        category: type,
+        category,
         date: f.date,
         startTime: f.startTime,
         endTime: f.endTime,
         locationText: placeText,
         location,
         notes: f.notes.trim(),
-        cost: Number(f.cost) || 0,
         links: cleanLinks(f.links),
         // Type-specific fields; cleared when they don't apply, so a changed type leaves nothing behind.
         endDate: type === 'stay' || (type === 'flight' && f.endDate > f.date) ? f.endDate : '',
@@ -102,7 +113,7 @@ export function ActivityForm({ open, trip, date, activity, draft, onClose, onCre
       };
       if (activity) await store.updateSub(trip.id, 'activities', activity.id, data);
       else {
-        const id = await store.addSub(trip.id, 'activities', { ...(data as Omit<Activity, 'id' | 'createdBy' | 'createdAt' | 'attendeeIds'>), attendeeIds: [me.uid] });
+        const id = await store.addSub(trip.id, 'activities', { ...(data as Omit<Activity, 'id' | 'createdBy' | 'createdAt' | 'attendeeIds'>), ...(draft?.placeId ? { placeId: draft.placeId } : {}), attendeeIds: [me.uid] });
         onCreated?.(id);
       }
       toast({ icon: 'check', label: activity ? 'Changes saved' : type === 'stay' ? 'Stay added: check-in and check-out' : 'Event added' });
@@ -115,7 +126,7 @@ export function ActivityForm({ open, trip, date, activity, draft, onClose, onCre
   };
 
   const remove = async () => {
-    if (!activity || !confirm(`Delete "${activity.title}"?`)) return;
+    if (!activity || !confirmAction(`Delete "${activity.title}"?`)) return;
     try {
       await store.deleteSub(trip.id, 'activities', activity.id);
       toast({ icon: 'trash', label: 'Event deleted' });
@@ -131,15 +142,14 @@ export function ActivityForm({ open, trip, date, activity, draft, onClose, onCre
       {list.map((d) => <option key={d} value={d}>{dayWord(d, trip.startDate)} · {formatDay(d)}</option>)}
     </Select>
   );
-  const times = (a: string, b: string, optional = false) => (
+  const times = (a: string, b: string, optionalA = false, optionalB = optionalA) => (
     <FieldRow>
-      <TextField label={optional ? `${a} (optional)` : a} type="time" value={f.startTime} onChange={(e) => set({ startTime: e.target.value })} />
-      <TextField label={optional ? `${b} (optional)` : b} type="time" value={f.endTime} onChange={(e) => set({ endTime: e.target.value })} />
+      <TextField label={optionalA ? `${a} (optional)` : a} type="time" value={f.startTime} onChange={(e) => set({ startTime: e.target.value })} />
+      <TextField label={optionalB ? `${b} (optional)` : b} type="time" value={f.endTime} onChange={(e) => set({ endTime: e.target.value })} />
     </FieldRow>
   );
   const extras = (
     <>
-      {type !== 'note' && <TextField label={`Cost per person (${trip.currency})`} type="number" inputMode="decimal" min={0} step="any" placeholder="0" value={f.cost} onChange={(e) => set({ cost: e.target.value })} />}
       {type !== 'note' && <TextArea label="Notes" placeholder="Booking reference, what to bring…" value={f.notes} onChange={(e) => set({ notes: e.target.value })} />}
       {type !== 'note' && <LinkEditor links={f.links} onChange={(links) => set({ links })} />}
     </>
@@ -150,13 +160,13 @@ export function ActivityForm({ open, trip, date, activity, draft, onClose, onCre
       subtitle={!type ? 'What are you adding?' : undefined}
       onClose={onClose} onSubmit={type ? submit : undefined} submitLabel={activity ? 'Save' : 'Add'} submitDisabled={!valid || busy}>
       {!type ? (
-        // The picker: a quick list inside the sheet, not a new screen
-        <ListGroup label="Event types">
+        // The picker: Option cards inside the sheet, not a new screen
+        <div className={s.optionGrid} role="group" aria-label="Event types">
           {EVENT_TYPES.map((x) => (
-            <ListItem key={x.value} icon={x.icon} title={x.label} meta={x.hint}
-              onClick={() => { haptic('selection'); set({ type: x.value, endDate: x.value === 'stay' ? (f.endDate || addDays(f.date, 1)) : f.endDate }); }} />
+            <OptionCard key={x.value} icon={x.icon} label={x.label}
+              onClick={() => { haptic('light'); set({ type: x.value, endDate: x.value === 'stay' ? (f.endDate || addDays(f.date, 1)) : f.endDate }); }} />
           ))}
-        </ListGroup>
+        </div>
       ) : (
         <>
           {type === 'flight' && (
@@ -182,12 +192,11 @@ export function ActivityForm({ open, trip, date, activity, draft, onClose, onCre
           {type === 'stay' && (
             <>
               <TextField label="Place" placeholder="Memmo Alfama, Lisbon" value={f.locationText} onChange={(e) => set({ locationText: e.target.value })}
-                hint="The hotel or address. One stay shows as check-in and check-out in the itinerary." />
+                hint="The hotel or address. It shows as check-in and check-out in the itinerary." />
               <FieldRow>
                 {daySelect('Check-in', f.date, (v) => set({ date: v, endDate: f.endDate > v ? f.endDate : addDays(v, 1) }))}
                 {daySelect('Check-out', f.endDate, (v) => set({ endDate: v }), [...days.filter((d) => d > f.date), ...(days.includes(addDays(trip.endDate, 1)) ? [] : [addDays(trip.endDate, 1)])])}
               </FieldRow>
-              {times('Check-in', 'Check-out', true)}
             </>
           )}
 
@@ -195,23 +204,21 @@ export function ActivityForm({ open, trip, date, activity, draft, onClose, onCre
             <>
               <FieldRow>
                 <TextField label="From" placeholder="Lisbon Oriente" value={f.fromText} onChange={(e) => set({ fromText: e.target.value })} />
-                <TextField label="To" placeholder="Porto Campanhã" value={f.toText} onChange={(e) => set({ toText: e.target.value })} />
+                <TextField label="To (optional)" placeholder="Porto Campanhã" value={f.toText} onChange={(e) => set({ toText: e.target.value })} />
               </FieldRow>
               {daySelect('Day', f.date, (v) => set({ date: v }))}
-              {times('Leaves', 'Arrives')}
-              <TextField label="What (optional)" placeholder="Train, ferry, car hire…" value={f.title} onChange={(e) => set({ title: e.target.value })}
-                hint={!(f.fromText.trim() && f.toText.trim()) ? 'For a taxi or car hire with no route, give it a name and a place.' : undefined} />
-              {!(f.fromText.trim() && f.toText.trim()) && <TextField label="Place" placeholder="Pick-up address" value={f.locationText} onChange={(e) => set({ locationText: e.target.value })} />}
+              {times('Leaves', 'Arrives', false, true)}
             </>
           )}
 
           {(type === 'food' || type === 'activity') && (
             <>
-              <TextField label={type === 'food' ? 'Name' : 'What'} placeholder={type === 'food' ? 'Dinner at Cervejaria Ramiro' : 'Belém Tower'} value={f.title} onChange={(e) => set({ title: e.target.value })} />
-              <TextField label="Place" placeholder="Address or place name" value={f.locationText} onChange={(e) => set({ locationText: e.target.value })}
-                hint="Needed for directions. A place in a new country adds it to the trip." />
-              {daySelect('Day', f.date, (v) => set({ date: v }))}
-              {times('Starts', 'Ends')}
+              <TextField label="Place" placeholder={type === 'food' ? 'Cervejaria Ramiro, Lisbon' : 'Belém Tower, Lisbon'} value={f.locationText} onChange={(e) => set({ locationText: e.target.value })}
+                hint="Its name, or an address. A place in a new country adds it to the trip." />
+              <FieldRow>
+                {daySelect('Day', f.date, (v) => set({ date: v }))}
+                <TextField label="Time" type="time" value={f.startTime} onChange={(e) => set({ startTime: e.target.value })} />
+              </FieldRow>
             </>
           )}
 

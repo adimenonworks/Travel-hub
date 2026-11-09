@@ -7,7 +7,7 @@
   gap: var(--space-default-200);
   background: transparent;
   border: 1px solid var(--interactive-unselected-ghost-border);
-  border-radius: var(--radius-500); /* 16 */
+  border-radius: var(--radius-1000); /* Figma: a pill, segments too */
   max-width: 100%;
 }
 .block { display: grid; width: 100%; }
@@ -15,7 +15,7 @@
   min-height: 34px;
   padding: var(--space-default-400) var(--space-default-500);
   border: 0;
-  border-radius: var(--radius-500);
+  border-radius: var(--radius-1000);
   background: transparent;
   font: var(--type-label); /* Label */
   color: var(--interactive-selected-ghost-text);
@@ -32,7 +32,7 @@
 .thumb {
   position: absolute; top: var(--space-default-200); bottom: var(--space-default-200); left: 0;
   width: var(--w); transform: translateX(var(--x));
-  border-radius: var(--radius-500);
+  border-radius: var(--radius-1000);
   background: var(--interactive-selected-primary-background);
   transition: background var(--motion-fast);
 }

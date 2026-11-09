@@ -141,6 +141,7 @@ export function Calendar({ start, end, onChange, min }: { start: string; end: st
           const disabled = !!min && d < min;
           return (
             <button key={i} type="button" className={[s.cell, s.day, s[`day-${state}`]].join(' ')} disabled={disabled}
+              style={state === 'range' || state === 'end' ? { '--i': Math.round((Date.parse(d) - Date.parse(start!)) / 864e5) } as CSSProperties : undefined}
               aria-pressed={state !== 'default'} aria-label={new Date(d + 'T12:00').toLocaleDateString(undefined, { weekday: 'long', day: 'numeric', month: 'long' })}
               onClick={() => pick(d)}>
               <span>{Number(d.slice(8))}</span>

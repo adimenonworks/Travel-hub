@@ -1,8 +1,10 @@
-/* Figma "Bottom Nav": a frosted pill (overlay/bar + Elevation/Floating bar) floating 16px from the sides and the bottom, above the home indicator. */
+/* Figma "Bottom Nav": a frosted pill (overlay/bar + Elevation/Floating bar) floating 16px from the sides and 16px from
+   the physical bottom edge of the screen (no safe area added; it sits over the home indicator area, like iOS bars).
+   The safe area goes into the page's bottom padding instead (Shell .withNav). */
 .nav {
   position: fixed; left: 0; right: 0; bottom: 0; z-index: 40;
   display: flex; justify-content: center; pointer-events: none;
-  padding: 0 max(var(--space-default-500), env(safe-area-inset-left)) calc(env(safe-area-inset-bottom) + var(--space-default-500)) max(var(--space-default-500), env(safe-area-inset-right));
+  padding: 0 max(var(--space-default-500), env(safe-area-inset-left)) var(--space-default-500) max(var(--space-default-500), env(safe-area-inset-right));
 }
 .bar {
   position: relative;

@@ -5,10 +5,10 @@
 :root {
   --type-display: var(--weight-black) var(--size-display)/1 var(--font-display);
   --type-display-tiny: var(--weight-black) var(--size-display-tiny)/1 var(--font-display);
-  --type-heading-1: var(--weight-bold) var(--size-heading-1)/1 var(--font-family);
-  --type-heading-2: var(--weight-semibold) var(--size-heading-2)/1 var(--font-family);
+  --type-heading-1: var(--weight-black) var(--size-heading-1)/1 var(--font-display);
+  --type-heading-2: var(--weight-bold) var(--size-heading-2)/1 var(--font-display);
   --type-heading-3: var(--weight-semibold) var(--size-heading-3)/1 var(--font-family);
-  --type-heading-4: var(--weight-bold) min(calc(18rem / 17), 25px)/1 var(--font-family);
+  --type-heading-4: var(--weight-bold) var(--size-heading-3)/1 var(--font-family);
   --type-body: var(--weight-regular) var(--size-body)/1.5 var(--font-family);
   --type-body-small: var(--weight-regular) var(--size-body-small)/1.5 var(--font-family);
   --type-label: var(--weight-medium) calc(14rem / 17)/1.5 var(--font-family);
@@ -18,8 +18,8 @@
 }
 .t-display { font: var(--type-display); letter-spacing: -0.01em; }
 .t-display-tiny { font: var(--type-display-tiny); letter-spacing: -0.01em; }
-.t-heading-1 { font: var(--type-heading-1); letter-spacing: -0.02em; }
-.t-heading-2 { font: var(--type-heading-2); letter-spacing: -0.02em; }
+.t-heading-1 { font: var(--type-heading-1); letter-spacing: -0.01em; }
+.t-heading-2 { font: var(--type-heading-2); letter-spacing: -0.01em; }
 .t-heading-3 { font: var(--type-heading-3); letter-spacing: -0.02em; }
 .t-heading-4 { font: var(--type-heading-4); letter-spacing: -0.01em; }
 .t-body { font: var(--type-body); }

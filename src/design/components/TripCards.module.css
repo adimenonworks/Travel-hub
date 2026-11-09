@@ -1,18 +1,32 @@
-/* Figma "Hero Card": 24 corners, subtle border, cover 2:1 on top, then 16 / 16 / 4 padding with gap 12 */
+/* Figma "Hero Card": the grey container, no border, 24 corners, cover 2:1 on top, then 16 / 16 / 4 padding with gap 12 */
 .hero {
   display: flex; flex-direction: column; overflow: hidden; /* the cover is a deliberate viewport */
-  border-radius: var(--radius-600); border: 1px solid var(--on-light-border-subtle);
-  background: var(--on-light-surface-primary);
+  border-radius: var(--radius-600);
+  background: var(--on-light-surface-secondary);
 }
 .cover { position: relative; aspect-ratio: 2 / 1; overflow: hidden; }
+/* Size Compact: a shorter cover */
+.heroCompact .cover { aspect-ratio: 3 / 1; }
 .cover > :first-child { position: absolute; inset: 0; width: 100%; height: 100%; }
 .cover > :first-child svg { width: 100%; height: 100%; }
-.countdown { position: absolute; top: var(--space-default-500); left: var(--space-default-500); }
+/* Show photo: the place's photo over the illustration, a bottom scrim (black 0 → 45%, 56px; the one raw value Figma
+   allows) and the photographer credit as a ghost link, Body small in white at 70%. */
+.photo { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.scrim { position: absolute; left: 0; right: 0; bottom: 0; height: 56px; background: linear-gradient(to bottom, rgb(0 0 0 / 0), rgb(0 0 0 / 0.45)); pointer-events: none; }
+.credit {
+  position: absolute; right: var(--space-default-300); bottom: var(--space-default-200); z-index: 2; max-width: calc(100% - 2 * var(--space-default-300));
+  padding: var(--space-default-200) var(--space-default-300); font: var(--type-body-small); color: var(--on-dark-text-primary); opacity: 0.7; text-align: right;
+}
+.credit a { color: inherit; text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 2px; position: relative; }
+.credit a::after { content: ''; position: absolute; inset: -12px -4px; } /* 44px tap area */
+.countdown { position: absolute; top: var(--space-default-500); left: var(--space-default-500);
+  /* On a cover the Neutral tag is a white pill (the page surface), so it reads on any photo or scene */
+  --tag-neutral-background: var(--on-light-surface-primary); --tag-neutral-text: var(--on-light-text-primary); }
 .body { display: flex; flex-direction: column; gap: var(--space-default-400); padding: var(--space-default-500) var(--space-default-500) var(--space-default-200); }
 .body:not(:has(.rows)) { padding-bottom: var(--space-default-500); }
 .titleRow { display: flex; align-items: center; gap: var(--space-default-300); }
 .titleText { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: var(--space-default-100); }
-.name { margin: 0; font: var(--type-heading-2); letter-spacing: -0.02em; color: var(--on-light-text-primary); overflow-wrap: anywhere; }
+.name { margin: 0; font: var(--type-heading-2); letter-spacing: -0.01em; color: var(--on-light-text-primary); overflow-wrap: anywhere; }
 .nameLink { color: inherit; text-decoration: none !important; }
 /* The name's link covers the whole card; the chips, avatars and the row sit above it */
 .nameLink::after { content: ''; position: absolute; inset: 0; z-index: 1; }
@@ -28,50 +42,32 @@
 .goingLink { text-decoration: none !important; display: inline-flex; position: relative; }
 .goingLink::after { content: ''; position: absolute; inset: -8px -2px; }
 
-/* Figma "Budget card": 16 padding, gap 12, 24 corners */
-.budget {
-  display: flex; flex-direction: column; gap: var(--space-default-400);
-  padding: var(--space-default-500); border-radius: var(--radius-600);
-  border: 1px solid var(--on-light-border-subtle); background: var(--on-light-surface-primary);
-}
-.budgetTop { display: flex; justify-content: space-between; align-items: flex-start; gap: var(--space-default-300); flex-wrap: wrap; }
-.budgetTotal { display: flex; flex-direction: column; gap: var(--space-default-100); }
-.budgetLabel { font: var(--type-body-small); color: var(--on-light-text-secondary); }
-.budgetAmount { font: var(--type-heading-1); letter-spacing: -0.02em; color: var(--on-light-text-primary); font-variant-numeric: tabular-nums; }
-.bar { display: flex; gap: var(--space-default-100); height: 8px; border-radius: var(--radius-1000); overflow: hidden; }
-.bar > span { flex-basis: 0; min-width: 4px; }
-.fill-brand { background: var(--on-light-text-brand); }
-.fill-mid { background: var(--on-mid-surface-primary); }
-.fill-orange { background: var(--on-accent-surface-orange); }
-.fill-empty { background: var(--on-light-surface-secondary); }
-.legend { margin: 0; display: flex; flex-direction: column; gap: var(--space-default-200); }
-.legendRow { display: flex; align-items: center; gap: var(--space-default-300); }
-.legendDot { flex: none; width: 8px; height: 8px; border-radius: var(--radius-1000); }
-.legendDot.fill-empty { box-shadow: inset 0 0 0 1px var(--on-light-border-subtle); }
-.legendLabel { flex: 1; min-width: 0; font: var(--type-body); color: var(--on-light-text-secondary); }
-.legendValue { margin: 0; font: var(--type-body); color: var(--on-light-text-primary); font-variant-numeric: tabular-nums; text-align: right; }
-
-/* Figma "Day Card" (Strip): 24 corners. Unselected: ghost with a border, 16 / 20. Selected: deep emerald, 20. */
+/* Figma "Day Card": 24 corners, the date (Display tiny) over the weekday. Unselected: ghost with a border.
+   Selected: brand (selected primary), scaled up with a spring; the cards either side move aside by the amount it
+   grew, so nothing overlaps. Every card is the same width, which makes that amount known. Transform only. */
 .day {
-  flex: none; position: relative; display: flex; align-items: center; justify-content: center;
-  min-width: calc(83rem / 17); min-height: calc(123rem / 17);
-  padding: var(--space-default-500) var(--space-default-600); border-radius: var(--radius-600);
+  --day-grow: 1.1;
+  flex: none; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--space-default-100);
+  width: calc(64rem / 17); min-height: calc(84rem / 17);
+  padding: var(--space-default-400) var(--space-default-200); border-radius: var(--radius-600);
   background: var(--interactive-unselected-ghost-background); color: var(--interactive-unselected-ghost-text);
   border: 1px solid var(--interactive-unselected-ghost-border);
   cursor: pointer; scroll-snap-align: start;
-  transition: background var(--motion-fast), transform var(--motion-release);
+  transition: background var(--motion-fast), color var(--motion-fast), transform var(--duration-base) var(--ease-standard);
 }
 .day:hover { background: var(--interactive-unselected-ghost-background-hover); }
+.daySelected {
+  border-color: transparent; background: var(--interactive-selected-primary-background); color: var(--interactive-selected-primary-text);
+  transform: scale(var(--day-grow)); transition: background var(--motion-fast), color var(--motion-fast), transform var(--duration-base) var(--ease-bounce);
+}
+.daySelected:hover { background: var(--interactive-selected-primary-background-hover); }
+.day:has(~ .daySelected) { transform: translateX(calc((1 - var(--day-grow)) * calc(64rem / 17) / 2)); }
+.daySelected ~ .day { transform: translateX(calc((var(--day-grow) - 1) * calc(64rem / 17) / 2)); }
 .day:active { transform: scale(0.97); transition: transform var(--motion-press); }
-.daySelected { align-items: flex-start; justify-content: flex-start; padding: var(--space-default-600); border-color: transparent; background: var(--interactive-selected-secondary-background); color: var(--interactive-selected-secondary-text); }
-.daySelected:hover { background: var(--interactive-selected-secondary-background-hover); }
-.dayCompact { display: flex; flex-direction: column; align-items: center; gap: var(--space-default-100); }
+.daySelected:active { transform: scale(calc(var(--day-grow) - 0.03)); }
 .dayNum { font: var(--type-display-tiny); letter-spacing: -0.01em; }
-.dayWord { font: var(--type-label); white-space: nowrap; }
-.dayOpen { display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-default-400); }
-.dayDate { display: flex; align-items: baseline; gap: var(--space-default-200); }
-.dayBig { font: var(--type-display); letter-spacing: -0.01em; }
-.dayMonth { font: var(--type-label-small); white-space: nowrap; }
+.dayWord { font: var(--type-label-small); white-space: nowrap; }
+@media (prefers-reduced-motion: reduce) { .day, .daySelected { transition: background var(--motion-fast), color var(--motion-fast); } }
 
 /* Figma "Timeline" */
 .timeline { display: flex; align-items: center; gap: var(--space-default-200); }
@@ -82,3 +78,20 @@
   font: var(--type-label-small); font-variant-numeric: tabular-nums;
 }
 .timelineLine { flex: 1; height: 1px; background: repeating-linear-gradient(90deg, var(--on-light-border-brand) 0 6px, transparent 6px 12px); }
+
+/* Figma "Journey details card": the grey container, 20 padding, 16 between parts, dashed dividers */
+.journey { display: flex; flex-direction: column; gap: var(--space-default-500); padding: var(--space-default-600); border-radius: var(--radius-600); background: var(--on-light-surface-secondary); }
+.journeyTags { display: flex; justify-content: space-between; align-items: center; gap: var(--space-default-300); flex-wrap: wrap; }
+.journeyTimes { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-default-400); } /* with large text the arrival wraps under the departure */
+.journeyEnd { display: flex; flex-direction: column; gap: var(--space-default-200); min-width: 0; max-width: 100%; }
+.journeyEnd > span { overflow-wrap: anywhere; }
+.journeyTime { white-space: nowrap; }
+.journeyEndTo { align-items: flex-end; text-align: right; }
+.journeyCity { font: var(--type-body); color: var(--on-light-text-secondary); }
+.journeyTime { font: var(--type-heading-1); letter-spacing: -0.01em; color: var(--on-light-text-primary); font-variant-numeric: tabular-nums; }
+.journeyDate { font: var(--type-body-small); color: var(--on-light-text-secondary); }
+.journeyDetails { display: flex; justify-content: space-between; gap: var(--space-default-400); padding-top: var(--space-default-500); border-top: 1px dashed var(--on-light-border-subtle); }
+.journeySide { display: flex; flex-direction: column; gap: var(--space-default-200); min-width: 0; }
+.journeyPlace { font: var(--type-heading-3); letter-spacing: -0.02em; color: var(--on-light-text-primary); }
+.journeyInfo { font: var(--type-body); color: var(--on-light-text-secondary); }
+.journeyFooter { padding-top: var(--space-default-500); border-top: 1px dashed var(--on-light-border-subtle); font: var(--type-body-small); color: var(--on-light-text-secondary); }

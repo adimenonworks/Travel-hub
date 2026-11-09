@@ -8,7 +8,7 @@
 
 .links { display: flex; flex-wrap: wrap; gap: var(--space-default-300); }
 .chip {
-  display: inline-flex; align-items: center; gap: 6px;
+  display: inline-flex; align-items: center; gap: var(--space-default-250);
   min-height: var(--size-tap); padding: 0 var(--space-default-500);
   border-radius: var(--radius-1000);
   background: var(--interactive-button-secondary-background);

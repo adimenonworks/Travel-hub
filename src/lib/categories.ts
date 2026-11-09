@@ -14,7 +14,7 @@ export const EVENT_TYPES: { value: EventType; label: string; icon: IconName; hin
   { value: 'transport', label: 'Transport', icon: 'train', hint: 'Train, bus, ferry, tram, taxi or car hire' },
   { value: 'food', label: 'Food & drink', icon: 'utensils', hint: 'Restaurants, cafés and bars' },
   { value: 'activity', label: 'Activity', icon: 'ticket', hint: 'Sights, tours, shows and things to do' },
-  { value: 'note', label: 'Note', icon: 'pencil', hint: 'A reminder, with or without a time' },
+  { value: 'note', label: 'Note', icon: 'notebook', hint: 'A reminder, with or without a time' },
 ];
 
 /** Older events used finer types; each folds into one of the six. */
@@ -47,8 +47,8 @@ export const BOOKING_GROUPS: { key: string; title: string; icon: IconName; type:
   { key: 'flights', title: 'Flights', icon: 'plane', type: 'flight', one: 'flight', many: 'flights' },
   { key: 'stays', title: 'Stays', icon: 'bed', type: 'stay', one: 'stay', many: 'stays' },
   { key: 'transport', title: 'Transport', icon: 'train', type: 'transport', one: 'trip', many: 'trips' },
-  { key: 'food', title: 'Food & drink', icon: 'utensils', type: 'food', one: 'place', many: 'places' },
   { key: 'activities', title: 'Activities', icon: 'ticket', type: 'activity', one: 'activity', many: 'activities' },
+  { key: 'food', title: 'Food & drink', icon: 'utensils', type: 'food', one: 'reservation', many: 'reservations' },
 ];
 
 /** Where an event ends up: a flight's or transfer's destination, otherwise its place. */

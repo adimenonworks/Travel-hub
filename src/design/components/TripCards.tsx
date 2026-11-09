@@ -1,53 +1,45 @@
-import { useState, type ReactNode } from 'react';
+import { type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
-import { CountryModal } from './CountryModal';
 import { Icon, type IconName } from './Icon';
-import { AvatarStack, Badge, Chip } from './Misc';
+import { AvatarStack, Badge } from './Misc';
 import { PageHeader } from './Bars';
 import { ListItem } from './Rows';
 import s from './TripCards.module.css';
 
 type Person = { id: string; name: string; photo?: string | null };
-type Country = { code: string; name: string; flag?: string };
 
-/** Country chips that open each country's quick-info sheet (emergency number, entry requirements). */
-function CountryChips({ countries, extra }: { countries: Country[]; extra?: ReactNode }) {
-  const [open, setOpen] = useState<string | null>(null);
-  if (countries.length === 0 && !extra) return null;
-  return (
-    <>
-      <ul className={s.chips} aria-label="Countries">
-        {countries.map((c) => <li key={c.code}><Chip flag={c.flag} onClick={() => setOpen(c.code)} label={`${c.name}: emergency number and entry requirements`}>{c.name}</Chip></li>)}
-        {extra && <li>{extra}</li>}
-      </ul>
-      <CountryModal code={open} onClose={() => setOpen(null)} />
-    </>
-  );
-}
 
 /**
- * Figma "Hero Card": the trip's cover with a countdown Tag ("In 9 days"), then the name (Heading 2), meta, who's going,
- * the country chips and, under a divider, one row: what's next (Show next up). Phase-aware: the caller passes the
- * countdown and the row for before, during or after the trip. The name links to the trip; chips open country info.
+ * Figma "Hero Card": the trip's cover (an illustration, or a photo with its credit) with a countdown Tag ("In 9 days"),
+ * then the name (Heading 2), dates, who's going and, under a divider, one row: what's next (Show next up), plus a
+ * heads-up row for one time-sensitive thing. Phase-aware: the caller passes the countdown and the rows.
  */
-export function HeroCard({ cover, countdown, title, meta, countries, people, to, next }: {
+export function HeroCard({ size = 'regular', cover, photo, countdown, title, meta, people, to, next, headsUp }: {
+  /** Figma "Size": Regular, or Compact (a shorter cover, the name, dates and countdown; no people, no next up) for lists */
+  size?: 'regular' | 'compact';
   /** Figma "Show cover": a photo or Cover Scene; leave out for the panel alone */
   cover?: ReactNode;
+  /** Figma "Show photo": a photo over the cover, with "Photo by <name> on Unsplash" (both names linked) */
+  photo?: { url: string; credit: ReactNode };
   countdown?: { icon?: IconName; label: string };
   title: string; meta: ReactNode;
-  countries: Country[];
   /** Figma "Show people" */
   people?: Person[];
   to?: string;
   /** Figma "Show next up": one List item, e.g. the next event */
   next?: { icon: IconName; title: string; meta?: string; to?: string };
+  /** Figma "Show heads-up": one time-sensitive row (check-in open, a flight change…) */
+  headsUp?: { icon: IconName; title: string; meta?: string; to?: string };
 }) {
   return (
-    <section className={s.hero} aria-label={title}>
+    <section className={[s.hero, size === 'compact' && s.heroCompact].filter(Boolean).join(' ')} aria-label={title}>
       {cover && (
         <div className={s.cover}>
           {cover}
-          {countdown && <span className={s.countdown}><Badge tone="tint" icon={countdown.icon ?? 'calendar'}>{countdown.label}</Badge></span>}
+          {photo && <img className={s.photo} src={photo.url} alt="" />}
+          {photo && <span className={s.scrim} aria-hidden="true" />}
+          {photo && <span className={s.credit}>{photo.credit}</span>}
+          {countdown && <span className={s.countdown}><Badge tone="neutral" icon={countdown.icon ?? 'calendar'}>{countdown.label}</Badge></span>}
         </div>
       )}
       <div className={s.body}>
@@ -56,13 +48,13 @@ export function HeroCard({ cover, countdown, title, meta, countries, people, to,
             <h2 className={s.name}>{to ? <Link to={to} className={s.nameLink}>{title}</Link> : title}</h2>
             <div className={s.meta}>{meta}</div>
           </div>
-          {people && people.length > 0 && <AvatarStack people={people} />}
+          {size === 'regular' && people && people.length > 0 && <AvatarStack people={people} />}
         </div>
-        {!cover && countdown && <div><Badge tone="tint" icon={countdown.icon ?? 'calendar'}>{countdown.label}</Badge></div>}
-        <CountryChips countries={countries} />
-        {next && (
+        {!cover && countdown && <div><Badge tone="neutral" icon={countdown.icon ?? 'calendar'}>{countdown.label}</Badge></div>}
+        {size === 'regular' && (next || headsUp) && (
           <div className={s.rows}>
-            <ListItem icon={next.icon} title={next.title} meta={next.meta} to={next.to} round />
+            {next && <ListItem icon={next.icon} title={next.title} meta={next.meta} to={next.to} round />}
+            {headsUp && <ListItem icon={headsUp.icon} title={headsUp.title} meta={headsUp.meta} to={headsUp.to} round />}
           </div>
         )}
       </div>
@@ -70,84 +62,31 @@ export function HeroCard({ cover, countdown, title, meta, countries, people, to,
   );
 }
 
-/** Figma "Trip header": the Page Header (Title small), the trip's meta line, then its country chips and who's going. */
-export function TripHeader({ title, meta, back, action, countries, going }: {
+/** Figma "Trip header": the Page Header (Title small) with back and edit, then the dates only ("2 – 11 Nov · 10 days"). */
+export function TripHeader({ title, meta, back, action }: {
   title: string; meta: ReactNode;
   back?: { to: string; label: string };
   action?: { icon: IconName; label: string; onClick: () => void };
-  countries: Country[];
-  /** The "4 going" chip; tapping it opens People */
-  going?: { label: string; to: string };
 }) {
   return (
     <div className={s.tripHeader}>
       <PageHeader title={title} size="small" back={back} action={action} />
       <div className={s.meta}>{meta}</div>
-      <CountryChips countries={countries} extra={going && <Link to={going.to} className={s.goingLink}><Chip icon="people">{going.label}</Chip></Link>} />
     </div>
   );
 }
 
-type Segment = { label: string; value: string; amount: number; color: 'brand' | 'mid' | 'orange' | 'empty' };
-
 /**
- * Figma "Budget card" (Phase Planning / During). Planning: what the trip costs so far (flights, stays, planned
- * activities and food) and the spending money left. During: today's planned spend against the daily allowance.
- * A bar shows the parts; the legend repeats them in words (colour is never the only cue).
+ * Figma "Day Card" (Selected No / Yes): a large date number with the weekday below. The selected card is brand
+ * coloured and a little larger; it grows with a spring while its neighbours ease aside (transform only, in CSS).
  */
-export function BudgetCard({ label, amount, segments, action, note }: {
-  label: string; amount: string; segments: Segment[]; action?: ReactNode; note?: ReactNode;
-}) {
-  const total = segments.reduce((n, x) => n + Math.max(0, x.amount), 0);
-  return (
-    <section className={s.budget} aria-label="Budget">
-      <div className={s.budgetTop}>
-        <div className={s.budgetTotal}>
-          <span className={s.budgetLabel}>{label}</span>
-          <span className={s.budgetAmount}>{amount}</span>
-        </div>
-        {action}
-      </div>
-      {total > 0 && (
-        <div className={s.bar} aria-hidden="true">
-          {segments.filter((x) => x.amount > 0).map((x) => <span key={x.label} className={s[`fill-${x.color}`]} style={{ flexGrow: x.amount }} />)}
-        </div>
-      )}
-      <dl className={s.legend}>
-        {segments.map((x) => (
-          <div key={x.label} className={s.legendRow}>
-            <span className={[s.legendDot, s[`fill-${x.color}`]].join(' ')} aria-hidden="true" />
-            <dt className={s.legendLabel}>{x.label}</dt>
-            <dd className={s.legendValue}>{x.value}</dd>
-          </div>
-        ))}
-      </dl>
-      {note}
-    </section>
-  );
-}
-
-/**
- * Figma "Day Card" (Layout Strip, Selected No / Yes). Unselected: the date (Display tiny) and a word ("Tomorrow", "Day 4").
- * Selected: deep emerald, the date in Display with month and word, and a Tag (e.g. "3 more events").
- */
-export function DayCard({ day, month, word, tag, selected, onClick, dataDay }: {
-  day: number; month: string; word: string; tag?: string; selected: boolean; onClick: () => void; dataDay?: string;
+export function DayCard({ day, weekday, label, selected, onClick, dataDay }: {
+  day: number; weekday: string; label: string; selected: boolean; onClick: () => void; dataDay?: string;
 }) {
   return (
-    <button type="button" data-day={dataDay} className={[s.day, selected && s.daySelected].filter(Boolean).join(' ')} aria-pressed={selected} onClick={onClick}
-      aria-label={`${word}, ${month} ${day}${tag ? `, ${tag}` : ''}`}>
-      {selected ? (
-        <span className={s.dayOpen} aria-hidden="true">
-          <span className={s.dayDate}><span className={s.dayBig}>{day}</span><span className={s.dayMonth}>{month} · {word}</span></span>
-          {tag && <Badge tone="tint">{tag}</Badge>}
-        </span>
-      ) : (
-        <span className={s.dayCompact} aria-hidden="true">
-          <span className={s.dayNum}>{day}</span>
-          <span className={s.dayWord}>{word}</span>
-        </span>
-      )}
+    <button type="button" data-day={dataDay} className={[s.day, selected && s.daySelected].filter(Boolean).join(' ')} aria-pressed={selected} onClick={onClick} aria-label={label}>
+      <span className={s.dayNum} aria-hidden="true">{day}</span>
+      <span className={s.dayWord} aria-hidden="true">{weekday}</span>
     </button>
   );
 }
@@ -159,5 +98,59 @@ export function Timeline({ time }: { time: string }) {
       <span className={s.timelineTab} aria-hidden="true"><Icon name="time" size={16} />{time}</span>
       <span className={s.timelineLine} />
     </div>
+  );
+}
+
+type JourneyEnd = { city: string; time: string; date: string; terminal?: string };
+/**
+ * Figma "Journey details card" (421:3200): the top of a flight's or train's detail page. Tags for the number and the
+ * status ("Check-in open" Warning, then "On time" Success, "Delayed" Warning or "Cancelled" Danger); the two cities with
+ * big times and dates, the duration between; then (Show airport details) terminal, gate and boarding on the left,
+ * terminal and belt on the right; a footer ("Operated by TAP Air Portugal · updated 2 min ago").
+ * Trains, buses and ferries show stations or ports, the operator, coach and seat, and no live status.
+ */
+export function JourneyDetails({ mode = 'plane', number, status, duration, from, to, gate, boarding, belt, footer, airportDetails = true }: {
+  mode?: 'plane' | 'train'; number?: string;
+  status?: { label: string; tone: 'success' | 'warning' | 'danger' };
+  duration?: string; from: JourneyEnd; to: JourneyEnd;
+  gate?: string; boarding?: string; belt?: string; footer?: ReactNode;
+  /** Figma "Show airport details" */ airportDetails?: boolean;
+}) {
+  return (
+    <section className={s.journey} aria-label={`${from.city} to ${to.city}`}>
+      {(number || status) && (
+        <div className={s.journeyTags}>
+          {number ? <Badge icon={mode}>{number}</Badge> : <span />}
+          {status && <Badge tone={status.tone}>{status.label}</Badge>}
+        </div>
+      )}
+      <div className={s.journeyTimes}>
+        <div className={s.journeyEnd}>
+          <span className={s.journeyCity}>{from.city}</span>
+          <span className={s.journeyTime}>{from.time}</span>
+          <span className={s.journeyDate}>{from.date}</span>
+        </div>
+        {duration && <Badge icon={mode}>{duration}</Badge>}
+        <div className={[s.journeyEnd, s.journeyEndTo].join(' ')}>
+          <span className={s.journeyCity}>{to.city}</span>
+          <span className={s.journeyTime}>{to.time}</span>
+          <span className={s.journeyDate}>{to.date}</span>
+        </div>
+      </div>
+      {airportDetails && (from.terminal || to.terminal || gate || boarding || belt) && (
+        <div className={s.journeyDetails}>
+          <div className={s.journeySide}>
+            {from.terminal && <span className={s.journeyPlace}>{from.terminal}</span>}
+            {gate !== undefined && <span className={s.journeyInfo}>Gate {gate || '—'}</span>}
+            {boarding && <span className={s.journeyInfo}>Boarding {boarding}</span>}
+          </div>
+          <div className={[s.journeySide, s.journeyEndTo].join(' ')}>
+            {to.terminal && <span className={s.journeyPlace}>{to.terminal}</span>}
+            {belt !== undefined && <span className={s.journeyInfo}>Belt {belt || '—'}</span>}
+          </div>
+        </div>
+      )}
+      {footer && <div className={s.journeyFooter}>{footer}</div>}
+    </section>
   );
 }
