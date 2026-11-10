@@ -1,7 +1,7 @@
 import { initializeApp, type FirebaseOptions } from 'firebase/app';
 import {
   GoogleAuthProvider, browserLocalPersistence, getAuth, getRedirectResult, indexedDBLocalPersistence, initializeAuth, onAuthStateChanged,
-  signInWithCredential, signInWithPopup, signInWithRedirect, signOut,
+  signInWithCredential, signInWithPopup, signInWithRedirect, signOut, deleteUser,
 } from 'firebase/auth';
 import {
   Timestamp, addDoc, arrayRemove, arrayUnion, collection, deleteDoc, deleteField, doc, getDoc, getDocFromCache, getDocs,
@@ -82,6 +82,60 @@ export function createFirebaseStore(config: FirebaseOptions): Store {
         if (USE_REDIRECT.includes(code)) await signInWithRedirect(auth, provider);
         else throw e;
       }
+    },
+    async deleteAccount(uid) {
+      const user = auth.currentUser;
+      if (!user || user.uid !== uid) throw new Error('Not signed in');
+      // Deleting a sign-in needs a recent sign-in (Firebase asks for one in the last 5 minutes). Confirm it's you
+      // first, so nothing is deleted if you cancel Google's sheet.
+      const signedInAt = Date.parse((await user.getIdTokenResult()).authTime) || 0;
+      if (Date.now() - signedInAt > 4 * 60_000) {
+        await this.signIn();
+        // Signing in as someone else must never delete their account.
+        if (auth.currentUser?.uid !== uid) throw Object.assign(new Error('Signed in with a different Google account.'), { code: 'app/wrong-account' });
+      }
+
+      const trips = (await getDocs(query(collection(db, 'trips'), where('memberIds', 'array-contains', uid)))).docs.map((d) => withId<Trip>(d.id, d.data()));
+      const mine = (await getDocs(query(collection(db, 'places'), where('ownerId', '==', uid)))).docs;
+      // 1. Your saved places a shared trip still uses go to that trip's next member (while you're still on it).
+      const kept = new Set<string>();
+      for (const t of trips) {
+        const others = t.memberIds.filter((m) => m !== uid);
+        if (!others.length) continue;
+        for (const name of ['ideas', 'activities'] as const) {
+          for (const d of (await getDocs(collection(db, 'trips', t.id, name))).docs) {
+            const p = mine.find((x) => x.id === d.data().placeId);
+            if (p && !kept.has(p.id)) {
+              kept.add(p.id);
+              await updateDoc(p.ref, { ownerId: others[0], handedVia: t.id, starredBy: arrayRemove(uid) });
+            }
+          }
+        }
+      }
+      for (const p of mine) if (!kept.has(p.id)) await deleteDoc(p.ref);
+      // 2. Trips: your messages go; trips you own go to the next member (or are deleted with nobody else); you leave the rest.
+      for (const t of trips) {
+        const others = t.memberIds.filter((m) => m !== uid);
+        if (others.length) {
+          const comments = await getDocs(query(collection(db, 'trips', t.id, 'comments'), where('authorId', '==', uid)));
+          for (const c of comments.docs) await deleteDoc(c.ref);
+        }
+        if (t.ownerId === uid && others.length) {
+          const roles = { ...t.roles }; delete roles[uid]; roles[others[0]] = 'owner';
+          await updateDoc(doc(db, 'trips', t.id), { ownerId: others[0], memberIds: others, roles });
+        } else if (t.ownerId === uid) await this.deleteTrip(t.id);
+        else await this.leaveTrip(t.id, uid);
+      }
+      // 3. Your stars, profile and private settings, then the sign-in.
+      const starred = await getDocs(query(collection(db, 'places'), where('starredBy', 'array-contains', uid)));
+      for (const p of starred.docs) await updateDoc(p.ref, { starredBy: arrayRemove(uid) });
+      for (const id of ['places', 'reads']) await deleteDoc(doc(db, 'users', uid, 'private', id)).catch(() => {});
+      await deleteDoc(doc(db, 'users', uid));
+      if (isNativeApp) {
+        const { SocialLogin } = await import('@capgo/capacitor-social-login');
+        await SocialLogin.logout({ provider: 'google' }).catch(() => {});
+      }
+      await deleteUser(auth.currentUser!);
     },
     async takeAuthError() {
       await redirectResult;

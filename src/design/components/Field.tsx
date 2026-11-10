@@ -40,6 +40,8 @@ export function Select({ label, hint, id, compact, children, ...rest }: Wrap & S
 }
 
 /** Lays fields out side by side, wrapping on narrow screens. */
-export function FieldRow({ children }: { children: ReactNode }) {
-  return <div className={s.row}>{children}</div>;
+export function FieldRow({ children, hint }: { children: ReactNode; hint?: ReactNode }) {
+  const row = <div className={s.row}>{children}</div>;
+  // A hint about the whole row (e.g. price + currency) runs the full width under it.
+  return hint ? <div className={s.field}>{row}<div className={s.hint}>{hint}</div></div> : row;
 }

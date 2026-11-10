@@ -52,6 +52,14 @@ class RoveViewController: CAPBridgeViewController {
         // Swipe back is drawn by the app itself (src/app/SwipeBack.tsx), which shows the real previous screen under
         // the one being dragged. The web view's own swipe would show a blank snapshot instead, so it's off.
         webView.allowsBackForwardNavigationGestures = false
+        // Like a native app: no long-press link previews, and nothing can be dragged out of the app (links, photos).
+        webView.allowsLinkPreview = false
+        let views: [UIView] = [webView, webView.scrollView] + webView.scrollView.subviews
+        for view in views {
+            for interaction in view.interactions {
+                if let drag = interaction as? UIDragInteraction { drag.isEnabled = false }
+            }
+        }
         // The page canvas colour in light and dark mode (on-light/surface/primary: neutral 0 / neutral 1000), so nothing flashes white before the app draws.
         let canvas = UIColor { traits in
             traits.userInterfaceStyle == .dark

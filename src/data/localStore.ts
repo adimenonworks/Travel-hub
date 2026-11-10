@@ -87,6 +87,26 @@ export function createLocalStore(): Store {
       authCb?.(null);
     },
 
+    async deleteAccount(uid) {
+      for (const t of Object.values(db.trips).filter((t) => t.memberIds.includes(uid))) {
+        const others = t.memberIds.filter((m) => m !== uid);
+        const comments = db.subs[t.id]?.comments ?? {};
+        for (const [id, c] of Object.entries(comments)) if ((c as { authorId?: string }).authorId === uid) delete comments[id];
+        if (t.ownerId === uid && others.length) { delete t.roles[uid]; t.roles[others[0]] = 'owner'; t.ownerId = others[0]; t.memberIds = others; }
+        else if (t.ownerId === uid) { delete db.trips[t.id]; delete db.subs[t.id]; }
+        else { t.memberIds = others; delete t.roles[uid]; }
+      }
+      for (const p of Object.values(db.places ?? {})) {
+        if (p.ownerId === uid) delete db.places![p.id];
+        else if (p.starredBy?.includes(uid)) p.starredBy = p.starredBy.filter((m) => m !== uid);
+      }
+      delete db.users[uid];
+      if (db.reads) delete db.reads[uid];
+      save();
+      sessionStorage.removeItem(SESSION);
+      authCb?.(null);
+    },
+
     watchProfile(uid, cb) {
       return watch(() => db.users[uid] ?? null, cb);
     },

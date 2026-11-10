@@ -108,7 +108,20 @@ await t('others cannot read private places', assertFails(getDoc(doc(B, 'users/al
 await t('others cannot write private places', assertFails(setDoc(doc(B, 'users/alice/private/places'), { homeCity: 'x' })));
 await env.withSecurityRulesDisabled(async (c) => setDoc(doc(c.firestore(), 'users/dave'), { name: 'Dave', photo: null, homeCity: 'Paris', visited: [] }));
 await t('old profile can move its places out (migration)', assertSucceeds(updateDoc(doc(db('dave'), 'users/dave'), { homeCity: deleteField(), visited: deleteField() })));
+// Deleting an account: the owner hands the trip (and saved places the trip uses) to another member
+await env.withSecurityRulesDisabled(async (c) => setDoc(doc(c.firestore(), 'trips/t8'), { ...trip, memberIds: ['alice', 'bob'], roles: { alice: 'owner', bob: 'member' } }));
+await t('member cannot take over the trip', assertFails(updateDoc(doc(B, 'trips/t8'), { ownerId: 'bob', memberIds: ['bob'], roles: { bob: 'owner' } })));
+await t('owner cannot hand the trip to a non-member', assertFails(updateDoc(doc(A, 'trips/t8'), { ownerId: 'carol', memberIds: ['bob'], roles: { bob: 'member', carol: 'owner' } })));
+await t('handing over cannot change anything else', assertFails(updateDoc(doc(A, 'trips/t8'), { ownerId: 'bob', memberIds: ['bob'], roles: { bob: 'owner' }, name: 'x' })));
+await setDoc(doc(A, 'places/p5'), place);
+await t('place cannot go to someone off the trip', assertFails(updateDoc(doc(A, 'places/p5'), { ownerId: 'carol', handedVia: 't8' })));
+await t('place cannot be handed via a trip you are not on', assertFails(updateDoc(doc(C, 'places/p5'), { ownerId: 'carol', handedVia: 't8' })));
+await t('owner hands a place to a trip-mate', assertSucceeds(updateDoc(doc(A, 'places/p5'), { ownerId: 'bob', handedVia: 't8' })));
+await t('owner hands the trip to a member and leaves', assertSucceeds(updateDoc(doc(A, 'trips/t8'), { ownerId: 'bob', memberIds: ['bob'], roles: { bob: 'owner' } })));
+await t('old owner can no longer read the trip', assertFails(getDoc(doc(A, 'trips/t8'))));
 await t('owner deletes trip', assertSucceeds(deleteDoc(doc(A, 'trips/t1'))));
+await t('user deletes own profile', assertSucceeds(deleteDoc(doc(A, 'users/alice'))));
+await t('new owner deletes trip', assertSucceeds(deleteDoc(doc(B, 'trips/t8'))));
 
 console.log(`\n${pass} passed, ${fail} failed`);
 await env.cleanup();

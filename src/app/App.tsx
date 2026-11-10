@@ -9,6 +9,7 @@ import { Join } from '../features/trip/Join';
 import { TripPage } from '../features/trip/TripPage';
 import { CountryCollection, Favourites, FavouriteCountry } from '../features/saves/Collections';
 import { ProfilePage } from '../features/profile/ProfilePage';
+import { Privacy } from '../features/profile/Privacy';
 import { Shell } from './Shell';
 
 // The design reference page is for builders only, so it loads on demand.
@@ -33,6 +34,7 @@ function Routed() {
         <Route path="/trip/:tripId/*" element={<TripPage />} />
         <Route path="/join/:code" element={<Join />} />
         <Route path="/profile" element={<ProfilePage />} />
+        <Route path="/privacy" element={<Privacy />} />
         <Route path="/profile/favourites" element={<Favourites />} />
         <Route path="/profile/favourites/:country" element={<FavouriteCountry />} />
         <Route path="/profile/collections/*" element={<Navigate to="/profile/favourites" replace />} />
