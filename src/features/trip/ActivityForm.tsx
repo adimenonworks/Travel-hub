@@ -8,6 +8,8 @@ import { geocodePlace } from '../../lib/geocode';
 import { PICKER_SECTIONS, eventKind, kindInfo, type EventKind } from '../../lib/categories';
 import { haptic, confirmAction } from '../../lib/native';
 import { LinkEditor, cleanLinks } from '../shared/Links';
+import { PriceField, fromPriceDraft, toPriceDraft, type PriceDraft } from '../shared/Price';
+import { priceOf } from '../../lib/currency';
 import { eventsOn, entryEnd, entryTime } from './events';
 import s from './trip.module.css';
 
@@ -16,6 +18,7 @@ export type ActivityDraft = Partial<Pick<Activity, 'title' | 'category' | 'notes
 type Form = {
   kind: EventKind | null; title: string; date: string; endDate: string; startTime: string; endTime: string;
   locationText: string; fromText: string; toText: string; ref: string; bookingRef: string; operator: string; notes: string; links: LinkItem[];
+  /** Per person; asked for everything you book ahead (not restaurants, cafés, bars or free time: those are everyday spending) */ price: PriceDraft;
 };
 
 /** Kinds that go from one place to another (Flight always; the others when they have a "to"). */
@@ -23,7 +26,7 @@ const JOURNEY: EventKind[] = ['flight', 'train', 'bus', 'ferry', 'taxi', 'transp
 /** Kinds with an operator (airline, train or bus company, ferry line, rental company). */
 const OPERATED: EventKind[] = ['train', 'bus', 'ferry', 'transport', 'car'];
 
-const toForm = (a: ActivityDraft | Activity | undefined, date: string): Form => {
+const toForm = (a: ActivityDraft | Activity | undefined, date: string, currency: string): Form => {
   const full = a as Partial<Activity> | undefined;
   const kind = a?.category ? eventKind(a.category) : null;
   return {
@@ -43,6 +46,7 @@ const toForm = (a: ActivityDraft | Activity | undefined, date: string): Form => 
     operator: full?.operator ?? '',
     notes: a?.notes ?? '',
     links: a?.links?.length ? a.links : [],
+    price: toPriceDraft(full?.id ? priceOf(full as Activity, { currency }) : null, currency),
   };
 };
 
@@ -83,9 +87,10 @@ export function ActivityForm({ open, trip, date, activity, draft, onClose, onCre
   const me = useMe();
   const toast = useToast();
   const activities = useSub(trip.id, 'activities') ?? [];
-  const [f, setF] = useState<Form>(() => toForm(activity ?? draft, date));
+  const budgetCurrency = trip.budget?.currency ?? trip.currency;
+  const [f, setF] = useState<Form>(() => toForm(activity ?? draft, date, budgetCurrency));
   const [busy, setBusy] = useState(false);
-  useEffect(() => { if (open) setF(toForm(activity ?? draft, date)); }, [open, activity, draft, date]);
+  useEffect(() => { if (open) setF(toForm(activity ?? draft, date, budgetCurrency)); }, [open, activity, draft, date]); // eslint-disable-line react-hooks/exhaustive-deps
   const set = (p: Partial<Form>) => setF((x) => ({ ...x, ...p }));
   // Food, drink and activities have an end time only when asked for: "Add end time" turns into the field
   const [withEnd, setWithEnd] = useState(false);
@@ -108,6 +113,8 @@ export function ActivityForm({ open, trip, date, activity, draft, onClose, onCre
   };
 
   // What each kind needs before it can be saved
+  // Costs to add up for the budget: what you book ahead. Food, drink and free time are everyday spending.
+  const priced = !!kind && group !== 'food' && kind !== 'free';
   const valid = !!kind && (
     kind === 'flight' ? !!(f.fromText.trim() && f.toText.trim())
       : group === 'transport' ? !!f.fromText.trim()
@@ -160,6 +167,8 @@ export function ActivityForm({ open, trip, date, activity, draft, onClose, onCre
         ref: kind === 'flight' ? f.ref.trim().toUpperCase().replace(/\s+/g, '') : '',
         bookingRef: info!.booking ? f.bookingRef.trim() : '',
         operator: OPERATED.includes(kind) ? f.operator.trim() : '',
+        price: priced ? fromPriceDraft(f.price) : null,
+        cost: 0,
       };
       if (activity) await store.updateSub(trip.id, 'activities', activity.id, data);
       else {
@@ -206,6 +215,7 @@ export function ActivityForm({ open, trip, date, activity, draft, onClose, onCre
   const extras = (
     <>
       {bookingRef}
+      {priced && <PriceField label="Price per person (optional)" value={f.price} onChange={(price) => set({ price })} />}
       <TextArea label="Notes" placeholder={kind === 'free' ? 'Beach, a nap, wander the old town…' : 'What to bring, who has the tickets…'} value={f.notes} onChange={(e) => set({ notes: e.target.value })} />
       {kind !== 'free' && <LinkEditor links={f.links} onChange={(links) => set({ links })} />}
     </>

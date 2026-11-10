@@ -32,7 +32,10 @@ export type Trip = {
   /** 'month': the dates are only roughly known — the whole month from startDate (shown as "March 2027"). Missing means exact. */
   dateMode?: 'exact' | 'month';
   currency: string;
-  /** Budgeting was removed. Older trips may still hold these until an organizer opens them (useBudgetCleanup deletes them). */
+  /** The trip's budget per person (New trip "Want to set a budget?" or Edit trip). null or missing: not tracking a budget.
+   *  Overview's Budget card subtracts the per-person prices of the events from it. */
+  budget?: Price | null;
+  /** The old, removed budgeting. Older trips may still hold these until an organizer opens them (useBudgetCleanup deletes them). */
   dailyBudget?: number;
   totalBudget?: number;
   dayBudgets?: Record<string, number>;

@@ -241,13 +241,44 @@ export function ProfileCard({ name, email, photo, avatar, ...press }: Press & { 
   );
 }
 
-/** Figma "Option card" (Selected No / Yes): a big tappable choice with an icon and a Heading 3 label. Leave `selected` out when it's a one-tap choice (e.g. the add-event picker), not a toggle. */
-export function OptionCard({ icon, label, selected, onClick }: { icon: IconName; label: string; selected?: boolean; onClick: () => void }) {
+/** Figma "Option card" (Selected No / Yes): a big tappable choice with an icon, a Heading 3 label and, with "Show
+ *  description", a Body small line under it. Leave `selected` out when it's a one-tap choice (e.g. the add-event picker). */
+export function OptionCard({ icon, label, description, selected, onClick }: { icon: IconName; label: string; description?: string; selected?: boolean; onClick: () => void }) {
   return (
     <button type="button" className={[s.option, selected && s.optionSelected].filter(Boolean).join(' ')} aria-pressed={selected} onClick={onClick}>
       <Icon name={icon} size={24} />
       <span className={s.optionLabel}>{label}</span>
+      {description && <span className={s.optionDescription}>{description}</span>}
     </button>
+  );
+}
+
+/**
+ * Figma "Budget card" (Overview → Budget): what's left of the per-person budget after the events with prices, a bar
+ * of how much is planned, and the planned total per category. Over budget, the label says so and the amount turns red.
+ */
+export function BudgetCard({ label, amount, caption, ratio, rows, over }: {
+  label: string; amount: string; caption: string; ratio: number; over?: boolean;
+  rows: { icon: IconName; label: string; amount: string }[];
+}) {
+  return (
+    <div className={s.budget}>
+      <div className={s.budgetTotal}>
+        <span className={s.budgetLabel}>{label}</span>
+        <span className={[s.budgetAmount, over && s.budgetOver].filter(Boolean).join(' ')}>{amount}</span>
+        <span className={s.budgetLabel}>{caption}</span>
+      </div>
+      <div className={s.budgetTrack} role="progressbar" aria-label="Planned of budget" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(Math.min(1, ratio) * 100)}>
+        <span className={over ? s.budgetFillOver : s.budgetFill} style={{ width: `${Math.min(1, Math.max(0, ratio)) * 100}%` }} />
+      </div>
+      {rows.length > 0 && (
+        <ul className={s.budgetRows} aria-label="Planned by category">
+          {rows.map((r) => (
+            <li key={r.label} className={s.budgetRow}><Icon name={r.icon} size={16} /><span className={s.budgetRowLabel}>{r.label}</span><span className={s.budgetRowAmount}>{r.amount}</span></li>
+          ))}
+        </ul>
+      )}
+    </div>
   );
 }
 

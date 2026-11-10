@@ -4,7 +4,7 @@ import {
   LinkButton, PageHeader, PageSection, SegmentedControl, Select, Sheet, Tabs, TextArea, TextField, Timeline, Illustration,
   type IllustrationName, COVER_ILLUSTRATIONS, ICON_NAMES, useToast, BottomNav, Skeleton,
   ListItem, ListGroup, SectionHeader, EventCard, TravelConnector, IdeaRow, Tile, QuickAction, MapCard, StatStrip, ProfileCard,
-  OptionCard, Switch, SearchField, StepProgress, DestinationHeader, TripHeader, DayCard, CountryModal,
+  OptionCard, BudgetCard, Switch, SearchField, StepProgress, DestinationHeader, TripHeader, DayCard, CountryModal,
 } from '../../design/components';
 import { flagUrl } from '../../lib/countries';
 import type { ReactNode } from 'react';
@@ -284,6 +284,9 @@ export function DesignSystem() {
             <ListItem icon="utensils" title="Ichiran Shibuya" meta="Ramen · Tokyo · from TikTok" trailing="2h" onClick={() => {}} />
             <ListItem icon="link" title="10 things to do in Cusco" meta="Article · Peru · cntraveler.com" trailing="Yesterday" />
             <ListItem size="compact" icon="doc" title="TAP e-ticket" trailing="PDF · 2h ago" />
+            <BudgetCard label="Left to spend" amount="A$1,800" caption="of A$5,000 per person · A$3,200 planned" ratio={0.64}
+              rows={[{ icon: 'plane', label: 'Flights', amount: 'A$1,900' }, { icon: 'bed', label: 'Stays', amount: 'A$900' }, { icon: 'key', label: 'Car rental', amount: 'A$180' }]} />
+            <OptionCard icon="wallet" label="Yes" description="Add costs to your bookings to see what the trip adds up to" onClick={() => {}} />
             <ListItem icon="ticket" title="TP-7XK2LQ" meta="Booking reference" action={<IconButton small icon="copy" label="Copy booking reference" onClick={() => {}} />} />
           </ListGroup>
           <ListGroup>

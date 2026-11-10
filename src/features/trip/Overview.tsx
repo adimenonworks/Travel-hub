@@ -1,11 +1,13 @@
 import { useState } from 'react';
-import { CountryModal, EventCard, ListGroup, ListItem, PageSection } from '../../design/components';
+import { BudgetCard, CountryModal, EventCard, ListGroup, ListItem, PageSection } from '../../design/components';
 import type { IconName } from '../../design/components';
 import { useMe, useProfile } from '../../data/hooks';
 import type { Place } from '../../data/types';
 import { BOOKING_GROUPS, eventType } from '../../lib/categories';
 import { countryCodeOf, countryName, flagUrl, tripCountries } from '../../lib/countries';
 import { timeAgo } from '../../lib/dates';
+import { priceOf, useBudgetTotals } from '../../lib/currency';
+import { money } from '../../lib/format';
 import { emergencyFor } from '../../lib/emergency';
 import { nextEvent } from '../../lib/trips';
 import { isInApp, recordView, useRecentViews, type ViewKind } from '../../lib/recent';
@@ -28,6 +30,12 @@ export function Overview(ctx: TripCtx) {
   const [country, setCountry] = useState<string | null>(null);
   const docs = activities.reduce((n, a) => n + a.links.length, 0);
   const recent = useRecentViews(trip.id);
+  // Budget (per person): the prices of the events you book ahead, by group. Food, drink and free time are everyday spending.
+  const priced = activities.flatMap((a) => { const g = eventType(a.category); const p = g === 'food' || g === 'free' ? null : priceOf(a, trip); return p && p.amount > 0 ? [{ price: p, group: g }] : []; });
+  const totals = useBudgetTotals(trip.budget, priced);
+  const left = (trip.budget?.amount ?? 0) - totals.planned;
+  const over = left < 0;
+  const budgetNote = totals.unconverted ? `${totals.unconverted} price${totals.unconverted === 1 ? '' : 's'} in other currencies will be added once rates load` : 'Per person, from the prices on your bookings';
   const me = useMe();
   const reads = useReads(me.uid);
   const home = useProfile(me.uid)?.home ?? null;
@@ -47,6 +55,15 @@ export function Overview(ctx: TripCtx) {
           ? <EventCard {...eventCardProps(next, ctx, true)} state="next" extras={unreadTag(unreadCount(reads, me.uid, next.id, ctx.comments))} />
           : <ListGroup><ListItem icon="calendar" title="Nothing planned yet" meta="Add events to the itinerary and the next one shows here." to={`${base}/itinerary`} /></ListGroup>}
       </PageSection>
+
+      {trip.budget && (
+        <PageSection title="Budget" meta={budgetNote}>
+          <BudgetCard label={over ? 'Over budget' : 'Left to spend'} amount={money(Math.round(Math.abs(left)), trip.budget.currency)} over={over}
+            caption={`of ${money(trip.budget.amount, trip.budget.currency)} per person · ${money(Math.round(totals.planned), trip.budget.currency)} planned`}
+            ratio={trip.budget.amount > 0 ? totals.planned / trip.budget.amount : 1}
+            rows={BOOKING_GROUPS.filter((g) => g.type !== 'food' && (totals.byGroup[g.type] ?? 0) > 0).map((g) => ({ icon: g.icon, label: g.title, amount: money(Math.round(totals.byGroup[g.type]), trip.budget!.currency) }))} />
+        </PageSection>
+      )}
 
       <PageSection title="Bookings" meta="Tickets, confirmations and PDFs, by type">
         <ListGroup label="Bookings">

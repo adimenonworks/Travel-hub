@@ -66,3 +66,29 @@ export function defaultHomeCurrency() {
   const euro = ['AT', 'BE', 'CY', 'DE', 'EE', 'ES', 'FI', 'FR', 'GR', 'HR', 'IE', 'IT', 'LT', 'LU', 'LV', 'MT', 'NL', 'PT', 'SI', 'SK'];
   return byRegion[region] ?? (euro.includes(region) ? 'EUR' : 'USD');
 }
+
+/**
+ * The budget's sums, per person, in the budget's currency: every event with a price (converted with today's rates; a
+ * price that can't be converted yet is left out and counted in `unconverted`), by event group.
+ */
+export function useBudgetTotals(budget: Price | null | undefined, items: { price: Price; group: string }[]) {
+  const [rates, setRates] = useState<Record<string, number> | null>(null);
+  const base = budget?.currency;
+  const others = [...new Set(items.map((i) => i.price.currency).filter((c) => c !== base))].join(',');
+  useEffect(() => {
+    setRates(null);
+    if (!base || !others) return;
+    let live = true;
+    // Rates from the budget's currency; a price in X is amount / rate[X]
+    getRates(base).then((r) => { if (live) setRates(r?.rates ?? {}); });
+    return () => { live = false; };
+  }, [base, others]);
+  const byGroup: Record<string, number> = {};
+  let planned = 0, unconverted = 0;
+  for (const i of items) {
+    const v = i.price.currency === base ? i.price.amount : rates?.[i.price.currency] ? i.price.amount / rates[i.price.currency] : null;
+    if (v === null) { unconverted++; continue; }
+    planned += v; byGroup[i.group] = (byGroup[i.group] ?? 0) + v;
+  }
+  return { planned: Math.round(planned * 100) / 100, byGroup, unconverted };
+}

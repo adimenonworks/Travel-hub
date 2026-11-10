@@ -7,9 +7,10 @@ import { addDays, today } from '../../lib/dates';
 import { CURRENCIES } from '../../lib/format';
 import { shrinkPhoto } from '../../lib/image';
 import { CityPicker } from '../shared/CityPicker';
+import { PriceField, fromPriceDraft, toPriceDraft, type PriceDraft } from '../shared/Price';
 import s from './trip.module.css';
 
-type Draft = { name: string; destination: Place | null; startDate: string; endDate: string; currency: string; coverPhoto: string | null; coverPosition: Pos | null };
+type Draft = { name: string; destination: Place | null; startDate: string; endDate: string; currency: string; coverPhoto: string | null; coverPosition: Pos | null; budget: PriceDraft };
 type Pos = { x: number; y: number };
 
 const fromTrip = (t?: Trip): Draft => ({
@@ -20,6 +21,7 @@ const fromTrip = (t?: Trip): Draft => ({
   currency: t?.currency ?? (Intl.NumberFormat().resolvedOptions().locale.startsWith('en-GB') ? 'GBP' : 'USD'),
   coverPhoto: t?.coverPhoto ?? null,
   coverPosition: t?.coverPosition ?? null,
+  budget: toPriceDraft(t?.budget ?? null, t?.budget?.currency ?? t?.currency ?? 'USD'),
 });
 
 /**
@@ -44,6 +46,8 @@ export function TripForm({ open, trip, onClose, onSaved, onDeleted }: { open: bo
       currency: d.currency,
       coverPhoto: d.coverPhoto,
       coverPosition: d.coverPhoto ? d.coverPosition : null,
+      // Empty means no budget (Overview's Budget card goes away)
+      budget: fromPriceDraft(d.budget),
     };
     try {
       if (trip) {
@@ -85,6 +89,7 @@ export function TripForm({ open, trip, onClose, onSaved, onDeleted }: { open: bo
         hint="Prices you add start in this currency.">
         {CURRENCIES.map((c) => <option key={c}>{c}</option>)}
       </Select>
+      <PriceField label="Budget per person (optional)" hint="A rough total for the trip. Overview shows what’s left after your bookings. Empty: no budget." value={d.budget} onChange={(budget) => set({ budget })} />
       <CoverPhotoField value={d.coverPhoto} position={d.coverPosition}
         onChange={(coverPhoto) => set({ coverPhoto, coverPosition: null })} onMove={(coverPosition) => set({ coverPosition })} />
       {error && <p className="t-label-small t-danger">{error}</p>}
