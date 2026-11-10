@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Avatar, IconButton, useToast } from '../../design/components';
+import { Avatar, IconButton, Notification, useToast } from '../../design/components';
 import { store } from '../../data';
 import { personName, useMe } from '../../data/hooks';
 import type { Comment, Profile } from '../../data/types';
@@ -12,6 +12,9 @@ import s from './shared.module.css';
  * is in the bubble; who and when sit above it. You can delete your own (a small ghost button).
  * While you type, the box to write in is fixed on top of the keyboard (--keyboard-height), so you always see what you write.
  */
+/** Messages are short: 150 characters at most (the database rules refuse longer ones too). */
+export const MAX_MESSAGE = 150;
+
 export function Comments({ tripId, targetId, comments, profiles }: { tripId: string; targetId: string; comments: Comment[]; profiles: Record<string, Profile> }) {
   const me = useMe();
   const toast = useToast();
@@ -19,9 +22,10 @@ export function Comments({ tripId, targetId, comments, profiles }: { tripId: str
   const [typing, setTyping] = useState(false);
   const list = comments.filter((c) => c.targetId === targetId).sort((a, b) => a.createdAt - b.createdAt);
 
+  const over = text.trim().length - MAX_MESSAGE;
   const send = async () => {
     const t = text.trim();
-    if (!t) return;
+    if (!t || t.length > MAX_MESSAGE) return;
     setText('');
     try { await store.addSub(tripId, 'comments', { targetId, text: t, authorId: me.uid }); }
     catch { setText(t); toast({ tone: 'error', label: "Couldn't send. Check your connection" }); }
@@ -56,11 +60,20 @@ export function Comments({ tripId, targetId, comments, profiles }: { tripId: str
       )}
       {typing && <div className={s.composerSpacer} aria-hidden="true" />}
       <div className={`${s.composer}${typing ? ` ${s.composerTyping}` : ''}`}>
-        <input className={s.commentInput} placeholder="Add a comment" aria-label="Add a comment" value={text} enterKeyHint="send"
+        {/* Over the limit: a Warning Notification above the box, and Send is disabled */}
+        {over > 0 && (
+          <div className={s.composerWarning} id="comment-limit">
+            <Notification state="warning">{`Messages can be up to ${MAX_MESSAGE} characters. Remove ${over} to send.`}</Notification>
+          </div>
+        )}
+        <input aria-describedby={over > 0 ? 'comment-limit' : undefined} aria-invalid={over > 0 || undefined} className={s.commentInput} placeholder="Add a comment" aria-label="Add a comment" value={text} enterKeyHint="send"
           onFocus={() => { setTyping(true); setTimeout(() => window.scrollTo({ top: document.documentElement.scrollHeight, behavior: 'smooth' }), 350); }} onBlur={() => setTyping(false)}
           onChange={(e) => setText(e.target.value)}
           onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); send(); } }} />
-        <IconButton icon="send" tone="brand" label="Send comment" onClick={send} disabled={!text.trim()} />
+        {text.trim().length >= MAX_MESSAGE - 20 && (
+          <span className={[s.commentCount, over > 0 && s.commentCountOver].filter(Boolean).join(' ')} aria-live="polite">{`${text.trim().length}/${MAX_MESSAGE}`}</span>
+        )}
+        <IconButton icon="send" tone="brand" label="Send comment" onClick={send} disabled={!text.trim() || over > 0} />
       </div>
     </div>
   );

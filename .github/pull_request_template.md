@@ -3,7 +3,7 @@
 ## Figma (components never drift)
 - [ ] Components built in Figma first, then code, matching 1:1 (every variant touched, icons, /#/design)
 - [ ] Touched components compared side by side (Figma vs /#/design)
-- [ ] Planning page: built items marked "✓ <date>" and moved to Built; decided / dropped items moved; counts and date updated
+- [ ] Planning page (bigger features only): built / decided / dropped features moved to their column
 - (Flows screens are no longer maintained)
 
 ## Checks

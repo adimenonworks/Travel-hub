@@ -79,7 +79,7 @@ export type NotificationState = 'warning' | 'success' | 'error' | 'neutral' | 'b
 export function Notification({ state = 'neutral', icon = 'info', label, children }: { state?: NotificationState; icon?: IconName; label?: ReactNode; children: ReactNode }) {
   return (
     <div className={[s.note, s[`note-${state}`]].filter(Boolean).join(' ')} role={state === 'error' ? 'alert' : undefined}>
-      <Icon name={icon} size={20} />
+      <Icon name={icon} size={24} />
       <div className={s.noteText}>
         {label && <div className={s.noteLabel}>{label}</div>}
         <div>{children}</div>
