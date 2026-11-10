@@ -8,7 +8,7 @@ import {
   initializeFirestore, onSnapshot, persistentLocalCache, persistentMultipleTabManager, query, setDoc, updateDoc, where, writeBatch, type DocumentData,
 } from 'firebase/firestore';
 import type { Store } from './store';
-import type { Invite, LinkPreview, Profile, SavedPlace, SubName, Trip } from './types';
+import type { ChatReads, Invite, LinkPreview, Profile, SavedPlace, SubName, Trip } from './types';
 import { getFunctions, httpsCallable } from 'firebase/functions';
 import { randomCode } from './util';
 import { googleIosClientId, isNativeApp } from '../lib/native';
@@ -133,6 +133,17 @@ export function createFirebaseStore(config: FirebaseOptions): Store {
         if (s?.exists()) out[id] = withId<Profile>(id, s.data());
       }));
       return out;
+    },
+    watchReads(uid, cb) {
+      // Private (users/{uid}/private/reads): only you can read or write it, as with your home city.
+      return onSnapshot(doc(db, 'users', uid, 'private', 'reads'),
+        (snap) => cb(snap.exists() ? (snap.data() as ChatReads) : null),
+        () => cb(null));
+    },
+    async markRead(uid, targetId, at, since) {
+      // A merge that sets only this event's time (and "since" if it isn't there yet), so devices never overwrite each other.
+      const ref = doc(db, 'users', uid, 'private', 'reads');
+      await setDoc(ref, { since, at: { [targetId]: at } }, { merge: true });
     },
     async saveProfile(uid, patch) {
       const rest: DocumentData = patch;

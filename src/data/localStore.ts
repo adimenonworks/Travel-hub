@@ -1,5 +1,5 @@
 import type { Store } from './store';
-import type { Invite, Profile, SavedPlace, SubName, Trip, User } from './types';
+import type { ChatReads, Invite, Profile, SavedPlace, SubName, Trip, User } from './types';
 import { randomCode } from './util';
 
 /**
@@ -9,6 +9,8 @@ import { randomCode } from './util';
  */
 type DB = {
   users: Record<string, Profile>;
+  /** Event-chat read state per person (demo mode) */
+  reads?: Record<string, ChatReads>;
   places?: Record<string, SavedPlace>;
   trips: Record<string, Trip>;
   subs: Record<string, Record<string, Record<string, Record<string, unknown>>>>; // tripId -> sub -> id -> doc
@@ -90,6 +92,15 @@ export function createLocalStore(): Store {
     },
     async getProfiles(uids) {
       return Object.fromEntries(uids.filter((id) => db.users[id]).map((id) => [id, structuredClone(db.users[id])]));
+    },
+    watchReads(uid, cb) {
+      return watch(() => db.reads?.[uid] ?? null, cb);
+    },
+    async markRead(uid, targetId, at, since) {
+      db.reads = db.reads ?? {};
+      const r = db.reads[uid] ?? { since, at: {} };
+      db.reads[uid] = { ...r, at: { ...r.at, [targetId]: at } };
+      save();
     },
     async saveProfile(uid, patch) {
       db.users[uid] = { ...(db.users[uid] ?? { id: uid, name: 'Traveler', photo: null }), ...patch };
