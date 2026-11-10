@@ -47,6 +47,14 @@ export function People({ trip, profiles, canManage, isOwner }: TripCtx) {
     catch { toast({ tone: 'error', label: "Couldn't save. Check your connection" }); }
   };
 
+  const removePerson = async () => {
+    if (!person) return;
+    const name = personName(profiles, person);
+    if (!confirmAction(`Remove ${name} from this trip?`)) return;
+    try { await store.removeMember(trip, person); toast({ icon: 'trash', label: `${name} removed` }); setPerson(null); }
+    catch { toast({ tone: 'error', label: "Couldn't remove. Check your connection" }); }
+  };
+
   return (
     <>
       <SectionHeader title="Travellers"
@@ -79,17 +87,10 @@ export function People({ trip, profiles, canManage, isOwner }: TripCtx) {
         }}>Leave trip</Button>
       )}
 
-      <Sheet open={!!person} title={person ? personName(profiles, person) : ''} subtitle="What they can do on this trip" onClose={() => setPerson(null)} onSubmit={saveRole} submitLabel="Save">
+      <Sheet open={!!person} title={person ? personName(profiles, person) : ''} subtitle="What they can do on this trip" onClose={() => setPerson(null)} onSubmit={saveRole} submitLabel="Save"
+        secondary={person ? <Button variant="destructive" size="large" onClick={removePerson}>Remove</Button> : undefined}>
         <SegmentedControl label="Role" block value={role} onChange={setRoleDraft} options={[{ value: 'member', label: 'Member' }, { value: 'editor', label: 'Organiser' }]} />
         <p className="t-body-small t-secondary">Organisers can edit the trip and the itinerary, and add ideas to days.</p>
-        {person && (
-          <Button variant="destructive" icon="trash" onClick={async () => {
-            const name = personName(profiles, person);
-            if (!confirmAction(`Remove ${name} from this trip?`)) return;
-            try { await store.removeMember(trip, person); toast({ icon: 'trash', label: `${name} removed` }); setPerson(null); }
-            catch { toast({ tone: 'error', label: "Couldn't remove. Check your connection" }); }
-          }}>Remove from trip</Button>
-        )}
       </Sheet>
     </>
   );

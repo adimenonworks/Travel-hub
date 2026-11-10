@@ -68,8 +68,15 @@ export function PlaceSheet({ place, onClose }: { place: SavedPlace | null; onClo
       onClose();
     } catch { toast({ tone: 'error', label: "Couldn't save. Check your connection" }); }
   };
+  const remove = async () => {
+    if (!confirmAction(`Delete "${place.name}" from your collection?`)) return;
+    try { await store.deletePlace(place.id); toast({ icon: 'trash', label: 'Place deleted' }); onClose(); }
+    catch { toast({ tone: 'error', label: "Couldn't delete. Check your connection" }); }
+  };
   return (
     <Sheet open title={place.name}
+      onSubmit={target ? addToTrip : undefined} submitLabel="Add to ideas"
+      secondary={mine ? <Button variant="destructive" size="large" onClick={remove}>Delete</Button> : undefined}
       subtitle={[placeCategory(place.category).one, place.city, place.countryCode ? countryName(place.countryCode) : null].filter(Boolean).join(' · ')} onClose={onClose}>
       {place.image && <img src={place.image} alt="" className={s.saveImage} />}
       <PlaceMarks visited={visited.has(place.id)} starred={isStar} />
@@ -88,20 +95,12 @@ export function PlaceSheet({ place, onClose }: { place: SavedPlace | null; onClo
       )}
       {fits.length > 0 && (
         <div className={s.field}>
-          {fits.length > 1 && (
+          {fits.length > 1 ? (
             <Select label="Add to a trip" value={target?.id} onChange={(e) => setTripId(e.target.value)}>
               {fits.map((t) => <option key={t.id} value={t.id}>{t.name}</option>)}
             </Select>
-          )}
-          <Button icon="lightbulb" onClick={addToTrip}>{`Add to ${target!.name} ideas`}</Button>
+          ) : <p className="t-body-small t-secondary">{`Add to ideas puts it on ${target!.name}, so everyone can vote on it.`}</p>}
         </div>
-      )}
-      {mine && (
-        <Button variant="destructive" icon="trash" onClick={async () => {
-          if (!confirmAction(`Delete "${place.name}" from your collection?`)) return;
-          try { await store.deletePlace(place.id); toast({ icon: 'trash', label: 'Place deleted' }); onClose(); }
-          catch { toast({ tone: 'error', label: "Couldn't delete. Check your connection" }); }
-        }}>Delete place</Button>
       )}
     </Sheet>
   );

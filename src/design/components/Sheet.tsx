@@ -14,6 +14,8 @@ type Props = {
   onSubmit?: () => void | Promise<void>;
   submitLabel?: string;
   submitDisabled?: boolean;
+  /** Figma "Show secondary action": a second Large button beside the primary, half and half (e.g. Delete). Never stacked. */
+  secondary?: ReactNode;
   children: ReactNode;
 };
 
@@ -23,7 +25,7 @@ type Props = {
  * It glides up on open and slides back down on close (the close button, the scrim, Escape, a drag down, or saving).
  * In the iPhone app it rises with the keyboard as one (see --keyboard-height in Sheet.module.css).
  */
-export function Sheet({ open, title, subtitle, onClose, onSubmit, submitLabel = 'Done', submitDisabled, children }: Props) {
+export function Sheet({ open, title, subtitle, onClose, onSubmit, submitLabel = 'Done', submitDisabled, secondary, children }: Props) {
   const ref = useRef<HTMLDivElement>(null);
   // Stays mounted while the closing animation plays; a timer covers browsers that skip the animation.
   const [mounted, setMounted] = useState(open);
@@ -122,7 +124,7 @@ export function Sheet({ open, title, subtitle, onClose, onSubmit, submitLabel = 
           </div>
           <div className={s.body}>
             {shown.current.children}
-            {onSubmit && <div className={s.footer}><Button type="submit" block disabled={submitDisabled}>{submitLabel}</Button></div>}
+            {(onSubmit || secondary) && <div className={s.footer}>{secondary}{onSubmit && <Button type="submit" block disabled={submitDisabled}>{submitLabel}</Button>}</div>}
           </div>
         </form>
       </div>

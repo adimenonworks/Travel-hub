@@ -83,7 +83,8 @@ function AlbumForm({ open, tripId, album, canDelete, onClose }: { open: boolean;
   };
 
   return (
-    <Sheet open={open} title={album ? 'Edit album' : 'Add album'} onClose={onClose} onSubmit={submit} submitLabel={album ? 'Save' : 'Add'} submitDisabled={!valid}>
+    <Sheet open={open} title={album ? 'Edit album' : 'Add album'} onClose={onClose} onSubmit={submit} submitLabel={album ? 'Save' : 'Add'} submitDisabled={!valid}
+      secondary={album && canDelete ? <Button variant="destructive" size="large" onClick={remove}>Remove</Button> : undefined}>
       <TextField label="Album name" placeholder="Lisbon 2026" value={title} onChange={(e) => setTitle(e.target.value)} />
       <TextField label="Share link" placeholder="https://photos.app.goo.gl/…" inputMode="url" autoComplete="off" value={url}
         onChange={(e) => setUrl(e.target.value)} onBlur={() => setUrl(clean)}
@@ -93,7 +94,6 @@ function AlbumForm({ open, tripId, album, canDelete, onClose }: { open: boolean;
         <p><b>Apple Photos:</b> open a Shared Album, tap the people icon, turn on <b>Public Website</b>, then tap <b>Share Link</b>.</p>
         <p>Anyone with the link can see the album, so only share it with people you trust.</p>
       </div>
-      {album && canDelete && <Button variant="destructive" icon="trash" block onClick={remove}>Remove album</Button>}
     </Sheet>
   );
 }
