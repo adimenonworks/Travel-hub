@@ -38,6 +38,22 @@ await t('member writes activity', assertSucceeds(updateDoc(doc(B, 'trips/t1/acti
 await t('member adds photo album', assertSucceeds(setDoc(doc(B, 'trips/t1/albums/p1'), { title: 'Lisbon', url: 'https://photos.app.goo.gl/x', createdBy: 'bob' })));
 await t('non-member cannot add photo album', assertFails(setDoc(doc(C, 'trips/t1/albums/p2'), { title: 'x', url: 'https://x', createdBy: 'carol' })));
 await t('non-member cannot read photo albums', assertFails(getDocs(collection(C, 'trips/t1/albums'))));
+// Trip content: authors, organisers and size limits
+await t('member adds a comment as themselves', assertSucceeds(setDoc(doc(B, 'trips/t1/comments/c1'), { targetId: 'a1', text: 'Meet at the stop?', authorId: 'bob', createdBy: 'bob', createdAt: 1 })));
+await t('cannot post a comment as someone else', assertFails(setDoc(doc(B, 'trips/t1/comments/c2'), { targetId: 'a1', text: 'hi', authorId: 'alice', createdBy: 'bob', createdAt: 1 })));
+await t('comment over 150 characters refused', assertFails(setDoc(doc(B, 'trips/t1/comments/c3'), { targetId: 'a1', text: 'x'.repeat(151), authorId: 'bob', createdBy: 'bob', createdAt: 1 })));
+await t('comment of exactly 150 characters allowed', assertSucceeds(setDoc(doc(B, 'trips/t1/comments/c4'), { targetId: 'a1', text: 'x'.repeat(150), authorId: 'bob', createdBy: 'bob', createdAt: 1 })));
+await t('owner cannot delete someone else\'s comment', assertFails(deleteDoc(doc(A, 'trips/t1/comments/c1'))));
+await t('owner cannot edit someone else\'s comment', assertFails(updateDoc(doc(A, 'trips/t1/comments/c1'), { text: 'changed' })));
+await t('author deletes own comment', assertSucceeds(deleteDoc(doc(B, 'trips/t1/comments/c1'))));
+await t('notes over 2,000 characters refused', assertFails(setDoc(doc(B, 'trips/t1/activities/a9'), { title: 'x', notes: 'x'.repeat(2001), createdBy: 'bob' })));
+await t('member adds an event', assertSucceeds(setDoc(doc(B, 'trips/t1/activities/a2'), { title: 'Fado', createdBy: 'bob' })));
+await t('cannot add an event as someone else', assertFails(setDoc(doc(B, 'trips/t1/activities/a3'), { title: 'Fado', createdBy: 'alice' })));
+await t('cannot change who added an event', assertFails(updateDoc(doc(B, 'trips/t1/activities/a2'), { createdBy: 'alice' })));
+await setDoc(doc(A, 'trips/t1/ideas/i1'), { title: 'Belém', createdBy: 'alice', votes: {} });
+await t('member votes on someone else\'s idea', assertSucceeds(updateDoc(doc(B, 'trips/t1/ideas/i1'), { 'votes.bob': true })));
+await t('member cannot delete someone else\'s idea', assertFails(deleteDoc(doc(B, 'trips/t1/ideas/i1'))));
+await t('owner deletes a member\'s event', assertSucceeds(deleteDoc(doc(A, 'trips/t1/activities/a2'))));
 await t('member cannot rename trip', assertFails(updateDoc(doc(B, 'trips/t1'), { name: 'x' })));
 await t('member cannot promote self', assertFails(updateDoc(doc(B, 'trips/t1'), { 'roles.bob': 'editor' })));
 await t('member cannot delete trip', assertFails(deleteDoc(doc(B, 'trips/t1'))));

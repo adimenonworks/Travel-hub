@@ -30,7 +30,8 @@ personal data.
 | Data | Who can read | Who can change |
 |---|---|---|
 | A trip | Its members only | Owner and organisers (they can't remove the owner or change ownership) |
-| A trip's events, ideas, comments, albums | Members | Members |
+| A trip's events, ideas, albums | Members | Members add and update; only whoever added it, or an organiser, deletes it |
+| A trip's comments | Members | Only the author edits or deletes; at most 150 characters |
 | Joining a trip | – | Someone with a valid, unexpired invite. They can only add themselves, as a member |
 | Leaving a trip | – | A member (not the owner) removes only themselves |
 | Deleting a trip | – | The owner only |
@@ -63,13 +64,11 @@ The rules have their own automated tests (`tests/rules/`). Run them whenever the
 
 ## 3. Things to watch, and what to do (in priority order)
 
-1. **Any trip member can change or delete anything in that trip.** That includes other people's events, ideas and
-   comments, because the rules for a trip's contents say "members can read and write". The app only shows delete on
-   your own comment, but a determined member could do more.
-   *Fix when needed:* tighten the rules so comments can only be edited/deleted by their author, and events and ideas
-   only by their author or the trip's organisers.
-2. **No size limits on events, ideas and comments.** A member could store very large text, costing everyone reads.
-   *Fix:* add length checks in the rules (for example comments ≤ 2,000 characters).
+1. **Done (11 Nov): trip content rules.** Comments can only be edited or deleted by their author (max 150 characters);
+   events, ideas and albums can only be deleted by whoever added them or an organiser; titles ≤ 200, notes ≤ 2,000
+   characters. Covered by tests in `tests/rules`. Takes effect once the rules are published in the Firebase console.
+2. **Members can still edit each other's events and ideas** (on purpose: planning together, voting). If that's ever a
+   problem, limit updates to the author and organisers, except votes and "who's going".
 3. **The Worker can be called by anyone who knows its address.** That can't leak data, but it can use up the
    Unsplash and flight quotas. *Fix:* a Cloudflare rate-limiting rule, and optionally require a Firebase sign-in
    token.
