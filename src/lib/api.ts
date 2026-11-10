@@ -11,13 +11,15 @@ export const hasApi = !!API_BASE;
 
 // ---------- Unsplash cover photos ----------
 
-/** One landscape photo of a place ("Lisbon Portugal"), or null. */
-export async function findCoverPhoto(q: string): Promise<TripPhoto | null> {
-  if (!hasApi || !q.trim()) return null;
+/** One landscape photo of a place ("Lisbon Portugal"); null when Unsplash has none; undefined when the lookup failed
+ *  (offline, server or key trouble), so the caller tries again later instead of remembering "no photo". */
+export async function findCoverPhoto(q: string): Promise<TripPhoto | null | undefined> {
+  if (!hasApi || !q.trim()) return undefined;
   try {
     const r = await fetch(`${API_BASE}/cover?q=${encodeURIComponent(q.trim())}`);
-    return r.ok ? ((await r.json()) as TripPhoto) : null;
-  } catch { return null; }
+    if (r.ok) return (await r.json()) as TripPhoto;
+    return r.status === 404 ? null : undefined;
+  } catch { return undefined; }
 }
 
 /** Unsplash's terms: tell them when a photo is chosen (or swapped in). Fire and forget. */

@@ -1,6 +1,6 @@
 // node server/worker.test.mjs — checks the Worker's Unsplash and AeroDataBox adapters with stand-in responses.
 import assert from 'node:assert/strict';
-import { searchCover, lookupFlight, normaliseFlight } from './worker.js';
+import { searchCover, lookupFlight, normaliseFlight, fromCache } from './worker.js';
 
 const reply = (status, body) => async (url, init) => ({ ok: status < 400, status, json: async () => body, url, init });
 
@@ -30,3 +30,9 @@ assert.equal(f.departure.revised, '2026-11-05 09:05+00:00');
 assert.equal(await lookupFlight('XX1', '2026-11-05', 'RKEY', reply(204, null)), null);
 assert.equal(normaliseFlight(null), null);
 console.log('worker adapters: all checks passed');
+
+// A cached answer saved for one caller must come back with only the next caller's origin (two values break CORS)
+const saved = new Response('{}', { headers: { 'access-control-allow-origin': 'https://adimenonworks.github.io', 'content-type': 'application/json' } });
+const again = fromCache(new Request('https://x/flight', { headers: { Origin: 'capacitor://localhost' } }), saved);
+assert.equal(again.headers.get('Access-Control-Allow-Origin'), 'capacitor://localhost');
+assert.equal(again.headers.get('Content-Type'), 'application/json');
