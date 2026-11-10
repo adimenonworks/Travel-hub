@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { Avatar, Button, Card, Select, LinkButton, ListGroup, ListItem, PageHeader, PageSection, ProfileCard as FigmaProfileCard, SegmentedControl, Sheet, StatStrip, TextField, useToast } from '../../design/components';
 import { store } from '../../data';
 import { useMe, useMyTrips, usePlaces, useProfile } from '../../data/hooks';
@@ -21,7 +22,7 @@ import s from './Profile.module.css';
 /** "Australian dollar" for AUD, as Figma's Currency row shows it. */
 const currencyName = (code: string) => { try { const n = new Intl.DisplayNames(undefined, { type: 'currency' }).of(code); return n ? n[0].toUpperCase() + n.slice(1) : code; } catch { return code; } };
 
-type Open = 'profile' | 'home' | 'maps' | 'appearance' | 'currency' | null;
+type Open = 'profile' | 'home' | 'maps' | 'appearance' | 'currency' | 'delete' | null;
 
 /**
  * You tab (Figma "You tab — Profile"): the Profile Card, "Your travels" (a Stat strip of countries, cities and days
@@ -107,8 +108,15 @@ export function ProfilePage() {
         </ListGroup>
       </PageSection>
 
-      <Button variant="destructive" block iconEnd="signout" onClick={() => store.signOut()}>Sign out</Button>
-      <p className={['t-body-small t-secondary', s.version].join(' ')}>{version}</p>
+      <div className={s.account}>
+        <Button variant="neutral" block iconEnd="signout" onClick={() => store.signOut()}>Sign out</Button>
+        <Button variant="destructive" block iconEnd="trash" onClick={() => setOpen('delete')}>Delete account</Button>
+      </div>
+      <p className={['t-body-small t-secondary', s.version].join(' ')}>
+        {version}{version && ' · '}<Link to="/privacy" className={s.privacy}>Privacy policy</Link>
+      </p>
+
+      <DeleteAccount open={open === 'delete'} uid={me.uid} onClose={() => setOpen(null)} />
 
       <Sheet open={open === 'profile'} title="Your profile" subtitle="What people on your trips see" onClose={() => setOpen(null)}>
         <ProfileEditor uid={me.uid} name={name} photo={profile ? profile.photo : me.photo} />
@@ -202,3 +210,41 @@ function ProfileEditor({ uid, name, photo, email }: { uid: string; name: string;
     </Card>
   );
 }
+
+/**
+ * "Are you sure?" before deleting the account: what happens to trips, messages, places and the profile, then
+ * Keep account (Neutral) and Delete account (Destructive) side by side.
+ */
+function DeleteAccount({ open, uid, onClose }: { open: boolean; uid: string; onClose: () => void }) {
+  const toast = useToast();
+  const [busy, setBusy] = useState(false);
+  const go = async () => {
+    setBusy(true);
+    try {
+      await store.deleteAccount(uid);
+      toast({ icon: 'check', label: 'Your account is deleted' });
+    } catch (e) {
+      const code = (e as { code?: string }).code ?? '';
+      setBusy(false);
+      if (code.includes('cancel') || code.includes('canceled')) return;
+      toast({ tone: 'error', label: code === 'app/wrong-account' ? 'That was a different Google account. Nothing was deleted' : "Couldn't delete your account. Try again" });
+    }
+  };
+  return (
+    <Sheet open={open} title="Delete your account?" subtitle="This can't be undone." onClose={busy ? () => {} : onClose}
+      secondary={<>
+        <Button variant="neutral" block onClick={onClose} disabled={busy}>Keep account</Button>
+        <Button variant="destructive" block loading={busy} disabled={busy} onClick={go}>Delete</Button>
+      </>}>
+      <ListGroup label="What deleting does">
+        <ListItem icon="plane" title="Trips you made" meta="Go to another person on the trip. Trips with only you are deleted." />
+        <ListItem icon="people" title="Trips you joined" meta="You leave them. Events and ideas you added stay for everyone else." />
+        <ListItem icon="chat" title="Your messages" meta="Deleted from every trip." />
+        <ListItem icon="star" title="Saved places" meta="Deleted, except places a trip still uses: those go to someone on that trip." />
+        <ListItem icon="person" title="Your profile and settings" meta="Name, photo, home city, places you've been and favourites are deleted." />
+      </ListGroup>
+      <p className="t-body-small t-secondary">Google may ask you to sign in again to confirm it's you.</p>
+    </Sheet>
+  );
+}
+

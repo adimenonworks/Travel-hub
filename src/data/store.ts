@@ -12,6 +12,13 @@ export interface Store {
   onAuth(cb: (user: User | null) => void): Unsubscribe;
   signIn(demoName?: string): Promise<void>;
   signOut(): Promise<void>;
+  /**
+   * Delete your account (You → Delete account). Trips you own go to another member (the first one listed); trips with
+   * nobody else are deleted. You leave the other trips and your messages are deleted. Saved places a trip still uses go
+   * to that trip's next member; the rest are deleted, as are your stars, profile and private settings. Last, the
+   * sign-in itself is deleted (on Firebase this may ask you to sign in with Google again to confirm it's you).
+   */
+  deleteAccount(uid: string): Promise<void>;
   /** An error left over from a redirect sign-in, if any (shown once). */
   takeAuthError?(): Promise<unknown>;
 

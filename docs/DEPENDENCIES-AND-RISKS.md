@@ -27,8 +27,8 @@ free-plan limits as of November 2026. Check each provider's pricing page before 
   re-installed. You also can't use TestFlight [Apple's beta testing app], push notifications or the App Store. It
   costs about A$149 a year and is needed before launch.
 - **App Store review requirements:**
-  - In-app **account deletion**: Apple requires it for apps with sign-in, and Rove doesn't have it yet.
-  - A **privacy policy** link.
+  - In-app **account deletion**: Apple requires it for apps with sign-in. Done (You → Delete account).
+  - A **privacy policy** link: in the app (You → Privacy policy); App Store Connect also needs it at a public web address.
   - **Sign in with Apple** may be required alongside Google.
 - **Google sign-in setup.** Rove depends on the iOS OAuth client ID and the URL scheme in `Info.plist`. If the bundle ID
   changes, both must be redone.
@@ -76,6 +76,6 @@ free-plan limits as of November 2026. Check each provider's pricing page before 
 2. Move Firebase to Blaze with a budget alert; turn on backups.
 3. Get Unsplash production approval; choose a paid flight-status plan or accept limits.
 4. Switch map tiles to a provider with a free tier.
-5. Add a rate limit to the Worker.
-6. Add in-app account deletion, a privacy policy, and Sign in with Apple.
+5. Add a rate limit to the Worker (skipped for now, 10 Nov).
+6. Put the privacy policy at a public web address, and add Sign in with Apple (account deletion and the in-app policy are done).
 7. Replace the website join page with Universal Links.

@@ -12,9 +12,9 @@ export const fromPriceDraft = (d: PriceDraft): Price | null => (d.amount.trim() 
 /** The optional Price field: an amount and the currency it was booked in. 0 means free. */
 export function PriceField({ value, onChange, label = 'Price (optional)', hint = 'Leave it empty if you don’t know. 0 means free.' }: { value: PriceDraft; onChange: (v: PriceDraft) => void; label?: string; hint?: string }) {
   return (
-    <FieldRow>
+    <FieldRow hint={hint}>
       <TextField label={label} type="number" inputMode="decimal" min={0} step="any" placeholder="—" value={value.amount}
-        onChange={(e) => onChange({ ...value, amount: e.target.value })} hint={hint} />
+        onChange={(e) => onChange({ ...value, amount: e.target.value })} />
       <Select label="Currency" value={value.currency} onChange={(e) => onChange({ ...value, currency: e.target.value })}>
         {[...new Set([value.currency, ...CURRENCIES])].map((c) => <option key={c} value={c}>{c}</option>)}
       </Select>

@@ -106,14 +106,25 @@ export function PlaceSheet({ place, onClose }: { place: SavedPlace | null; onClo
   );
 }
 
-type Filter = 'all' | 'places' | 'links' | 'notes' | 'visited';
+type Filter = 'all' | PlaceCategory | 'links' | 'notes' | 'visited';
 const kindOf = (p: SavedPlace) => p.type ?? 'place';
 const SHOW = 3;
 
+/** A city's places split into its categories (Restaurants, Cafés…), each a small titled List group. */
+function CategoryGroups({ list, where, render }: { list: SavedPlace[]; where: string; render: (p: SavedPlace) => ReactNode }) {
+  return <>{PLACE_CATEGORIES.map((c) => ({ c, places: list.filter((p) => p.category === c.value) })).filter((x) => x.places.length > 0).map(({ c, places }) => (
+    <section key={c.value} className={s.favCategory} aria-label={`${c.label} in ${where}`}>
+      <h3 className={s.favCategoryTitle}><Icon name={c.icon} size={16} />{c.label}</h3>
+      <ListGroup label={`${c.label} in ${where}`}>{places.map(render)}</ListGroup>
+    </section>
+  ))}</>;
+}
+
 /**
  * A country's collection (Figma "Saved destination"): the neutral flag-led header ("24 saves · 3 cities · Saved by
- * you"), filter Chips (All · Places · Links · Notes, and Visited once something is), the map card, a section per city
- * (three Places, "See all n" for the rest; unvisited first, with ★ and ✓) and Links & notes last. A Place opens its
+ * you"), filter Chips (All, then each category that has places, Links and Notes when there are some, and Visited once
+ * something is), the map card, a section per city (or state/province when there's no city), split into its categories
+ * (three places, "See all n" for the rest; unvisited first, with ★ and ✓) and Links & notes last. A Place opens its
  * sheet, where it's moved, recategorised or deleted.
  */
 export function CountryCollection() {
@@ -132,20 +143,27 @@ export function CountryCollection() {
   const title = code ? countryName(code) : 'Unsorted';
   const places = mine.filter((p) => kindOf(p) === 'place');
   const links = mine.filter((p) => kindOf(p) === 'link'), notes = mine.filter((p) => kindOf(p) === 'note');
-  const showPlaces = filter === 'all' || filter === 'places' || filter === 'visited';
-  const cityList = sortPlaces(places.filter((p) => filter !== 'visited' || visited.has(p.id)), visited);
-  const cities = showPlaces ? groupBy(cityList, cityOf) : [];
+  const isCategory = PLACE_CATEGORIES.some((c) => c.value === filter);
+  const showPlaces = filter === 'all' || filter === 'visited' || isCategory;
+  const cityList = sortPlaces(places.filter((p) => (filter !== 'visited' || visited.has(p.id)) && (!isCategory || p.category === filter)), visited);
+  // In each city: categories in their usual order, unvisited first inside each.
+  const order = (p: SavedPlace) => PLACE_CATEGORIES.findIndex((c) => c.value === p.category);
+  const cities = showPlaces ? groupBy(cityList, cityOf).map(([c, list]) => [c, list.slice().sort((x, y) => order(x) - order(y))] as [string, SavedPlace[]]) : [];
   const extras = filter === 'all' ? [...links, ...notes] : filter === 'links' ? links : filter === 'notes' ? notes : [];
   const pins = places.filter((p) => p.lat != null && p.lng != null).map((p) => ({ lat: p.lat!, lng: p.lng!, label: p.name }));
   const live = open ? mine.find((p) => p.id === open) ?? null : null;
   const cityCount = new Set(places.map(cityOf)).size;
   const filters: { value: Filter; label: string; n: number }[] = [
-    { value: 'all', label: 'All', n: mine.length }, { value: 'places', label: 'Places', n: places.length },
-    { value: 'links', label: 'Links', n: links.length }, { value: 'notes', label: 'Notes', n: notes.length },
+    { value: 'all', label: 'All', n: mine.length },
+    ...PLACE_CATEGORIES.map((c) => ({ value: c.value as Filter, label: c.label, n: places.filter((p) => p.category === c.value).length })).filter((f) => f.n > 0),
+    ...(links.length ? [{ value: 'links' as Filter, label: 'Links', n: links.length }] : []),
+    ...(notes.length ? [{ value: 'notes' as Filter, label: 'Notes', n: notes.length }] : []),
     ...(places.some((p) => visited.has(p.id)) ? [{ value: 'visited' as Filter, label: 'Visited', n: places.filter((p) => visited.has(p.id)).length }] : []),
   ];
   const seeAll = (key: string, n: number) => n > SHOW && !expanded.includes(key)
     ? <Button variant="ghost" size="regular" iconEnd="chevron-right" onClick={() => setExpanded((x) => [...x, key])}>{`See all ${n}`}</Button> : undefined;
+  const row = (p: SavedPlace) => <PlaceRow key={p.id} place={p} visited={visited.has(p.id)} starred={starred(p)} onClick={() => setOpen(p.id)}
+    meta={[p.kind || placeCategory(p.category).one, p.source ? `from ${p.source}` : null].filter(Boolean).join(' · ')} />;
 
   return (
     <Content>
@@ -165,15 +183,14 @@ export function CountryCollection() {
           {showPlaces && pins.length > 0 && <MapCard media={<Illustration name="map" size={72} />} title={`See ${pins.length} place${pins.length === 1 ? '' : 's'} on a map`}
             meta={[...new Set(places.map(cityOf))].slice(0, 3).join(', ')} onClick={() => setMap(true)} />}
           {cities.length === 0 && extras.length === 0 && <p className="t-body t-secondary">Nothing matches this filter.</p>}
-          {cities.map(([city, list]) => (
-            <PageSection key={city} title={city} action={seeAll(city, list.length)}>
-              <ListGroup label={city}>
-                {(expanded.includes(city) ? list : list.slice(0, SHOW)).map((p) => (
-                  <PlaceRow key={p.id} place={p} visited={visited.has(p.id)} starred={starred(p)} onClick={() => setOpen(p.id)} />
-                ))}
-              </ListGroup>
-            </PageSection>
-          ))}
+          {cities.map(([city, list]) => {
+            const shown = expanded.includes(city) ? list : list.slice(0, SHOW);
+            return (
+              <PageSection key={city} title={city} action={seeAll(city, list.length)}>
+                {isCategory ? <ListGroup label={city}>{shown.map(row)}</ListGroup> : <CategoryGroups list={shown} where={city} render={row} />}
+              </PageSection>
+            );
+          })}
           {extras.length > 0 && (
             <PageSection title="Links & notes" action={seeAll('links', extras.length)}>
               <ListGroup label="Links and notes">
@@ -261,17 +278,10 @@ export function FavouriteCountry() {
         <Card media={<Illustration name="memories" size={120} />} title="Nothing starred here yet" body="Star a place and it shows here." />
       ) : cities.map(([city, list]) => (
         <PageSection key={city} title={city} meta={`${list.length} place${list.length === 1 ? '' : 's'}`}>
-          {PLACE_CATEGORIES.map((c) => ({ c, places: list.filter((p) => p.category === c.value) })).filter((x) => x.places.length > 0).map(({ c, places }) => (
-            <section key={c.value} className={s.favCategory} aria-label={`${c.label} in ${city}`}>
-              <h3 className={s.favCategoryTitle}><Icon name={c.icon} size={16} />{c.label}</h3>
-              <ListGroup label={`${c.label} in ${city}`}>
-                {places.map((p) => (
-                  <PlaceRow key={p.id} place={p} visited={visited.has(p.id)} starred onClick={() => setOpen(p.id)}
-                    meta={[p.kind || c.one, p.source ? `from ${p.source}` : null].filter(Boolean).join(' · ')} />
-                ))}
-              </ListGroup>
-            </section>
-          ))}
+          <CategoryGroups list={list} where={city} render={(p) => (
+            <PlaceRow key={p.id} place={p} visited={visited.has(p.id)} starred onClick={() => setOpen(p.id)}
+              meta={[p.kind || placeCategory(p.category).one, p.source ? `from ${p.source}` : null].filter(Boolean).join(' · ')} />
+          )} />
         </PageSection>
       ))}
       <PlaceSheet place={live} onClose={() => setOpen(null)} />

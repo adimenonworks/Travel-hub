@@ -10,3 +10,11 @@
 .map { border-radius: var(--radius-600); overflow: hidden; border: 1px solid var(--on-light-border-subtle); }
 
 .version { text-align: center; }
+.account { display: flex; flex-direction: column; gap: var(--space-default-400); }
+/* A small, quiet link under the version (Settings → Privacy policy) */
+.privacy { color: inherit; text-decoration: underline; text-underline-offset: 2px; display: inline-flex; align-items: center; min-height: var(--size-tap); }
+/* Privacy policy: body text, bullet lists */
+.policy { display: flex; flex-direction: column; gap: var(--space-stack); }
+.policyText { display: flex; flex-direction: column; gap: var(--space-default-400); color: var(--on-light-text-primary); }
+.policyText ul { margin: 0; padding-left: var(--space-default-700); display: flex; flex-direction: column; gap: var(--space-default-300); }
+.policyText p { margin: 0; }

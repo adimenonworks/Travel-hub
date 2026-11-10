@@ -228,7 +228,7 @@
   /* Layout (Figma "Layout" collection) */
   /* Figma Layout collection (space/default/500 → --space-default-500, radius/600 → --radius-600) */
   --space-default-0: var(--space-0); --space-default-100: var(--space-2); --space-default-200: var(--space-4); --space-default-250: var(--space-6);
-  --space-default-300: var(--space-8); --space-default-400: var(--space-12); --space-default-500: var(--space-16); --space-default-600: var(--space-20);
+  --space-default-300: var(--space-8); --space-default-400: var(--space-12); --space-default-450: var(--space-18); --space-default-500: var(--space-16); --space-default-600: var(--space-20);
   --space-default-700: var(--space-24); --space-default-800: var(--space-32); --space-default-900: var(--space-40); --space-default-950: var(--space-48); --space-default-1000: var(--space-96);
   --space-negative-200: var(--space--6); /* how far each avatar in a stack tucks under the one before */
   --radius-100: var(--radius-2); --radius-200: var(--radius-4); --radius-300: var(--radius-8); --radius-400: var(--radius-12); --radius-500: var(--radius-16);
@@ -257,7 +257,7 @@
   --elevation-floating-bar: var(--shadow-raised);
 
   /* Sizing and motion (code only) */
-  --size-tap: 44px; --size-control: 48px; --size-control-sm: 32px; /* Button Regular (Wise's small button) */ --size-tab-bar: calc(64rem / 17); /* Bottom Nav height, growing with text size */ --size-content-max: 480px; /* phone width: on a computer the test site shows a centred phone column */
+  --size-tap: 44px; --size-control: 48px; --size-control-sm: 32px; /* Button Regular (Wise's small button) */ --size-tab-bar: calc(56rem / 17); /* Bottom Nav height, growing with text size */ --size-content-max: 480px; /* phone width: on a computer the test site shows a centred phone column */
   --motion-fast: var(--duration-fast) var(--ease-standard);
   --motion-base: var(--duration-base) var(--ease-standard);
   --motion-sheet: var(--duration-sheet) var(--ease-spring);

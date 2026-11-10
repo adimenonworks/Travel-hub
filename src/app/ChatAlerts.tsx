@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { useToast } from '../design/components';
 import { personName, useMe, useMyTrips, useProfiles, useSubFor } from '../data/hooks';
 import { haptic } from '../lib/native';
+import { useFixPostcodeCities } from '../features/saves/fixCities';
 
 /**
  * Event chat alerts while the app is open: when someone else posts on an event in one of your trips, a Toast slides
@@ -10,6 +11,7 @@ import { haptic } from '../lib/native';
  * (Alerts when Rove is closed need push notifications: the Apple Developer Program and a server.)
  */
 export function ChatAlerts() {
+  useFixPostcodeCities(); // background tidy-up, mounted once with the shell
   const me = useMe();
   const trips = useMyTrips() ?? [];
   const ids = trips.map((t) => t.id);

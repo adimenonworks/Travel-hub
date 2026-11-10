@@ -12,6 +12,14 @@ const MOVE = ['station', 'halt', 'bus_station', 'ferry_terminal', 'aerodrome'];
 
 type PhotonFeature = { properties: Record<string, string | undefined>; geometry: { coordinates: [number, number] } };
 
+/** A postcode ("7000", "SW1A 1AA", "H2X 1Y4") is never a city. */
+export const looksLikePostcode = (s: string) => /^\s*\d{3,6}\s*$/.test(s) || /^\s*[A-Z]{1,2}\d[A-Z\d]?\s?\d[A-Z]{2}\s*$/i.test(s) || /^\s*[A-Z]\d[A-Z]\s?\d[A-Z]\d\s*$/i.test(s);
+
+/** The city from map data: the city, town or village, otherwise the state or province. Never a postcode or county. */
+export function cityFrom(p: Record<string, string | undefined>) {
+  return [p.city, p.town, p.village, p.state].find((x) => x && !looksLikePostcode(x)) ?? '';
+}
+
 function toPlace(f: PhotonFeature, fallback: string): FoundPlace | null {
   const p = f.properties;
   const code = (p.countrycode ?? '').toLowerCase();
@@ -20,7 +28,7 @@ function toPlace(f: PhotonFeature, fallback: string): FoundPlace | null {
   const v = p.osm_value ?? '';
   return {
     name: p.name ?? fallback,
-    city: p.city ?? p.town ?? p.village ?? p.county ?? p.state ?? '',
+    city: cityFrom(p),
     country: p.country ?? countryName(code),
     countryCode: code,
     lat: f.geometry.coordinates[1], lng: f.geometry.coordinates[0],
@@ -37,7 +45,8 @@ export async function searchPlaces(q: string, signal?: AbortSignal): Promise<Fou
   const res = await fetch(`https://photon.komoot.io/api/?${new URLSearchParams({ q: q.trim(), limit: '6', lang: 'en' })}`, { signal });
   if (!res.ok) throw new Error('Place search is unavailable');
   const json = (await res.json()) as { features: PhotonFeature[] };
-  return json.features.map((f) => toPlace(f, q)).filter((p): p is FoundPlace => !!p);
+  // Postcode areas aren't places anyone saves.
+  return json.features.filter((f) => f.properties.osm_value !== 'postcode').map((f) => toPlace(f, q)).filter((p): p is FoundPlace => !!p);
 }
 
 const SITES: [RegExp, string][] = [[/tiktok\.com$/, 'TikTok'], [/instagram\.com$/, 'Instagram'], [/youtube\.com$|youtu\.be$/, 'YouTube'], [/google\.[a-z.]+$|goo\.gl$/, 'Google Maps']];
@@ -201,4 +210,14 @@ export async function readLink(raw: string): Promise<LinkPreview> {
   const at = maps?.lat !== undefined && maps.lng !== undefined ? { lat: maps.lat, lng: maps.lng } : undefined;
   const place = maps ? await findPlace(name ?? '', maps.address, at) : null;
   return { url, site, title: name ?? place?.name ?? title, image: '', place };
+}
+
+/** The city (or state/province) at a point, from Photon's reverse lookup; '' when unknown or offline. */
+export async function cityAt(lat: number, lng: number): Promise<string> {
+  try {
+    const res = await fetch(`https://photon.komoot.io/reverse?${new URLSearchParams({ lat: String(lat), lon: String(lng), lang: 'en' })}`);
+    if (!res.ok) return '';
+    const json = (await res.json()) as { features: PhotonFeature[] };
+    return json.features.map((f) => cityFrom(f.properties)).find(Boolean) ?? '';
+  } catch { return ''; }
 }
