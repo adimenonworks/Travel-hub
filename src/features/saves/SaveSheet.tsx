@@ -3,7 +3,6 @@ import { Button, Chip, Icon, ListGroup, ListItem, SearchField, Sheet, Skeleton, 
 import type { Place } from '../../data/types';
 import { flagUrl } from '../../lib/countries';
 import { searchCities } from '../../lib/geocode';
-import { isNativeApp } from '../../lib/native';
 import { useCountries, placeCounts } from './Collections';
 import { store } from '../../data';
 import { useActivitiesFor, useMyTrips, usePlaces } from '../../data/hooks';
@@ -51,9 +50,8 @@ export function SaveSheet({ request, onClose }: { request: SaveRequest | null; o
     if (!request) return;
     setMode(request.mode); setLink(request.mode === 'link' ? request.url ?? '' : ''); setQuery(''); setResults(null);
     setPreview(null); setAlsoTrip(false); setNote(''); setChosen(null); setStep('preview'); setWhereQuery(''); setNewCity(null);
+    // The clipboard is read only when you tap Paste: reading it here made iOS show its Paste bubble as the sheet opened.
     if (request.mode === 'link' && request.url) read(request.url);
-    // In the app, offer the link you just copied (the field starts with it; nothing is read until Continue).
-    else if (request.mode === 'link' && isNativeApp) navigator.clipboard?.readText().then((t) => { const u = findUrl(t); if (u) setLink(u); }).catch(() => {});
   }, [request]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const show = (p: LinkPreview) => { setPreview(p); setCategory(detectCategory(p.place)); setAlsoTrip(false); setChosen(null); setStep('preview'); };

@@ -10,7 +10,7 @@ import s from './shared.module.css';
  * Figma "Comments", styled like Messages in Rove's colours: your comments sit on the right in deep green bubbles,
  * everyone else's on the left in grey ones with their avatar lined up with the top of the bubble. Only the message
  * is in the bubble; who and when sit above it. You can delete your own (a small ghost button).
- * The box to write in rides on top of the keyboard while you type (--keyboard-height), so it's never hidden.
+ * While you type, the box to write in is fixed on top of the keyboard (--keyboard-height), so you always see what you write.
  */
 export function Comments({ tripId, targetId, comments, profiles }: { tripId: string; targetId: string; comments: Comment[]; profiles: Record<string, Profile> }) {
   const me = useMe();
@@ -54,9 +54,10 @@ export function Comments({ tripId, targetId, comments, profiles }: { tripId: str
           })}
         </ol>
       )}
+      {typing && <div className={s.composerSpacer} aria-hidden="true" />}
       <div className={`${s.composer}${typing ? ` ${s.composerTyping}` : ''}`}>
         <input className={s.commentInput} placeholder="Add a comment" aria-label="Add a comment" value={text} enterKeyHint="send"
-          onFocus={() => setTyping(true)} onBlur={() => setTyping(false)}
+          onFocus={() => { setTyping(true); setTimeout(() => window.scrollTo({ top: document.documentElement.scrollHeight, behavior: 'smooth' }), 350); }} onBlur={() => setTyping(false)}
           onChange={(e) => setText(e.target.value)}
           onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); send(); } }} />
         <IconButton icon="send" tone="brand" label="Send comment" onClick={send} disabled={!text.trim()} />

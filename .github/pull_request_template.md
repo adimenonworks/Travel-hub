@@ -1,10 +1,10 @@
 ## What changed
 
-## Figma (never let it drift)
-- [ ] Components updated (Foundations: every variant touched, icons, /#/design)
-- [ ] Flows page: every touched screen updated in its flow section, notes rewritten, sections resized
+## Figma (components never drift)
+- [ ] Components built in Figma first, then code, matching 1:1 (every variant touched, icons, /#/design)
+- [ ] Touched components compared side by side (Figma vs /#/design)
 - [ ] Planning page: built items marked "✓ <date>" and moved to Built; decided / dropped items moved; counts and date updated
-- [ ] Touched screens compared side by side with their Flows frames
+- (Flows screens are no longer maintained)
 
 ## Checks
 - [ ] `npm run build`
