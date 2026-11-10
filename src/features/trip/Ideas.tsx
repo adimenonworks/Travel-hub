@@ -228,7 +228,8 @@ function IdeaForm({ open, tripId, currency, idea, onClose }: { open: boolean; tr
   };
 
   return (
-    <Sheet open={open} title={idea ? 'Edit idea' : 'New idea'} onClose={onClose} onSubmit={submit} submitLabel={idea ? 'Save' : 'Add'} submitDisabled={!f.title.trim()}>
+    <Sheet open={open} title={idea ? 'Edit idea' : 'New idea'} onClose={onClose} onSubmit={submit} submitLabel={idea ? 'Save' : 'Add'} submitDisabled={!f.title.trim()}
+      secondary={idea ? <Button variant="destructive" size="large" onClick={remove}>Delete</Button> : undefined}>
       <TextField label="Idea" placeholder="Dinner at Taberna da Rua das Flores" value={f.title} onChange={(e) => set({ title: e.target.value })} />
       <Select label="Type" value={f.category} onChange={(e) => set({ category: e.target.value as Category })}>
         {CATEGORIES.map((c) => <option key={c.value} value={c.value}>{c.label}</option>)}
@@ -236,7 +237,6 @@ function IdeaForm({ open, tripId, currency, idea, onClose }: { open: boolean; tr
       {eventType(f.category) !== 'food' && <PriceField value={f.price} onChange={(price) => set({ price })} />}
       <TextArea label="Why it's great" value={f.notes} onChange={(e) => set({ notes: e.target.value })} />
       <LinkEditor links={f.links} onChange={(links) => set({ links })} />
-      {idea && <Button variant="destructive" icon="trash" block onClick={remove}>Delete idea</Button>}
     </Sheet>
   );
 }

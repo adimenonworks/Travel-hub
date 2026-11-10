@@ -37,7 +37,8 @@
   padding: var(--space-default-600) var(--space-default-700) var(--space-default-900);
   display: flex; flex-direction: column; gap: var(--space-default-500);
 }
-.footer { padding-top: var(--space-default-100); }
+.footer { padding-top: var(--space-default-100); display: flex; gap: var(--space-default-300); } /* secondary + primary, half and half */
+.footer > * { flex: 1 1 0; min-width: 0; }
 
 /* Closing: the sheet slides back down and the scrim fades, faster than it came in. */
 .closing { pointer-events: none; animation: fadeOut var(--motion-sheet-out) forwards; }

@@ -230,7 +230,8 @@ export function ActivityForm({ open, trip, date, activity, draft, onClose, onCre
   return (
     <Sheet open={open} title={activity ? `Edit ${label?.toLowerCase() ?? 'event'}` : addTitle}
       subtitle={!kind ? 'What are you adding?' : undefined}
-      onClose={onClose} onSubmit={kind ? submit : undefined} submitLabel={activity ? 'Save' : 'Add'} submitDisabled={!valid || busy}>
+      onClose={onClose} onSubmit={kind ? submit : undefined} submitLabel={activity ? 'Save' : 'Add'} submitDisabled={!valid || busy}
+      secondary={activity && kind ? <Button variant="destructive" size="large" onClick={remove}>Delete</Button> : undefined}>
       {!kind ? (
         // The picker: Option cards in sections inside the sheet, not a new screen
         PICKER_SECTIONS.map((sec) => (
@@ -342,7 +343,6 @@ export function ActivityForm({ open, trip, date, activity, draft, onClose, onCre
 
           {extras}
           {!activity && !draft && <Button variant="ghost" icon="chevron-left" onClick={() => set({ kind: null })}>Choose another type</Button>}
-          {activity && <Button variant="destructive" icon="trash" block onClick={remove}>Delete</Button>}
         </>
       )}
     </Sheet>
