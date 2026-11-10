@@ -26,7 +26,7 @@
 
 /* Tone=Accent: the deep green card (on-dark/surface/brand). The global surface-dark class re-points every on-light
    token inside it to the on-dark token of the same name, so its text and icons turn light; its button is Primary. */
-.accent { border-color: transparent; }
+.accent { border-color: transparent; background: var(--on-dark-surface-brand); } /* .card's own background would otherwise win over .surface-dark (it reads the re-pointed secondary, a lighter green) */
 
 .interactive { position: relative; isolation: isolate; cursor: pointer; transition: transform var(--motion-fast), background var(--motion-fast); text-align: left; width: 100%; color: inherit; display: block; }
 .interactive.structured { display: flex; } /* a structured Card that is a link keeps its column layout */
