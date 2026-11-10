@@ -1,6 +1,6 @@
 import type { Activity } from '../../data/types';
 import { daysBetween, formatDay, formatTime, today } from '../../lib/dates';
-import { categoryInfo, eventType } from '../../lib/categories';
+import { behaviourOf, categoryInfo, eventKind, spanWords } from '../../lib/categories';
 import type { TripCtx } from './TripPage';
 
 /**
@@ -12,7 +12,8 @@ export type DayEntry = { a: Activity; part?: 'in' | 'out' };
 const short = (s?: string) => s?.split(',')[0].trim() || undefined;
 /** A journey's end under its time: the airport or station code when one is given ("Lisbon (LIS)" → "LIS"), else the place. */
 const stop = (s?: string) => s?.match(/\(([^)]+)\)/)?.[1] ?? short(s);
-const isStay = (a: Activity) => (eventType(a.category) === 'stay' || eventType(a.category) === 'car') && !!a.endDate && a.endDate > a.date;
+/** A span (stay, cruise, car rental, campervan) that runs over more than one day shows at its start and its end. */
+const isStay = (a: Activity) => behaviourOf(a.category) === 'span' && !!a.endDate && a.endDate > a.date;
 
 /** When an entry happens on its day: check-out uses the stay's end time. */
 export const entryTime = (e: DayEntry) => (e.part === 'out' ? e.a.endTime : e.a.startTime);
@@ -48,73 +49,68 @@ function duration(start: string, end: string) {
 }
 
 /**
- * An event as a Figma "Event card": the layout, icon, title and meta its type calls for.
- * Flight → Journey (departs → arrives, flight number). Transport → Journey when it has a from and a to, else Standard.
- * Stay → "Check-in" / "Check-out" on its two days; Car rental → "Pick-up" / "Drop-off". Free time → Standard.
- * Food & drink, Activity → Standard.
+ * An event as a Figma "Event card", by its behaviour:
+ * - journey: Journey card (departs → arrives; a flight's number). Other journeys without a "to" are Standard.
+ * - span: "Check-in · 15:00" / "Check-out · 11:00" on its two days (Embark / Disembark for a cruise, Pick-up /
+ *   Drop-off for car rental and campervans).
+ * - place: Standard. open (free time, rest): Standard, its area or first line of notes. note: the Note layout.
  */
 export function eventCardProps(input: Activity | DayEntry, ctx: TripCtx, showDay = false) {
   const e: DayEntry = 'a' in input ? input : { a: input };
   const a = e.a;
-  const type = eventType(a.category);
+  const behaviour = behaviourOf(a.category);
+  const kind = eventKind(a.category);
   const info = categoryInfo(a.category);
   const day = (d: string) => (d === today() ? 'Today' : formatDay(d));
-  // "08:30 – 10:00"; with only a start, "17:30 onwards" (free time with only a start is a moment: "07:30")
-  const range = a.startTime ? `${formatTime(a.startTime)}${a.endTime ? ` – ${formatTime(a.endTime)}` : type === 'free' ? '' : ' onwards'}` : undefined;
+  // "08:30 – 10:00"; with only a start, "17:30 onwards" (free time and notes with only a start are a moment: "07:30")
+  const moment = behaviour === 'open' || behaviour === 'note';
+  const range = a.startTime ? `${formatTime(a.startTime)}${a.endTime ? ` – ${formatTime(a.endTime)}` : moment ? '' : ' onwards'}` : undefined;
   const base = {
     title: a.title, icon: info.icon,
     to: `/trip/${ctx.trip.id}/plan/${a.id}`,
   };
   const withDay = (t?: string) => (showDay ? [day(a.date), t].filter(Boolean).join(', ') : t);
+  const arrives = (t: string) => `${formatTime(t)}${a.endDate && a.endDate > a.date ? ` +${daysBetween(a.date, a.endDate)}` : ''}`;
 
-  if (type === 'flight')
+  if (behaviour === 'journey' && (kind === 'flight' || (a.fromText && a.toText)))
     return {
       ...base, layout: 'journey' as const,
-      time: withDay(a.ref || undefined), timeIcon: null, place: undefined,
+      time: withDay(kind === 'flight' ? a.ref || undefined : undefined), timeIcon: kind === 'flight' ? null : undefined, place: undefined,
       journey: {
         fromTime: a.startTime ? formatTime(a.startTime) : '—', fromPlace: stop(a.fromText),
-        toTime: a.endTime ? `${formatTime(a.endTime)}${a.endDate && a.endDate > a.date ? ` +${daysBetween(a.date, a.endDate)}` : ''}` : '—',
-        toPlace: stop(a.toText), mode: 'plane' as const,
+        toTime: a.endTime ? arrives(a.endTime) : '—', toPlace: stop(a.toText),
+        ...(kind === 'flight' ? {} : { duration: a.endDate && a.endDate > a.date ? undefined : duration(a.startTime, a.endTime) }),
+        mode: info.icon,
       },
     };
-  if (type === 'transport' && a.fromText && a.toText)
-    return {
-      ...base, layout: 'journey' as const, time: withDay(undefined), place: undefined,
-      journey: {
-        fromTime: a.startTime ? formatTime(a.startTime) : '—', fromPlace: stop(a.fromText),
-        toTime: a.endTime ? formatTime(a.endTime) : '—', toPlace: stop(a.toText),
-        duration: duration(a.startTime, a.endTime), mode: info.icon,
-      },
-    };
-  // Stay: "Check-in · 15:00" / "Check-out · 10:00" on the time line, the stay's name as the title
-  if (type === 'stay' && isStay(a)) {
-    const nights = daysBetween(a.date, a.endDate!);
+  if (behaviour === 'span') {
+    const [start, end] = spanWords(a.category);
+    const vehicle = kind === 'car' || kind === 'campervan';
+    const nights = a.endDate ? daysBetween(a.date, a.endDate) : 0;
+    const where = (part?: 'in' | 'out') => short(vehicle ? (part === 'out' ? a.toText || a.fromText || a.locationText : a.fromText || a.locationText) : a.locationText || a.location?.name);
     if (e.part) {
-      const word = e.part === 'in' ? 'Check-in' : 'Check-out';
+      const word = e.part === 'in' ? start : end;
       return {
         ...base, layout: 'standard' as const,
         time: entryTime(e) ? `${word} · ${formatTime(entryTime(e))}` : word,
-        place: e.part === 'in' ? `${nights} night${nights === 1 ? '' : 's'}` : short(a.locationText || a.location?.name),
-        placeIcon: e.part === 'in' ? null : undefined,
+        place: !vehicle && e.part === 'in' ? `${nights} night${nights === 1 ? '' : 's'}` : where(e.part),
+        placeIcon: !vehicle && e.part === 'in' ? null : undefined,
       };
     }
-    return { ...base, layout: 'standard' as const, time: `${formatDay(a.date)} → ${formatDay(a.endDate!)}`, place: `${nights} night${nights === 1 ? '' : 's'}`, placeIcon: null };
+    if (!vehicle && isStay(a)) return { ...base, layout: 'standard' as const, time: `${formatDay(a.date)} → ${formatDay(a.endDate!)}`, place: `${nights} night${nights === 1 ? '' : 's'}`, placeIcon: null };
+    // A one-day rental: one card
+    const first = a.endDate && a.endDate > a.date ? (a.startTime ? formatTime(a.startTime) : undefined) : range;
+    return { ...base, layout: 'standard' as const, time: withDay(first ? `${start} · ${first}` : start), place: where('in') };
   }
-  // Car rental: "Pick-up · 09:00" at the pick-up place, "Drop-off · 18:00" where it's returned (same day: one card)
-  if (type === 'car') {
-    if (e.part) {
-      const word = e.part === 'in' ? 'Pick-up' : 'Drop-off';
-      return {
-        ...base, layout: 'standard' as const,
-        time: entryTime(e) ? `${word} · ${formatTime(entryTime(e))}` : word,
-        place: short(e.part === 'in' ? a.fromText || a.locationText : a.toText || a.fromText || a.locationText),
-      };
-    }
-    const pickUp = a.endDate && a.endDate > a.date ? (a.startTime ? formatTime(a.startTime) : undefined) : range;
-    return { ...base, layout: 'standard' as const, time: withDay(pickUp ? `Pick-up · ${pickUp}` : 'Pick-up'), place: short(a.fromText || a.locationText) };
-  }
-  // Free time: a standard card (so it turns deep green when it's next), its place or first line of notes
-  if (type === 'free')
+  // Free time and rest: a standard card (so it turns deep green when it's next), its area or the first line of notes
+  if (behaviour === 'open')
     return { ...base, layout: 'standard' as const, time: withDay(range), place: short(a.locationText) ?? (a.notes.split('\n')[0] || undefined), placeIcon: a.locationText ? undefined : null };
+  // A note: white with a border, its text under the title
+  if (behaviour === 'note') {
+    // The title is the note's first line; underneath goes the rest of it (older notes kept their text separately)
+    const lines = a.notes.split('\n').map((l) => l.trim()).filter(Boolean);
+    const rest = lines[0] && a.title.startsWith(lines[0].slice(0, 80)) ? lines.slice(1).join(' ') : lines.join(' ');
+    return { ...base, layout: 'note' as const, time: withDay(range), place: rest || undefined, placeIcon: null };
+  }
   return { ...base, layout: 'standard' as const, time: withDay(range), place: short(a.locationText || a.location?.name) };
 }

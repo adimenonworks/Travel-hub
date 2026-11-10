@@ -1,3 +1,4 @@
+import { eventKind, eventType } from './categories';
 import type { IconName } from '../design/components';
 import type { Activity, Category, LinkPreview, PlaceCategory, SavedPlace, Trip } from '../data/types';
 import { countryCodeOf } from './countries';
@@ -35,11 +36,13 @@ export function detectCategory(p: LinkPreview['place']): PlaceCategory {
 
 /** The event type an idea or event about this Place gets (cafés and bars keep their own icon). */
 export const eventCategoryOf = (c: PlaceCategory): Category =>
-  c === 'restaurant' ? 'restaurant' : c === 'cafe' ? 'cafe' : c === 'bar' ? 'bar' : c === 'stay' ? 'stay' : 'activity';
+  c === 'restaurant' ? 'restaurant' : c === 'cafe' ? 'cafe' : c === 'bar' ? 'bar' : c === 'stay' ? 'hotel' : c === 'shop' ? 'shopping' : 'sight';
 
 /** The Place category for an event that gets starred without a Place yet. */
 export function placeCategoryOfEvent(c: Category): PlaceCategory {
-  return c === 'cafe' ? 'cafe' : c === 'drinks' || c === 'bar' ? 'bar' : c === 'food' || c === 'restaurant' ? 'restaurant' : c === 'stay' ? 'stay' : 'sight';
+  const k = eventKind(c), t = eventType(c);
+  return k === 'cafe' ? 'cafe' : k === 'bar' || k === 'tasting' || k === 'nightlife' ? 'bar' : t === 'food' ? 'restaurant'
+    : t === 'stays' ? 'stay' : k === 'shopping' || k === 'market' ? 'shop' : 'sight';
 }
 
 /** "Tokyo" for a saved Place, or "Other places" when no city was found. */

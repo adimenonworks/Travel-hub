@@ -6,7 +6,7 @@ import { findCoverPhoto, flightTag, hasApi, photographerUrl, trackCoverDownload,
 import { personName, useProfiles, useSub } from '../../data/hooks';
 import type { Trip } from '../../data/types';
 import { daysBetween, formatDay, formatTime, today, tripPhase } from '../../lib/dates';
-import { eventType } from '../../lib/categories';
+import { eventKind } from '../../lib/categories';
 import { countryName, tripCountries } from '../../lib/countries';
 import { categoryInfo } from '../../lib/categories';
 import { heroCountdown, nextEvent, tripDatesLabel } from '../../lib/trips';
@@ -44,7 +44,7 @@ export function TripHero({ trip, cover = true, size = 'regular' }: { trip: Trip;
   // Heads-up: one time-sensitive thing at a time. A flight leaving within 24 hours ("Check-in open", the usual airline
   // window; Rove never says whether you've checked in), else, in the fortnight before the trip, the entry rules.
   const soon = Date.now() + 24 * 3600e3;
-  const flight = activities.find((a) => eventType(a.category) === 'flight' && a.startTime
+  const flight = activities.find((a) => eventKind(a.category) === 'flight' && a.startTime
     && new Date(`${a.date}T${a.startTime}`).getTime() > Date.now() && new Date(`${a.date}T${a.startTime}`).getTime() < soon);
   const abroad = tripCountries(trip, activities);
   const live = useFlightStatus(flight);

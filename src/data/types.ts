@@ -58,15 +58,22 @@ export type Trip = {
 /** A link, PDF or booking. `emailUrl` optionally points at the email it came from (e.g. a Gmail message link). */
 export type LinkItem = { label: string; url: string; emailUrl?: string };
 
-/** Event kinds (src/lib/categories.ts). 'transport', 'food', 'note', 'drinks', 'sight' and 'other' are older values (see LEGACY there). */
+/** Event categories (src/lib/categories.ts: 7 types → categories → behaviours). 'stay', 'activity', 'transport', 'food', 'drinks' and 'other' are older values (see LEGACY there). */
 /**
  * A known price, in the currency it was entered or booked in (an amount of 0 is "Free"). Optional everywhere and never
  * added up: a price belongs to the one item it's on.
  */
 export type Price = { amount: number; currency: string };
 
-export type Category = 'flight' | 'train' | 'bus' | 'ferry' | 'taxi' | 'car' | 'stay' | 'restaurant' | 'cafe' | 'bar' | 'activity' | 'free'
-  | 'transport' | 'food' | 'note' | 'drinks' | 'sight' | 'other';
+export type Category =
+  | 'flight'
+  | 'train' | 'bus' | 'ferry' | 'taxi' | 'transfer' | 'metro' | 'driver' | 'bike' | 'car' | 'campervan'
+  | 'hotel' | 'apartment' | 'hostel' | 'camping' | 'cruise' | 'friends'
+  | 'restaurant' | 'cafe' | 'bar' | 'market' | 'tasting'
+  | 'sight' | 'museum' | 'tour' | 'hike' | 'nature' | 'show' | 'sports' | 'festival' | 'themepark' | 'spa' | 'class' | 'adventure' | 'nightlife' | 'shopping' | 'meetup'
+  | 'free' | 'rest' | 'note' | 'errand'
+  // older values, read through LEGACY in categories.ts
+  | 'stay' | 'activity' | 'transport' | 'food' | 'drinks' | 'other';
 
 export type Activity = {
   id: string;
@@ -75,6 +82,10 @@ export type Activity = {
   endTime: string;
   title: string;
   category: Category;
+  /** Derived from `category` when saved (its type and behaviour, see categories.ts); never typed in. Read through
+   *  eventType() / behaviourOf(), which also handle older events without them. */
+  type?: string;
+  behaviour?: string;
   location: Place | null;
   locationText: string;
   notes: string;

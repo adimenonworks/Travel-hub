@@ -45,16 +45,17 @@ export function Bookings(ctx: TripCtx) {
     );
   }
 
-  const g = BOOKING_GROUPS.find((x) => x.key === group) ?? BOOKING_GROUPS[0];
+  // Older addresses: 'car' is now under Getting around
+  const g = BOOKING_GROUPS.find((x) => x.key === (group === 'car' ? 'transport' : group)) ?? BOOKING_GROUPS[0];
   const list = activities.filter((a) => eventType(a.category) === g.type).sort((a, b) => a.date.localeCompare(b.date) || byTime(a, b));
   const days = [...new Set(list.map((a) => a.date))];
   const [adding, setAdding] = useState(false);
-  const addLabel = { flight: 'Add a flight', stay: 'Add a stay', transport: 'Add transport', car: 'Add a car rental', activity: 'Add an activity', food: 'Add food & drink', free: 'Add free time' }[g.type];
+  const addLabel = { flights: 'Add a flight', stays: 'Add a stay', transport: 'Add a way to get around', activities: 'Add an activity', food: 'Add food & drink', free: 'Add free time', notes: 'Add a note' }[g.type];
   const t = today();
   return (
     <>
       <PageHeader title={g.title} size="small" back={back} />
-      <SectionHeader title={`${list.length} ${list.length === 1 ? g.one : g.many}`} meta={g.type === 'flight' ? 'Tap one for tickets, seats and bags' : 'Tap one for its details, tickets and notes'} />
+      <SectionHeader title={`${list.length} ${list.length === 1 ? g.one : g.many}`} meta={g.type === 'flights' ? 'Tap one for tickets, seats and bags' : 'Tap one for its details, tickets and notes'} />
       {list.length === 0 ? <EmptyState illustration="calendar" title={`No ${g.many} yet`} message={`Add an event to the itinerary and choose its type, and it shows here.`} /> : days.map((d) => (
         <PageSection key={d} title={formatDay(d)}>
           <div className={s.eventList}>
@@ -63,7 +64,7 @@ export function Bookings(ctx: TripCtx) {
         </PageSection>
       ))}
       <Button variant="neutral" block onClick={() => setAdding(true)}>{addLabel}</Button>
-      <ActivityForm open={adding} trip={trip} date={t >= trip.startDate && t <= trip.endDate ? t : trip.startDate} draft={g.type === 'transport' || g.type === 'food' ? undefined : { category: g.type }} onClose={() => setAdding(false)} />
+      <ActivityForm open={adding} trip={trip} date={t >= trip.startDate && t <= trip.endDate ? t : trip.startDate} draft={{ category: g.add }} onClose={() => setAdding(false)} />
     </>
   );
 }

@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react';
 import { store } from '../../data';
 import type { Activity } from '../../data/types';
 import { placeCategoryOfEvent } from '../../lib/places';
-import { eventType } from '../../lib/categories';
+import { behaviourOf } from '../../lib/categories';
 
 /** The city from a geocoded name ("Cais do Sodré, Lisbon, Portugal" → "Lisbon"); the first part when that's all there is. */
 const cityFrom = (name?: string) => {
@@ -16,7 +16,7 @@ const cityFrom = (name?: string) => {
  */
 export async function placeForEvent(tripId: string, a: Activity, starredBy: string[]): Promise<string | null> {
   if (a.placeId) return a.placeId;
-  if (!a.location || eventType(a.category) === 'free') return null;
+  if (!a.location || behaviourOf(a.category) === 'open' || behaviourOf(a.category) === 'note') return null;
   const { id } = store.addPlace({
     name: a.title, category: placeCategoryOfEvent(a.category), city: cityFrom(a.location.name),
     country: a.location.country ?? '', countryCode: (a.location.countryCode ?? '').toLowerCase(),
