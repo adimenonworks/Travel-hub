@@ -36,13 +36,9 @@
 
 /* The day's plan */
 .timeline { display: flex; flex-direction: column; gap: var(--space-default-500); }
-.dayTitle { display: flex; align-items: center; gap: var(--space-default-400); flex-wrap: wrap; }
 .timelineItem { display: flex; flex-direction: column; gap: var(--space-default-300); }
 
 /* A tab's title with its one action beside it; the text wraps rather than pushing the button underneath. */
-.dayHead { display: flex; align-items: center; justify-content: space-between; gap: var(--space-default-400); }
-.dayHead > :first-child { flex: 1; min-width: 0; }
-.dayHead > :last-child { flex: none; }
 
 
 
@@ -51,7 +47,6 @@
 /* A plan's own page */
 
 /* People */
-.dangerZone { display: flex; gap: var(--space-default-400); flex-wrap: wrap; }
 
 /* Photos */
 /* Photos: albums as Figma Cards (24 corners, 16 padding) with a cover scene on top (8 corners: 24 − 16) */
@@ -82,8 +77,6 @@
 .eventList { display: flex; flex-direction: column; gap: var(--space-default-300); }
 
 /* Event detail */
-.planButtons { display: grid; grid-template-columns: repeat(auto-fit, minmax(calc(140rem / 17), 1fr)); gap: var(--space-default-300); }
-.planMap { border-radius: var(--radius-600); overflow: hidden; border: 1px solid var(--on-light-border-subtle); }
 .docRow { display: flex; align-items: center; gap: var(--space-default-200); }
 .docRow > :first-child { flex: 1; min-width: 0; }
 .selectable { -webkit-user-select: text; user-select: text; -webkit-touch-callout: default; white-space: pre-wrap; }

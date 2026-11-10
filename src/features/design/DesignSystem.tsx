@@ -3,7 +3,7 @@ import {
   Avatar, AvatarStack, Badge, Chip, Notification, Button, Card, EmptyState, FieldRow, HeroCard, Icon, IconButton,
   LinkButton, PageHeader, PageSection, SegmentedControl, Select, Sheet, Tabs, TextArea, TextField, Timeline, Illustration,
   type IllustrationName, COVER_ILLUSTRATIONS, ICON_NAMES, useToast, BottomNav, Skeleton,
-  ListItem, ListGroup, SectionHeader, EventCard, TravelConnector, IdeaRow, Tile, QuickAction, MapCard, StatStrip, ProfileCard,
+  ListItem, ListGroup, SectionHeader, EventCard, TravelConnector, IdeaRow, Tile, MapCard, StatStrip, ProfileCard,
   OptionCard, BudgetCard, Switch, SearchField, StepProgress, DestinationHeader, TripHeader, DayCard, CountryModal,
 } from '../../design/components';
 import { flagUrl } from '../../lib/countries';
@@ -278,7 +278,7 @@ export function DesignSystem() {
           <EventCard icon="notebook" layout="note" title="Bag drop closes 40 min before" place="Sam has the passports" />
         </Section>
 
-        <Section title="Rows, groups and tiles" footer="Section header, List group of List items (Default / Compact), Idea rows with Vote buttons, Tiles, Quick actions, Map card, Stat strip, Profile Card.">
+        <Section title="Rows, groups and tiles" footer="Section header, List group of List items (Default / Compact), Idea rows with Vote buttons, Tiles, Map card, Stat strip, Profile Card.">
           <SectionHeader title="Saved for later" meta="4 places · 61 saves" action={<LinkButton to="/design" variant="ghost" size="regular" iconEnd="chevron-right">See all</LinkButton>} />
           <ListGroup>
             <ListItem icon="utensils" title="Ichiran Shibuya" meta="Ramen · Tokyo · from TikTok" trailing="2h" onClick={() => {}} />
@@ -302,10 +302,6 @@ export function DesignSystem() {
             <Tile tone="add" icon="plus" title="New place to go" />
           </div>
           <div className={s.quickRow}>
-            <QuickAction icon="link" label="Save a link" onClick={() => {}} />
-            <QuickAction icon="pin" label="Add a place" onClick={() => {}} />
-            <QuickAction icon="calendar" label="Plan a trip" onClick={() => {}} />
-            <QuickAction icon="people" label="Invite" onClick={() => {}} />
           </div>
           <MapCard media={<Illustration name="map" size={72} />} title="See 15 places on a map" meta="Tokyo, Kyoto, Osaka" onClick={() => {}} />
           <StatStrip stats={[{ value: 12, label: 'countries' }, { value: 31, label: 'cities' }, { value: 96, label: 'days away' }]} />

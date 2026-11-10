@@ -53,8 +53,6 @@ export function visitedPlaceIds(activities: Activity[], now = today()) {
   return new Set(activities.filter((a) => a.placeId && a.date < now).map((a) => a.placeId!));
 }
 
-export const isStarred = (p: SavedPlace, uid: string) => !!p.starredBy?.includes(uid);
-
 /** Unvisited first, then newest first. */
 export function sortPlaces(list: SavedPlace[], visited: Set<string>) {
   return list.slice().sort((a, b) => Number(visited.has(a.id)) - Number(visited.has(b.id)) || b.createdAt - a.createdAt);

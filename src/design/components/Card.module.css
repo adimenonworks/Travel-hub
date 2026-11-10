@@ -38,4 +38,3 @@
 .section { display: flex; flex-direction: column; gap: var(--space-default-400); }
 .sectionHeader { display: flex; align-items: center; justify-content: space-between; gap: var(--space-default-400); min-height: var(--size-tap); flex-wrap: wrap; }
 .sectionTitle { font: var(--type-heading-2); letter-spacing: -0.01em; color: var(--on-light-text-primary); }
-.sectionFooter { font: var(--type-label-small); color: var(--on-light-text-secondary); padding: 0 var(--space-default-300); }

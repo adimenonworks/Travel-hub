@@ -189,15 +189,6 @@ export function Tile({ title, meta, icon, media, tone = 'default', ...press }: P
   );
 }
 
-/** Figma "Quick action": a 56px emerald circle with an icon and a Body small label under it. */
-export function QuickAction({ icon, label, ...press }: Press & { icon: IconName; label: string }) {
-  return (
-    <Pressable {...press} className={s.quick}>
-      <span className={s.quickCircle} aria-hidden="true"><Icon name={icon} size={24} /></span>
-      <span className={s.quickLabel}>{label}</span>
-    </Pressable>
-  );
-}
 
 /** Figma "Map card": an illustration, a title and meta, and a chevron, on the light grey surface. */
 export function MapCard({ title, meta, media, ...press }: Press & { title: string; meta?: ReactNode; media: ReactNode }) {

@@ -4,7 +4,6 @@
 .pressable:active { transform: scale(0.98); transition: background var(--motion-fast), transform var(--motion-press); }
 
 .chevron { flex: none; color: var(--on-light-icon-secondary); }
-.dot { color: var(--on-light-text-secondary); }
 
 /* Thumb: a 48px white circle (List item, Idea row) on the grey container */
 .thumb {

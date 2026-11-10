@@ -1,5 +1,5 @@
 import type { IconName } from '../design/components';
-import type { Activity, Category } from '../data/types';
+import type { Category } from '../data/types';
 
 /**
  * Event groups: how an event behaves (its card layout, form shape and Overview "Bookings" row).
@@ -57,10 +57,6 @@ export function categoryInfo(c: Category | string): { value: EventType; label: s
   return { value: k.group, label: k.label, icon: c === 'sight' ? 'camera' : k.icon };
 }
 
-/** All stored categories in this group (new and old), for filtering. */
-export const categoriesOf = (t: EventType): string[] =>
-  [...EVENT_KINDS.filter((k) => k.group === t).map((k) => k.value), ...Object.keys(LEGACY).filter((k) => kindInfo(k).group === t)];
-
 /**
  * The Overview's "Bookings" rows: one per group (Free time has none). Rove doesn't track booked vs not booked,
  * so each row just counts the events of its kind (Documents counts the links and files attached to events).
@@ -74,5 +70,3 @@ export const BOOKING_GROUPS: { key: string; title: string; icon: IconName; type:
   { key: 'food', title: 'Food & drink', icon: 'utensils', type: 'food', one: 'reservation', many: 'reservations' },
 ];
 
-/** Where an event ends up: a journey's or rental's drop-off place, otherwise its place. */
-export const endPlace = (a: Activity) => a.to ?? a.location;
