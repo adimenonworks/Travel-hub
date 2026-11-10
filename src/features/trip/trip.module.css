@@ -120,3 +120,7 @@
 .flowFootnote { margin: 0; text-align: center; font: var(--type-body-small); color: var(--on-dark-text-secondary); }
 .flipped { transform: rotate(180deg); }
 .flowBudget { display: flex; flex-direction: column; gap: var(--space-default-300); padding: var(--space-default-500); border-radius: var(--radius-600); background: var(--on-light-surface-primary); } /* the amount, on a white card on the deep green screen */
+/* Add to itinerary: step 1 lists the 7 types (Option cards with what each covers); step 2 wraps the category chips */
+.typeList { display: flex; flex-direction: column; gap: var(--space-default-300); }
+.kindPicker { display: flex; flex-direction: column; gap: var(--space-default-300); }
+.kindChips { display: flex; flex-wrap: wrap; gap: var(--space-default-300); }

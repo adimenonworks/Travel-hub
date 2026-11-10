@@ -3,7 +3,7 @@ import { BudgetCard, CountryModal, EventCard, ListGroup, ListItem, PageSection }
 import type { IconName } from '../../design/components';
 import { useMe, useProfile } from '../../data/hooks';
 import type { Place } from '../../data/types';
-import { BOOKING_GROUPS, eventType } from '../../lib/categories';
+import { BOOKING_GROUPS, eventType, isEveryday } from '../../lib/categories';
 import { countryCodeOf, countryName, flagUrl, tripCountries } from '../../lib/countries';
 import { timeAgo } from '../../lib/dates';
 import { priceOf, useBudgetTotals } from '../../lib/currency';
@@ -31,7 +31,7 @@ export function Overview(ctx: TripCtx) {
   const docs = activities.reduce((n, a) => n + a.links.length, 0);
   const recent = useRecentViews(trip.id);
   // Budget (per person): the prices of the events you book ahead, by group. Food, drink and free time are everyday spending.
-  const priced = activities.flatMap((a) => { const g = eventType(a.category); const p = g === 'food' || g === 'free' ? null : priceOf(a, trip); return p && p.amount > 0 ? [{ price: p, group: g }] : []; });
+  const priced = activities.flatMap((a) => { const g = eventType(a.category); const p = isEveryday(a.category) ? null : priceOf(a, trip); return p && p.amount > 0 ? [{ price: p, group: g }] : []; });
   const totals = useBudgetTotals(trip.budget, priced);
   const left = (trip.budget?.amount ?? 0) - totals.planned;
   const over = left < 0;

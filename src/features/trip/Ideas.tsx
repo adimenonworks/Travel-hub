@@ -9,7 +9,7 @@ import { cityOf, eventCategoryOf, groupBy, placeCategory, sortPlaces, tripCountr
 import { PlaceMarks, PlaceRow } from '../saves/Collections';
 import { usePlaceMarks } from '../saves/placeMarks';
 import { haptic, confirmAction } from '../../lib/native';
-import { CATEGORIES, categoryInfo, eventType } from '../../lib/categories';
+import { EVENT_TYPES, categoryInfo, eventKind, isEveryday } from '../../lib/categories';
 import { priceOf, priceText } from '../../lib/currency';
 import { recordView } from '../../lib/recent';
 import { hostOf, isPdf } from '../../lib/format';
@@ -204,7 +204,7 @@ function IdeaSheet({ idea, place, ctx, onClose, onEdit, onSchedule }: { idea: Id
 type Form = { title: string; category: Category; notes: string; price: PriceDraft; links: LinkItem[] };
 
 function IdeaForm({ open, tripId, currency, idea, onClose }: { open: boolean; tripId: string; currency: string; idea?: Idea; onClose: () => void }) {
-  const blank: Form = { title: '', category: 'food', notes: '', price: toPriceDraft(null, currency), links: [] };
+  const blank: Form = { title: '', category: 'restaurant', notes: '', price: toPriceDraft(null, currency), links: [] };
   const [f, setF] = useState<Form>(blank);
   useEffect(() => {
     if (open) setF(idea ? { title: idea.title, category: idea.category, notes: idea.notes, price: toPriceDraft(priceOf(idea, { currency }), currency), links: idea.links } : blank);
@@ -231,10 +231,12 @@ function IdeaForm({ open, tripId, currency, idea, onClose }: { open: boolean; tr
     <Sheet open={open} title={idea ? 'Edit idea' : 'New idea'} onClose={onClose} onSubmit={submit} submitLabel={idea ? 'Save' : 'Add'} submitDisabled={!f.title.trim()}
       secondary={idea ? <Button variant="destructive" size="large" onClick={remove}>Delete</Button> : undefined}>
       <TextField label="Idea" placeholder="Dinner at Taberna da Rua das Flores" value={f.title} onChange={(e) => set({ title: e.target.value })} />
-      <Select label="Type" value={f.category} onChange={(e) => set({ category: e.target.value as Category })}>
-        {CATEGORIES.map((c) => <option key={c.value} value={c.value}>{c.label}</option>)}
+      <Select label="Type" value={eventKind(f.category)} onChange={(e) => set({ category: e.target.value as Category })}>
+        {EVENT_TYPES.filter((t) => t.value !== 'free' && t.value !== 'notes').map((t) => (
+          <optgroup key={t.value} label={t.label}>{t.kinds.map((c) => <option key={c.value} value={c.value}>{c.label}</option>)}</optgroup>
+        ))}
       </Select>
-      {eventType(f.category) !== 'food' && <PriceField value={f.price} onChange={(price) => set({ price })} />}
+      {!isEveryday(f.category) && <PriceField value={f.price} onChange={(price) => set({ price })} />}
       <TextArea label="Why it's great" value={f.notes} onChange={(e) => set({ notes: e.target.value })} />
       <LinkEditor links={f.links} onChange={(links) => set({ links })} />
     </Sheet>

@@ -17,7 +17,7 @@ import { haptic, confirmAction } from '../../lib/native';
 import { recordView } from '../../lib/recent';
 import { markRead } from '../../lib/reads';
 import { flightTag, updatedAgo, useFlightStatus } from '../../lib/api';
-import { eventKind, eventType, kindInfo } from '../../lib/categories';
+import { behaviourOf, eventKind, isEveryday, kindInfo, spanWords } from '../../lib/categories';
 import { priceOf } from '../../lib/currency';
 import { PriceWithConversion } from '../shared/Price';
 import { getMapsApp, mapsAppLabel } from '../../lib/prefs';
@@ -52,15 +52,15 @@ export function ActivityPage(ctx: TripCtx) {
   const places = usePlacesById(ctx.activities.flatMap((x) => (x.placeId ? [x.placeId] : [])));
   const itinerary = `/trip/${trip.id}/itinerary${a ? `?day=${a.date}` : ''}`;
   // Live status for a flight (24 hours out until it lands), and a Warning haptic when it changes to Delayed or Cancelled
-  const live = useFlightStatus(a && eventType(a.category) === 'flight' ? a : undefined);
-  const tag = a && eventType(a.category) === 'flight' ? flightTag(a, live) : undefined;
+  const live = useFlightStatus(a && eventKind(a.category) === 'flight' ? a : undefined);
+  const tag = a && eventKind(a.category) === 'flight' ? flightTag(a, live) : undefined;
   useEffect(() => { if (tag && tag.tone !== 'success' && tag.label !== 'Check-in open') haptic('warning'); }, [tag?.label]); // eslint-disable-line react-hooks/exhaustive-deps
   // The event's chat counts as read while its page is open (and again as new messages arrive)
   const chatSize = ctx.comments.filter((c) => c.targetId === activityId).length;
   useEffect(() => { if (activityId) markRead(me.uid, activityId); }, [activityId, chatSize, me.uid]);
   // Recently viewed: a booking you open (any event but a note)
   useEffect(() => {
-    if (a && eventType(a.category) !== 'free') recordView(trip.id, { url: `/trip/${trip.id}/plan/${a.id}`, label: a.title, kind: 'Booking' });
+    if (a && !['open', 'note'].includes(behaviourOf(a.category))) recordView(trip.id, { url: `/trip/${trip.id}/plan/${a.id}`, label: a.title, kind: 'Booking' });
   }, [a?.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   if (!a)
@@ -75,8 +75,10 @@ export function ActivityPage(ctx: TripCtx) {
   const starred = !!place?.starredBy?.includes(me.uid);
   const app = getMapsApp();
   const where = a.locationText || a.location?.name;
-  const type = eventType(a.category);
+  const behaviour = behaviourOf(a.category);
   const kind = eventKind(a.category);
+  const vehicle = kind === 'car' || kind === 'campervan';
+  const [startWord, endWord] = spanWords(a.category);
   const removeDoc = async (i: number) => {
     const doc = a.links[i];
     if (!confirmAction(`Remove "${doc.label || hostOf(doc.url)}"?`)) return;
@@ -94,14 +96,14 @@ export function ActivityPage(ctx: TripCtx) {
   };
   const goingNames = a.attendeeIds.map((id) => (id === me.uid ? 'you' : personName(profiles, id).split(' ')[0]));
 
-  const journey = type === 'flight' || (type === 'transport' && !!a.fromText && !!a.toText);
+  const journey = behaviour === 'journey' && (kind === 'flight' || (!!a.fromText && !!a.toText));
   const city = (t?: string) => (t ?? '').split(',')[0].replace(/\s*\([^)]*\)\s*/g, ' ').trim();
   const code = (t?: string) => t?.match(/\(([^)]+)\)/)?.[1];
-  const backTo = journey && type === 'flight' ? { to: `/trip/${trip.id}/bookings/flights`, label: 'Flights' } : { to: itinerary, label: 'Itinerary' };
+  const backTo = journey && kind === 'flight' ? { to: `/trip/${trip.id}/bookings/flights`, label: 'Flights' } : { to: itinerary, label: 'Itinerary' };
   const adder = a.createdBy === me.uid ? 'you' : personName(profiles, a.createdBy).split(' ')[0];
   const copy = async (text: string, what: string) => { try { await navigator.clipboard.writeText(text); toast({ icon: 'copy', label: `${what} copied` }); } catch { /* the text is selectable */ } };
   // Figma List item with "Show action": the reference as the title, what it is under it, and a small Copy button
-  const price = type === 'food' || type === 'free' ? null : priceOf(a, trip);
+  const price = isEveryday(a.category) ? null : priceOf(a, trip);
   const booking = [
     a.ref && <ListItem key="num" icon="plane" title={<span className={s.selectable}>{a.ref}</span>} meta="Flight number"
       action={<IconButton small icon="copy" label="Copy flight number" onClick={() => copy(a.ref!, 'Flight number')} />} />,
@@ -129,7 +131,7 @@ export function ActivityPage(ctx: TripCtx) {
           duration={journeyDuration(a)}
           footer={[a.operator || live?.airline ? `Operated by ${a.operator || live!.airline}` : '', live ? updatedAgo(live.updatedAt) : ''].filter(Boolean).join(' · ') || undefined} />
       ) : (
-        <EventCard {...eventCardProps(a, ctx, true)} {...(type !== 'free' && where ? { place: undefined } : {})} to={undefined} favourite={starred} />
+        <EventCard {...eventCardProps(a, ctx, true)} {...(behaviour !== 'open' && behaviour !== 'note' && where ? { place: undefined } : {})} to={undefined} favourite={starred} />
       )}
 
       {/* Figma "Event detail — Location": the map, the address and the two ways to get there, together in one card */}
@@ -147,7 +149,7 @@ export function ActivityPage(ctx: TripCtx) {
                 <span className="t-heading-3">{where.split(',')[0]}</span>
                 {where.includes(',') && <span className="t-body t-secondary">{where.split(',').slice(1).join(',').trim()}</span>}
               </div>
-              {type !== 'free' && <IconButton icon="star" state={starred ? 'filled' : 'default'} aria-pressed={starred}
+              {behaviour !== 'open' && behaviour !== 'note' && <IconButton icon="star" state={starred ? 'filled' : 'default'} aria-pressed={starred}
                 label={starred ? `Remove ${where.split(',')[0]} from favourites` : `Add ${where.split(',')[0]} to favourites`} onClick={star} />}
             </div>
             <div className={s.whereButtons}>
@@ -158,11 +160,11 @@ export function ActivityPage(ctx: TripCtx) {
         </PageSection>
       )}
 
-      {!journey && ((type === 'stay' && a.endDate) || type === 'car' || booking.length > 0 || a.attendeeIds.length > 0 || a.notes) && (
+      {!journey && ((behaviour === 'span' && !vehicle && a.endDate) || vehicle || booking.length > 0 || a.attendeeIds.length > 0 || a.notes) && (
         <ListGroup label="Details">
-          {type === 'stay' && a.endDate && <ListItem icon="calendar" title="Check-in and check-out" meta={`${formatDay(a.date)}${a.startTime ? `, ${formatTime(a.startTime)}` : ''} → ${formatDay(a.endDate)}${a.endTime ? `, ${formatTime(a.endTime)}` : ''}`} />}
-          {type === 'car' && <ListItem icon="key" title="Pick-up" meta={[a.fromText, `${formatDay(a.date)}${a.startTime ? `, ${formatTime(a.startTime)}` : ''}`].filter(Boolean).join(' · ')} />}
-          {type === 'car' && <ListItem icon="key" title="Drop-off" meta={[a.toText || a.fromText, `${formatDay(a.endDate || a.date)}${a.endTime ? `, ${formatTime(a.endTime)}` : ''}`].filter(Boolean).join(' · ')} />}
+          {behaviour === 'span' && !vehicle && a.endDate && <ListItem icon="calendar" title={`${startWord} and ${endWord.toLowerCase()}`} meta={`${formatDay(a.date)}${a.startTime ? `, ${formatTime(a.startTime)}` : ''} → ${formatDay(a.endDate)}${a.endTime ? `, ${formatTime(a.endTime)}` : ''}`} />}
+          {vehicle && <ListItem icon={kindInfo(a.category).icon} title={startWord} meta={[a.fromText, `${formatDay(a.date)}${a.startTime ? `, ${formatTime(a.startTime)}` : ''}`].filter(Boolean).join(' · ')} />}
+          {vehicle && <ListItem icon={kindInfo(a.category).icon} title={endWord} meta={[a.toText || a.fromText, `${formatDay(a.endDate || a.date)}${a.endTime ? `, ${formatTime(a.endTime)}` : ''}`].filter(Boolean).join(' · ')} />}
           {booking}
           {a.attendeeIds.length > 0 && <ListItem icon="people" title="Who’s going" meta={`${a.attendeeIds.length} of ${trip.memberIds.length}: ${goingNames.join(', ')}`} />}
           {a.notes && <ListItem icon="notebook" title="Notes" meta={<span className={s.selectable}>{`${a.notes} · added by ${adder}`}</span>} />}
