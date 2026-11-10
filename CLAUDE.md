@@ -34,6 +34,7 @@ firestore.rules + tests/rules/   security rules and their emulator tests
 server/         Rove's small server: a Cloudflare Worker for Unsplash covers and flight status (keys live only in the Worker)
 functions/      Cloud Functions (readLink; not deployed: needs the Blaze plan, which the owner declined; the iPhone app reads links itself)
 ios/App/ShareExtension/   iPhone share extension (Share → Rove opens rove://save?url=…)
+docs/           HOW-ROVE-IS-BUILT.md (platforms, how they connect, how to rebuild), DEPENDENCIES-AND-RISKS.md (limits, what breaks first), SECURITY.md (how data is kept safe, what to watch). Keep them current when a platform, limit or rule changes; condensed copies are the "Guides" panels on the Figma Planning page.
 ```
 
 ## Rules for changes

@@ -1,0 +1,97 @@
+# Security in Rove: how people's data is kept safe
+
+A plain-spoken review (10 Nov 2026) of what Rove protects, how it does it, and what to watch. Rove holds people's
+travel plans (where and when they'll be away), their saved places and their names, so it should be treated as
+personal data.
+
+---
+
+## 1. The short version
+
+- **Only people on a trip can see that trip.** This is enforced by the database itself (Firestore security rules),
+  not just by the app. A modified app, or someone calling the database directly, gets the same answer: no.
+- **No passwords.** Sign-in is Google's. Rove never sees or stores a password.
+- **Secret keys never ship in the app.** The Unsplash and flight-data keys live only in the Cloudflare Worker.
+- **Your private details stay private.** Home city, places you've visited, your currency and what you've read are in a
+  private profile that only you can read.
+- **Invites expire.** An invite link works for 14 days, and its code is 12 random characters (impossible to guess).
+
+---
+
+## 2. How each part is protected
+
+### Signing in
+- Google sign-in hands Firebase a short-lived token. Firebase checks it, and every database request carries your
+  identity.
+- The Firebase web config in `.env.production` is **public by design**. It only says which project to talk to. It
+  is not a key, and the security rules are what protect the data.
+
+### The database rules (`firestore.rules`)
+| Data | Who can read | Who can change |
+|---|---|---|
+| A trip | Its members only | Owner and organisers (they can't remove the owner or change ownership) |
+| A trip's events, ideas, comments, albums | Members | Members |
+| Joining a trip | – | Someone with a valid, unexpired invite. They can only add themselves, as a member |
+| Leaving a trip | – | A member (not the owner) removes only themselves |
+| Deleting a trip | – | The owner only |
+| Public profile (name, photo) | Anyone signed in, one person at a time, by ID (nobody can list all users) | You; only `name` and `photo` are allowed |
+| Private profile (home, visited, currency, reads) | You only | You only |
+| Saved places | You, and people you've added the place to a trip with (read by ID). Lists only ever return your own or ones you starred | You. Others can only add or remove their own star |
+| Invites | Anyone signed in, by code (no listing) | Created by the trip's owner/organisers; deleted by whoever made it |
+
+The rules have their own automated tests (`tests/rules/`). Run them whenever the rules change.
+
+### Rove's small server (the Worker)
+- It keeps the keys as Cloudflare secrets: they are never in the code, the app or GitHub.
+- It only answers three things (`/cover`, `/cover/download`, `/flight`) and checks the inputs: flight numbers and
+  dates must have the right shape, and download pings must point at Unsplash.
+- Browsers may only read its answers from Rove's own origins (`capacitor://localhost`, the old website, localhost
+  for testing). This is CORS [the browser rule for which sites may read a server's answers].
+
+### Inside the app
+- **Nothing anyone types is turned into code.** React displays all text (comments, notes, link titles) as plain text,
+  so a comment can't inject a script. The one place that decodes page titles uses a detached text box, which never
+  runs code.
+- **Links open safely.** External links open outside the app (`noreferrer`), so other sites can't control Rove's
+  window.
+- **Link reading** (Save a place) only extracts the title, an `https://` image and a place name; the rest is ignored.
+- **Cover photos** you upload are shrunk on the phone. The rules only accept a JPEG/WebP image under 500 KB.
+- **The clipboard** is only read when you tap Paste (iOS shows its permission bubble then).
+- **The share extension** only passes a link into the Save a place sheet; nothing is saved until you press Save.
+
+---
+
+## 3. Things to watch, and what to do (in priority order)
+
+1. **Any trip member can change or delete anything in that trip.** That includes other people's events, ideas and
+   comments, because the rules for a trip's contents say "members can read and write". The app only shows delete on
+   your own comment, but a determined member could do more.
+   *Fix when needed:* tighten the rules so comments can only be edited/deleted by their author, and events and ideas
+   only by their author or the trip's organisers.
+2. **No size limits on events, ideas and comments.** A member could store very large text, costing everyone reads.
+   *Fix:* add length checks in the rules (for example comments ≤ 2,000 characters).
+3. **The Worker can be called by anyone who knows its address.** That can't leak data, but it can use up the
+   Unsplash and flight quotas. *Fix:* a Cloudflare rate-limiting rule, and optionally require a Firebase sign-in
+   token.
+4. **No App Check.** [Firebase's way to prove a request comes from the real Rove app.] The rules still protect the
+   data, but App Check stops scripts from hammering the database. *Fix:* turn on App Check with App Attest for iOS
+   before launch.
+5. **Account deletion.** People can't delete their account and data from inside the app yet. Apple requires this,
+   and privacy laws expect it. *Fix:* a "Delete my account" row in You. It should remove the profile, private
+   profile and saved places, leave or hand over owned trips, then delete the sign-in.
+6. **Saved places can be read by ID by anyone signed in.** IDs are random and only shared through trips, so this is
+   low risk. If a place's notes ever become sensitive, limit reads to the owner and trip-mates.
+7. **Privacy policy.** Rove sends place names to Photon, Open-Meteo and Nominatim, flight numbers to AeroDataBox
+   (via the Worker), and city names to Unsplash. A privacy policy should say so.
+8. **Old data after deleting a trip** stays in Firestore (unreachable) until a clean-up job is added. Mention it in the
+   privacy policy, or add the job.
+
+---
+
+## 4. Habits that keep Rove safe
+
+- Never put a secret key in the app, `.env.production` or GitHub. Keys go in the Worker's secrets.
+- Change `firestore.rules` only with tests (`tests/rules`), and re-publish in the Firebase console afterwards.
+- Never render text as HTML. Avoid `dangerouslySetInnerHTML`.
+- Update dependencies regularly (`npm outdated`), together, and to releases at least two weeks old.
+- Before launch: App Check, account deletion, a privacy policy, the tighter comment/event rules, and the Worker rate limit.
