@@ -39,8 +39,6 @@
 
 /* Figma "Trip header": Page Header, then meta and chips, gap 12 */
 .tripHeader { display: flex; flex-direction: column; gap: var(--space-default-400); }
-.goingLink { text-decoration: none !important; display: inline-flex; position: relative; }
-.goingLink::after { content: ''; position: absolute; inset: -8px -2px; }
 
 /* Figma "Day Card": 24 corners, the date (Display tiny) over the weekday. Unselected: ghost with a border, 64 wide.
    Selected: brand (selected primary) and wider (88), so it pushes the cards beside it aside; picking another day

@@ -1,4 +1,4 @@
-import { createContext, useContext, useLayoutEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react';
+import { useLayoutEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react';
 import { NavLink, Link, useLocation, useNavigate } from 'react-router-dom';
 import { goBack } from '../../app/navigation';
 import { Icon, type IconName } from './Icon';
@@ -7,7 +7,6 @@ import { haptic } from '../../lib/native';
 import s from './Bars.module.css';
 
 /** Kept for older callers; the Figma Page Header no longer shows your profile picture (the You tab does). */
-export const HeaderProfileContext = createContext<ReactNode>(null);
 
 /**
  * Figma "Page Header": an optional ghost back button, then the title row: the title (Type=Title Large: Display 48;
@@ -24,7 +23,6 @@ export function PageHeader({ title, subtitle, back, action, fit, size = 'large' 
   /** Figma "Type": large = Title Large (tabs), small = Title small (a trip's pages) */
   size?: 'large' | 'small';
 }) {
-  useContext(HeaderProfileContext);
   const navigate = useNavigate();
   const titleRef = useRef<HTMLHeadingElement>(null);
   const [smaller, setSmaller] = useState(false);
