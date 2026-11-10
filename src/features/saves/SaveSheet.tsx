@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Button, Chip, Icon, ListGroup, ListItem, SearchField, Sheet, Skeleton, Switch, TextArea, TextField, useToast } from '../../design/components';
+import { Button, Chip, Icon, ListGroup, ListItem, Sheet, Skeleton, Switch, TextArea, TextField, useToast } from '../../design/components';
 import type { Place } from '../../data/types';
 import { flagUrl } from '../../lib/countries';
 import { searchCities } from '../../lib/geocode';
@@ -9,18 +9,18 @@ import { useActivitiesFor, useMyTrips, usePlaces } from '../../data/hooks';
 import type { LinkPreview, PlaceCategory } from '../../data/types';
 import { countryName } from '../../lib/countries';
 import { today } from '../../lib/dates';
-import { findUrl, readLink, searchPlaces } from '../../lib/links';
+import { findUrl, readLink } from '../../lib/links';
 import { haptic } from '../../lib/native';
 import { PLACE_CATEGORIES, detectCategory, eventCategoryOf, placeCategory, tripCoversCity } from '../../lib/places';
 import s from './saves.module.css';
 
-export type SaveRequest = { mode: 'link'; url?: string } | { mode: 'place' };
-type Found = NonNullable<LinkPreview['place']>;
+export type SaveRequest = { mode: 'link'; url?: string };
 
 /**
- * Save a place (handover "Save a place", this round's item 1): paste a link or search, Rove reads it, and the save is
- * filed into Collections under country → city → category. The category comes from the place type Rove detects; the
- * person can change it. Saving never asks for dates. If an upcoming trip covers that city, a switch offers "Also add to
+ * Save a place: a link field with Paste (Neutral) and Continue (Primary, disabled until there's a link). While Rove reads
+ * the link only a skeleton shows. The preview has the place's name (cleaned of ratings and addresses, editable), where
+ * it's filed (country · city, Rove's pick from the link, with Change) and its category (chips, always shown). It's
+ * filed into Collections under country → city → category; a new country simply starts a new collection. Saving never asks for dates. If an upcoming trip covers that city, a switch offers "Also add to
  * <trip> ideas" (off by default). The same place saved twice isn't duplicated. Offline, it saves on the device and
  * syncs later. Opened by Save a place and by links shared to Rove from other apps.
  */
@@ -28,10 +28,8 @@ export function SaveSheet({ request, onClose }: { request: SaveRequest | null; o
   const toast = useToast();
   const trips = useMyTrips();
   const places = usePlaces() ?? [];
-  const [mode, setMode] = useState<'link' | 'place'>('link');
   const [link, setLink] = useState('');
-  const [query, setQuery] = useState('');
-  const [results, setResults] = useState<Found[] | null>(null);
+  const [name, setName] = useState('');
   const [preview, setPreview] = useState<LinkPreview | null>(null);
   const [reading, setReading] = useState(false);
   const [category, setCategory] = useState<PlaceCategory>('sight');
@@ -48,30 +46,22 @@ export function SaveSheet({ request, onClose }: { request: SaveRequest | null; o
   // Start fresh each time it opens; a shared link is read straight away.
   useEffect(() => {
     if (!request) return;
-    setMode(request.mode); setLink(request.mode === 'link' ? request.url ?? '' : ''); setQuery(''); setResults(null);
+    setLink(request.url ?? ''); setName('');
     setPreview(null); setAlsoTrip(false); setNote(''); setChosen(null); setStep('preview'); setWhereQuery(''); setNewCity(null);
     // The clipboard is read only when you tap Paste: reading it here made iOS show its Paste bubble as the sheet opened.
-    if (request.mode === 'link' && request.url) read(request.url);
+    if (request.url) read(request.url);
   }, [request]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const show = (p: LinkPreview) => { setPreview(p); setCategory(detectCategory(p.place)); setAlsoTrip(false); setChosen(null); setStep('preview'); };
+  const show = (p: LinkPreview) => {
+    setPreview(p); setName(p.place && !p.place.isArea ? p.place.name : p.title); setCategory(detectCategory(p.place));
+    setAlsoTrip(false); setChosen(null); setStep('preview');
+  };
   const read = async (raw: string) => {
     const url = findUrl(raw) ?? raw.trim();
     if (!/^https?:\/\//.test(url)) { toast({ tone: 'error', label: 'That doesn’t look like a link' }); return; }
     setReading(true);
     try { show(await readLink(url)); } finally { setReading(false); }
   };
-
-  // Search as you type (Photon).
-  useEffect(() => {
-    if (mode !== 'place' || preview) return;
-    const ctrl = new AbortController();
-    const t = setTimeout(() => {
-      if (query.trim().length < 2) { setResults(null); return; }
-      searchPlaces(query, ctrl.signal).then(setResults).catch((e) => { if (e.name !== 'AbortError') setResults([]); });
-    }, 250);
-    return () => { clearTimeout(t); ctrl.abort(); };
-  }, [query, mode, preview]);
 
   // "Where should it go?": search any country or city.
   useEffect(() => {
@@ -93,7 +83,8 @@ export function SaveSheet({ request, onClose }: { request: SaveRequest | null; o
   const target = chosen ?? picked;
   const code = target.code;
   const city = target.city;
-  const kind: 'place' | 'link' = place ? 'place' : 'link';
+  // A place when Rove found one or you chose a city; otherwise a link filed under its country ("Links & notes")
+  const kind: 'place' | 'link' = place || city ? 'place' : 'link';
   const trip = city ? upcoming.find((t) => tripCoversCity(t, acts[t.id] ?? [], city)) : undefined;
 
   const paste = async () => {
@@ -107,14 +98,14 @@ export function SaveSheet({ request, onClose }: { request: SaveRequest | null; o
     if (!preview) return;
     if (!code) return; // "Choose where to save" first
     const where = [countryName(code), city].filter(Boolean).join(' · ');
-    const name = place?.name ?? (preview.title === preview.site ? preview.place?.name ?? preview.title : preview.title);
+    const title = name.trim() || place?.name || preview.title;
     // The same place twice: same link, or the same name in the same spot.
     const dupe = places.find((p) => (!!preview.url && p.url === preview.url)
-      || (!!place && p.name === place.name && p.lat != null && Math.abs(p.lat - place.lat) < 0.002 && Math.abs((p.lng ?? 0) - place.lng) < 0.002));
+      || (!!place && p.name === title && p.lat != null && Math.abs(p.lat - place.lat) < 0.002 && Math.abs((p.lng ?? 0) - place.lng) < 0.002));
     if (dupe) { toast({ icon: 'check', label: `Already in your ${dupe.countryCode ? countryName(dupe.countryCode) : 'Unsorted'} collection` }); onClose(); return; }
     try {
       const { id, saved } = store.addPlace({
-        name, category, city: kind === 'place' ? city : '', country: countryName(code), countryCode: code, ...(kind === 'link' ? { type: 'link' as const } : {}),
+        name: title, category, city: kind === 'place' ? city : '', country: countryName(code), countryCode: code, ...(kind === 'link' ? { type: 'link' as const } : {}),
         lat: place?.lat ?? null, lng: place?.lng ?? null,
         ...(preview.url ? { url: preview.url } : {}), ...(preview.image ? { image: preview.image } : {}),
         ...(preview.site ? { source: preview.site } : {}), ...(place?.kind ? { kind: place.kind } : {}),
@@ -123,7 +114,7 @@ export function SaveSheet({ request, onClose }: { request: SaveRequest | null; o
       saved.catch(() => toast({ tone: 'error', label: "Couldn't save. Check your connection" }));
       // "Also add to <trip> ideas": an Idea that points at the Place (never a copy).
       const idea = alsoTrip && trip ? store.queueSub(trip.id, 'ideas', {
-        title: name, category: eventCategoryOf(category), notes: '', links: [], votes: {}, status: 'open', placeId: id,
+        title, category: eventCategoryOf(category), notes: '', links: [], votes: {}, status: 'open', placeId: id,
       }) : null;
       haptic('success');
       toast({
@@ -146,42 +137,26 @@ export function SaveSheet({ request, onClose }: { request: SaveRequest | null; o
 
   return (
     <Sheet open={open} title={whereSheet ? 'Where should it go?' : 'Save a place'}
-      subtitle={whereSheet ? (picked.code ? `Rove picked ${countryName(picked.code)} from the link` : 'Rove couldn’t tell from the link') : preview ? undefined : 'Paste a link from TikTok, Instagram, Maps or any site, or search'}
+      subtitle={whereSheet ? (picked.code ? `Rove picked ${countryName(picked.code)} from the link` : 'Rove couldn’t tell from the link') : preview || reading ? undefined : 'Paste a link from TikTok, Instagram, Google Maps or any site'}
       onClose={onClose} onSubmit={preview ? save : undefined} submitDisabled={!!preview && !code}
       submitLabel={code ? `Save to ${whereSheet && city ? city : countryName(code)}` : 'Save'}>
-      {!preview && (
-        <div className={s.modes} role="group" aria-label="How to save">
-          <Chip active={mode === 'link'} icon="link" onClick={() => setMode('link')} label={`Paste a link${mode === 'link' ? ', selected' : ''}`}>Paste a link</Chip>
-          <Chip active={mode === 'place'} icon="search" onClick={() => setMode('place')} label={`Search${mode === 'place' ? ', selected' : ''}`}>Search</Chip>
+      {/* Reading the link: only the skeleton (the preview's shape) */}
+      {!preview && reading && (
+        <div className={s.reading} role="status" aria-label="Reading the link">
+          <Skeleton shape="block" height={72} />
+          <Skeleton shape="block" height={72} />
+          <Skeleton width="40%" />
         </div>
       )}
 
-      {!preview && mode === 'link' && (
-        reading ? <div className={s.reading}><Skeleton shape="block" height={72} /><span className="t-body-small t-secondary" role="status">Reading the link…</span></div> : (
-          <>
-            <TextField label="Link" placeholder="https://…" inputMode="url" autoComplete="off" value={link} onChange={(e) => setLink(e.target.value)}
-              onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); read(link); } }} />
-            <div className={s.row}>
-              <Button variant="neutral" icon="copy" onClick={paste}>Paste</Button>
-              <Button disabled={!link.trim()} onClick={() => read(link)}>Continue</Button>
-            </div>
-          </>
-        )
-      )}
-
-      {!preview && mode === 'place' && (
+      {!preview && !reading && (
         <>
-          <SearchField label="Search a place" placeholder="Search a restaurant, bar, shop or sight" value={query} onChange={(e) => setQuery(e.target.value)} />
-          {results && results.length === 0 && <p className="t-body-small t-secondary">Nothing found. Try the name and the city.</p>}
-          {results && results.length > 0 && (
-            <ListGroup label="Places">
-              {results.map((p) => (
-                <ListItem key={`${p.lat},${p.lng}`} icon={placeCategory(detectCategory(p)).icon} title={p.name}
-                  meta={[p.kind, p.city, p.country].filter(Boolean).join(' · ')}
-                  onClick={() => { haptic('selection'); show({ url: '', site: '', title: p.name, image: '', place: p }); }} />
-              ))}
-            </ListGroup>
-          )}
+          <TextField label="Link" placeholder="https://…" inputMode="url" autoComplete="off" value={link} onChange={(e) => setLink(e.target.value)}
+            onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); if (link.trim()) read(link); } }} />
+          <div className={s.buttonPair}>
+            <Button variant="neutral" size="large" icon="copy" onClick={paste}>Paste</Button>
+            <Button size="large" disabled={!link.trim()} onClick={() => read(link)}>Continue</Button>
+          </div>
         </>
       )}
 
@@ -190,10 +165,11 @@ export function SaveSheet({ request, onClose }: { request: SaveRequest | null; o
           <div className={s.preview}>
             <span className={s.previewThumb} aria-hidden="true">{preview.image ? <img src={preview.image} alt="" /> : <Icon name={kind === 'link' ? 'link' : icon} size={24} />}</span>
             <span className={s.previewText}>
-              <span className={s.previewTitle}>{place?.name ?? preview.title}</span>
+              <span className={s.previewTitle}>{name.trim() || preview.title}</span>
               {meta && <span className={s.previewMeta}>{meta}</span>}
             </span>
           </div>
+          <TextField label="Name" value={name} autoComplete="off" onChange={(e) => setName(e.target.value)} />
           {/* Saving to: Rove's pick, with Change. With nothing found, Save waits until a country is chosen. */}
           <div className={s.preview}>
             <span className={[s.previewThumb, s.previewRound].join(' ')} aria-hidden="true">{code ? <img src={flagUrl(code)} alt="" className={s.flag} /> : <Icon name="pin" size={24} />}</span>
@@ -203,7 +179,7 @@ export function SaveSheet({ request, onClose }: { request: SaveRequest | null; o
             </span>
             <Button variant="ghost" size="regular" onClick={() => { setStep('where'); setNewCity(null); }}>{code ? 'Change' : 'Choose'}</Button>
           </div>
-          {kind === 'place' && (
+          {(
             <div className={s.field}>
               <h3 className={s.label} id="save-category">Category</h3>
               <div className={s.chipsWrap} role="group" aria-labelledby="save-category">

@@ -57,6 +57,22 @@ function mapsPlace(url: URL) {
   return name ? decodeURIComponent(name.replace(/\+/g, ' ')) : null;
 }
 
+/**
+ * A place's name from a page title: drops ratings ("4.6★(2,104)"), addresses and site names after a separator
+ * ("Time Out Market · Av. 24 de Julho 49, Lisbon" → "Time Out Market"), hashtags, emoji, and keeps the account name of
+ * "Name (@handle) on Instagram: caption".
+ */
+export function cleanTitle(raw: string) {
+  let t = raw.replace(/\s+/g, ' ').trim();
+  t = t.replace(/^(.*?)\s+(?:\(@[^)]*\)\s+)?on (?:Instagram|TikTok)\b.*$/i, '$1');  // "Name on Instagram: caption" → the account name
+  t = t.replace(/[#@][\p{L}\p{N}_]+/gu, ' ');                               // hashtags and handles
+  t = t.replace(/\p{Extended_Pictographic}|\uFE0F/gu, ' ');                 // emoji
+  const parts = t.split(/\s+[·|•–—]\s+|\s+-\s+|\s*[★☆⭐]|\s\d(?:[.,]\d)?\s*(?:stars?|★)|\s\(\d/);  // ratings, addresses, site names
+  t = (parts.find((x) => x.trim() && !/^(tiktok|instagram|youtube|google maps|facebook)$/i.test(x.trim())) ?? parts[0]) ?? '';
+  t = t.replace(/^["'“”‘’]+|["'“”‘’.,:;!]+$/g, '').replace(/\s+/g, ' ').trim();
+  return t.length > 60 ? `${t.slice(0, 57).replace(/\s+\S*$/, '')}…` : t;
+}
+
 /** The first web link in some text (a share often includes a caption). */
 export function findUrl(text: string) {
   return text.match(/https?:\/\/[^\s<>"]+/)?.[0]?.replace(/[).,]+$/, '') ?? null;
@@ -102,10 +118,10 @@ async function readOnPhone(url: string): Promise<LinkPreview | null> {
       } catch { /* keep what we have */ }
     }
     const name = mapsPlace(new URL(finalUrl));
-    const query = name ?? title.replace(/\s*[|·–—-]\s*[^|·–—-]*$/, '').slice(0, 80);
+    const clean = cleanTitle(name ?? title);
     let place: FoundPlace | null = null;
-    if (query) { try { place = (await searchPlaces(query))[0] ?? null; } catch { /* offline */ } }
-    return { url: finalUrl, site, title: title || name || host, image: /^https:\/\//.test(image) ? image : '', place };
+    if (clean) { try { place = (await searchPlaces(clean))[0] ?? null; } catch { /* offline */ } }
+    return { url: finalUrl, site, title: clean || host, image: /^https:\/\//.test(image) ? image : '', place };
   } catch {
     return null;
   }
@@ -121,7 +137,7 @@ export async function readLink(raw: string): Promise<LinkPreview> {
   const onPhone = isNativeApp ? await readOnPhone(url) : null;
   if (onPhone) return onPhone;
   const fromServer = await store.readLink(url);
-  if (fromServer) return fromServer;
+  if (fromServer) return { ...fromServer, title: cleanTitle(fromServer.title) || fromServer.title };
   let u: URL | null = null;
   try { u = new URL(url); } catch { /* not a link */ }
   const site = siteOf(url);
