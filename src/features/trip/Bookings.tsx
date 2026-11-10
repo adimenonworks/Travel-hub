@@ -49,7 +49,7 @@ export function Bookings(ctx: TripCtx) {
   const list = activities.filter((a) => eventType(a.category) === g.type).sort((a, b) => a.date.localeCompare(b.date) || byTime(a, b));
   const days = [...new Set(list.map((a) => a.date))];
   const [adding, setAdding] = useState(false);
-  const addLabel = { flight: 'Add a flight', stay: 'Add a stay', transport: 'Add transport', activity: 'Add an activity', food: 'Add food & drink', note: 'Add a note' }[g.type];
+  const addLabel = { flight: 'Add a flight', stay: 'Add a stay', transport: 'Add transport', car: 'Add a car rental', activity: 'Add an activity', food: 'Add food & drink', free: 'Add free time' }[g.type];
   const t = today();
   return (
     <>
@@ -63,7 +63,7 @@ export function Bookings(ctx: TripCtx) {
         </PageSection>
       ))}
       <Button variant="neutral" block onClick={() => setAdding(true)}>{addLabel}</Button>
-      <ActivityForm open={adding} trip={trip} date={t >= trip.startDate && t <= trip.endDate ? t : trip.startDate} draft={{ category: g.type }} onClose={() => setAdding(false)} />
+      <ActivityForm open={adding} trip={trip} date={t >= trip.startDate && t <= trip.endDate ? t : trip.startDate} draft={g.type === 'transport' || g.type === 'food' ? undefined : { category: g.type }} onClose={() => setAdding(false)} />
     </>
   );
 }

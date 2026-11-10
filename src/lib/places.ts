@@ -35,11 +35,11 @@ export function detectCategory(p: LinkPreview['place']): PlaceCategory {
 
 /** The event type an idea or event about this Place gets (cafés and bars keep their own icon). */
 export const eventCategoryOf = (c: PlaceCategory): Category =>
-  c === 'restaurant' ? 'food' : c === 'cafe' ? 'cafe' : c === 'bar' ? 'drinks' : c === 'stay' ? 'stay' : 'activity';
+  c === 'restaurant' ? 'restaurant' : c === 'cafe' ? 'cafe' : c === 'bar' ? 'bar' : c === 'stay' ? 'stay' : 'activity';
 
 /** The Place category for an event that gets starred without a Place yet. */
 export function placeCategoryOfEvent(c: Category): PlaceCategory {
-  return c === 'cafe' ? 'cafe' : c === 'drinks' ? 'bar' : c === 'food' ? 'restaurant' : c === 'stay' ? 'stay' : 'sight';
+  return c === 'cafe' ? 'cafe' : c === 'drinks' || c === 'bar' ? 'bar' : c === 'food' || c === 'restaurant' ? 'restaurant' : c === 'stay' ? 'stay' : 'sight';
 }
 
 /** "Tokyo" for a saved Place, or "Other places" when no city was found. */
