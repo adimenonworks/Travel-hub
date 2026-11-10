@@ -26,6 +26,13 @@ You need: a Cloudflare account (free), your Unsplash **Access Key**, and a Rapid
 
 Until step 7, the app works the same but shows illustrations instead of photos and no live flight status.
 
+## Updating the worker
+
+Rove's worker is live at `https://rove-api.adimenon9.workers.dev`. When `server/worker.js` changes on Main:
+open the worker on dash.cloudflare.com → **Edit code** → select everything and delete it → paste the new `server/worker.js` → **Deploy**. The secrets stay as they are.
+
+If covers don't appear, open `https://rove-api.adimenon9.workers.dev/cover?q=Lisbon` in a browser. `{"error":"unsplash 401"}` means the `UNSPLASH_ACCESS_KEY` secret is wrong: it must be the **Access Key** from unsplash.com/oauth/applications → your app → Keys (not the Secret Key). Edit the secret, paste the Access Key, Save; no redeploy needed.
+
 ## Unsplash production approval
 
 Demo keys allow 50 requests an hour (the worker caches each place for a day, so that's plenty to start). To get about 1,000 an hour, apply for production on unsplash.com/oauth/applications with screenshots of a trip cover and its credit. The app already does what their checklist asks: it hotlinks the photo, triggers the download when a photo is chosen, credits "Photo by <name> on Unsplash" with both names linked, and doesn't use Unsplash's logo or a similar name.

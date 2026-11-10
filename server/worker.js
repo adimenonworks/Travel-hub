@@ -20,6 +20,14 @@ function cors(request) {
   };
 }
 
+// A cached answer still carries the CORS headers of whoever asked first: replace them (not add a second copy, which
+// browsers reject) with this caller's.
+export function fromCache(request, hit) {
+  const headers = new Headers(hit.headers);
+  for (const [k, v] of Object.entries(cors(request))) headers.set(k, v);
+  return new Response(hit.body, { status: hit.status, headers });
+}
+
 const json = (request, body, status = 200, maxAge = 0) =>
   new Response(JSON.stringify(body), { status, headers: { 'Content-Type': 'application/json', 'Cache-Control': maxAge ? `public, max-age=${maxAge}` : 'no-store', ...cors(request) } });
 
@@ -83,7 +91,7 @@ export default {
         // Unsplash allows 50 requests an hour in demo mode: cache each place for a day at the edge.
         const cache = caches.default, key = new Request(`https://cache.rove/cover?q=${encodeURIComponent(q.toLowerCase())}`);
         const hit = await cache.match(key);
-        if (hit) return new Response(hit.body, { headers: { ...Object.fromEntries(hit.headers), ...cors(request) } });
+        if (hit) return fromCache(request, hit);
         const photo = await searchCover(q, env.UNSPLASH_ACCESS_KEY);
         const res = json(request, photo ?? { error: 'none' }, photo ? 200 : 404, 86400);
         if (photo) ctx.waitUntil(cache.put(key, res.clone()));
@@ -101,7 +109,7 @@ export default {
         // 600 units a month on the free plan: cache each flight for 10 minutes at the edge, whoever asks.
         const cache = caches.default, key = new Request(`https://cache.rove/flight/${number}/${date}`);
         const hit = await cache.match(key);
-        if (hit) return new Response(hit.body, { headers: { ...Object.fromEntries(hit.headers), ...cors(request) } });
+        if (hit) return fromCache(request, hit);
         const flight = await lookupFlight(number, date, env.RAPIDAPI_KEY);
         const res = json(request, flight ?? { error: 'not found' }, flight ? 200 : 404, 600);
         ctx.waitUntil(cache.put(key, res.clone()));

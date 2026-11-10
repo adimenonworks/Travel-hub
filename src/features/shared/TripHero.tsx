@@ -61,6 +61,7 @@ export function TripHero({ trip, cover = true, size = 'regular' }: { trip: Trip;
     if (!hasApi || !canSet || trip.coverPhoto || trip.cover !== undefined || asked.has(trip.id)) return;
     asked.add(trip.id);
     findCoverPhoto(coverQuery(trip)).then((photo) => {
+      if (photo === undefined) { asked.delete(trip.id); return; } // failed: try again next time this card shows
       store.updateTrip(trip.id, { cover: photo }).catch(() => {});
       if (photo) trackCoverDownload(photo);
     });
