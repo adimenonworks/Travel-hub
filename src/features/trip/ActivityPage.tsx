@@ -128,10 +128,6 @@ export function ActivityPage(ctx: TripCtx) {
         <EventCard {...eventCardProps(a, ctx, true)} {...(type !== 'free' && where ? { place: undefined } : {})} to={undefined} favourite={starred} />
       )}
 
-      {!journey && type !== 'free' && (
-        <Button block size="regular" variant="neutral" icon="star" onClick={star}>{starred ? 'Favourite' : 'Add to favourites'}</Button>
-      )}
-
       {/* Figma "Event detail — Location": the map, the address and the two ways to get there, together in one card */}
       {!journey && where && (
         <PageSection title="Location">
@@ -141,9 +137,14 @@ export function ActivityPage(ctx: TripCtx) {
                 <MapView pins={[{ lat: a.location.lat, lng: a.location.lng, label: a.title }]} center={a.location} zoom={15} height={160} />
               </div>
             )}
-            <div className={s.whereText}>
-              <span className="t-heading-3">{where.split(',')[0]}</span>
-              {where.includes(',') && <span className="t-body t-secondary">{where.split(',').slice(1).join(',').trim()}</span>}
+            {/* Figma Location card: the place, with its Favourite star (stars the Place in your Collections, with its category) */}
+            <div className={s.wherePlace}>
+              <div className={s.whereText}>
+                <span className="t-heading-3">{where.split(',')[0]}</span>
+                {where.includes(',') && <span className="t-body t-secondary">{where.split(',').slice(1).join(',').trim()}</span>}
+              </div>
+              {type !== 'free' && <IconButton icon="star" state={starred ? 'filled' : 'default'} aria-pressed={starred}
+                label={starred ? `Remove ${where.split(',')[0]} from favourites` : `Add ${where.split(',')[0]} to favourites`} onClick={star} />}
             </div>
             <div className={s.whereButtons}>
               <LinkButton href={mapsUrl(where, a.location, app)} variant="neutral" icon="map" label={`Directions to ${where} in ${mapsAppLabel(app)}`}>{mapsAppLabel(app)}</LinkButton>

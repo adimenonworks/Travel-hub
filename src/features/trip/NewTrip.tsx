@@ -4,7 +4,7 @@ import { useCountries, placeCounts } from '../saves/Collections';
 import { store } from '../../data';
 import type { Place, Trip } from '../../data/types';
 import { useMe, usePlaces } from '../../data/hooks';
-import { cityOf, eventCategoryOf, groupBy, placeCategory } from '../../lib/places';
+import { PLACE_CATEGORIES, cityOf, eventCategoryOf, groupBy, placeCategory } from '../../lib/places';
 import { addDays, daysBetween, formatDay, today } from '../../lib/dates';
 import { countryCodeOf, countryName, flagUrl } from '../../lib/countries';
 import { searchCities } from '../../lib/geocode';
@@ -36,6 +36,7 @@ export function NewTrip({ open, onClose, onOpenTrip }: { open: boolean; onClose:
   /** Step 4: the saved places chosen to come along (none until you pick), and the city whose places are showing. */
   const [picked, setPicked] = useState<string[]>([]);
   const [openGroup, setOpenGroup] = useState<string | null>(null);
+  const [openCat, setOpenCat] = useState<string | null>(null);
   const toast = useToast();
   // Step 4 offers your saved Places by country (the trip's country first, then the most saved), then by city,
   // with each country's links and notes as one more group.
@@ -204,8 +205,8 @@ export function NewTrip({ open, onClose, onOpenTrip }: { open: boolean; onClose:
       </FlowScreen>
     );
 
-  // Step 4 (Figma "New trip — 4. Bring your saves?"): nothing comes along until you pick it. Tap a city to open it and
-  // tick places, or "All" for the whole city. Skipping is fine: Ideas → Add idea → From saved brings them in later.
+  // Step 4 (Figma "New trip — 4. Bring your saves?"): nothing comes along until you pick it. Country → city (tap to
+  // open; "All of <city>") → category (Restaurants, Cafés…; tap to open; "All …") → places to tick. Skipping is fine: Ideas → Add idea → From saved brings them in later.
   const toggle = (ids: string[], on: boolean) => setPicked((x) => (on ? [...new Set([...x, ...ids])] : x.filter((y) => !ids.includes(y))));
   return (
     <FlowScreen step={4} of={4} stepKey={4} title="Bring your saves?" subtitle="Pick places you've saved to add to this trip's Ideas." onClose={onClose}
@@ -236,14 +237,38 @@ export function NewTrip({ open, onClose, onOpenTrip }: { open: boolean; onClose:
                     <div className={s.flowDropdown}>
                       <ListItem size="compact" icon={n === list.length ? 'check' : 'plus'} title={`All of ${g === 'Links & notes' ? 'these' : g}`}
                         onClick={() => { haptic('light'); toggle(ids, n !== list.length); }} label={`All of ${g}, ${n === list.length ? 'chosen' : 'not chosen'}`} />
-                      {list.map((p) => {
-                        const on = picked.includes(p.id);
-                        return (
-                          <ListItem key={p.id} size="compact" icon={on ? 'check' : placeCategory(p.category).icon} title={p.name}
-                            trailing={on ? 'Chosen' : undefined}
-                            onClick={() => { haptic('light'); toggle([p.id], !on); }} label={`${p.name}, ${on ? 'chosen' : 'not chosen'}`} />
-                        );
-                      })}
+                      {/* City → category → places: each category opens to its places (links and notes have no category) */}
+                      {(g === 'Links & notes' ? [{ c: null, places: list }] : PLACE_CATEGORIES.map((c) => ({ c, places: list.filter((p) => p.category === c.value) })).filter((x) => x.places.length > 0))
+                        .map(({ c, places }) => {
+                          const catKey = `${key}/${c?.value ?? 'links'}`, catOpen = !c || openCat === catKey;
+                          const catIds = places.map((p) => p.id), m = catIds.filter((id) => picked.includes(id)).length;
+                          return (
+                            <Fragment key={catKey}>
+                              {c && (
+                                <ListItem size="compact" icon={c.icon} title={c.label} meta={m ? `${m} of ${places.length} chosen` : `${places.length} saved`}
+                                  trailing={<Icon name="chevron-down" size={16} className={catOpen ? s.flipped : undefined} />}
+                                  onClick={() => { haptic('selection'); setOpenCat(catOpen ? null : catKey); }}
+                                  label={`${c.label} in ${g}, ${places.length} saved, ${m} chosen. ${catOpen ? 'Hide' : 'Show'} places`} />
+                              )}
+                              {catOpen && (
+                                <div className={c ? s.flowDropdown : undefined}>
+                                  {c && places.length > 1 && (
+                                    <ListItem size="compact" icon={m === places.length ? 'check' : 'plus'} title={`All ${c.label.toLowerCase()}`}
+                                      onClick={() => { haptic('light'); toggle(catIds, m !== places.length); }} label={`All ${c.label} in ${g}, ${m === places.length ? 'chosen' : 'not chosen'}`} />
+                                  )}
+                                  {places.map((p) => {
+                                    const on = picked.includes(p.id);
+                                    return (
+                                      <ListItem key={p.id} size="compact" icon={on ? 'check' : placeCategory(p.category).icon} title={p.name}
+                                        trailing={on ? 'Chosen' : undefined}
+                                        onClick={() => { haptic('light'); toggle([p.id], !on); }} label={`${p.name}, ${on ? 'chosen' : 'not chosen'}`} />
+                                    );
+                                  })}
+                                </div>
+                              )}
+                            </Fragment>
+                          );
+                        })}
                     </div>
                   )}
                 </Fragment>
