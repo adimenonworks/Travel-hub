@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type FormEvent } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Avatar, Button, Card, Select, LinkButton, ListGroup, ListItem, PageHeader, PageSection, ProfileCard as FigmaProfileCard, SegmentedControl, Sheet, StatStrip, TextField, useToast } from '../../design/components';
 import { store } from '../../data';
 import { useMe, useMyTrips, usePlaces, useProfile } from '../../data/hooks';
@@ -163,12 +163,12 @@ function ProfileEditor({ uid, name, photo, email }: { uid: string; name: string;
     }
   };
 
-  const saveName = async (e: FormEvent) => {
-    e.preventDefault();
+  const toast = useToast();
+  const saveName = async () => {
     const next = draft.trim();
     if (!next || next === name) return;
-    await store.saveProfile(uid, { name: next });
-    setSaved(true);
+    try { await store.saveProfile(uid, { name: next }); setSaved(true); toast({ icon: 'check', label: 'Nickname saved' }); }
+    catch { toast({ tone: 'error', label: "Couldn't save your nickname. Check your connection" }); }
   };
 
   const trimmed = draft.trim();
@@ -189,13 +189,15 @@ function ProfileEditor({ uid, name, photo, email }: { uid: string; name: string;
       <input ref={input} type="file" accept="image/*" className="visually-hidden" tabIndex={-1} aria-hidden="true"
         onChange={(e) => pick(e.target.files?.[0])} />
       {error && <p className="t-label-small t-danger" role="alert">{error}</p>}
-      <form className={s.nameRow} onSubmit={saveName}>
+      {/* Not a <form>: this sits inside the Sheet's form, and a form inside a form can submit the outer one (a page reload in the app) */}
+      <div className={s.nameRow}>
         <div className={s.addField}>
-          <TextField label="Nickname" value={draft} maxLength={40} autoComplete="nickname" aria-describedby="nickname-hint"
-            onChange={(e) => { setDraft(e.target.value); setSaved(false); }} />
+          <TextField label="Nickname" value={draft} maxLength={40} autoComplete="nickname" aria-describedby="nickname-hint" enterKeyHint="done"
+            onChange={(e) => { setDraft(e.target.value); setSaved(false); }}
+            onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); saveName(); } }} />
         </div>
-        <Button type="submit" iconEnd="check" aria-label="Save nickname" title="Save nickname" disabled={!trimmed || trimmed === name} />
-      </form>
+        <Button type="button" iconEnd="check" aria-label="Save nickname" title="Save nickname" disabled={!trimmed || trimmed === name} onClick={saveName} />
+      </div>
       <p id="nickname-hint" className="t-label-small t-secondary" role="status">{saved && draft === name ? 'Saved.' : 'What people on your trips see.'}</p>
     </Card>
   );

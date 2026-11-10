@@ -1,5 +1,5 @@
 /* Home: the two quick actions (Save a place, Plan a trip) side by side, filling the width */
-.quickActions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-default-300); }
+.quickActions { display: flex; flex-wrap: wrap; justify-content: flex-start; gap: var(--space-default-300); } /* buttons hug their labels, left-aligned (Wise) */
 
 /* Trips tab: the Segmented Control, the button, then trips 16 apart */
 .list { display: flex; flex-direction: column; gap: var(--space-default-500); }

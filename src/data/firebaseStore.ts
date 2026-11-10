@@ -158,7 +158,21 @@ export function createFirebaseStore(config: FirebaseOptions): Store {
           Object.assign(pub, priv);
         }
       }
-      if (Object.keys(pub).length) await setDoc(doc(db, 'users', uid), pub, { merge: true });
+      if (!Object.keys(pub).length) return;
+      const ref = doc(db, 'users', uid);
+      try {
+        await setDoc(ref, pub, { merge: true });
+      } catch (e) {
+        // The rules only allow name and photo on the public profile. An older version could leave other fields there
+        // (home, visited…), and then every save is refused. Move private ones to the private document, drop the rest, retry.
+        if ((e as { code?: string })?.code !== 'permission-denied') throw e;
+        const now = (await getDoc(ref)).data() ?? {};
+        const extra = Object.keys(now).filter((k) => k !== 'name' && k !== 'photo');
+        if (!extra.length) throw e;
+        const moved = Object.fromEntries(extra.filter(isPrivate).map((k) => [k, now[k]]));
+        if (Object.keys(moved).length) await setDoc(doc(db, 'users', uid, 'private', 'places'), moved, { merge: true });
+        await updateDoc(ref, { ...Object.fromEntries(extra.map((k) => [k, deleteField()])), ...pub });
+      }
     },
 
     watchMyTrips(uid, cb) {

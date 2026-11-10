@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { CountryModal, EventCard, LinkButton, ListGroup, ListItem, PageSection } from '../../design/components';
+import { CountryModal, EventCard, ListGroup, ListItem, PageSection } from '../../design/components';
 import type { IconName } from '../../design/components';
 import { useMe, useProfile } from '../../data/hooks';
 import type { Place } from '../../data/types';
@@ -42,7 +42,7 @@ export function Overview(ctx: TripCtx) {
   return (
     <div className={s.overview}>
 
-      <PageSection title="Next stop" action={<LinkButton to={`${base}/itinerary`} variant="ghost" size="regular" iconEnd="chevron-right">Itinerary</LinkButton>}>
+      <PageSection title="Next stop">
         {next
           ? <EventCard {...eventCardProps(next, ctx, true)} state="next" extras={unreadTag(unreadCount(reads, me.uid, next.id, ctx.comments))} />
           : <ListGroup><ListItem icon="calendar" title="Nothing planned yet" meta="Add events to the itinerary and the next one shows here." to={`${base}/itinerary`} /></ListGroup>}
