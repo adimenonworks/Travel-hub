@@ -96,9 +96,9 @@ function TripLoaded({ trip }: { trip: Trip }) {
           action={canManage ? { icon: 'pencil', label: 'Edit trip', onClick: () => setEditing(true) } : undefined}
           meta={tripDatesLabel(trip)}
         />
-        <div className={s.sectionNav}>
-          <Tabs items={tabs} label="Trip sections" />
-        </div>
+        <StickyTabs>
+          <Tabs items={tabs} label="Trip sections" replace />
+        </StickyTabs>
         <TabPanels location={location} section={section}>
           {(loc) => (
             <Routes location={loc}>
@@ -119,6 +119,26 @@ function TripLoaded({ trip }: { trip: Trip }) {
 }
 
 const TAB_ORDER = ['', 'itinerary', 'ideas', 'photos', 'people'];
+
+/**
+ * The trip's Tab Bar, sticky under the status bar. Only once it's actually stuck does it fill the status-bar strip
+ * above it (so nothing shows behind the clock); before that the strip would cover the bottom of the trip header.
+ */
+function StickyTabs({ children }: { children: React.ReactNode }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [stuck, setStuck] = useState(false);
+  useEffect(() => {
+    const el = ref.current; if (!el) return;
+    const check = () => {
+      const top = parseFloat(getComputedStyle(el).top) || 0;
+      setStuck(el.getBoundingClientRect().top <= top + 0.5);
+    };
+    check();
+    window.addEventListener('scroll', check, { passive: true }); window.addEventListener('resize', check);
+    return () => { window.removeEventListener('scroll', check); window.removeEventListener('resize', check); };
+  }, []);
+  return <div ref={ref} className={s.sectionNav} data-stuck={stuck || undefined}>{children}</div>;
+}
 
 /**
  * The trip's tabs as nested views under one header and Tab Bar that never unmount (SlideSwap slides the panel in
@@ -182,7 +202,7 @@ function useTabSwipe(box: React.RefObject<HTMLDivElement | null>, section: strin
       const i = TAB_ORDER.indexOf(section) + (dx < 0 ? 1 : -1);
       if (i < 0 || i >= TAB_ORDER.length) return;
       haptic('selection');
-      navigate(TAB_ORDER[i] ? `${base}/${TAB_ORDER[i]}` : base);
+      navigate(TAB_ORDER[i] ? `${base}/${TAB_ORDER[i]}` : base, { replace: true }); // tabs never add history: Back leaves the trip
     };
     el.addEventListener('touchstart', down, { passive: true });
     el.addEventListener('touchend', up, { passive: true });
