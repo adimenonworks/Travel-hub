@@ -1,6 +1,7 @@
 import type { Activity } from '../../data/types';
 import { daysBetween, formatDay, formatTime, today } from '../../lib/dates';
 import { behaviourOf, categoryInfo, eventKind, spanWords } from '../../lib/categories';
+import { durationLabel, journeyMs, toInstant } from '../../lib/timezone';
 import type { TripCtx } from './TripPage';
 
 /**
@@ -10,6 +11,8 @@ import type { TripCtx } from './TripPage';
 export type DayEntry = { a: Activity; part?: 'in' | 'out' };
 
 const short = (s?: string) => s?.split(',')[0].trim() || undefined;
+/** "Lisbon (LIS)" → "Lisbon" */
+const cityName = (s?: string) => short(s)?.replace(/\s*\([^)]*\)\s*/g, ' ').trim() || undefined;
 /** A journey's end under its time: the airport or station code when one is given ("Lisbon (LIS)" → "LIS"), else the place. */
 const stop = (s?: string) => s?.match(/\(([^)]+)\)/)?.[1] ?? short(s);
 /** A span (stay, cruise, car rental, campervan) that runs over more than one day shows at its start and its end. */
@@ -34,10 +37,41 @@ export function entryEnd(e: DayEntry) {
 export function eventsOn(activities: Activity[], day: string): DayEntry[] {
   const out: DayEntry[] = [];
   for (const a of activities) {
+    if (!isFirstLeg(a, activities)) continue; // a connection shows as one card, on its first leg's day
     if (a.date === day) out.push(isStay(a) ? { a, part: 'in' } : { a });
     else if (isStay(a) && a.endDate === day) out.push({ a, part: 'out' });
   }
   return out.sort((x, y) => (entryTime(x) || '99').localeCompare(entryTime(y) || '99') || x.a.createdAt - y.a.createdAt);
+}
+
+/** The legs of the journey an event belongs to (a flight with connections), in order; just the event when it's alone. */
+export function legsOf(a: Activity, activities: Activity[]): Activity[] {
+  if (!a.journeyId) return [a];
+  const legs = activities.filter((x) => x.journeyId === a.journeyId);
+  return legs.length < 2 ? [a] : legs.sort((x, y) => toInstant(x.date, x.startTime, x.tz) - toInstant(y.date, y.startTime, y.tz));
+}
+/** Later legs of a connection are folded into the first leg's card. */
+export const isFirstLeg = (a: Activity, activities: Activity[]) => legsOf(a, activities)[0].id === a.id;
+
+/** Tight-connection limits in minutes (international / domestic) and when a layover counts as overnight, in hours. */
+export const LAYOVER_LIMITS = { international: 60, domestic: 45, overnightHours: 8 };
+export type Layover = { at: string; code?: string; ms: number; tight: boolean; overnight: boolean; arrives: Activity; leaves: Activity };
+/** The gaps between legs: where, how long, and whether it's tight or overnight (worked out, never stored). */
+export function layovers(legs: Activity[]): Layover[] {
+  const out: Layover[] = [];
+  for (let i = 1; i < legs.length; i++) {
+    const a = legs[i - 1], b = legs[i];
+    if (!a.endTime || !b.startTime) continue;
+    const ms = toInstant(b.date, b.startTime, b.tz) - toInstant(a.endDate || a.date, a.endTime, a.toTz ?? a.tz);
+    const countries = new Set([a.location?.countryCode, a.to?.countryCode, b.to?.countryCode].filter(Boolean));
+    const limit = countries.size > 1 ? LAYOVER_LIMITS.international : LAYOVER_LIMITS.domestic;
+    out.push({
+      at: cityName(a.toText) ?? '', code: a.toText?.match(/\(([^)]+)\)/)?.[1], ms, arrives: a, leaves: b,
+      tight: ms > 0 && ms < limit * 60000,
+      overnight: ms > LAYOVER_LIMITS.overnightHours * 3600e3 || (a.endDate || a.date) < b.date,
+    });
+  }
+  return out;
 }
 
 /** "1h 20m" between two times on the same day, or undefined. */
@@ -72,6 +106,22 @@ export function eventCardProps(input: Activity | DayEntry, ctx: TripCtx, showDay
   const withDay = (t?: string) => (showDay ? [day(a.date), t].filter(Boolean).join(', ') : t);
   const arrives = (t: string) => `${formatTime(t)}${a.endDate && a.endDate > a.date ? ` +${daysBetween(a.date, a.endDate)}` : ''}`;
 
+  const legs = legsOf(a, ctx.activities);
+  if (behaviour === 'journey' && legs.length > 1) {
+    // One card for the whole journey: "Melbourne → Lisbon · 1 stop", the layover under it ("2h 35m in Dubai")
+    const last = legs[legs.length - 1], stops = layovers(legs);
+    const lastDay = last.endDate || last.date;
+    return {
+      ...base, title: `${cityName(a.fromText)} → ${cityName(last.toText)} · ${legs.length - 1} stop${legs.length === 2 ? '' : 's'}`, layout: 'journey' as const,
+      time: withDay(stops.length === 1 ? `${durationLabel(stops[0].ms)} in ${stops[0].at}` : stops.map((x) => x.at).join(', ')), timeIcon: null, place: undefined,
+      journey: {
+        fromTime: a.startTime ? formatTime(a.startTime) : '—', fromPlace: stop(a.fromText),
+        toTime: last.endTime ? `${formatTime(last.endTime)}${lastDay > a.date ? ` +${daysBetween(a.date, lastDay)}` : ''}` : '—', toPlace: stop(last.toText),
+        duration: last.endTime && a.startTime ? durationLabel(toInstant(lastDay, last.endTime, last.toTz ?? last.tz) - toInstant(a.date, a.startTime, a.tz)) || undefined : undefined,
+        mode: info.icon,
+      },
+    };
+  }
   if (behaviour === 'journey' && (kind === 'flight' || (a.fromText && a.toText)))
     return {
       ...base, layout: 'journey' as const,
@@ -79,7 +129,7 @@ export function eventCardProps(input: Activity | DayEntry, ctx: TripCtx, showDay
       journey: {
         fromTime: a.startTime ? formatTime(a.startTime) : '—', fromPlace: stop(a.fromText),
         toTime: a.endTime ? arrives(a.endTime) : '—', toPlace: stop(a.toText),
-        ...(kind === 'flight' ? {} : { duration: a.endDate && a.endDate > a.date ? undefined : duration(a.startTime, a.endTime) }),
+        ...(kind === 'flight' ? {} : { duration: (a.tz ? durationLabel(journeyMs(a)) : duration(a.startTime, a.endTime)) || undefined }),
         mode: info.icon,
       },
     };

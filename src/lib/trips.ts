@@ -1,3 +1,4 @@
+import { toInstant } from './timezone';
 import type { Activity, Trip } from '../data/types';
 import { daysBetween as between, formatRange, today as todayDay, tripPhase } from './dates';
 import { behaviourOf } from './categories';
@@ -33,11 +34,20 @@ export function tripDatesLabel(trip: Pick<Trip, 'startDate' | 'endDate' | 'dateM
 /** When an event finishes, for sorting what's still to come. An event with no time counts until the day is over. */
 const endsAt = (a: Activity) => (a.endTime && a.endTime >= a.startTime ? a.endTime : a.endTime ? '99:99' : a.startTime || '99:99');
 
-/** The next thing in the plan: today's next event that hasn't finished, else the first one on a later day. */
-export function nextEvent(activities: Activity[], now = todayDay(), time = new Date().toTimeString().slice(0, 5)): Activity | undefined {
-  return activities
-    .filter((a) => a.date > now || (a.date === now && endsAt(a) > time))
-    .sort((a, b) => a.date.localeCompare(b.date) || (a.startTime || '99').localeCompare(b.startTime || '99'))[0];
+/**
+ * The next thing in the plan: the first event that hasn't finished yet, by the exact moment (each event's own time
+ * zone, so it's right wherever the phone is). An event with no time counts until its day is over. Later legs of a
+ * connection are part of the first leg's journey.
+ */
+export function nextEvent(activities: Activity[], now = Date.now()): Activity | undefined {
+  const firstLegs = activities.filter((a) => !a.journeyId || activities.filter((x) => x.journeyId === a.journeyId)
+    .every((x) => toInstant(x.date, x.startTime, x.tz) >= toInstant(a.date, a.startTime, a.tz)));
+  const ends = (a: Activity) => {
+    const t = endsAt(a);
+    return t === '99:99' ? toInstant(a.date, '23:59', a.tz) + 60000 : toInstant(a.date, t, a.tz);
+  };
+  return firstLegs.filter((a) => ends(a) > now)
+    .sort((a, b) => toInstant(a.date, a.startTime || '23:59', a.tz) - toInstant(b.date, b.startTime || '23:59', b.tz))[0];
 }
 
 /** Straight-line distance between two points in km (haversine). */

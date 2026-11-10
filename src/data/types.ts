@@ -86,6 +86,13 @@ export type Activity = {
    *  eventType() / behaviourOf(), which also handle older events without them. */
   type?: string;
   behaviour?: string;
+  /** The IANA time zone of where it happens ("Europe/Lisbon"), looked up from its place when saved; a journey's
+   *  arrival zone is `toTz`. Times stay as typed (local to the place); the zone works out the exact moment
+   *  (src/lib/timezone.ts). Older events have none and use the phone's zone. */
+  tz?: string;
+  toTz?: string;
+  /** Legs of one booking (a flight with a connection) share this id; the layover between them is worked out, never stored. */
+  journeyId?: string;
   location: Place | null;
   locationText: string;
   notes: string;

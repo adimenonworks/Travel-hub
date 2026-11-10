@@ -124,3 +124,5 @@
 .typeList { display: flex; flex-direction: column; gap: var(--space-default-300); }
 .kindPicker { display: flex; flex-direction: column; gap: var(--space-default-300); }
 .kindChips { display: flex; flex-wrap: wrap; gap: var(--space-default-300); }
+.legs { display: flex; flex-direction: column; gap: var(--space-default-300); }
+.legs > button:last-child { align-self: flex-start; } /* Add a connection hugs its label */
