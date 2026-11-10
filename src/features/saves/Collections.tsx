@@ -212,28 +212,28 @@ export function placeCounts(list: SavedPlace[]) {
 }
 
 /**
- * Favourites (You → Favourite places → See all): every Place you've starred. Chips filter by country (All, then each
- * country with its flag); the page is sectioned by city ("Lisbon", "Portugal · 3 places"), each Place with its ★.
- */
-/**
- * Favourites (Figma flow "You — Favourites"): "See more" on You opens this. One Tile per category you've starred
- * something in, with how many; a tile opens that category's favourites.
+ * Favourites (You → Favourite places → See more): the places you've starred, filed like Collections. A Tile per country
+ * (its flag and how many), A to Z; a country opens its favourites by city (or state/province when there's no city),
+ * each city split into its categories (Restaurants, Cafés, Bars, Shops, Stays, Sights & activities).
  */
 export function Favourites() {
   const all = usePlaces();
   const { starred } = usePlaceMarks();
   if (all === null) return <PageSkeleton />;
   const favs = all.filter(starred);
-  const cats = PLACE_CATEGORIES.map((c) => ({ ...c, n: favs.filter((p) => p.category === c.value).length })).filter((c) => c.n > 0);
+  const countries = [...new Set(favs.map((p) => p.countryCode ?? ''))]
+    .map((code) => ({ code, name: code ? countryName(code) : 'Unsorted', n: favs.filter((p) => (p.countryCode ?? '') === code).length }))
+    .sort((a, b) => (a.code ? a.name : '~').localeCompare(b.code ? b.name : '~'));
   return (
     <Content>
       <PageHeader title="Favourites" size="small" back={{ to: '/profile', label: 'You' }} />
       {favs.length === 0 ? (
-        <Card media={<Illustration name="memories" size={120} />} title="No favourites yet" body="Star a place in your collections, or an idea or event on a trip, and it shows here." />
+        <Card media={<Illustration name="memories" size={120} />} title="No favourites yet" body="Star a place in your collections, or the place on an event or idea, and it shows here." />
       ) : (
         <div className={s.tileGrid}>
-          {cats.map((c) => (
-            <Tile key={c.value} icon={c.icon} title={c.label} meta={`${c.n} place${c.n === 1 ? '' : 's'}`} to={`/profile/favourites/${c.value}`} />
+          {countries.map((c) => (
+            <Tile key={c.code || 'none'} title={c.name} meta={`${c.n} place${c.n === 1 ? '' : 's'}`} to={`/profile/favourites/${c.code || 'unsorted'}`}
+              media={c.code ? <img src={flagUrl(c.code)} alt="" /> : undefined} icon={c.code ? undefined : 'star'} />
           ))}
         </div>
       )}
@@ -242,53 +242,39 @@ export function Favourites() {
 }
 
 /**
- * One category of favourites (Figma "You — Favourites — category"): country Chips at the top (All, then each country
- * A to Z). All lists them most recently saved first; a country shows a section per city, A to Z.
+ * One country's favourites: a section per city (A to Z), and inside it a List group per category with its title,
+ * so you see at a glance whether it's a café, bar, stay or restaurant.
  */
-export function FavouriteCategory() {
-  const { category = '' } = useParams();
+export function FavouriteCountry() {
+  const { country = '' } = useParams();
+  const code = country === 'unsorted' ? '' : country;
   const all = usePlaces();
   const { visited, starred } = usePlaceMarks();
-  const [country, setCountry] = useState<string>('all');
   const [open, setOpen] = useState<string | null>(null);
-  const cat = PLACE_CATEGORIES.find((c) => c.value === category);
   if (all === null) return <PageSkeleton />;
-  const favs = all.filter((p) => starred(p) && p.category === category).sort((a, b) => b.createdAt - a.createdAt);
-  const countries = [...new Set(favs.map((p) => p.countryCode ?? ''))].sort((a, b) => (a ? countryName(a) : '~').localeCompare(b ? countryName(b) : '~'));
-  const shown = favs.filter((p) => country === 'all' || (p.countryCode ?? '') === country);
-  const cities = groupBy(shown, cityOf).sort((a, b) => a[0].localeCompare(b[0]));
+  const favs = all.filter((p) => starred(p) && (p.countryCode ?? '') === code).sort((a, b) => b.createdAt - a.createdAt);
+  const cities = groupBy(favs, cityOf).sort((a, b) => a[0].localeCompare(b[0]));
   const live = open ? all.find((p) => p.id === open) ?? null : null;
-  const row = (p: (typeof favs)[number], withCity: boolean) => (
-    <PlaceRow key={p.id} place={p} visited={visited.has(p.id)} starred onClick={() => setOpen(p.id)}
-      meta={[withCity ? [cityOf(p), p.countryCode ? countryName(p.countryCode) : null].filter(Boolean).join(', ') : p.kind || placeCategory(p.category).one, p.source ? `from ${p.source}` : null].filter(Boolean).join(' · ')} />
-  );
-  const chip = (key: string, label: string, flag?: string) => (
-    <li key={key}><Chip active={country === key} flag={flag} onClick={() => { haptic('selection'); setCountry(key); }} label={`${label}${country === key ? ', selected' : ''}`}>{label}</Chip></li>
-  );
   return (
     <Content>
-      <PageHeader title={cat?.label ?? 'Favourites'} size="small" back={{ to: '/profile/favourites', label: 'Favourites' }} />
+      <PageHeader title={code ? countryName(code) : 'Unsorted'} size="small" back={{ to: '/profile/favourites', label: 'Favourites' }} />
       {favs.length === 0 ? (
         <Card media={<Illustration name="memories" size={120} />} title="Nothing starred here yet" body="Star a place and it shows here." />
-      ) : (
-        <>
-          {countries.length > 1 && (
-            <ul className={s.chips} aria-label="Country">
-              {chip('all', 'All')}
-              {countries.map((c) => chip(c, c ? countryName(c) : 'Unsorted', c ? flagUrl(c) : undefined))}
-            </ul>
-          )}
-          {country === 'all' ? (
-            <PageSection title="Recently saved" meta={`${shown.length} place${shown.length === 1 ? '' : 's'}`}>
-              <ListGroup label="Recently saved">{shown.map((p) => row(p, true))}</ListGroup>
-            </PageSection>
-          ) : cities.map(([city, list]) => (
-            <PageSection key={city} title={city} meta={`${list.length} place${list.length === 1 ? '' : 's'}`}>
-              <ListGroup label={city}>{list.map((p) => row(p, false))}</ListGroup>
-            </PageSection>
+      ) : cities.map(([city, list]) => (
+        <PageSection key={city} title={city} meta={`${list.length} place${list.length === 1 ? '' : 's'}`}>
+          {PLACE_CATEGORIES.map((c) => ({ c, places: list.filter((p) => p.category === c.value) })).filter((x) => x.places.length > 0).map(({ c, places }) => (
+            <section key={c.value} className={s.favCategory} aria-label={`${c.label} in ${city}`}>
+              <h3 className={s.favCategoryTitle}><Icon name={c.icon} size={16} />{c.label}</h3>
+              <ListGroup label={`${c.label} in ${city}`}>
+                {places.map((p) => (
+                  <PlaceRow key={p.id} place={p} visited={visited.has(p.id)} starred onClick={() => setOpen(p.id)}
+                    meta={[p.kind || c.one, p.source ? `from ${p.source}` : null].filter(Boolean).join(' · ')} />
+                ))}
+              </ListGroup>
+            </section>
           ))}
-        </>
-      )}
+        </PageSection>
+      ))}
       <PlaceSheet place={live} onClose={() => setOpen(null)} />
     </Content>
   );
