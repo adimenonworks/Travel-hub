@@ -59,8 +59,11 @@ export function Trips() {
               actions={<Button block iconEnd="chevron-right" onClick={() => newTrip()}>Plan a trip</Button>} />
           ) : (
             <>
-              <Button block iconEnd="chevron-right" onClick={() => newTrip()}>Plan a new trip</Button>
-              <div className={s.list}>{upcoming.map((t) => <TripHero key={t.id} trip={t} size="compact" />)}</div>
+              <div className={s.list}>
+                {upcoming.map((t) => <TripHero key={t.id} trip={t} size="compact" />)}
+                {/* Figma Tile Tone=Add, like Saved's "New place to go" */}
+                <Tile tone="add" icon="plus" title="Plan a new trip" onClick={() => newTrip()} />
+              </div>
             </>
           ))}
           {segment === 'saved' && (countries.length === 0 ? (

@@ -95,8 +95,8 @@
 /* Months (Figma "New trip — 2b. Roughly"): three across, fewer as text grows */
 .monthGrid { grid-template-columns: repeat(auto-fit, minmax(calc(96rem / 17), 1fr)); }
 .flowSummary { display: flex; flex-direction: column; gap: var(--space-default-100); }
-.flowSummaryTitle { font: var(--type-heading-2); letter-spacing: -0.01em; color: var(--on-mid-text-primary); }
-.flowSummaryMeta { margin: 0; font: var(--type-body-small); color: var(--on-mid-text-secondary); }
+.flowSummaryTitle { font: var(--type-heading-2); letter-spacing: -0.01em; color: var(--on-dark-text-primary); }
+.flowSummaryMeta { margin: 0; font: var(--type-body-small); color: var(--on-dark-text-secondary); }
 /* The Ghost button on the deep emerald Celebration screen uses the ghost "inverse" text */
 .onDarkGhost[class] { color: var(--on-dark-text-primary); }
 
@@ -105,12 +105,11 @@
 .addSection { display: flex; flex-direction: column; gap: var(--space-default-300); }
 .ideaImage { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; border-radius: var(--radius-500); }
 
-/* New trip flow: a section title on the emerald screen, the date-mode chips, and the Skip link under the footer button */
+/* New trip flow: a section title on the deep green screen, the date-mode chips, and the Skip link under the footer button */
 .flowSection { display: flex; flex-direction: column; gap: var(--space-default-400); }
-.flowSectionTitle { display: flex; align-items: center; margin: 0; font: var(--type-heading-2); letter-spacing: -0.01em; color: var(--on-mid-text-primary); }
+.flowSectionTitle { display: flex; align-items: center; margin: 0; font: var(--type-heading-2); letter-spacing: -0.01em; color: var(--on-dark-text-primary); }
 .flowChips { display: flex; flex-wrap: wrap; gap: var(--space-default-300); }
-.flowSkip { color: var(--on-mid-text-primary); }
-/* Lists on the emerald flow screens are white with grey icon circles (Figma New trip): the two surfaces swap */
+.flowSkip { color: var(--on-dark-text-primary); }
 
 /* Event detail, Location: one grey card with the map (inner corners 24 − 8 = 16), the address, then the buttons */
 .whereCard { display: flex; flex-direction: column; gap: var(--space-default-500); padding: var(--space-default-300); padding-bottom: var(--space-default-500); border-radius: var(--radius-600); background: var(--on-light-surface-secondary); }
@@ -122,5 +121,5 @@
 /* New trip step 4: a city's places drop down under it (indented), each ticked to come along */
 .flowDropdown { display: flex; flex-direction: column; padding-left: var(--space-default-700); }
 .flowFlag { width: calc(20rem / 17); height: calc(20rem / 17); border-radius: var(--radius-1000); object-fit: cover; margin-right: var(--space-default-300); flex: none; }
-.flowFootnote { margin: 0; text-align: center; font: var(--type-body-small); color: var(--on-mid-text-secondary); }
+.flowFootnote { margin: 0; text-align: center; font: var(--type-body-small); color: var(--on-dark-text-secondary); }
 .flipped { transform: rotate(180deg); }

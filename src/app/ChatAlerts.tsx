@@ -35,7 +35,7 @@ export function ChatAlerts() {
       const to = `/trip/${tripId}/plan/${event.id}`;
       if (pathname === to) continue; // you're reading it
       haptic('light');
-      toast({ icon: 'chat', label: `${personName(profiles, c.authorId).split(' ')[0]} on ${event.title}: ${c.text}`, action: { label: 'Open', onClick: () => navigate(to) } });
+      toast({ size: 'large', icon: 'chat', label: `${personName(profiles, c.authorId).split(' ')[0]} on ${event.title}: ${c.text}`, action: { label: 'Open', onClick: () => navigate(to) } });
     }
   }, [comments]); // eslint-disable-line react-hooks/exhaustive-deps
   return null;

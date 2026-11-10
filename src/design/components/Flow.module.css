@@ -1,7 +1,7 @@
-/* Figma "Flow screen": full screen on on-mid/surface/primary, 48 / 24 / 40 padding, gap 24 */
+/* Figma "Flow screen": full screen on on-dark/surface/secondary (deep green), 48 / 24 / 40 padding, gap 24 */
 .flow {
   position: fixed; inset: 0; z-index: 150; overflow-y: auto; overscroll-behavior: contain;
-  background: var(--on-mid-surface-primary); color: var(--on-mid-text-primary);
+  background: var(--on-dark-surface-secondary); color: var(--on-dark-text-primary);
   animation: expand var(--duration-slow) var(--ease-fluid); /* the "Plan a new trip" button expands into the flow */
 }
 .inner {
@@ -12,8 +12,8 @@
 .bar { display: flex; align-items: center; gap: var(--space-default-500); }
 .step { flex: 1; display: flex; flex-direction: column; gap: var(--space-default-700); animation: stepIn var(--duration-base) var(--ease-fluid); }
 .heading { display: flex; flex-direction: column; gap: var(--space-default-300); }
-.title { margin: 0; font: var(--type-display-tiny); letter-spacing: -0.01em; color: var(--on-mid-text-primary); }
-.subtitle { margin: 0; font: var(--type-body); color: var(--on-mid-text-secondary); }
+.title { margin: 0; font: var(--type-display-tiny); letter-spacing: -0.01em; color: var(--on-dark-text-primary); }
+.subtitle { margin: 0; font: var(--type-body); color: var(--on-dark-text-secondary); }
 .content { display: flex; flex-direction: column; gap: var(--space-default-500); }
 .footer { display: flex; flex-direction: column; align-items: center; gap: var(--space-default-500); }
 .footer > :first-child { width: 100%; }

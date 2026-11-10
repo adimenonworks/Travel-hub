@@ -120,7 +120,7 @@ function CoverPhotoField({ value, position, onChange, onMove }: {
       <div className="t-body-small t-bold">Cover photo</div>
       {value && <CoverPositioner src={value} position={position ?? { x: 50, y: 50 }} onMove={onMove} />}
       <div className={s.coverButtons}>
-        <Button variant="secondary" size="regular" icon="photo" onClick={() => input.current?.click()} disabled={busy}>
+        <Button variant="neutral" size="regular" icon="photo" onClick={() => input.current?.click()} disabled={busy}>
           {busy ? 'Preparing photo…' : value ? 'Change photo' : 'Choose photo'}
         </Button>
         {value && position && <Button variant="ghost" size="regular" onClick={() => onMove(null)}>Re-centre</Button>}

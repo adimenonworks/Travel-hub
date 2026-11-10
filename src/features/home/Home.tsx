@@ -39,7 +39,7 @@ export function Home() {
       <PageHeader title={`Hi, ${name.split(' ')[0]}`} fit />
       <nav className={s.quickActions} aria-label="Quick actions">
         <Button size="regular" icon="plus" onClick={() => openSave({ mode: 'link' })}>Save a place</Button>
-        <Button size="regular" variant="secondary" icon="calendar" onClick={() => newTrip()}>Plan a trip</Button>
+        <Button size="regular" variant="neutral" icon="calendar" onClick={() => newTrip()}>Plan a trip</Button>
       </nav>
       {trips === null ? <PageSkeleton bare /> : featured ? (
         <PageSection title="Upcoming trip">

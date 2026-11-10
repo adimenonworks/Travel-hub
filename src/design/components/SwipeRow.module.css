@@ -12,8 +12,8 @@
   transition: background var(--motion-fast), transform var(--motion-release);
 }
 .action:active { transform: scale(0.96); transition: transform var(--motion-press); }
-.neutral { background: var(--interactive-button-secondary-background); color: var(--interactive-button-secondary-text); }
-.neutral:active { background: var(--interactive-button-secondary-background-pressed); }
+.neutral { background: var(--interactive-button-inverse-neutral-background); color: var(--interactive-button-inverse-neutral-text); }
+.neutral:active { background: var(--interactive-button-inverse-neutral-background-pressed); }
 .destructive { background: var(--interactive-button-destructive-background); color: var(--interactive-button-destructive-text); }
 .destructive:active { background: var(--interactive-button-destructive-background-pressed); }
 

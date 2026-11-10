@@ -31,7 +31,7 @@ export function Join() {
       <Content>
         <Card>
           <EmptyState illustration="ticket" title={expired ? 'This invite has expired' : 'Invite not found'} message="Ask the trip organizer for a new link."
-            action={<LinkButton to="/" variant="secondary">Go to my trips</LinkButton>} />
+            action={<LinkButton to="/" variant="neutral">Go to my trips</LinkButton>} />
         </Card>
       </Content>
     );

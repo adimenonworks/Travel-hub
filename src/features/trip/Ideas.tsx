@@ -138,7 +138,7 @@ function AddIdeaSheet({ open, ctx, onClose, onNew }: { open: boolean; ctx: TripC
   };
   return (
     <Sheet open={open} title="Add an idea" subtitle={fits.length ? 'From your saved places, or something new' : undefined} onClose={onClose}>
-      <Button variant="secondary" icon="plus" block onClick={onNew}>New idea</Button>
+      <Button variant="neutral" icon="plus" block onClick={onNew}>New idea</Button>
       {fits.length === 0 ? (
         <p className="t-body-small t-secondary">Places you save in {[...codes].map(countryName).join(' or ') || 'this trip’s countries'} show up here, ready to add.</p>
       ) : groupBy(sortPlaces(fits, visited), cityOf).map(([city, list]) => (
@@ -185,17 +185,17 @@ function IdeaSheet({ idea, place, ctx, onClose, onEdit, onSchedule }: { idea: Id
       <LinkChips links={idea.links} onOpen={(l) => recordView(ctx.trip.id, { url: l.url, kind: isPdf(l.url) ? 'PDF' : 'Link', label: l.label || hostOf(l.url), meta: idea.title })} />
       {place && (
         <div className={s.ideaButtons}>
-          {place.url && <LinkButton href={place.url} variant="secondary" icon="arrow-up-right">{`Open on ${place.source || 'the web'}`}</LinkButton>}
-          <Button variant="secondary" icon="star" onClick={star}>{starred(place) ? 'Favourite' : 'Add to favourites'}</Button>
+          {place.url && <LinkButton href={place.url} variant="neutral" icon="arrow-up-right">{`Open on ${place.source || 'the web'}`}</LinkButton>}
+          <Button variant="neutral" icon="star" onClick={star}>{starred(place) ? 'Favourite' : 'Add to favourites'}</Button>
         </div>
       )}
       {ctx.canManage && idea.status === 'open' && (
         <div className={s.ideaButtons}>
-          <Button variant="secondary" onClick={() => setStatus('rejected', 'Idea passed')}>Pass</Button>
+          <Button variant="neutral" onClick={() => setStatus('rejected', 'Idea passed')}>Pass</Button>
           <Button icon="calendar" onClick={onSchedule}>Add to a day</Button>
         </div>
       )}
-      {ctx.canManage && idea.status === 'rejected' && <Button variant="secondary" block onClick={() => setStatus('open', 'Idea back to decide')}>Back to “To decide”</Button>}
+      {ctx.canManage && idea.status === 'rejected' && <Button variant="neutral" block onClick={() => setStatus('open', 'Idea back to decide')}>Back to “To decide”</Button>}
       {canEdit && <Button variant="ghost" icon="pencil" onClick={onEdit}>Edit idea</Button>}
     </Sheet>
   );

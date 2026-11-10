@@ -75,8 +75,8 @@ export function PlaceSheet({ place, onClose }: { place: SavedPlace | null; onClo
       <PlaceMarks visited={visited.has(place.id)} starred={isStar} />
       {place.notes && <p className="t-body">{place.notes}</p>}
       <div className={s.row}>
-        {place.url && <LinkButton href={place.url} variant="secondary" icon="arrow-up-right">{`Open on ${place.source || 'the web'}`}</LinkButton>}
-        <Button variant="secondary" icon="star" onClick={star}>{isStar ? 'Favourite' : 'Add to favourites'}</Button>
+        {place.url && <LinkButton href={place.url} variant="neutral" icon="arrow-up-right">{`Open on ${place.source || 'the web'}`}</LinkButton>}
+        <Button variant="neutral" icon="star" onClick={star}>{isStar ? 'Favourite' : 'Add to favourites'}</Button>
       </div>
       {mine && (
         <Select label="Category" value={place.category} onChange={async (e) => {
