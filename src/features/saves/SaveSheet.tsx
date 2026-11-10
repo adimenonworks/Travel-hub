@@ -10,7 +10,7 @@ import type { LinkPreview, PlaceCategory } from '../../data/types';
 import { countryName } from '../../lib/countries';
 import { today } from '../../lib/dates';
 import { findUrl, readLink } from '../../lib/links';
-import { haptic } from '../../lib/native';
+import { haptic, readClipboard } from '../../lib/native';
 import { PLACE_CATEGORIES, detectCategory, eventCategoryOf, placeCategory, tripCoversCity } from '../../lib/places';
 import s from './saves.module.css';
 
@@ -89,7 +89,7 @@ export function SaveSheet({ request, onClose }: { request: SaveRequest | null; o
 
   const paste = async () => {
     try {
-      const url = findUrl(await navigator.clipboard.readText());
+      const url = findUrl(await readClipboard());
       if (url) { setLink(url); read(url); } else toast({ label: 'No link on the clipboard' });
     } catch { toast({ label: 'Paste the link into the field' }); }
   };
