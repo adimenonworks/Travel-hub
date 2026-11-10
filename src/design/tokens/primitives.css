@@ -14,7 +14,7 @@
   --color-pink-50: #fef8fa; --color-pink-100: #fef1f6; --color-pink-200: #feddeb; --color-pink-300: #feb9d6; --color-pink-400: #ff88c0; --color-pink-500: #e769a7; --color-pink-600: #c44887; --color-pink-700: #a12669; --color-pink-800: #840152; --color-pink-900: #60013a;
   --color-neutral-0: #ffffff; --color-neutral-50: #fafafa; --color-neutral-100: #f4f4f4; --color-neutral-200: #e6e6e6; --color-neutral-300: #cdcdcd; --color-neutral-400: #afafaf; --color-neutral-500: #959595; --color-neutral-600: #767676; --color-neutral-700: #595959; --color-neutral-800: #434343; --color-neutral-900: #2e2e2e; --color-neutral-1000: #1c1c1c;
   --space--40: -40px; --space--24: -24px; --space--16: -16px; --space--10: -10px; --space--8: -8px; --space--6: -6px; --space--4: -4px; --space--2: -2px;
-  --space-0: 0px; --space-2: 2px; --space-4: 4px; --space-6: 6px; --space-8: 8px; --space-10: 10px; --space-12: 12px; --space-16: 16px; --space-20: 20px; --space-24: 24px; --space-32: 32px; --space-40: 40px; --space-48: 48px; --space-96: 96px; --space-120: 120px;
+  --space-0: 0px; --space-2: 2px; --space-4: 4px; --space-6: 6px; --space-8: 8px; --space-10: 10px; --space-12: 12px; --space-16: 16px; --space-18: 18px; --space-20: 20px; --space-24: 24px; --space-32: 32px; --space-40: 40px; --space-48: 48px; --space-96: 96px; --space-120: 120px;
   --radius-0: 0px; --radius-2: 2px; --radius-4: 4px; --radius-8: 8px; --radius-12: 12px; --radius-16: 16px; --radius-20: 20px; --radius-24: 24px; --radius-32: 32px; --radius-40: 40px; --radius-48: 48px; --radius-64: 64px; --radius-80: 80px; --radius-96: 96px; --radius-999: 999px;
 
   /* Type families (Figma Typography: font/family, font/display). Both bundled in main.tsx, both SIL Open Font License. */

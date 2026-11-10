@@ -342,7 +342,6 @@ export function ActivityForm({ open, trip, date, activity, draft, onClose, onCre
           )}
 
           {extras}
-          {!activity && !draft && <Button variant="ghost" icon="chevron-left" onClick={() => set({ kind: null })}>Choose another type</Button>}
         </>
       )}
     </Sheet>
