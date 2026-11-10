@@ -8,12 +8,13 @@ import { geocodePlace } from '../../lib/geocode';
 import { EVENT_TYPES, behaviourOf, eventKind, isEveryday, kindInfo, spanWords, type EventKind, type EventType } from '../../lib/categories';
 import { haptic, confirmAction } from '../../lib/native';
 import { LinkEditor, cleanLinks } from '../shared/Links';
+import { zoneAt, zoneOfDay } from '../../lib/timezone';
 import { PriceField, fromPriceDraft, toPriceDraft, type PriceDraft } from '../shared/Price';
 import { priceOf } from '../../lib/currency';
 import { eventsOn, entryEnd, entryTime } from './events';
 import s from './trip.module.css';
 
-export type ActivityDraft = Partial<Pick<Activity, 'title' | 'category' | 'notes' | 'links' | 'date' | 'startTime' | 'endTime' | 'locationText' | 'placeId'>>;
+export type ActivityDraft = Partial<Pick<Activity, 'title' | 'category' | 'notes' | 'links' | 'date' | 'startTime' | 'endTime' | 'locationText' | 'placeId' | 'fromText' | 'journeyId'>>;
 
 type Form = {
   /** Step 1 picks the type; step 2 a category inside it (null until picked) */
@@ -31,7 +32,8 @@ const toForm = (a: ActivityDraft | Activity | undefined, date: string, currency:
     kind,
     title: a?.title ?? '',
     date: a?.date ?? date,
-    endDate: full?.endDate ?? '',
+    // A span starts out a night long (a rental: same day) until its end is picked
+    endDate: full?.endDate || (kind && behaviourOf(kind) === 'span' ? (kind === 'car' || kind === 'campervan' ? a?.date ?? date : addDays(a?.date ?? date, 1)) : ''),
     startTime: a?.startTime ?? '',
     endTime: a?.endTime ?? '',
     locationText: a?.locationText ?? '',
@@ -153,6 +155,11 @@ export function ActivityForm({ open, trip, date, activity, draft, onClose, onCre
                 : info.type === 'transport' ? `${info.label} · ${city(placeText)}`
                   : keep || city(placeText);
       const ends = behaviour === 'span' || (behaviour === 'journey' && f.endDate > f.date);
+      // Time zones: where it happens (and where a journey or rental ends). Free time and notes use where you are that day.
+      const [tz, toTz] = await Promise.all([
+        location ? zoneAt(location) : Promise.resolve(zoneOfDay(activities.filter((x) => x.id !== activity?.id), f.date) ?? (await zoneAt(trip.destination))),
+        to ? zoneAt(to) : Promise.resolve(undefined),
+      ]);
       const data: Partial<Activity> & { category: Category } = {
         title,
         category: kind,
@@ -176,6 +183,9 @@ export function ActivityForm({ open, trip, date, activity, draft, onClose, onCre
         seats: behaviour === 'journey' ? f.seats.trim() : '',
         price: priced ? fromPriceDraft(f.price) : null,
         cost: 0,
+        ...(tz ? { tz } : {}),
+        ...(toTz ? { toTz } : {}),
+        ...(!activity && draft?.journeyId ? { journeyId: draft.journeyId } : {}),
       };
       if (activity) await store.updateSub(trip.id, 'activities', activity.id, data);
       else {

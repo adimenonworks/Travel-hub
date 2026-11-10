@@ -311,3 +311,22 @@ export function DestinationHeader({ tone = 'neutral', flag, title, meta, action 
     </section>
   );
 }
+
+/**
+ * Figma "Layover block": between the legs of one journey on its detail page. Where and how long (worked out from the
+ * gap between legs, never stored), an optional Warning tag ("Tight connection", "Overnight in Dubai") and action.
+ */
+export function LayoverBlock({ title, meta, warning, action }: { title: string; meta?: string; warning?: string; action?: ReactNode }) {
+  return (
+    <div className={s.layover}>
+      <div className={s.layoverRow}>
+        <Icon name="clock" size={24} />
+        <div className={s.layoverText}>
+          <span className="t-heading-4">{title}</span>
+          {meta && <span className="t-body-small t-secondary">{meta}</span>}
+        </div>
+      </div>
+      {(warning || action) && <div className={s.layoverActions}>{warning && <Badge tone="warning" icon="info">{warning}</Badge>}{action}</div>}
+    </div>
+  );
+}

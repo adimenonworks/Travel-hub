@@ -10,7 +10,9 @@ import { store } from '../../data';
 import { travelEstimate } from '../../lib/trips';
 import { SlideSwap } from '../shared/SlideSwap';
 import { ActivityForm } from './ActivityForm';
-import { entryEnd, entryTime, eventCardProps, eventsOn, type DayEntry } from './events';
+import { entryEnd, entryTime, eventCardProps, eventsOn, isFirstLeg, legsOf, type DayEntry } from './events';
+import { behaviourOf, categoryInfo } from '../../lib/categories';
+import { crossesDateLine, localNow, zoneOfDay } from '../../lib/timezone';
 import type { TripCtx } from './TripPage';
 import s from './trip.module.css';
 
@@ -52,7 +54,11 @@ export function Itinerary(ctx: TripCtx) {
 
   // What's on each day (a Stay counts on its check-in and check-out days).
   const byDay = useMemo(() => Object.fromEntries(days.map((d) => [d, eventsOn(activities, d)])), [activities, trip.startDate, trip.endDate]); // eslint-disable-line react-hooks/exhaustive-deps
-  const now = useNow();
+  // "Now" is the local time where you are that day (the day's stay or last arrival), so the now-line, Next and Done
+  // are right in any time zone; without stored zones it's the phone's time, as before.
+  const tick = useTick();
+  const zone = useMemo(() => zoneOfDay(activities, day), [activities, day]);
+  const { day: localToday, time: now } = localNow(zone, tick);
   const word = (d: string) => dayWord(d, trip.startDate, t);
   const list: DayEntry[] = byDay[day] ?? [];
   const me = useMe();
@@ -86,14 +92,22 @@ export function Itinerary(ctx: TripCtx) {
         <SlideSwap value={day} id={day} rank={days.indexOf(day)}>{(d) => {
           const list: DayEntry[] = byDay[d] ?? [];
           // On today's plan, the "now" line (Figma Timeline) sits before the next plan. The page doesn't scroll to it.
-          const showNow = d === t && list.length > 1;
-          const nextIndex = d === t ? list.findIndex((e) => entryEnd(e) > now) : -1;
-          const stateOf = (i: number): EventState => d < t || (d === t && entryEnd(list[i]) <= now) ? 'done' : i === nextIndex ? 'next' : 'default';
+          const showNow = d === localToday && list.length > 1;
+          const nextIndex = d === localToday ? list.findIndex((e) => entryEnd(e) > now) : -1;
+          const stateOf = (i: number): EventState => d < localToday || (d === localToday && entryEnd(list[i]) <= now) ? 'done' : i === nextIndex ? 'next' : 'default';
+          // A journey that lands on a later day: a marker at the top of that day. A journey that crosses the date line: a note.
+          const arrivals = activities.filter((a) => behaviourOf(a.category) === 'journey' && isFirstLeg(a, activities)).flatMap((a) => {
+            const legs = legsOf(a, activities), last = legs[legs.length - 1];
+            return (last.endDate || last.date) === d && (last.endDate || last.date) > a.date && last.endTime ? [{ a, last }] : [];
+          });
+          const dateLine = list.some((e) => legsOf(e.a, activities).some(crossesDateLine));
           return list.length === 0 ? (
             <EmptyState illustration="calendar" title="Nothing planned yet" message="Add something to do, or schedule an idea from the Ideas board."
               action={<Button variant="neutral" icon="plus" onClick={() => setAdding(true)}>Add event</Button>} />
           ) : (
             <div className={s.eventList}>
+              {arrivals.map(({ a, last }) => <TravelConnector key={`arr-${a.id}`} icon={categoryInfo(a.category).icon} label={`Arrives ${formatTime(last.endTime)} from ${(a.fromText ?? '').split(',')[0].replace(/\s*\([^)]*\)/, '')}`} />)}
+              {dateLine && <TravelConnector icon="globe" label="You cross the date line on this journey" />}
               {list.map((e, n) => {
                 const a = e.a;
                 const state = stateOf(n);
@@ -136,12 +150,11 @@ export function Itinerary(ctx: TripCtx) {
   );
 }
 
-/** The current time as HH:mm, updated every minute. */
-function useNow() {
-  const fmt = () => new Date().toTimeString().slice(0, 5);
-  const [now, setNow] = useState(fmt);
+/** The current moment, updated every minute. */
+function useTick() {
+  const [now, setNow] = useState(Date.now);
   useEffect(() => {
-    const id = setInterval(() => setNow(fmt()), 60_000);
+    const id = setInterval(() => setNow(Date.now()), 60_000);
     return () => clearInterval(id);
   }, []);
   return now;

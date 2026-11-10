@@ -1,7 +1,7 @@
-import { useEffect, useState } from 'react';
+import { Fragment, useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { nextTransition } from '../../app/navigation';
-import { Button, EmptyState, EventCard, IconButton, JourneyDetails, LinkButton, ListGroup, ListItem, PageHeader, PageSection, Sheet, TextField, useToast } from '../../design/components';
+import { Button, EmptyState, EventCard, IconButton, JourneyDetails, LayoverBlock, LinkButton, ListGroup, ListItem, PageHeader, PageSection, Sheet, TextField, useToast } from '../../design/components';
 import type { Activity } from '../../data/types';
 import { daysBetween } from '../../lib/dates';
 import { store } from '../../data';
@@ -17,6 +17,8 @@ import { haptic, confirmAction } from '../../lib/native';
 import { recordView } from '../../lib/recent';
 import { markRead } from '../../lib/reads';
 import { flightTag, updatedAgo, useFlightStatus } from '../../lib/api';
+import { durationLabel, journeyMs } from '../../lib/timezone';
+import { layovers, legsOf, type Layover } from './events';
 import { behaviourOf, eventKind, isEveryday, kindInfo, spanWords } from '../../lib/categories';
 import { priceOf } from '../../lib/currency';
 import { PriceWithConversion } from '../shared/Price';
@@ -29,6 +31,7 @@ import s from './trip.module.css';
 /** "1h 20m", "24h 40m", for the Journey details card (across days too). */
 function journeyDuration(a: Activity) {
   if (!a.startTime || !a.endTime) return undefined;
+  if (a.tz) return durationLabel(journeyMs(a)) || undefined; // from the exact moments: right across time zones
   const [h1, m1] = a.startTime.split(':').map(Number), [h2, m2] = a.endTime.split(':').map(Number);
   const min = (a.endDate && a.endDate > a.date ? daysBetween(a.date, a.endDate) * 1440 : 0) + h2 * 60 + m2 - (h1 * 60 + m1);
   if (min <= 0) return undefined;
@@ -48,6 +51,8 @@ export function ActivityPage(ctx: TripCtx) {
   const a = ctx.activities.find((x) => x.id === activityId);
   const [editing, setEditing] = useState(false);
   const [addingDoc, setAddingDoc] = useState(false);
+  const [connecting, setConnecting] = useState(false);
+  const [stayAt, setStayAt] = useState<Layover | null>(null);
   const toast = useToast();
   const places = usePlacesById(ctx.activities.flatMap((x) => (x.placeId ? [x.placeId] : [])));
   const itinerary = `/trip/${trip.id}/itinerary${a ? `?day=${a.date}` : ''}`;
@@ -97,6 +102,10 @@ export function ActivityPage(ctx: TripCtx) {
   const goingNames = a.attendeeIds.map((id) => (id === me.uid ? 'you' : personName(profiles, id).split(' ')[0]));
 
   const journey = behaviour === 'journey' && (kind === 'flight' || (!!a.fromText && !!a.toText));
+  // A flight with connections: every leg, with the layovers between them
+  const legs = legsOf(a, ctx.activities);
+  const stops = layovers(legs);
+  const lastLeg = legs[legs.length - 1];
   const city = (t?: string) => (t ?? '').split(',')[0].replace(/\s*\([^)]*\)\s*/g, ' ').trim();
   const code = (t?: string) => t?.match(/\(([^)]+)\)/)?.[1];
   const backTo = journey && kind === 'flight' ? { to: `/trip/${trip.id}/bookings/flights`, label: 'Flights' } : { to: itinerary, label: 'Itinerary' };
@@ -117,19 +126,35 @@ export function ActivityPage(ctx: TripCtx) {
 
   return (
     <>
-      <PageHeader title={journey ? `${city(a.fromText)} to ${city(a.toText)}` : a.title} size="small" back={backTo}
+      <PageHeader title={journey ? `${city(legs[0].fromText)} to ${city(lastLeg.toText)}` : a.title} size="small" back={backTo}
         action={{ icon: 'pencil', label: 'Edit event', onClick: () => setEditing(true) }} />
 
       {/* Figma "Journey detail" for flights and trains; every other type shows its Event card. No price anywhere. */}
       {journey ? (
-        <JourneyDetails mode={kindInfo(a.category).icon} number={a.ref || undefined} status={tag}
-          from={{ city: city(a.fromText), time: live?.departure?.revised ? live.departure.revised.slice(11, 16) : a.startTime ? formatTime(a.startTime) : '—', date: formatDay(a.date),
-            terminal: [live?.departure?.airport || code(a.fromText), live?.departure?.terminal && `Terminal ${live.departure.terminal}`].filter(Boolean).join(' · ') || undefined }}
-          to={{ city: city(a.toText), time: live?.arrival?.revised ? live.arrival.revised.slice(11, 16) : a.endTime ? formatTime(a.endTime) : '—', date: formatDay(a.endDate || a.date),
-            terminal: [live?.arrival?.airport || code(a.toText), live?.arrival?.terminal && `Terminal ${live.arrival.terminal}`].filter(Boolean).join(' · ') || undefined }}
-          gate={live ? live.departure?.gate ?? '' : undefined} belt={live ? live.arrival?.belt ?? '' : undefined}
-          duration={journeyDuration(a)}
-          footer={[a.operator || live?.airline ? `Operated by ${a.operator || live!.airline}` : '', live ? updatedAgo(live.updatedAt) : ''].filter(Boolean).join(' · ') || undefined} />
+        <div className={s.legs}>
+          {legs.map((leg, i) => {
+            const own = leg.id === a.id ? live : null;
+            return (
+              <Fragment key={leg.id}>
+                {i > 0 && stops[i - 1] && (
+                  <LayoverBlock title={`${durationLabel(stops[i - 1].ms) || 'Layover'} in ${stops[i - 1].at}`}
+                    meta={stops[i - 1].code ? `Change at ${stops[i - 1].code}` : undefined}
+                    warning={stops[i - 1].overnight ? `Overnight in ${stops[i - 1].at}` : stops[i - 1].tight ? 'Tight connection' : undefined}
+                    action={stops[i - 1].overnight ? <Button variant="ghost" size="regular" icon="plus" onClick={() => setStayAt(stops[i - 1])}>Add a stay</Button> : undefined} />
+                )}
+                <JourneyDetails mode={kindInfo(leg.category).icon} number={leg.ref || undefined} status={leg.id === a.id ? tag : undefined}
+                  from={{ city: city(leg.fromText), time: own?.departure?.revised ? own.departure.revised.slice(11, 16) : leg.startTime ? formatTime(leg.startTime) : '—', date: formatDay(leg.date),
+                    terminal: [own?.departure?.airport || code(leg.fromText), own?.departure?.terminal && `Terminal ${own.departure.terminal}`].filter(Boolean).join(' · ') || undefined }}
+                  to={{ city: city(leg.toText), time: own?.arrival?.revised ? own.arrival.revised.slice(11, 16) : leg.endTime ? `${formatTime(leg.endTime)}${leg.endDate && leg.endDate > leg.date ? ` +${daysBetween(leg.date, leg.endDate)}` : ''}` : '—', date: formatDay(leg.endDate || leg.date),
+                    terminal: [own?.arrival?.airport || code(leg.toText), own?.arrival?.terminal && `Terminal ${own.arrival.terminal}`].filter(Boolean).join(' · ') || undefined }}
+                  gate={own ? own.departure?.gate ?? '' : undefined} belt={own ? own.arrival?.belt ?? '' : undefined}
+                  duration={journeyDuration(leg)}
+                  footer={[leg.operator || own?.airline ? `Operated by ${leg.operator || own!.airline}` : '', own ? updatedAgo(own.updatedAt) : ''].filter(Boolean).join(' · ') || undefined} />
+              </Fragment>
+            );
+          })}
+          {ctx.canManage && <Button variant="neutral" icon="plus" onClick={() => setConnecting(true)}>Add a connection</Button>}
+        </div>
       ) : (
         <EventCard {...eventCardProps(a, ctx, true)} {...(behaviour !== 'open' && behaviour !== 'note' && where ? { place: undefined } : {})} to={undefined} favourite={starred} />
       )}
@@ -209,6 +234,13 @@ export function ActivityPage(ctx: TripCtx) {
         <Comments tripId={trip.id} targetId={a.id} comments={ctx.comments} profiles={profiles} />
       </PageSection>
 
+      {/* A connection: the next leg leaves from where this journey lands, and joins this journey */}
+      <ActivityForm open={connecting} trip={trip} date={lastLeg.endDate || lastLeg.date}
+        draft={{ category: a.category, fromText: lastLeg.toText ?? '', date: lastLeg.endDate || lastLeg.date, journeyId: a.journeyId ?? a.id }}
+        onCreated={() => { if (!a.journeyId) store.updateSub(trip.id, 'activities', a.id, { journeyId: a.id }).catch(() => {}); }}
+        onClose={() => setConnecting(false)} />
+      <ActivityForm open={!!stayAt} trip={trip} date={stayAt ? stayAt.arrives.endDate || stayAt.arrives.date : a.date}
+        draft={stayAt ? { category: 'hotel', locationText: stayAt.at } : undefined} onClose={() => setStayAt(null)} />
       <ActivityForm open={editing} trip={trip} date={a.date} activity={a} onClose={() => setEditing(false)}
         onDeleted={(gone) => { nextTransition('back'); navigate(`/trip/${trip.id}/itinerary?day=${gone.date}`, { replace: true }); }} />
       <DocumentForm open={addingDoc} onClose={() => setAddingDoc(false)}

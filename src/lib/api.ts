@@ -1,3 +1,4 @@
+import { toInstant } from './timezone';
 import { useEffect, useState } from 'react';
 import type { Activity, TripPhoto } from '../data/types';
 
@@ -42,8 +43,8 @@ const flights = new Map<string, { at: number; value: Promise<FlightStatus | null
 const TEN_MIN = 10 * 60 * 1000;
 
 /** The departure as a time, from the event's date and start time (the airport's local time, as entered). */
-const departs = (a: Activity) => (a.startTime ? new Date(`${a.date}T${a.startTime}`).getTime() : NaN);
-const arrives = (a: Activity) => (a.endTime ? new Date(`${a.endDate || a.date}T${a.endTime}`).getTime() : departs(a) + 12 * 3600e3);
+const departs = (a: Activity) => (a.startTime ? toInstant(a.date, a.startTime, a.tz) : NaN);
+const arrives = (a: Activity) => (a.endTime ? toInstant(a.endDate || a.date, a.endTime, a.toTz ?? a.tz) : departs(a) + 12 * 3600e3);
 
 /** Whether to ask about this flight now: from 24 hours before departure until it has landed (plus an hour). */
 export function shouldPoll(a: Activity, now = Date.now()) {

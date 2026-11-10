@@ -213,3 +213,8 @@
 .budgetRow { display: flex; align-items: center; gap: var(--space-default-300); color: var(--on-light-icon-primary); }
 .budgetRowLabel { flex: 1; min-width: 0; font: var(--type-body); color: var(--on-light-text-primary); }
 .budgetRowAmount { font: var(--type-label); color: var(--on-light-text-primary); }
+/* Figma "Layover block": 16 padding, 12 gap, 16 corners, a dashed subtle border on the page */
+.layover { display: flex; flex-direction: column; gap: var(--space-default-400); padding: var(--space-default-500); border-radius: var(--radius-500); border: 1px dashed var(--on-light-border-subtle); background: var(--on-light-surface-primary); }
+.layoverRow { display: flex; align-items: center; gap: var(--space-default-400); color: var(--on-light-icon-primary); }
+.layoverText { display: flex; flex-direction: column; gap: var(--space-default-100); min-width: 0; color: var(--on-light-text-primary); }
+.layoverActions { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-default-300); }

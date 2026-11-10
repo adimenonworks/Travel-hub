@@ -1,3 +1,4 @@
+import { toInstant } from '../../lib/timezone';
 import { useEffect } from 'react';
 import { HeroCard } from '../../design/components';
 import { store } from '../../data';
@@ -45,7 +46,7 @@ export function TripHero({ trip, cover = true, size = 'regular' }: { trip: Trip;
   // window; Rove never says whether you've checked in), else, in the fortnight before the trip, the entry rules.
   const soon = Date.now() + 24 * 3600e3;
   const flight = activities.find((a) => eventKind(a.category) === 'flight' && a.startTime
-    && new Date(`${a.date}T${a.startTime}`).getTime() > Date.now() && new Date(`${a.date}T${a.startTime}`).getTime() < soon);
+    && toInstant(a.date, a.startTime, a.tz) > Date.now() && toInstant(a.date, a.startTime, a.tz) < soon);
   const abroad = tripCountries(trip, activities);
   const live = useFlightStatus(flight);
   const tag = flight ? flightTag(flight, live) : undefined;
