@@ -55,6 +55,14 @@ ios/App/ShareExtension/   iPhone share extension (Share → Rove opens rove://sa
 - **Native (iPhone app):** `RoveViewController` (in `ios/App/App/AppDelegate.swift`; `SceneDelegate.swift` makes it the root screen, and hands Google sign-in return links to `GIDSignIn`) turns on swipe-back and sets the light/dark canvas colour (white / #1c1c1c, the page colour) so nothing flashes white; the launch screen has a dark version. `setupNative()` in `src/lib/native.ts` keeps the status bar and keyboard in the app's theme, passes the keyboard height to CSS and hides the tab bar while typing. Sharing uses `shareLink()` (native share sheet). The share extension target (`ios/App/ShareExtension`, bundle `com.adimenon.rove.share`) opens `rove://save?url=…` (URL scheme in Info.plist; `@capacitor/app` delivers it) and copies the link instead if Rove can't be opened. Invite links use `PUBLIC_SITE` in the app (the app's own address is `capacitor://localhost`).
 - **Later:** push notifications (APNs, needs the Apple Developer Program), a Wise-style fourth tab once its page exists.
 
+## Definition of done (never let Figma drift)
+
+A change isn't done, and isn't merged, until Figma matches it. In the same piece of work, every time:
+1. **Components** (page Foundations): every variant the change touches, the icon set, and the /#/design page.
+2. **Flows page:** every screen the change touches, in its flow's section and in order; new screens added, replaced ones deleted, the section's Notes rewritten to match how the flow behaves now, sections resized to fit. A change that adds a flow gets a new section.
+3. **Planning page:** mark items off. When something is built, its card moves to **Built** with "✓ <date>" in its title; when something is decided, added or dropped, its card moves to the right column (Next / Later / Needs a design first / Blue sky / Decided not to build), and a reversed decision is added to "Decisions that changed". Update the column counts and "Updated <date>".
+4. Before the PR: compare each touched screen with its Flows frame (screenshots side by side) and fix any difference in Figma or code. The PR description's Figma checklist (`.github/pull_request_template.md`) is ticked honestly; anything not done is said there and to the owner.
+
 ## Before pushing
 
 1. `npm run build` (type-checks and builds).
