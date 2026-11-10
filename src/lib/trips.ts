@@ -1,5 +1,6 @@
 import type { Activity, Trip } from '../data/types';
 import { daysBetween as between, formatRange, today as todayDay, tripPhase } from './dates';
+import { eventType } from './categories';
 
 /** The trip that matters now: the one you're on, else the next one. Home's hero and the Trip tab both use it. */
 export function featuredTrip(trips: Trip[] | null | undefined): Trip | undefined {
@@ -53,7 +54,7 @@ export function distanceKm(a: { lat: number; lng: number }, b: { lat: number; ln
 export function travelEstimate(from: Activity, to: Activity): { label: string; icon: 'pin' | 'car' } | null {
   // From where the first one ends (a flight's or transfer's destination) to where the next one starts.
   const a = from.to ?? from.location, b = to.location;
-  if (!a || !b || from.category === 'note' || to.category === 'note') return null;
+  if (!a || !b || eventType(from.category) === 'free' || eventType(to.category) === 'free') return null;
   const km = distanceKm(a, b) * 1.3;
   if (km > 300) return null; // a flight or a long journey: no walk or drive to estimate
   if (km < 0.05) return null;

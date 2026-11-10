@@ -17,7 +17,7 @@ import { haptic, confirmAction } from '../../lib/native';
 import { recordView } from '../../lib/recent';
 import { markRead } from '../../lib/reads';
 import { flightTag, updatedAgo, useFlightStatus } from '../../lib/api';
-import { eventType } from '../../lib/categories';
+import { eventKind, eventType, kindInfo } from '../../lib/categories';
 import { getMapsApp, mapsAppLabel } from '../../lib/prefs';
 import { ActivityForm } from './ActivityForm';
 import { eventCardProps } from './events';
@@ -58,7 +58,7 @@ export function ActivityPage(ctx: TripCtx) {
   useEffect(() => { if (activityId) markRead(me.uid, activityId); }, [activityId, chatSize, me.uid]);
   // Recently viewed: a booking you open (any event but a note)
   useEffect(() => {
-    if (a && eventType(a.category) !== 'note') recordView(trip.id, { url: `/trip/${trip.id}/plan/${a.id}`, label: a.title, kind: 'Booking' });
+    if (a && eventType(a.category) !== 'free') recordView(trip.id, { url: `/trip/${trip.id}/plan/${a.id}`, label: a.title, kind: 'Booking' });
   }, [a?.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   if (!a)
@@ -74,6 +74,7 @@ export function ActivityPage(ctx: TripCtx) {
   const app = getMapsApp();
   const where = a.locationText || a.location?.name;
   const type = eventType(a.category);
+  const kind = eventKind(a.category);
   const removeDoc = async (i: number) => {
     const doc = a.links[i];
     if (!confirmAction(`Remove "${doc.label || hostOf(doc.url)}"?`)) return;
@@ -96,9 +97,14 @@ export function ActivityPage(ctx: TripCtx) {
   const code = (t?: string) => t?.match(/\(([^)]+)\)/)?.[1];
   const backTo = journey && type === 'flight' ? { to: `/trip/${trip.id}/bookings/flights`, label: 'Flights' } : { to: itinerary, label: 'Itinerary' };
   const adder = a.createdBy === me.uid ? 'you' : personName(profiles, a.createdBy).split(' ')[0];
-  const copyRef = async (ref: string) => { try { await navigator.clipboard.writeText(ref); toast({ icon: 'copy', label: 'Booking reference copied' }); } catch { /* the reference is selectable */ } };
+  const copy = async (text: string, what: string) => { try { await navigator.clipboard.writeText(text); toast({ icon: 'copy', label: `${what} copied` }); } catch { /* the text is selectable */ } };
+  // Figma List item with "Show action": the reference as the title, what it is under it, and a small Copy button
   const booking = [
-    a.bookingRef && <ListItem key="ref" icon="copy" title="Booking reference" meta={`${a.bookingRef} · tap to copy`} onClick={() => copyRef(a.bookingRef!)} />,
+    a.ref && <ListItem key="num" icon="plane" title={<span className={s.selectable}>{a.ref}</span>} meta="Flight number"
+      action={<IconButton small icon="copy" label="Copy flight number" onClick={() => copy(a.ref!, 'Flight number')} />} />,
+    a.bookingRef && <ListItem key="ref" icon="ticket" title={<span className={s.selectable}>{a.bookingRef}</span>} meta={kind === 'restaurant' ? 'Reservation reference' : 'Booking reference'}
+      action={<IconButton small icon="copy" label="Copy booking reference" onClick={() => copy(a.bookingRef!, kind === 'restaurant' ? 'Reservation reference' : 'Booking reference')} />} />,
+    a.operator && !journey && <ListItem key="op" icon={kindInfo(a.category).icon} title={a.operator} meta="Company" />,
     a.seats && <ListItem key="seats" icon="user-add" title="Seats" meta={a.seats} />,
     a.bags && <ListItem key="bags" icon="info" title="Bags" meta={a.bags} />,
   ].filter(Boolean);
@@ -110,7 +116,7 @@ export function ActivityPage(ctx: TripCtx) {
 
       {/* Figma "Journey detail" for flights and trains; every other type shows its Event card. No price anywhere. */}
       {journey ? (
-        <JourneyDetails mode={type === 'flight' ? 'plane' : 'train'} number={a.ref || undefined} status={tag}
+        <JourneyDetails mode={kindInfo(a.category).icon} number={a.ref || undefined} status={tag}
           from={{ city: city(a.fromText), time: live?.departure?.revised ? live.departure.revised.slice(11, 16) : a.startTime ? formatTime(a.startTime) : '—', date: formatDay(a.date),
             terminal: [live?.departure?.airport || code(a.fromText), live?.departure?.terminal && `Terminal ${live.departure.terminal}`].filter(Boolean).join(' · ') || undefined }}
           to={{ city: city(a.toText), time: live?.arrival?.revised ? live.arrival.revised.slice(11, 16) : a.endTime ? formatTime(a.endTime) : '—', date: formatDay(a.endDate || a.date),
@@ -119,10 +125,10 @@ export function ActivityPage(ctx: TripCtx) {
           duration={journeyDuration(a)}
           footer={[a.operator || live?.airline ? `Operated by ${a.operator || live!.airline}` : '', live ? updatedAgo(live.updatedAt) : ''].filter(Boolean).join(' · ') || undefined} />
       ) : (
-        <EventCard {...eventCardProps(a, ctx, true)} {...(type !== 'note' && where ? { place: undefined } : {})} to={undefined} favourite={starred} />
+        <EventCard {...eventCardProps(a, ctx, true)} {...(type !== 'free' && where ? { place: undefined } : {})} to={undefined} favourite={starred} />
       )}
 
-      {!journey && a.category !== 'note' && (
+      {!journey && type !== 'free' && (
         <Button block size="regular" variant="neutral" icon="star" onClick={star}>{starred ? 'Favourite' : 'Add to favourites'}</Button>
       )}
 
@@ -147,17 +153,19 @@ export function ActivityPage(ctx: TripCtx) {
         </PageSection>
       )}
 
-      {!journey && ((type === 'stay' && a.endDate) || booking.length > 0 || a.attendeeIds.length > 0 || a.notes) && (
+      {!journey && ((type === 'stay' && a.endDate) || type === 'car' || booking.length > 0 || a.attendeeIds.length > 0 || a.notes) && (
         <ListGroup label="Details">
           {type === 'stay' && a.endDate && <ListItem icon="calendar" title="Check-in and check-out" meta={`${formatDay(a.date)}${a.startTime ? `, ${formatTime(a.startTime)}` : ''} → ${formatDay(a.endDate)}${a.endTime ? `, ${formatTime(a.endTime)}` : ''}`} />}
+          {type === 'car' && <ListItem icon="key" title="Pick-up" meta={[a.fromText, `${formatDay(a.date)}${a.startTime ? `, ${formatTime(a.startTime)}` : ''}`].filter(Boolean).join(' · ')} />}
+          {type === 'car' && <ListItem icon="key" title="Drop-off" meta={[a.toText || a.fromText, `${formatDay(a.endDate || a.date)}${a.endTime ? `, ${formatTime(a.endTime)}` : ''}`].filter(Boolean).join(' · ')} />}
           {booking}
           {a.attendeeIds.length > 0 && <ListItem icon="people" title="Who’s going" meta={`${a.attendeeIds.length} of ${trip.memberIds.length}: ${goingNames.join(', ')}`} />}
-          {a.notes && <ListItem icon="notebook" title={type === 'note' ? 'More' : 'Notes'} meta={<span className={s.selectable}>{`${a.notes} · added by ${adder}`}</span>} />}
+          {a.notes && <ListItem icon="notebook" title="Notes" meta={<span className={s.selectable}>{`${a.notes} · added by ${adder}`}</span>} />}
         </ListGroup>
       )}
 
       {journey && booking.length > 0 && (
-        <PageSection title="Booking" meta="From your confirmation email">
+        <PageSection title="Booking">
           <ListGroup label="Booking">{booking}</ListGroup>
         </PageSection>
       )}

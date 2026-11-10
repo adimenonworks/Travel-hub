@@ -24,8 +24,10 @@ function Thumb({ icon, media, round }: { icon?: IconName; media?: ReactNode; rou
  * Figma "List item" (Size Default / Compact): a 48px thumb (Compact: 32), the title (Heading 3; Compact: Body),
  * a meta line (Body small) and optional trailing text. Used inside a List group.
  */
-export function ListItem({ title, meta, trailing, icon, media, size = 'default', round, ...press }: Press & {
+export function ListItem({ title, meta, trailing, action, icon, media, size = 'default', round, ...press }: Press & {
   title: ReactNode; meta?: ReactNode; trailing?: ReactNode; icon?: IconName; media?: ReactNode; size?: 'default' | 'compact'; round?: boolean;
+  /** Figma "Show action": a small Ghost Icon button at the end, e.g. Copy for a booking reference. Not inside a pressable row. */
+  action?: ReactNode;
 }) {
   return (
     <Pressable {...press} role="listitem" className={[s.item, size === 'compact' && s.compact].filter(Boolean).join(' ')}>
@@ -35,13 +37,12 @@ export function ListItem({ title, meta, trailing, icon, media, size = 'default',
         {meta && <span className={s.itemMeta}>{meta}</span>}
       </span>
       {trailing !== undefined && trailing !== null && trailing !== false && <span className={s.itemTrailing}>{trailing}</span>}
+      {action}
     </Pressable>
   );
 }
 
-/** Figma "List group": the rounded white container (24px corners, subtle border) that stacks List items. */
-/** Figma "List group". Tone=Dark is the deep green variant for the bright green flow screens (New trip): white text,
- *  icons on sunken circles. The default (grey) is unchanged everywhere else. */
+/** Figma "List group": the rounded container (24px corners) that stacks List items. */
 export function ListGroup({ children, label, className }: { children: ReactNode; label?: string; className?: string }) {
   return <div role="list" aria-label={label} className={[s.group, className].filter(Boolean).join(' ')}>{children}</div>;
 }

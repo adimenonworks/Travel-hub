@@ -110,7 +110,7 @@ type JourneyEnd = { city: string; time: string; date: string; terminal?: string 
  * Trains, buses and ferries show stations or ports, the operator, coach and seat, and no live status.
  */
 export function JourneyDetails({ mode = 'plane', number, status, duration, from, to, gate, boarding, belt, footer, airportDetails = true }: {
-  mode?: 'plane' | 'train'; number?: string;
+  /** The journey's icon: Plane, Train, Bus, Ferry or Taxi */ mode?: IconName; number?: string;
   status?: { label: string; tone: 'success' | 'warning' | 'danger' };
   duration?: string; from: JourneyEnd; to: JourneyEnd;
   gate?: string; boarding?: string; belt?: string; footer?: ReactNode;

@@ -55,14 +55,15 @@ export type Trip = {
 /** A link, PDF or booking. `emailUrl` optionally points at the email it came from (e.g. a Gmail message link). */
 export type LinkItem = { label: string; url: string; emailUrl?: string };
 
-/** The six event types (src/lib/categories.ts). 'cafe', 'drinks', 'sight' and 'other' are older values, read as Food & drink or Activity. */
+/** Event kinds (src/lib/categories.ts). 'transport', 'food', 'note', 'drinks', 'sight' and 'other' are older values (see LEGACY there). */
 /**
  * A known price, in the currency it was entered or booked in (an amount of 0 is "Free"). Optional everywhere and never
  * added up: a price belongs to the one item it's on.
  */
 export type Price = { amount: number; currency: string };
 
-export type Category = 'flight' | 'stay' | 'transport' | 'food' | 'activity' | 'note' | 'drinks' | 'cafe' | 'sight' | 'other';
+export type Category = 'flight' | 'train' | 'bus' | 'ferry' | 'taxi' | 'car' | 'stay' | 'restaurant' | 'cafe' | 'bar' | 'activity' | 'free'
+  | 'transport' | 'food' | 'note' | 'drinks' | 'sight' | 'other';
 
 export type Activity = {
   id: string;

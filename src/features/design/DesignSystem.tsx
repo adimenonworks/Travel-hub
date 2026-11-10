@@ -284,6 +284,7 @@ export function DesignSystem() {
             <ListItem icon="utensils" title="Ichiran Shibuya" meta="Ramen · Tokyo · from TikTok" trailing="2h" onClick={() => {}} />
             <ListItem icon="link" title="10 things to do in Cusco" meta="Article · Peru · cntraveler.com" trailing="Yesterday" />
             <ListItem size="compact" icon="doc" title="TAP e-ticket" trailing="PDF · 2h ago" />
+            <ListItem icon="ticket" title="TP-7XK2LQ" meta="Booking reference" action={<IconButton small icon="copy" label="Copy booking reference" onClick={() => {}} />} />
           </ListGroup>
           <ListGroup>
             <IdeaRow icon="star" title="Fado night in Alfama" meta="Show · Clube de Fado · €30 · Sam" tag={{ icon: 'star', label: 'Most votes' }} vote={{ count: 4, voted: true, onClick: () => {} }} />
