@@ -50,11 +50,61 @@ export function siteOf(url: string) {
   } catch { return ''; }
 }
 
-/** A link's place name when the link says it: Google Maps /place/<name>/@lat,lng or ?q=. */
-function mapsPlace(url: URL) {
+/**
+ * What a Google Maps link says about its place: the name (just the name: Google often adds the full address after a
+ * comma, e.g. "?q=Time Out Market, Av. 24 de Julho 49, Lisbon, Portugal"), that address, and the map coordinates
+ * (the pin's own "!3d<lat>!4d<lng>", else the view's "@lat,lng"). A Google consent page's ?continue= link counts too.
+ */
+export function mapsInfo(url: URL): { name: string | null; address: string; lat?: number; lng?: number } | null {
+  if (/consent\.google\./.test(url.hostname)) {
+    const next = url.searchParams.get('continue');
+    try { return next ? mapsInfo(new URL(next)) : null; } catch { return null; }
+  }
   if (!/google\./.test(url.hostname) || !url.pathname.includes('/maps')) return null;
-  const name = url.pathname.match(/\/place\/([^/]+)/)?.[1] ?? url.searchParams.get('q') ?? url.searchParams.get('query');
-  return name ? decodeURIComponent(name.replace(/\+/g, ' ')) : null;
+  const raw = url.pathname.match(/\/place\/([^/]+)/)?.[1] ?? url.searchParams.get('q') ?? url.searchParams.get('query');
+  const text = raw ? decodeURIComponent(raw.replace(/\+/g, ' ')).trim() : '';
+  const coordsOnly = /^-?\d+(\.\d+)?,\s*-?\d+(\.\d+)?$/.test(text);
+  const [first, ...rest] = coordsOnly ? [''] : text.split(/\s*,\s*/);
+  const full = url.href;
+  const pin = full.match(/!3d(-?\d+\.\d+)!4d(-?\d+\.\d+)/);
+  const view = full.match(/@(-?\d+\.\d+),(-?\d+\.\d+)/);
+  const q = coordsOnly ? text.split(',').map(Number) : null;
+  const lat = pin ? +pin[1] : q ? q[0] : view ? +view[1] : undefined;
+  const lng = pin ? +pin[2] : q ? q[1] : view ? +view[2] : undefined;
+  return { name: first || null, address: rest.join(', '), lat, lng };
+}
+
+/** The place nearest a point (Photon reverse geocoding, free): gives the city and country for a map pin. */
+async function placeAt(lat: number, lng: number): Promise<FoundPlace | null> {
+  const res = await fetch(`https://photon.komoot.io/reverse?${new URLSearchParams({ lat: String(lat), lon: String(lng), lang: 'en' })}`);
+  if (!res.ok) return null;
+  const json = (await res.json()) as { features: PhotonFeature[] };
+  return json.features[0] ? toPlace(json.features[0], '') : null;
+}
+
+const km = (a: { lat: number; lng: number }, b: { lat: number; lng: number }) => {
+  const r = Math.PI / 180, dLat = (b.lat - a.lat) * r, dLng = (b.lng - a.lng) * r;
+  const h = Math.sin(dLat / 2) ** 2 + Math.cos(a.lat * r) * Math.cos(b.lat * r) * Math.sin(dLng / 2) ** 2;
+  return 12742 * Math.asin(Math.sqrt(h));
+};
+
+/**
+ * Find the place a link is about, so its country and city fill in by themselves.
+ * With map coordinates: the search result for the name near the pin, else what's at the pin (named after the link).
+ * Without: search the name with its address (more precise), then the name alone.
+ */
+async function findPlace(name: string, address = '', at?: { lat: number; lng: number }): Promise<FoundPlace | null> {
+  try {
+    if (at) {
+      const near = name ? (await searchPlaces(name)).find((p) => km(p, at) < 2) : undefined;
+      if (near) return near;
+      const here = await placeAt(at.lat, at.lng);
+      return here ? { ...here, name: name || here.name, lat: at.lat, lng: at.lng, isArea: !name && here.isArea } : null;
+    }
+    if (!name) return null;
+    if (address) { const full = (await searchPlaces(`${name}, ${address}`))[0]; if (full) return { ...full, name }; }
+    return (await searchPlaces(name))[0] ?? null;
+  } catch { return null; } // offline or blocked
 }
 
 /**
@@ -70,6 +120,9 @@ export function cleanTitle(raw: string) {
   const parts = t.split(/\s+[·|•–—]\s+|\s+-\s+|\s*[★☆⭐]|\s\d(?:[.,]\d)?\s*(?:stars?|★)|\s\(\d/);  // ratings, addresses, site names
   t = (parts.find((x) => x.trim() && !/^(tiktok|instagram|youtube|google maps|facebook)$/i.test(x.trim())) ?? parts[0]) ?? '';
   t = t.replace(/^["'“”‘’]+|["'“”‘’.,:;!]+$/g, '').replace(/\s+/g, ' ').trim();
+  // "Name, 12 Some Street, City, Country" → "Name" (an address after the name has a number or several commas)
+  const bits = t.split(/\s*,\s*/);
+  if (bits.length > 1 && (bits.length > 2 || /\d/.test(bits.slice(1).join(' ')))) t = bits[0];
   return t.length > 60 ? `${t.slice(0, 57).replace(/\s+\S*$/, '')}…` : t;
 }
 
@@ -117,11 +170,11 @@ async function readOnPhone(url: string): Promise<LinkPreview | null> {
         title = o.title || title; image = o.thumbnail_url || image; site = 'TikTok';
       } catch { /* keep what we have */ }
     }
-    const name = mapsPlace(new URL(finalUrl));
-    const clean = cleanTitle(name ?? title);
-    let place: FoundPlace | null = null;
-    if (clean) { try { place = (await searchPlaces(clean))[0] ?? null; } catch { /* offline */ } }
-    return { url: finalUrl, site, title: clean || host, image: /^https:\/\//.test(image) ? image : '', place };
+    const maps = mapsInfo(new URL(finalUrl)) ?? mapsInfo(new URL(url));
+    const clean = cleanTitle(maps?.name ?? title);
+    const at = maps?.lat !== undefined && maps.lng !== undefined ? { lat: maps.lat, lng: maps.lng } : undefined;
+    const place = await findPlace(clean, maps?.address, at);
+    return { url: finalUrl, site, title: clean || place?.name || host, image: /^https:\/\//.test(image) ? image : '', place };
   } catch {
     return null;
   }
@@ -141,10 +194,11 @@ export async function readLink(raw: string): Promise<LinkPreview> {
   let u: URL | null = null;
   try { u = new URL(url); } catch { /* not a link */ }
   const site = siteOf(url);
-  const name = u ? mapsPlace(u) : null;
+  const maps = u ? mapsInfo(u) : null;
+  const name = maps?.name ?? null;
   const slug = u?.pathname.split('/').filter(Boolean).pop()?.replace(/[-_]+/g, ' ').replace(/\.\w+$/, '') ?? '';
   const title = name ?? (slug && !/^\d+$/.test(slug) && slug.length > 3 ? slug.replace(/^./, (c) => c.toUpperCase()) : site || url);
-  let place: FoundPlace | null = null;
-  if (name) { try { place = (await searchPlaces(name))[0] ?? null; } catch { /* offline or blocked */ } }
-  return { url, site, title, image: '', place };
+  const at = maps?.lat !== undefined && maps.lng !== undefined ? { lat: maps.lat, lng: maps.lng } : undefined;
+  const place = maps ? await findPlace(name ?? '', maps.address, at) : null;
+  return { url, site, title: name ?? place?.name ?? title, image: '', place };
 }

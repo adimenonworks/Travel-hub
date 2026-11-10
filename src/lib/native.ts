@@ -116,3 +116,16 @@ export async function appVersion(): Promise<string> {
   }
   return `Rove ${__APP_VERSION__} (web)`;
 }
+
+/**
+ * The text on the clipboard. In the iPhone app this reads it natively (@capacitor/clipboard), so tapping a Paste button
+ * pastes straight away instead of showing the web view's own "Paste" bubble. In a browser it uses the web clipboard.
+ */
+export async function readClipboard(): Promise<string> {
+  if (isNativeApp) {
+    const { Clipboard } = await import('@capacitor/clipboard');
+    const { value } = await Clipboard.read();
+    return value ?? '';
+  }
+  return navigator.clipboard.readText();
+}
