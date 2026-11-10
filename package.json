@@ -36,5 +36,9 @@
     "@vitejs/plugin-react": "^6.1.2",
     "typescript": "^7.0.2",
     "vite": "^8.3.5"
+  },
+  "overrides": {
+    "@grpc/grpc-js": "^1.14.7",
+    "uuid": "^11.1.1"
   }
 }
