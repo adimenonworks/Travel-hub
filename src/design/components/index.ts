@@ -10,7 +10,7 @@ export { BottomNav, type NavTab } from './BottomNav';
 export { PageHeader, HeaderProfileContext, Tabs, type TabItem } from './Bars';
 export { Illustration, COVER_ILLUSTRATIONS, type IllustrationName } from './Illustration';
 export { HeroCard, TripHeader, DayCard, Timeline, JourneyDetails } from './TripCards';
-export { ListItem, ListGroup, SectionHeader, PageSection, EventCard, TravelConnector, VoteButton, IdeaRow, Tile, QuickAction, MapCard, StatStrip, ProfileCard, OptionCard, SearchField, StepProgress, DestinationHeader, type EventState, type TileTone } from './Rows';
+export { ListItem, ListGroup, SectionHeader, PageSection, EventCard, TravelConnector, VoteButton, IdeaRow, Tile, QuickAction, MapCard, StatStrip, ProfileCard, OptionCard, BudgetCard, SearchField, StepProgress, DestinationHeader, type EventState, type TileTone } from './Rows';
 export { ToastProvider, useToast } from './Toast';
 export { CountryModal } from './CountryModal';
 export { FlowScreen, CelebrationScreen, Calendar } from './Flow';

@@ -9,6 +9,7 @@ import { addDays, daysBetween, formatDay, today } from '../../lib/dates';
 import { countryCodeOf, countryName, flagUrl } from '../../lib/countries';
 import { searchCities } from '../../lib/geocode';
 import { haptic, isNativeApp, PUBLIC_SITE, shareLink } from '../../lib/native';
+import { PriceField, fromPriceDraft, useHomeCurrency, type PriceDraft } from '../shared/Price';
 import s from './trip.module.css';
 
 type Step = 1 | 2 | 3 | 4;
@@ -37,6 +38,11 @@ export function NewTrip({ open, onClose, onOpenTrip }: { open: boolean; onClose:
   const [picked, setPicked] = useState<string[]>([]);
   const [openGroup, setOpenGroup] = useState<string | null>(null);
   const [openCat, setOpenCat] = useState<string | null>(null);
+  /** Step 2 "Want to set a budget?": null until chosen; the amount is per person */
+  const [askBudget, setAskBudget] = useState(false);
+  const [budgetOn, setBudgetOn] = useState<boolean | null>(null);
+  const [budget, setBudget] = useState<PriceDraft>({ amount: '', currency: '' });
+  const home = useHomeCurrency();
   const toast = useToast();
   // Step 4 offers your saved Places by country (the trip's country first, then the most saved), then by city,
   // with each country's links and notes as one more group.
@@ -52,11 +58,12 @@ export function NewTrip({ open, onClose, onOpenTrip }: { open: boolean; onClose:
       groups: groupBy(list, groupOf).sort((a, b) => (a[0] === 'Links & notes' ? 1 : b[0] === 'Links & notes' ? -1 : b[1].length - a[1].length)),
     }));
   const savedCountries = (useCountries() ?? []).filter((c) => c.code);
-  const steps = byCountry.length ? 4 : 3;
+  const steps = byCountry.length ? 5 : 4;
 
   useEffect(() => {
     if (!open) return;
     setStep(1); setPlace(null); setStart(''); setEnd(''); setCompany(null); setBusy(false); setCreated(null); setPicked([]); setOpenGroup(null); setDateMode('exact');
+    setAskBudget(false); setBudgetOn(null); setBudget({ amount: '', currency: '' });
   }, [open]);
   if (!open) return null;
 
@@ -69,6 +76,7 @@ export function NewTrip({ open, onClose, onOpenTrip }: { open: boolean; onClose:
     try {
       const id = await store.createTrip({
         name: city, destination: place, startDate: start, endDate: end, currency: defaultCurrency(), ...(dateMode === 'month' ? { dateMode } : {}),
+        budget: budgetOn ? fromPriceDraft({ ...budget, currency: budget.currency || home }) : null,
         coverPhoto: null, coverPosition: null,
       });
       // "Bring your saves?": each chosen Place becomes an Idea that points at it.
@@ -110,13 +118,34 @@ export function NewTrip({ open, onClose, onOpenTrip }: { open: boolean; onClose:
 
   const next = (to: Step) => setStep(to);
 
-  const create3 = steps === 4 ? () => next(4) : () => create();
+  const create3 = steps === 5 ? () => next(4) : () => create();
   const createLabel = busy ? 'Creating your trip…' : 'Create my trip';
+
+  // Step 2 "Want to set a budget?": Yes asks for a rough total per person; No skips it (it can be added in Edit trip)
+  if (step === 1 && askBudget)
+    return (
+      <FlowScreen step={2} of={steps} stepKey="budget" title="Want to set a budget?" subtitle="Rove adds up what your bookings cost, so you know what’s left for everyday spending." onClose={onClose}
+        footer={<Button size="large" iconEnd="chevron-right" disabled={budgetOn === null || (budgetOn && !fromPriceDraft({ ...budget, currency: budget.currency || home }))}
+          onClick={() => { setAskBudget(false); next(2); }}>Continue</Button>}>
+        <div className={s.optionGrid} role="group" aria-label="Budget">
+          <OptionCard icon="wallet" label="Yes" description="Add costs to your bookings to see what the trip adds up to" selected={budgetOn === true}
+            onClick={() => { haptic('selection'); setBudgetOn(true); }} />
+          <OptionCard icon="x" label="No" description="I don’t want to track a budget for this trip" selected={budgetOn === false}
+            onClick={() => { haptic('selection'); setBudgetOn(false); }} />
+        </div>
+        {budgetOn && (
+          <div className={s.flowBudget}>
+            <PriceField label="Budget per person" hint="A rough total is fine. You can change it in Edit trip."
+              value={{ amount: budget.amount, currency: budget.currency || home }} onChange={setBudget} />
+          </div>
+        )}
+      </FlowScreen>
+    );
 
   if (step === 1)
     return (
       <FlowScreen step={1} of={steps} stepKey={1} title="Where to next?" subtitle="Pick a place you’ve saved, or search anywhere." onClose={onClose}
-        footer={<Button size="large" iconEnd="chevron-right" disabled={!place} onClick={() => next(2)}>{place ? `Plan ${city}` : 'Pick a place'}</Button>}>
+        footer={<Button size="large" iconEnd="chevron-right" disabled={!place} onClick={() => setAskBudget(true)}>{place ? `Plan ${city}` : 'Pick a place'}</Button>}>
         <DestinationSearch value={place} onPick={(p) => { haptic('selection'); setPlace(p); }} />
         {savedCountries.length > 0 && (
           <section className={s.flowSection} aria-labelledby="from-saved">
@@ -146,7 +175,7 @@ export function NewTrip({ open, onClose, onOpenTrip }: { open: boolean; onClose:
   const monthLabel = (m: string, opts: Intl.DateTimeFormatOptions = { month: 'long', year: 'numeric' }) => new Date(m + '-15T12:00').toLocaleDateString(undefined, opts);
   if (step === 2)
     return (
-      <FlowScreen step={2} of={steps} stepKey={2} title="When are you going?" subtitle="Roughly is fine. You can change it later." onClose={onClose}
+      <FlowScreen step={3} of={steps} stepKey={2} title="When are you going?" subtitle="Roughly is fine. You can change it later." onClose={onClose}
         footer={<Button size="large" iconEnd="chevron-right" disabled={!start || !end} onClick={() => next(3)}>
           {!start || !end ? (dateMode === 'month' ? 'Pick a month' : 'Pick your dates') : dateMode === 'month' ? `Continue · ${monthLabel(start.slice(0, 7), { month: 'long' })}` : `Continue · ${nDays} day${nDays === 1 ? '' : 's'}`}
         </Button>}>
@@ -187,9 +216,9 @@ export function NewTrip({ open, onClose, onOpenTrip }: { open: boolean; onClose:
 
   if (step === 3)
     return (
-      <FlowScreen step={3} of={steps} stepKey={3} title="Who’s coming?" subtitle="Everyone you add can see and edit the plan." onClose={onClose}
+      <FlowScreen step={4} of={steps} stepKey={3} title="Who’s coming?" subtitle="Everyone you add can see and edit the plan." onClose={onClose}
         footer={<>
-          <Button size="large" iconEnd="chevron-right" loading={busy && steps !== 4} disabled={busy} onClick={create3}>{steps === 4 ? 'Continue' : createLabel}</Button>
+          <Button size="large" iconEnd="chevron-right" loading={busy && steps !== 5} disabled={busy} onClick={create3}>{steps === 5 ? 'Continue' : createLabel}</Button>
           <Button variant="ghost" className={s.flowSkip} disabled={busy} onClick={() => { setCompany('me'); create3(); }}>Skip for now</Button>
         </>}>
         <div className={s.optionGrid}>
@@ -209,7 +238,7 @@ export function NewTrip({ open, onClose, onOpenTrip }: { open: boolean; onClose:
   // open; "All of <city>") → category (Restaurants, Cafés…; tap to open; "All …") → places to tick. Skipping is fine: Ideas → Add idea → From saved brings them in later.
   const toggle = (ids: string[], on: boolean) => setPicked((x) => (on ? [...new Set([...x, ...ids])] : x.filter((y) => !ids.includes(y))));
   return (
-    <FlowScreen step={4} of={4} stepKey={4} title="Bring your saves?" subtitle="Pick places you've saved to add to this trip's Ideas." onClose={onClose}
+    <FlowScreen step={5} of={steps} stepKey={4} title="Bring your saves?" subtitle="Pick places you've saved to add to this trip's Ideas." onClose={onClose}
       footer={<>
         <Button size="large" iconEnd="chevron-right" loading={busy} disabled={busy} onClick={() => create()}>
           {picked.length ? `${createLabel} · ${picked.length} save${picked.length === 1 ? '' : 's'}` : createLabel}

@@ -18,6 +18,8 @@ import { recordView } from '../../lib/recent';
 import { markRead } from '../../lib/reads';
 import { flightTag, updatedAgo, useFlightStatus } from '../../lib/api';
 import { eventKind, eventType, kindInfo } from '../../lib/categories';
+import { priceOf } from '../../lib/currency';
+import { PriceWithConversion } from '../shared/Price';
 import { getMapsApp, mapsAppLabel } from '../../lib/prefs';
 import { ActivityForm } from './ActivityForm';
 import { eventCardProps } from './events';
@@ -99,11 +101,13 @@ export function ActivityPage(ctx: TripCtx) {
   const adder = a.createdBy === me.uid ? 'you' : personName(profiles, a.createdBy).split(' ')[0];
   const copy = async (text: string, what: string) => { try { await navigator.clipboard.writeText(text); toast({ icon: 'copy', label: `${what} copied` }); } catch { /* the text is selectable */ } };
   // Figma List item with "Show action": the reference as the title, what it is under it, and a small Copy button
+  const price = type === 'food' || type === 'free' ? null : priceOf(a, trip);
   const booking = [
     a.ref && <ListItem key="num" icon="plane" title={<span className={s.selectable}>{a.ref}</span>} meta="Flight number"
       action={<IconButton small icon="copy" label="Copy flight number" onClick={() => copy(a.ref!, 'Flight number')} />} />,
     a.bookingRef && <ListItem key="ref" icon="ticket" title={<span className={s.selectable}>{a.bookingRef}</span>} meta={kind === 'restaurant' ? 'Reservation reference' : 'Booking reference'}
       action={<IconButton small icon="copy" label="Copy booking reference" onClick={() => copy(a.bookingRef!, kind === 'restaurant' ? 'Reservation reference' : 'Booking reference')} />} />,
+    price && <ListItem key="price" icon="wallet" title={<PriceWithConversion price={price} />} meta="Price per person" />,
     a.operator && !journey && <ListItem key="op" icon={kindInfo(a.category).icon} title={a.operator} meta="Company" />,
     a.seats && <ListItem key="seats" icon="user-add" title="Seats" meta={a.seats} />,
     a.bags && <ListItem key="bags" icon="info" title="Bags" meta={a.bags} />,
