@@ -16,7 +16,9 @@
 .sectionNav::before {
   content: ''; position: absolute; left: 0; right: 0; bottom: 100%;
   height: calc(env(safe-area-inset-top) + 1px); background: inherit; pointer-events: none;
+  visibility: hidden;
 }
+.sectionNav[data-stuck]::before { visibility: visible; }
 
 /* The tab's content */
 .tabPanel { display: flex; flex-direction: column; gap: var(--space-stack); }

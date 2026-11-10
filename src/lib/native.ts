@@ -26,6 +26,8 @@ export async function setupNative() {
     Keyboard.setStyle({ style: dark ? KeyboardStyle.Dark : KeyboardStyle.Light }).catch(() => {});
   };
   sync();
+  // iOS's bar above the keyboard (‹ › Done): Done collapses the keyboard.
+  Keyboard.setAccessoryBarVisible({ isVisible: true }).catch(() => {});
   window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', sync);
   new MutationObserver(sync).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
   // The web view keeps its size while the keyboard is up (resize: 'none'), so the keyboard's height goes to CSS:

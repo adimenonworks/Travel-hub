@@ -58,7 +58,8 @@ export function PageHeader({ title, subtitle, back, action, fit, size = 'large' 
 export type TabItem = { to: string; label: string; icon?: IconName; end?: boolean; count?: number; active?: boolean };
 
 /** Tabs for switching sections of a page. The current tab is darker and underlined in emerald. */
-export function Tabs({ items, label, className }: { items: TabItem[]; label: string; className?: string }) {
+/** `replace`: switching tabs replaces the history entry, so Back leaves the screen instead of walking back through tabs. */
+export function Tabs({ items, label, className, replace }: { items: TabItem[]; label: string; className?: string; replace?: boolean }) {
   // One underline slides to the current tab: measure where that tab sits, then move the line there.
   const nav = useRef<HTMLElement>(null);
   const { pathname } = useLocation();
@@ -97,8 +98,8 @@ export function Tabs({ items, label, className }: { items: TabItem[]; label: str
           </>
         );
         return t.active === undefined
-          ? <NavLink key={t.to} to={t.to} end={t.end} className={s.tab}>{body}</NavLink>
-          : <Link key={t.to} to={t.to} className={s.tab} aria-current={t.active ? 'page' : undefined} onClick={() => { if (!t.active) haptic('selection'); }}>{body}</Link>;
+          ? <NavLink key={t.to} to={t.to} end={t.end} replace={replace} className={s.tab}>{body}</NavLink>
+          : <Link key={t.to} to={t.to} replace={replace} className={s.tab} aria-current={t.active ? 'page' : undefined} onClick={() => { if (!t.active) haptic('selection'); }}>{body}</Link>;
       })}
     </nav>
   );
