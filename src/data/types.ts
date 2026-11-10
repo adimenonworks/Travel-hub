@@ -16,6 +16,10 @@ export type Profile = {
   currency?: string;
 };
 
+/** Which event chats you've read, synced across your devices (users/{uid}/private/reads): when you last opened each
+ *  event, by event id; `since` is when this started, so older messages don't count as new. */
+export type ChatReads = { since: number; at: Record<string, number> };
+
 /** An Unsplash photo as stored on a trip: hotlinked URLs and what the credit needs. */
 export type TripPhoto = { id: string; url: string; small: string; color?: string | null; name: string; username: string; downloadLocation: string };
 

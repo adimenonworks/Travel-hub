@@ -1,4 +1,4 @@
-import type { Vote, Invite, LinkPreview, NewDoc, Profile, SavedPlace, SubCollections, SubName, Trip, User } from './types';
+import type { ChatReads, Vote, Invite, LinkPreview, NewDoc, Profile, SavedPlace, SubCollections, SubName, Trip, User } from './types';
 
 export type Unsubscribe = () => void;
 
@@ -18,6 +18,10 @@ export interface Store {
   watchProfile(uid: string, cb: (p: Profile | null) => void): Unsubscribe;
   getProfiles(uids: string[]): Promise<Record<string, Profile>>;
   saveProfile(uid: string, patch: Partial<Omit<Profile, 'id'>>): Promise<void>;
+  /** Your event-chat read state (private, synced across your devices); null until it's first saved. */
+  watchReads(uid: string, cb: (r: ChatReads | null) => void): Unsubscribe;
+  /** You've read an event's chat up to `at` (only that event's time changes, so two devices never clash). */
+  markRead(uid: string, targetId: string, at: number, since: number): Promise<void>;
 
   watchMyTrips(uid: string, cb: (trips: Trip[]) => void): Unsubscribe;
   watchTrip(id: string, cb: (trip: Trip | null) => void, onError?: (e: Error) => void): Unsubscribe;
