@@ -5,7 +5,7 @@ import { Icon, type IconName } from './Icon';
 import s from './Button.module.css';
 
 /** Figma Button "Variant". Inverse is the deep emerald button for brand surfaces; Neutral the dark grey one; Tertiary is outlined. */
-export type ButtonVariant = 'primary' | 'secondary' | 'destructive' | 'inverse' | 'neutral' | 'tertiary' | 'ghost';
+export type ButtonVariant = 'primary' | 'destructive' | 'inverse' | 'neutral' | 'tertiary' | 'ghost';
 /** Figma Button "Size": Regular is 32px (Label, 16px icons, still a 44px tap area) and the default; Large is 48px (Label, 24px icons), the default for full-width (block) buttons. */
 export type ButtonSize = 'regular' | 'large';
 
@@ -50,7 +50,7 @@ export function LinkButton({ to, href, variant, size, block, icon, iconEnd, labe
   return <Link to={to!} className={c} aria-label={label} onClick={onClick}>{body}</Link>;
 }
 
-/** Figma Icon button tones, plus 'brand': the Page Header's action, a Figma Button (Secondary) with only an icon. */
+/** Figma Icon button tones. ('brand', the old emerald Page Header action, now draws as Secondary: the grey circle.) */
 export type IconButtonTone = 'secondary' | 'ghost' | 'on-brand' | 'brand';
 
 /**
@@ -65,7 +65,7 @@ export function IconButton({ icon, label, tone, variant, state, small, className
   /** @deprecated Figma has one size (40px); ignored */ size?: ButtonSize;
   /** Show the filled icon (e.g. a starred event) */ state?: 'default' | 'filled';
 }) {
-  const t = tone ?? variant ?? 'ghost';
+  const t = (tone === 'brand' ? 'secondary' : tone) ?? variant ?? 'ghost';
   delete (rest as { size?: unknown }).size;
   return (
     <button type={type} className={[s.iconButton, small && s.iconSmall, s[`icon-${t}`], className].filter(Boolean).join(' ')} aria-label={label} title={label} {...rest}>

@@ -115,12 +115,12 @@ export function NewTrip({ open, onClose, onOpenTrip }: { open: boolean; onClose:
   if (step === 1)
     return (
       <FlowScreen step={1} of={steps} stepKey={1} title="Where to next?" subtitle="Pick a place you’ve saved, or search anywhere." onClose={onClose}
-        footer={<Button size="large" variant="inverse" iconEnd="chevron-right" disabled={!place} onClick={() => next(2)}>{place ? `Plan ${city}` : 'Pick a place'}</Button>}>
+        footer={<Button size="large" iconEnd="chevron-right" disabled={!place} onClick={() => next(2)}>{place ? `Plan ${city}` : 'Pick a place'}</Button>}>
         <DestinationSearch value={place} onPick={(p) => { haptic('selection'); setPlace(p); }} />
         {savedCountries.length > 0 && (
           <section className={s.flowSection} aria-labelledby="from-saved">
             <h2 className={s.flowSectionTitle} id="from-saved">From your saved places</h2>
-                        <ListGroup tone="dark" label="From your saved places">
+                        <ListGroup label="From your saved places">
               {savedCountries.map((c) => {
                 const at = c.places.find((p) => p.lat != null && p.lng != null);
                 const picked = countryCodeOf(place) === c.code && place?.name === c.name;
@@ -146,7 +146,7 @@ export function NewTrip({ open, onClose, onOpenTrip }: { open: boolean; onClose:
   if (step === 2)
     return (
       <FlowScreen step={2} of={steps} stepKey={2} title="When are you going?" subtitle="Roughly is fine. You can change it later." onClose={onClose}
-        footer={<Button size="large" variant="inverse" iconEnd="chevron-right" disabled={!start || !end} onClick={() => next(3)}>
+        footer={<Button size="large" iconEnd="chevron-right" disabled={!start || !end} onClick={() => next(3)}>
           {!start || !end ? (dateMode === 'month' ? 'Pick a month' : 'Pick your dates') : dateMode === 'month' ? `Continue · ${monthLabel(start.slice(0, 7), { month: 'long' })}` : `Continue · ${nDays} day${nDays === 1 ? '' : 's'}`}
         </Button>}>
         <div className={s.flowChips} role="group" aria-label="How sure are you?">
@@ -188,7 +188,7 @@ export function NewTrip({ open, onClose, onOpenTrip }: { open: boolean; onClose:
     return (
       <FlowScreen step={3} of={steps} stepKey={3} title="Who’s coming?" subtitle="Everyone you add can see and edit the plan." onClose={onClose}
         footer={<>
-          <Button size="large" variant="inverse" iconEnd="chevron-right" loading={busy && steps !== 4} disabled={busy} onClick={create3}>{steps === 4 ? 'Continue' : createLabel}</Button>
+          <Button size="large" iconEnd="chevron-right" loading={busy && steps !== 4} disabled={busy} onClick={create3}>{steps === 4 ? 'Continue' : createLabel}</Button>
           <Button variant="ghost" className={s.flowSkip} disabled={busy} onClick={() => { setCompany('me'); create3(); }}>Skip for now</Button>
         </>}>
         <div className={s.optionGrid}>
@@ -196,7 +196,7 @@ export function NewTrip({ open, onClose, onOpenTrip }: { open: boolean; onClose:
           <OptionCard icon="people" label="With others" selected={company === 'others'} onClick={() => { haptic('light'); setCompany('others'); }} />
         </div>
         {company === 'others' && (
-                    <ListGroup tone="dark" label="Invited">
+                    <ListGroup label="Invited">
             <ListItem icon="person" title="You" meta="Owner" />
             <ListItem icon="link" title="Share an invite link" meta="Next, once your trip is made. Anyone with it can join for 14 days." />
           </ListGroup>
@@ -210,7 +210,7 @@ export function NewTrip({ open, onClose, onOpenTrip }: { open: boolean; onClose:
   return (
     <FlowScreen step={4} of={4} stepKey={4} title="Bring your saves?" subtitle="Pick places you've saved to add to this trip's Ideas." onClose={onClose}
       footer={<>
-        <Button size="large" variant="inverse" iconEnd="chevron-right" loading={busy} disabled={busy} onClick={() => create()}>
+        <Button size="large" iconEnd="chevron-right" loading={busy} disabled={busy} onClick={() => create()}>
           {picked.length ? `${createLabel} · ${picked.length} save${picked.length === 1 ? '' : 's'}` : createLabel}
         </Button>
         <Button variant="ghost" className={s.flowSkip} disabled={busy} onClick={() => create(false)}>Skip for now</Button>
@@ -221,7 +221,7 @@ export function NewTrip({ open, onClose, onOpenTrip }: { open: boolean; onClose:
           <h2 className={s.flowSectionTitle} id={`saves-${c.code}`}>
             {flagUrl(c.code) && <img src={flagUrl(c.code)} alt="" className={s.flowFlag} />}{countryName(c.code)}
           </h2>
-          <ListGroup tone="dark" label={`Saved places in ${countryName(c.code)}`}>
+          <ListGroup label={`Saved places in ${countryName(c.code)}`}>
             {c.groups.map(([g, list]) => {
               const key = `${c.code}/${g}`, open = openGroup === key;
               const ids = list.map((p) => p.id), n = ids.filter((id) => picked.includes(id)).length;
@@ -275,7 +275,7 @@ function DestinationSearch({ value, onPick }: { value: Place | null; onPick: (p:
       <SearchField label="Search a country or city" placeholder="Search a country or city" value={text} onChange={(e) => setText(e.target.value)} autoFocus />
       {error && <p className={s.flowSummaryMeta} role="alert">City search isn’t working right now. Check your connection and try again.</p>}
       {shown.length > 0 && (
-                <ListGroup tone="dark" label="Places">
+                <ListGroup label="Places">
           {shown.map((p) => {
             const code = countryCodeOf(p);
             const picked = value?.name === p.name && value.lat === p.lat;

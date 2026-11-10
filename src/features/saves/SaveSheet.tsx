@@ -162,7 +162,7 @@ export function SaveSheet({ request, onClose }: { request: SaveRequest | null; o
             <TextField label="Link" placeholder="https://…" inputMode="url" autoComplete="off" value={link} onChange={(e) => setLink(e.target.value)}
               onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); read(link); } }} />
             <div className={s.row}>
-              <Button variant="secondary" icon="copy" onClick={paste}>Paste</Button>
+              <Button variant="neutral" icon="copy" onClick={paste}>Paste</Button>
               <Button disabled={!link.trim()} onClick={() => read(link)}>Continue</Button>
             </div>
           </>

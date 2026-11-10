@@ -91,7 +91,7 @@ export function Itinerary(ctx: TripCtx) {
           const stateOf = (i: number): EventState => d < t || (d === t && entryEnd(list[i]) <= now) ? 'done' : i === nextIndex ? 'next' : 'default';
           return list.length === 0 ? (
             <EmptyState illustration="calendar" title="Nothing planned yet" message="Add something to do, or schedule an idea from the Ideas board."
-              action={<Button variant="secondary" icon="plus" onClick={() => setAdding(true)}>Add event</Button>} />
+              action={<Button variant="neutral" icon="plus" onClick={() => setAdding(true)}>Add event</Button>} />
           ) : (
             <div className={s.eventList}>
               {list.map((e, n) => {

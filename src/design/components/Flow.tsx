@@ -28,8 +28,8 @@ export function FlowScreen({ step, of, title, subtitle, onClose, children, foote
     <div className={s.flow} role="dialog" aria-modal="true" aria-label={title}>
       <div className={s.inner}>
         <div className={s.bar}>
-          <IconButton icon="x" tone="on-brand" label="Close" onClick={onClose} />
           <StepProgress step={step} of={of} />
+          <IconButton icon="x" tone="on-brand" label="Close" onClick={onClose} />
         </div>
         <div key={stepKey} className={s.step}>
           <div className={s.heading}>

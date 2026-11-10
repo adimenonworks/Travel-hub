@@ -11,8 +11,8 @@
   display: inline-flex; align-items: center; gap: var(--space-default-250);
   min-height: var(--size-tap); padding: 0 var(--space-default-500);
   border-radius: var(--radius-1000);
-  background: var(--interactive-button-secondary-background);
-  color: var(--interactive-button-secondary-text);
+  background: var(--interactive-button-inverse-neutral-background);
+  color: var(--interactive-button-inverse-neutral-text);
   font-size: var(--size-body-small); font-weight: var(--weight-semibold);
   max-width: 100%;
   text-decoration: none !important;

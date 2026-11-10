@@ -42,8 +42,8 @@ export function ListItem({ title, meta, trailing, icon, media, size = 'default',
 /** Figma "List group": the rounded white container (24px corners, subtle border) that stacks List items. */
 /** Figma "List group". Tone=Dark is the deep green variant for the bright green flow screens (New trip): white text,
  *  icons on sunken circles. The default (grey) is unchanged everywhere else. */
-export function ListGroup({ children, label, className, tone = 'default' }: { children: ReactNode; label?: string; className?: string; tone?: 'default' | 'dark' }) {
-  return <div role="list" aria-label={label} className={[s.group, tone === 'dark' && `surface-dark ${s.groupDark}`, className].filter(Boolean).join(' ')}>{children}</div>;
+export function ListGroup({ children, label, className }: { children: ReactNode; label?: string; className?: string }) {
+  return <div role="list" aria-label={label} className={[s.group, className].filter(Boolean).join(' ')}>{children}</div>;
 }
 
 /** Figma "Section header": Heading 2 title, optional Body small meta under it, optional Ghost action (e.g. "See all ›"). */
@@ -265,7 +265,6 @@ export function SearchField({ icon = 'pin', label, ...rest }: React.InputHTMLAtt
 export function StepProgress({ step, of = 4 }: { step: number; of?: number }) {
   return (
     <div className={s.steps} role="progressbar" aria-valuemin={1} aria-valuemax={of} aria-valuenow={step} aria-label={`Step ${step} of ${of}`}>
-      <span className={s.stepCount} aria-hidden="true">{step} of {of}</span>
       <span className={s.stepSegments} aria-hidden="true">
         {Array.from({ length: of }, (_, i) => <span key={i} className={i < step ? s.stepOn : undefined} />)}
       </span>

@@ -20,10 +20,6 @@
 .primary:active:not(:disabled) { background: var(--interactive-button-primary-background-pressed); }
 .primary:disabled { background: var(--interactive-button-primary-disabled-background); color: var(--interactive-button-primary-disabled-foreground); }
 
-.secondary { background: var(--interactive-button-secondary-background); color: var(--interactive-button-secondary-text); }
-.secondary:hover:not(:disabled) { background: var(--interactive-button-secondary-background-hover); }
-.secondary:active:not(:disabled) { background: var(--interactive-button-secondary-background-pressed); }
-.secondary:disabled { background: var(--interactive-button-secondary-disabled-background); color: var(--interactive-button-secondary-disabled-foreground); }
 
 .destructive { background: var(--interactive-button-destructive-background); color: var(--interactive-button-destructive-text); }
 .destructive:hover:not(:disabled) { background: var(--interactive-button-destructive-background-hover); }
@@ -73,10 +69,6 @@
 .icon-secondary { background: var(--on-light-surface-secondary); color: var(--on-light-icon-primary); } /* Figma Icon button Secondary: neutral grey */
 .icon-secondary:hover:not(:disabled) { box-shadow: inset 0 0 0 100vmax var(--interactive-unselected-ghost-background-hover); }
 .icon-secondary:active:not(:disabled) { box-shadow: inset 0 0 0 100vmax var(--interactive-unselected-ghost-background-pressed); }
-/* The Page Header's action is a Figma Button (Secondary) with only an icon: emerald, 40px */
-.icon-brand { background: var(--interactive-button-secondary-background); color: var(--interactive-button-secondary-icon); }
-.icon-brand:hover:not(:disabled) { background: var(--interactive-button-secondary-background-hover); }
-.icon-brand:active:not(:disabled) { background: var(--interactive-button-secondary-background-pressed); }
 .icon-ghost { background: var(--interactive-button-ghost-background); color: var(--interactive-button-ghost-icon); }
 .icon-ghost:hover:not(:disabled) { background: var(--interactive-button-ghost-background-hover); }
 .icon-ghost:active:not(:disabled) { background: var(--interactive-button-ghost-background-pressed); }
@@ -86,7 +78,6 @@
 
 /* Each variant's icons use its own icon token (Figma: …/icon), separate from the label colour. */
 .primary .glyph { color: var(--interactive-button-primary-icon); }
-.secondary .glyph { color: var(--interactive-button-secondary-icon); }
 .destructive .glyph { color: var(--interactive-button-destructive-icon); }
 .inverse .glyph { color: var(--interactive-button-inverse-brand-icon); }
 .neutral .glyph { color: var(--interactive-button-inverse-neutral-icon); }

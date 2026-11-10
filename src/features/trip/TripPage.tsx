@@ -39,7 +39,7 @@ export function TripPage() {
     return (
       <Content>
         <EmptyState illustration="compass" title="Trip not found" message="It may have been deleted, or you're not a member yet. Ask the organizer for an invite link."
-          action={<LinkButton to="/trips" variant="secondary">Back to trips</LinkButton>} />
+          action={<LinkButton to="/trips" variant="neutral">Back to trips</LinkButton>} />
       </Content>
     );
   return <TripLoaded trip={trip} />;

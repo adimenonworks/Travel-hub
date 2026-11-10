@@ -34,9 +34,6 @@
   background: var(--on-light-surface-secondary);
 }
 /* Tone=Dark: deep green with the icon circles sunken, as on the Event card's Next state */
-.groupDark { background: var(--on-dark-surface-brand); }
-.groupDark .thumb { background: var(--on-dark-surface-sunken); }
-.groupDark > .pressable:hover { background: var(--on-dark-surface-sunken); }
 /* A pressed row tints out to the group's padding */
 .group > .pressable { margin: 0 calc(-1 * var(--space-default-500)); padding-left: var(--space-default-500); padding-right: var(--space-default-500); width: calc(100% + 2 * var(--space-default-500)); border-radius: var(--radius-500); }
 .group > .pressable:hover { background: var(--interactive-unselected-ghost-background-hover); }
@@ -189,10 +186,9 @@
 
 /* Step progress (on the bright emerald flow screen) */
 .steps { display: flex; flex-direction: column; gap: var(--space-default-300); flex: 1; min-width: 0; }
-.stepCount { align-self: flex-end; font: var(--type-body); color: var(--on-mid-text-secondary); }
 .stepSegments { display: flex; gap: var(--space-default-250); }
-.stepSegments > span { flex: 1; height: 4px; border-radius: var(--radius-100); background: var(--on-mid-border-subtle); transition: background var(--motion-base); }
-.stepSegments > .stepOn { background: var(--on-mid-text-primary); }
+.stepSegments > span { flex: 1; height: 4px; border-radius: var(--radius-100); background: var(--on-dark-divider-default); transition: background var(--motion-base); }
+.stepSegments > .stepOn { background: var(--on-dark-icon-primary); }
 
 /* Destination header */
 .destination { display: flex; flex-direction: column; gap: var(--space-default-500); padding: var(--space-default-600); border-radius: var(--radius-600); }

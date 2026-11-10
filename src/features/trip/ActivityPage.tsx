@@ -65,7 +65,7 @@ export function ActivityPage(ctx: TripCtx) {
     return (
       <>
         <PageHeader title="Event not found" back={{ to: itinerary, label: 'Itinerary' }} />
-        <EmptyState illustration="calendar" title="This event was deleted" message="It may have been removed from the itinerary." action={<LinkButton to={itinerary} variant="secondary">Back to itinerary</LinkButton>} />
+        <EmptyState illustration="calendar" title="This event was deleted" message="It may have been removed from the itinerary." action={<LinkButton to={itinerary} variant="neutral">Back to itinerary</LinkButton>} />
       </>
     );
 
@@ -123,7 +123,7 @@ export function ActivityPage(ctx: TripCtx) {
       )}
 
       {!journey && a.category !== 'note' && (
-        <Button block size="regular" variant="secondary" icon="star" onClick={star}>{starred ? 'Favourite' : 'Add to favourites'}</Button>
+        <Button block size="regular" variant="neutral" icon="star" onClick={star}>{starred ? 'Favourite' : 'Add to favourites'}</Button>
       )}
 
       {/* Figma "Event detail — Location": the map, the address and the two ways to get there, together in one card */}
@@ -140,8 +140,8 @@ export function ActivityPage(ctx: TripCtx) {
               {where.includes(',') && <span className="t-body t-secondary">{where.split(',').slice(1).join(',').trim()}</span>}
             </div>
             <div className={s.whereButtons}>
-              <LinkButton href={mapsUrl(where, a.location, app)} variant="secondary" icon="map" label={`Directions to ${where} in ${mapsAppLabel(app)}`}>{mapsAppLabel(app)}</LinkButton>
-              <LinkButton href={uberUrl(where, a.location)} variant="secondary" icon="car" label={`Get an Uber to ${where}`}>Uber</LinkButton>
+              <LinkButton href={mapsUrl(where, a.location, app)} variant="neutral" icon="map" label={`Directions to ${where} in ${mapsAppLabel(app)}`}>{mapsAppLabel(app)}</LinkButton>
+              <LinkButton href={uberUrl(where, a.location)} variant="neutral" icon="car" label={`Get an Uber to ${where}`}>Uber</LinkButton>
             </div>
           </div>
         </PageSection>
