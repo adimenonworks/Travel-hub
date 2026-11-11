@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { Button, Card, Illustration, LinkButton } from '../../design/components';
+import { Button, Card, LinkButton, Logo } from '../../design/components';
 import { APP_STORE_URL, appLink, knownToHaveApp, rememberHasApp } from '../../lib/site';
 import s from './SignIn.module.css';
 
@@ -32,7 +32,7 @@ export function GetApp() {
   return (
     <div className={s.page}>
       <div className={s.hero}>
-        <Illustration name={joined ? 'friends' : 'suitcase'} size={160} />
+        <span className={s.mark}><Logo size={88} /></span>
         <h1 className="t-display">{joined ? 'You’re in!' : 'Rove lives on your iPhone'}</h1>
         <p className="t-body t-secondary">{joined
           ? `${joined} is waiting for you in the Rove app.`

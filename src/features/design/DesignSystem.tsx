@@ -2,7 +2,7 @@ import { useState, type CSSProperties } from 'react';
 import {
   Avatar, AvatarStack, Badge, Chip, Notification, Button, Card, EmptyState, FieldRow, HeroCard, Icon, IconButton,
   LinkButton, PageHeader, PageSection, SegmentControl, Select, Sheet, Tabs, TextArea, TextField, Timeline, Illustration,
-  type IllustrationName, COVER_ILLUSTRATIONS, ICON_NAMES, useToast, BottomNav, Skeleton,
+  type IllustrationName, COVER_ILLUSTRATIONS, ICON_NAMES, useToast, BottomNav, Skeleton, Logo,
   ListItem, ListGroup, SectionHeader, EventCard, TravelConnector, IdeaRow, Tile, StatStrip, ProfileCard,
   OptionCard, BudgetCard, Switch, SearchField, StepProgress, TripHeader, DayCard, CountryModal,
   CategoryIcon, ContextMenu, Accordion, SpanCard, CollectionHeader,
@@ -186,6 +186,9 @@ export function DesignSystem() {
           </Card>
         </Section>
 
+        <Section title="Logo" footer="Figma “Logo”: the walker R, as on the app icon. On the sign-in and Get Rove pages, the launch screen and every icon (app, favicon, home screen). Fixed brand colours in both modes.">
+          <div style={{ display: 'flex', gap: 'var(--space-default-500)', alignItems: 'end' }}><Logo /><Logo size={56} /><Logo size={32} /></div>
+        </Section>
         <Section title="Illustrations" footer="One style everywhere: white frames with a bold outline and a slight tilt, emerald land, a warm sun, sparkles. Spots go in empty states; covers fill a trip card when it has no photo.">
           <Card className={s.icons}>
             {spotNames.map((n) => <span key={n} className={s.icon}><Illustration name={n} size={96} /><code className={s.code}>{n}</code></span>)}
