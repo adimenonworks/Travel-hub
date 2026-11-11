@@ -11,19 +11,33 @@ import { CountryCollection, Favourites, FavouriteCountry } from '../features/sav
 import { ProfilePage } from '../features/profile/ProfilePage';
 import { Privacy } from '../features/profile/Privacy';
 import { Shell } from './Shell';
+import { GetApp } from '../features/auth/GetApp';
+import { joinOnly } from '../lib/site';
 
 // The design reference page is for builders only, so it loads on demand.
 const DesignSystem = lazy(() => import('../features/design/DesignSystem').then((m) => ({ default: m.DesignSystem })));
 
 function Routed() {
   const { user, loading } = useAuth();
-  const { pathname } = useLocation();
+  const { pathname, search } = useLocation();
   if (loading) return <PageSkeleton />;
   if (pathname === '/design' && !user) return <DesignSystem />;
-  if (!user) {
-    const joining = pathname.startsWith('/join/');
-    return <SignIn message={joining ? "You've been invited to a trip. Sign in to join." : undefined} />;
+  const joining = pathname.startsWith('/join/');
+  // Collection invite links end in ?to=collection, so the message is right before anyone has signed in
+  const invited = new URLSearchParams(search).get('to') === 'collection'
+    ? "You've been invited to a collection of saved places. Sign in to join it."
+    : "You've been invited to a trip. Sign in to join.";
+  // The website is join-only: sign in, accept the invite, then get the app
+  if (joinOnly()) {
+    return (
+      <Routes>
+        <Route path="/privacy" element={<Privacy />} />
+        <Route path="/join/:code" element={user ? <Join /> : <SignIn message={invited} />} />
+        <Route path="*" element={<GetApp />} />
+      </Routes>
+    );
   }
+  if (!user) return <SignIn message={joining ? invited : undefined} />;
   return (
     <Shell>
       <Routes>

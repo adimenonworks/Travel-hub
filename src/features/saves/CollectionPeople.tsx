@@ -10,10 +10,12 @@ import s from './saves.module.css';
 
 /** What each collection role can do, in a line */
 export const COLLECTION_ROLE_HELP: Record<CollectionRole, string> = {
-  member: 'Sees every place, adds places, moves them to another city, changes their category and stars them. Only whoever saved a place can delete it.',
-  viewer: 'Sees every place, stars them and opens them in Maps, but can’t add or change anything.',
+  member: 'Can see every place, add places, move them to another city, change their category and star them. Only whoever saved a place can delete it.',
+  viewer: 'Can see every place, star them and open them in Maps, but can’t add or change anything.',
 };
-const roleName = (r: CollectionRole | 'owner') => (r === 'owner' ? 'Owner' : r === 'member' ? 'Member' : 'Viewer');
+/** Collections have two roles, shown as what they let you do (stored as 'member' and 'viewer') */
+export const collectionRoleName = (r: CollectionRole | 'owner') => (r === 'owner' ? 'Owner' : r === 'member' ? 'Can edit' : 'Can view');
+const roleName = collectionRoleName;
 
 /** "you", "you and Sam", "Alex and you", "you, Sam and Ana", "you and 3 others": who a collection is with, its owner first. */
 export function savedBy(ids: string[], me: string, profiles: Record<string, Profile>) {
@@ -48,7 +50,7 @@ export function CollectionPeople({ open, onClose, code, share, profiles }: {
       const first = (me.name || 'My').split(' ')[0];
       const codeId = await store.createCollectionInvite(sh, as, `${first}'s ${country} collection`);
       // Inside the iPhone app the page address is capacitor://localhost, which nobody else can open
-      const url = `${isNativeApp ? PUBLIC_SITE : location.origin + location.pathname}#/join/${codeId}`;
+      const url = `${isNativeApp ? PUBLIC_SITE : location.origin + location.pathname}#/join/${codeId}?to=collection`;
       const text = `See my ${country} places on Rove`;
       if (!(await shareLink({ title: `${first}'s ${country} collection`, text, url }))) {
         await navigator.clipboard.writeText(url);
@@ -101,8 +103,8 @@ export function CollectionPeople({ open, onClose, code, share, profiles }: {
           </ListGroup>
           {owner && (
             <section className={s.field} aria-labelledby="invite-as">
-              <h3 className="t-heading-4" id="invite-as">Invite people as</h3>
-              <SegmentControl label="Invite as" block value={as} onChange={setAs} options={[{ value: 'viewer', label: 'Viewer' }, { value: 'member', label: 'Member' }]} />
+              <h3 className="t-heading-4" id="invite-as">People you invite</h3>
+              <SegmentControl label="People you invite" block value={as} onChange={setAs} options={[{ value: 'viewer', label: 'Can view' }, { value: 'member', label: 'Can edit' }]} />
               <p className="t-body-small t-secondary">{`${COLLECTION_ROLE_HELP[as]} Anyone with the link can join for the next 14 days.`}</p>
             </section>
           )}
@@ -111,7 +113,7 @@ export function CollectionPeople({ open, onClose, code, share, profiles }: {
       <Sheet open={open && !!person} mode="edit" title={person ? personName(profiles, person) : ''} subtitle={`What they can do in your ${country} collection`}
         onClose={() => setPerson(null)} onSubmit={saveRole} submitLabel="Save"
         secondary={<Button variant="destructive" size="large" onClick={remove}>Remove</Button>}>
-        <SegmentControl label="Role" block value={role} onChange={setRole} options={[{ value: 'viewer', label: 'Viewer' }, { value: 'member', label: 'Member' }]} />
+        <SegmentControl label="Role" block value={role} onChange={setRole} options={[{ value: 'viewer', label: 'Can view' }, { value: 'member', label: 'Can edit' }]} />
         <p className="t-body-small t-secondary">{COLLECTION_ROLE_HELP[role]}</p>
       </Sheet>
     </>

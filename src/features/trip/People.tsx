@@ -6,12 +6,14 @@ import { personName, useMe } from '../../data/hooks';
 import type { TripCtx } from './TripPage';
 import { isNativeApp, PUBLIC_SITE, shareLink, confirmAction } from '../../lib/native';
 
-/** Trip "People" tab (Figma "Trip — People"): the travellers as a List group (the owner can tap someone to change their role or remove them), then the invite card. */
-/** What each role can do, in a line (the People role sheet) */
+/**
+ * Trip "People" tab (Figma "Trip — People"): the travellers as a List group, then the invite card. There are two roles,
+ * Planner and Viewer; any Planner taps someone to change their role or remove them. Whoever created the trip is a
+ * Planner like everyone else (no rank shown); they're just the one who can delete it, and leaving hands it on.
+ */
 const ROLE_HELP = {
   viewer: 'Sees the whole trip and can chat, but can’t add or change anything.',
-  member: 'Adds and edits events, ideas and photos, votes and chats.',
-  editor: 'Everything a member does, and edits the trip, invites people, decides ideas and can delete anything.',
+  planner: 'Plans everything: edits the trip and its events, ideas and photos, invites people and changes their roles.',
 } as const;
 
 export function People({ trip, profiles, canManage, isOwner }: TripCtx) {
@@ -44,13 +46,15 @@ export function People({ trip, profiles, canManage, isOwner }: TripCtx) {
   };
 
   const members = trip.memberIds.slice().sort((a, b) => (trip.roles[a] === 'owner' ? -1 : trip.roles[b] === 'owner' ? 1 : 0));
-  const roleName = (id: string) => { const r = trip.roles[id] ?? 'member'; return r === 'owner' ? 'Owner' : r === 'editor' ? 'Organiser' : r === 'viewer' ? 'Viewer' : 'Member'; };
+  const roleName = (id: string) => (trip.roles[id] === 'viewer' ? 'Viewer' : 'Planner');
   const [person, setPerson] = useState<string | null>(null);
-  const [role, setRoleDraft] = useState<'editor' | 'member' | 'viewer'>('member');
-  const open = (id: string) => { const r = trip.roles[id]; setRoleDraft(r === 'editor' || r === 'viewer' ? r : 'member'); setPerson(id); };
+  const [role, setRoleDraft] = useState<'planner' | 'viewer'>('planner');
+  const open = (id: string) => { setRoleDraft(trip.roles[id] === 'viewer' ? 'viewer' : 'planner'); setPerson(id); };
   const saveRole = async () => {
     if (!person) return;
-    try { await store.setRole(trip, person, role); toast({ icon: 'check', label: 'Role updated' }); setPerson(null); }
+    const was = trip.roles[person] === 'viewer' ? 'viewer' : 'planner';
+    if (was === role) { setPerson(null); return; }
+    try { await store.setRole(trip, person, role === 'viewer' ? 'viewer' : 'editor'); toast({ icon: 'check', label: 'Role updated' }); setPerson(null); }
     catch { toast({ tone: 'error', label: "Couldn't save. Check your connection" }); }
   };
 
@@ -69,7 +73,8 @@ export function People({ trip, profiles, canManage, isOwner }: TripCtx) {
       <ListGroup label="Travellers">
         {members.map((id) => {
           const name = personName(profiles, id);
-          const editable = isOwner && id !== me.uid;
+          // Any Planner changes anyone's role, except their own and the trip creator's (the trip always keeps them)
+          const editable = canManage && id !== me.uid && id !== trip.ownerId;
           return (
             <ListItem key={id} media={<Avatar name={name} photo={profiles[id]?.photo} size={40} />} round
               title={name} meta={`${roleName(id)}${id === me.uid ? ' · you' : ''}`}
@@ -85,10 +90,10 @@ export function People({ trip, profiles, canManage, isOwner }: TripCtx) {
         </Card>
       )}
 
-      {/* Deleting the trip lives in Edit trip; here members other than the owner can leave. */}
-      {!isOwner && (
+      {/* Deleting the trip lives in Edit trip (its creator only); here anyone can leave, while someone else is on it */}
+      {members.length > 1 && (
         <Button variant="destructive" icon="signout" onClick={async () => {
-          if (!confirmAction(`Leave "${trip.name}"?`)) return;
+          if (!confirmAction(isOwner ? `Leave "${trip.name}"? It stays with everyone else.` : `Leave "${trip.name}"?`)) return;
           await store.leaveTrip(trip.id, me.uid);
           navigate('/');
         }}>Leave trip</Button>
@@ -96,7 +101,7 @@ export function People({ trip, profiles, canManage, isOwner }: TripCtx) {
 
       <Sheet open={!!person} mode="edit" title={person ? personName(profiles, person) : ''} subtitle="What they can do on this trip" onClose={() => setPerson(null)} onSubmit={saveRole} submitLabel="Save"
         secondary={person ? <Button variant="destructive" size="large" onClick={removePerson}>Remove</Button> : undefined}>
-        <SegmentControl label="Role" block value={role} onChange={setRoleDraft} options={[{ value: 'viewer', label: 'Viewer' }, { value: 'member', label: 'Member' }, { value: 'editor', label: 'Organiser' }]} />
+        <SegmentControl label="Role" block value={role} onChange={setRoleDraft} options={[{ value: 'viewer', label: 'Viewer' }, { value: 'planner', label: 'Planner' }]} />
         <p className="t-body-small t-secondary">{ROLE_HELP[role]}</p>
       </Sheet>
     </>

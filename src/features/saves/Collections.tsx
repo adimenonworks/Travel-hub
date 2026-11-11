@@ -4,7 +4,7 @@ import { Button, Card, CategoryIcon, Chip, CollectionHeader, TextField, EmptySta
 import { hostOf } from '../../lib/format';
 import { store } from '../../data';
 import { personName, useActivitiesFor, useMe, useMyTrips, usePlaces, useProfiles, useShares, useSharedPlaces } from '../../data/hooks';
-import { CollectionPeople, savedBy } from './CollectionPeople';
+import { CollectionPeople, collectionRoleName, savedBy } from './CollectionPeople';
 import type { CollectionRole, SavedPlace } from '../../data/types';
 import { countryName, flagUrl } from '../../lib/countries';
 import { today } from '../../lib/dates';
@@ -252,7 +252,7 @@ export function CountryCollection() {
 
   return (
     <Content>
-      <PageHeader title={title} subtitle={ownerFirst ? `${ownerFirst}'s collection · ${role === 'member' ? 'Member' : 'Viewer'}` : undefined} back={{ to: '/trips', label: 'Collections' }} fit
+      <PageHeader title={title} subtitle={ownerFirst ? `${ownerFirst}'s collection · ${collectionRoleName(role)}` : undefined} back={{ to: '/trips', label: 'Collections' }} fit
         action={shareable ? { icon: 'user-add', label: owner ? 'Share this collection' : 'People in this collection', onClick: () => { haptic('selection'); setPeople(true); } } : undefined} />
       {mine.length === 0 ? (
         <EmptyState illustration="map" title={`Nothing saved in ${title}`} message="Save cafés, bars, stays and sights you find online."

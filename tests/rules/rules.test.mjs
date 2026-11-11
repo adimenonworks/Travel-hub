@@ -52,10 +52,11 @@ await t('cannot add an event as someone else', assertFails(setDoc(doc(B, 'trips/
 await t('cannot change who added an event', assertFails(updateDoc(doc(B, 'trips/t1/activities/a2'), { createdBy: 'alice' })));
 await setDoc(doc(A, 'trips/t1/ideas/i1'), { title: 'Belém', createdBy: 'alice', votes: {} });
 await t('member votes on someone else\'s idea', assertSucceeds(updateDoc(doc(B, 'trips/t1/ideas/i1'), { 'votes.bob': true })));
-await t('member cannot delete someone else\'s idea', assertFails(deleteDoc(doc(B, 'trips/t1/ideas/i1'))));
+await setDoc(doc(A, 'trips/t1/ideas/i9'), { title: 'Sintra', createdBy: 'alice', votes: {} });
+await t('member (a Planner) deletes someone else\'s idea', assertSucceeds(deleteDoc(doc(B, 'trips/t1/ideas/i9'))));
 await t('owner deletes a member\'s event', assertSucceeds(deleteDoc(doc(A, 'trips/t1/activities/a2'))));
-await t('member cannot rename trip', assertFails(updateDoc(doc(B, 'trips/t1'), { name: 'x' })));
-await t('member cannot promote self', assertFails(updateDoc(doc(B, 'trips/t1'), { 'roles.bob': 'editor' })));
+await t('member (a Planner) renames trip', assertSucceeds(updateDoc(doc(B, 'trips/t1'), { name: 'Lisbon' })));
+await t('member cannot take ownership', assertFails(updateDoc(doc(B, 'trips/t1'), { ownerId: 'bob', 'roles.bob': 'owner' })));
 await t('member cannot delete trip', assertFails(deleteDoc(doc(B, 'trips/t1'))));
 // Viewers: see the trip and chat, but add, edit and vote on nothing
 await t('owner makes carol a viewer', assertSucceeds(updateDoc(doc(A, 'trips/t1'), { memberIds: arrayUnion('carol'), 'roles.carol': 'viewer' })));
@@ -84,7 +85,12 @@ await t('editor cannot remove owner', assertFails(updateDoc(doc(B, 'trips/t1'), 
 await t('editor cannot take ownership', assertFails(updateDoc(doc(B, 'trips/t1'), { ownerId: 'bob' })));
 await t('bob leaves', assertSucceeds(updateDoc(doc(B, 'trips/t1'), { memberIds: arrayRemove('bob'), 'roles.bob': deleteField() })));
 await t('ex-member cannot read', assertFails(getDoc(doc(B, 'trips/t1'))));
-await t('owner cannot leave (must delete)', assertFails(updateDoc(doc(A, 'trips/t1'), { memberIds: arrayRemove('alice'), 'roles.alice': deleteField() })));
+await t('owner cannot just leave (hands it over instead)', assertFails(updateDoc(doc(A, 'trips/t1'), { memberIds: arrayRemove('alice'), 'roles.alice': deleteField() })));
+// Planners: any of them removes another; the trip's creator leaves by handing it on
+await env.withSecurityRulesDisabled(async (c) => setDoc(doc(c.firestore(), 'trips/t9'), { name: 'Rome', ownerId: 'alice', memberIds: ['alice', 'bob', 'carol'], roles: { alice: 'owner', bob: 'member', carol: 'member' } }));
+await t('a Planner removes another Planner', assertSucceeds(updateDoc(doc(B, 'trips/t9'), { memberIds: arrayRemove('carol'), 'roles.carol': deleteField() })));
+await t('a Planner cannot delete the trip', assertFails(deleteDoc(doc(B, 'trips/t9'))));
+await t('creator leaves by handing the trip to a Planner', assertSucceeds(updateDoc(doc(A, 'trips/t9'), { ownerId: 'bob', memberIds: ['bob'], roles: { bob: 'owner' } })));
 
 // Saved Places (Collections)
 const place = { ownerId: 'alice', name: 'Ichiran', category: 'restaurant', city: 'Tokyo', country: 'Japan', countryCode: 'jp', lat: 35.6, lng: 139.7 };

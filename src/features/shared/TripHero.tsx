@@ -49,7 +49,7 @@ export function TripHero({ trip, cover = true, size = 'regular' }: { trip: Trip;
       : undefined;
   // Unsplash cover: an organizer's Rove fetches one the first time the trip shows without a photo of its own.
   const me = useMe();
-  const canSet = ['owner', 'editor'].includes(trip.roles[me.uid] ?? '');
+  const canSet = ['owner', 'editor', 'member'].includes(trip.roles[me.uid] ?? '');
   useEffect(() => {
     if (!hasApi || !canSet || trip.coverPhoto || trip.cover !== undefined || asked.has(trip.id)) return;
     asked.add(trip.id);

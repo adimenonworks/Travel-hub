@@ -93,7 +93,9 @@ export function useRole(trip: Trip): { role: Role | undefined; canManage: boolea
   const me = useMe();
   return useMemo(() => {
     const role = trip.roles[me.uid];
-    return { role, canManage: role === 'owner' || role === 'editor', isOwner: role === 'owner', canContribute: !!role && role !== 'viewer' };
+    // Everyone but a Viewer is a Planner (owner, organiser and member are stored, but plan alike); only whoever created the
+    // trip can delete it, and that rank is never shown
+    return { role, canManage: !!role && role !== 'viewer', isOwner: role === 'owner', canContribute: !!role && role !== 'viewer' };
   }, [trip.roles, me.uid]);
 }
 

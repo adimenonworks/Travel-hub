@@ -29,8 +29,8 @@ personal data.
 ### The database rules (`firestore.rules`)
 | Data | Who can read | Who can change |
 |---|---|---|
-| A trip | Its members only | Owner and organisers (they can't remove the owner or change ownership; only the owner, deleting their account, hands it to another member) |
-| A trip's events, ideas, albums | Members | Members add and update; only whoever added it, or an organiser, deletes it |
+| A trip | Its members only | Planners (everyone but Viewers; they can't remove the trip's creator or change ownership; only the creator deletes the trip, and leaving or deleting their account hands it to another member) |
+| A trip's events, ideas, albums | Members | Planners add, update and delete; Viewers only comment |
 | A trip's comments | Members | Only the author edits or deletes; at most 150 characters |
 | Joining a trip | – | Someone with a valid, unexpired invite. They can only add themselves, as a member |
 | Leaving a trip | – | A member (not the owner) removes only themselves |
@@ -39,7 +39,7 @@ personal data.
 | Private profile (home, visited, currency, reads) | You only | You only |
 | Saved places | You, people you've added the place to a trip with (read by ID), and the people in a collection you shared (your places in that country, and places they added to it). Lists only return your own, ones you starred, and ones in a collection shared with you | You (deleting your account hands one a trip uses to someone on that trip). In a shared collection its owner and Members may also change a place's city or category; only whoever saved a place deletes it. Others can only add or remove their own star |
 | Shared collections (`collectionShares/{owner}_{country}`) | Its owner and the people in it | The owner adds roles (Member / Viewer) or removes people; you join only with a valid collection invite, as its role; anyone can leave |
-| Invites | Anyone signed in, by code (no listing) | Trip invites by the trip's owner/organisers; collection invites by the collection's owner (as Member or Viewer); deleted by whoever made it |
+| Invites | Anyone signed in, by code (no listing) | Trip invites by its Planners; collection invites by the collection's owner (Can edit or Can view); deleted by whoever made it |
 
 The rules have their own automated tests (`tests/rules/`). Run them whenever the rules change.
 

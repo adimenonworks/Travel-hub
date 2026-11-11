@@ -263,6 +263,16 @@ export function createFirebaseStore(config: FirebaseOptions): Store {
       await deleteDoc(doc(db, 'trips', id));
     },
     async leaveTrip(id, uid) {
+      // Whoever created the trip hands it to the next planner (or anyone left) as they go
+      const snap = await getDoc(doc(db, 'trips', id));
+      const t = snap.exists() ? withId<Trip>(id, snap.data()) : null;
+      const others = t ? t.memberIds.filter((m) => m !== uid) : [];
+      if (t && t.ownerId === uid && others.length) {
+        const to = others.find((m) => t.roles[m] !== 'viewer') ?? others[0];
+        const roles = { ...t.roles }; delete roles[uid]; roles[to] = 'owner';
+        await updateDoc(doc(db, 'trips', id), { ownerId: to, memberIds: others, roles });
+        return;
+      }
       await updateDoc(doc(db, 'trips', id), { memberIds: arrayRemove(uid), [`roles.${uid}`]: deleteField() });
     },
     async removeMember(trip, uid) {

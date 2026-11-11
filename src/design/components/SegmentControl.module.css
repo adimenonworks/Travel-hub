@@ -13,11 +13,13 @@
 .block { display: grid; width: 100%; }
 .option {
   min-height: 34px;
-  padding: var(--space-default-400) var(--space-default-500);
+  /* Side padding gives way as text grows (16px at the default size, 8px from about 23px text), so words keep to one line */
+  padding: var(--space-default-400) clamp(var(--space-default-300), calc(54px - 2rem), var(--space-default-500));
   border: 0;
   border-radius: var(--radius-1000);
   background: transparent;
-  font: var(--type-label); /* Label */
+  /* Label, growing up to 1.4× like the titles (then it stops, so "Member" fits half a phone at accessibility sizes) */
+  font: var(--weight-medium) min(calc(14rem / 17), 20px)/1.5 var(--font-family);
   color: var(--interactive-selected-ghost-text);
   overflow-wrap: break-word; text-align: center;
   position: relative; z-index: 1;
