@@ -16,6 +16,9 @@ type Props = {
   submitDisabled?: boolean;
   /** Figma "Show secondary action": a second Large button beside the primary, half and half (e.g. Delete). Never stacked. */
   secondary?: ReactNode;
+  /** Figma edit sheet ("Show save" + "Show discard"): Save is the Primary tick Icon button top-right (in place of the
+   *  close button) and the footer is "Discard changes" (Neutral) beside the optional `secondary` (Delete). */
+  mode?: 'default' | 'edit';
   children: ReactNode;
 };
 
@@ -25,7 +28,8 @@ type Props = {
  * It glides up on open and slides back down on close (the close button, the scrim, Escape, a drag down, or saving).
  * In the iPhone app it rises with the keyboard as one (see --keyboard-height in Sheet.module.css).
  */
-export function Sheet({ open, title, subtitle, onClose, onSubmit, submitLabel = 'Done', submitDisabled, secondary, children }: Props) {
+export function Sheet({ open, title, subtitle, onClose, onSubmit, submitLabel = 'Done', submitDisabled, secondary, mode = 'default', children }: Props) {
+  const edit = mode === 'edit';
   const ref = useRef<HTMLDivElement>(null);
   // Stays mounted while the closing animation plays; a timer covers browsers that skip the animation.
   const [mounted, setMounted] = useState(open);
@@ -119,12 +123,16 @@ export function Sheet({ open, title, subtitle, onClose, onSubmit, submitLabel = 
                 <h2 className={s.title}>{shown.current.title}</h2>
                 {shown.current.subtitle && <p className={s.subtitle}>{shown.current.subtitle}</p>}
               </div>
-              <IconButton icon="x" label="Close" onClick={onClose} />
+              {edit && onSubmit
+                ? <IconButton type="submit" icon="check" tone="primary" label={submitLabel === 'Done' ? 'Save' : submitLabel} disabled={submitDisabled} />
+                : <IconButton icon="x" label="Close" onClick={onClose} />}
             </div>
           </div>
           <div className={s.body}>
             {shown.current.children}
-            {(onSubmit || secondary) && <div className={s.footer}>{secondary}{onSubmit && <Button type="submit" block disabled={submitDisabled}>{submitLabel}</Button>}</div>}
+            {edit
+              ? <div className={s.footer}><Button variant="neutral" size="large" onClick={onClose}>Discard changes</Button>{secondary}</div>
+              : (onSubmit || secondary) && <div className={s.footer}>{secondary}{onSubmit && <Button type="submit" block disabled={submitDisabled}>{submitLabel}</Button>}</div>}
           </div>
         </form>
       </div>

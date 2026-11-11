@@ -242,10 +242,10 @@
 .layoverText { display: flex; flex-direction: column; gap: var(--space-default-100); min-width: 0; color: var(--on-light-text-primary); }
 .layoverActions { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-default-300); }
 
-/* Figma "Span card": two ends side by side (padding 20, gap 16, a divider between), an optional footer */
+/* Figma "Span card": two ends side by side (padding 20, gap 20, a divider centred between), an optional footer */
 .span { display: flex; flex-direction: column; gap: var(--space-default-500); padding: var(--space-default-600); border-radius: var(--radius-600); background: var(--on-light-surface-secondary); }
-.spanEnds { display: flex; gap: var(--space-default-500); flex-wrap: wrap; }
-.spanEnd { flex: 1 1 calc(120rem / 17); min-width: 0; display: flex; flex-direction: column; gap: var(--space-default-100); }
+.spanEnds { display: grid; grid-template-columns: 1fr auto 1fr; gap: var(--space-default-600); } /* the divider in the middle, 20 from each side's text, like the card's padding */
+.spanEnd { min-width: 0; display: flex; flex-direction: column; gap: var(--space-default-100); }
 .spanDivider { flex: none; width: 1px; align-self: stretch; background: var(--on-light-divider-default); }
 .spanLabel { margin: 0; font: var(--type-body-small); color: var(--on-light-text-secondary); overflow-wrap: anywhere; }
 .spanDate { font: var(--type-heading-3); letter-spacing: -0.02em; color: var(--on-light-text-primary); }

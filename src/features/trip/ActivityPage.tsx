@@ -10,7 +10,7 @@ import { placeForEvent } from '../saves/starEvent';
 import type { LinkItem } from '../../data/types';
 import { formatDay, formatTime } from '../../lib/dates';
 import { hostOf, isPdf, normalizeUrl } from '../../lib/format';
-import { mapsUrl, uberUrl } from '../../lib/geocode';
+import { directionsUrl, mapsUrl, uberUrl } from '../../lib/geocode';
 import { MapView } from '../shared/Map';
 import { Comments } from '../shared/Comments';
 import { haptic, confirmAction } from '../../lib/native';
@@ -131,6 +131,9 @@ export function ActivityPage(ctx: TripCtx) {
   const length = !a.endDate || a.endDate === a.date ? undefined
     : eventType(a.category) === 'stays' ? `${daysBetween(a.date, a.endDate)} ${daysBetween(a.date, a.endDate) === 1 ? 'night' : 'nights'}`
       : sameDaySpan(a.category) ? undefined : `${daysBetween(a.date, a.endDate) + 1} days`;
+  // A route to open in Maps: a journey other than a flight, or a car rental's pick-up and drop-off
+  const routeFrom = (journey && kind !== 'flight') || vehicle ? (a.fromText || '').trim() : '';
+  const routeTo = routeFrom ? ((vehicle ? a.toText || '' : a.toText || '').trim() !== routeFrom ? (a.toText || '').trim() : '') : '';
   const goingRow = a.attendeeIds.length > 0 && <ListItem icon="people" title="Who’s going" meta={`${a.attendeeIds.length} of ${trip.memberIds.length}: ${goingNames.join(', ')}`} />;
   const priceRow = price && <ListItem icon="wallet" title={<PriceWithConversion price={price} />} meta="Price per person" />;
 
@@ -140,7 +143,7 @@ export function ActivityPage(ctx: TripCtx) {
       <PageHeader title={journey ? `${city(legs[0].fromText)} to ${city(lastLeg.toText)}` : a.title} size="small" back={backTo}
         icon={kindInfo(a.category).icon} tone={categoryTone(a.category)}
         subtitle={journey ? formatDay(a.date) : spans ? (a.endDate && a.endDate !== a.date ? `${formatDay(a.date)} – ${formatDay(a.endDate)}` : formatDay(a.date)) : eventCardProps(a, ctx, true).time}
-        action={{ icon: 'pencil', label: 'Edit event', onClick: () => setEditing(true) }} />
+        action={ctx.canContribute ? { icon: 'pencil', label: 'Edit event', onClick: () => setEditing(true) } : undefined} />
 
       {/* Figma "Journey detail" for flights and trains; every other type shows its Event card. No price anywhere. */}
       {journey ? (
@@ -173,6 +176,19 @@ export function ActivityPage(ctx: TripCtx) {
         <SpanCard footer={length}
           start={{ label: startWord, ...at(a.date, a.startTime), place: vehicle ? a.fromText?.split(',')[0] : undefined }}
           end={{ label: endWord, ...at(a.endDate, a.endTime), place: vehicle ? (a.toText || a.fromText)?.split(',')[0] : undefined }} />
+      )}
+
+      {/* Route: where a journey (not a flight) or a car's rental starts and ends, each opening in the maps app, and directions */}
+      {/* (a car shows a Route only when it's dropped off somewhere else: its pick-up is already the Location card) */}
+      {routeFrom && (!vehicle || routeTo) && (
+        <PageSection title="Route" action={routeTo ? <LinkButton href={directionsUrl({ q: routeFrom, p: a.location }, { q: routeTo, p: a.to })} variant="ghost" size="regular" icon="map" label={`Directions from ${routeFrom} to ${routeTo}`}>Directions</LinkButton> : undefined}>
+          <ListGroup label="Route">
+            <ListItem icon="pin" title={routeFrom.split(',')[0]} meta={[vehicle ? startWord : 'From', routeFrom.split(',').slice(1).join(',').trim()].filter(Boolean).join(' · ')}
+              href={mapsUrl(routeFrom, a.location, app)} label={`${routeFrom} in ${mapsAppLabel(app)}`} trailing={mapsAppLabel(app)} />
+            {routeTo && <ListItem icon="pin" title={routeTo.split(',')[0]} meta={[vehicle ? endWord : 'To', routeTo.split(',').slice(1).join(',').trim()].filter(Boolean).join(' · ')}
+              href={mapsUrl(routeTo, a.to, app)} label={`${routeTo} in ${mapsAppLabel(app)}`} trailing={mapsAppLabel(app)} />}
+          </ListGroup>
+        </PageSection>
       )}
 
       {/* Figma "Event detail — Location": the map, the address and the two ways to get there, together in one card */}
@@ -223,7 +239,7 @@ export function ActivityPage(ctx: TripCtx) {
         </PageSection>
       )}
 
-      <PageSection title="Files & links" action={<Button variant="ghost" size="regular" iconEnd="chevron-right" onClick={() => setAddingDoc(true)}>Add</Button>}>
+      <PageSection title="Files & links" action={ctx.canContribute ? <Button variant="ghost" size="regular" iconEnd="chevron-right" onClick={() => setAddingDoc(true)}>Add</Button> : undefined}>
         {a.links.length > 0 || a.manageUrl ? (
           <ListGroup label="Files and links">
             {a.links.map((l, i) => {
@@ -234,7 +250,7 @@ export function ActivityPage(ctx: TripCtx) {
                     trailing={isPdf(l.url) ? 'PDF' : undefined} href={l.url} label={`${name} (opens in a new tab)`}
                     onClick={() => recordView(trip.id, { url: l.url, kind: isPdf(l.url) ? 'PDF' : 'Link', label: name, meta: a.title })} />
                   {l.emailUrl && <LinkButton href={l.emailUrl} size="regular" variant="ghost" icon="mail" label={`Open the email for ${name}`} />}
-                  <IconButton icon="trash" label={`Remove ${name}`} onClick={() => removeDoc(i)} />
+                  {ctx.canContribute && <IconButton icon="trash" label={`Remove ${name}`} onClick={() => removeDoc(i)} />}
                 </div>
               );
             })}

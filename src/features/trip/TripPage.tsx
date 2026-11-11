@@ -28,6 +28,8 @@ export type TripCtx = {
   profiles: Record<string, Profile>;
   canManage: boolean;
   isOwner: boolean;
+  /** Everyone but a Viewer adds and edits events, ideas and photos, and votes */
+  canContribute: boolean;
 };
 
 export function TripPage() {
@@ -50,7 +52,7 @@ function TripLoaded({ trip }: { trip: Trip }) {
   const comments = useSub(trip.id, 'comments');
   const albums = useSub(trip.id, 'albums');
   const profiles = useProfiles(trip.memberIds);
-  const { canManage, isOwner } = useRole(trip);
+  const { canManage, isOwner, canContribute } = useRole(trip);
   const me = useMe();
   const [editing, setEditing] = useState(false);
   const navigate = useNavigate();
@@ -61,7 +63,7 @@ function TripLoaded({ trip }: { trip: Trip }) {
   useStarMigration(trip.id, activities ?? [], me.uid);
   useBudgetCleanup(trip, canManage);
   if (!activities || !ideas || !comments || !albums) return <PageSkeleton />;
-  const ctx: TripCtx = { trip, activities, ideas, comments, albums, profiles, canManage, isOwner };
+  const ctx: TripCtx = { trip, activities, ideas, comments, albums, profiles, canManage, isOwner, canContribute };
 
   const base = `/trip/${trip.id}`;
   const section = pathname.slice(base.length + 1).split('/')[0];

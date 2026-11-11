@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Button, CategoryIcon, Chip, FieldRow, OptionCard, Select, Sheet, TextArea, TextField, useToast } from '../../design/components';
 import { store } from '../../data';
-import { useMe, useSub } from '../../data/hooks';
+import { useMe, useRole, useSub } from '../../data/hooks';
 import type { Activity, Category, LinkItem, Place, Trip } from '../../data/types';
 import { addDays, dayWord, formatDay, formatTime, tripDays } from '../../lib/dates';
 import { geocodePlace } from '../../lib/geocode';
@@ -88,6 +88,8 @@ export function ActivityForm({ open, trip, date, activity, draft, onClose, onCre
   /** After a delete: e.g. the event's own page goes back to its day in the itinerary */ onDeleted?: (a: Activity) => void;
 }) {
   const me = useMe();
+  // Delete only for organizers or whoever added it (the rules refuse anyone else)
+  const { canManage } = useRole(trip);
   const toast = useToast();
   const activities = useSub(trip.id, 'activities') ?? [];
   const budgetCurrency = trip.budget?.currency ?? trip.currency;
@@ -95,38 +97,41 @@ export function ActivityForm({ open, trip, date, activity, draft, onClose, onCre
   const [busy, setBusy] = useState(false);
   const [changingType, setChangingType] = useState(false);
   useEffect(() => { if (open) setChangingType(false); }, [open]);
-  useEffect(() => { if (open) setF(toForm(activity ?? draft, date, budgetCurrency)); }, [open, activity, draft, date]); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => { if (open) { const x = toForm(activity ?? draft, date, budgetCurrency); if (x.endDate && x.kind && behaviourOf(x.kind) === 'span' && x.endDate > trip.endDate) x.endDate = trip.endDate < x.date ? x.date : trip.endDate; setF(x); } }, [open, activity, draft, date]); // eslint-disable-line react-hooks/exhaustive-deps
   const set = (p: Partial<Form>) => setF((x) => ({ ...x, ...p }));
   // At a place: an end time only when asked for ("+ Add end time" turns into the field)
   const [withEnd, setWithEnd] = useState(false);
   useEffect(() => { if (open) setWithEnd(!!(activity ?? draft)?.endTime); }, [open, activity, draft]);
   // Location from a link (Google or Apple Maps, or any page about a place): the place it points at, and its name
-  const [linkPlace, setLinkPlace] = useState<Place | null>(null);
-  const [reading, setReading] = useState(false);
-  useEffect(() => { if (open) { setLinkPlace(null); setReading(false); } }, [open]);
-  const fromLink = async (url: string) => {
-    setReading(true);
+  // (Location, From and To each take a link: the place each link found, by field)
+  type PlaceKey = 'locationText' | 'fromText' | 'toText';
+  const [linkPlaces, setLinkPlaces] = useState<Partial<Record<PlaceKey, Place>>>({});
+  const [reading, setReading] = useState<PlaceKey | null>(null);
+  useEffect(() => { if (open) { setLinkPlaces({}); setReading(null); } }, [open]);
+  const linkPlace = linkPlaces.locationText ?? null;
+  const fromLink = async (url: string, key: PlaceKey = 'locationText') => {
+    setReading(key);
     try {
       const p = await readLink(url);
       const pl = p.place;
       if (pl && !pl.isArea && pl.name) {
         const text = [pl.name, pl.city].filter(Boolean).join(', ');
-        if (Number.isFinite(pl.lat)) setLinkPlace({ name: text, lat: pl.lat, lng: pl.lng, country: pl.country, countryCode: pl.countryCode }); // no map position: geocoded from the text when saved
-        // The place fills Location; the Name too, but only if you haven't typed one
-        setF((x) => ({ ...x, locationText: text, title: x.title.trim() ? x.title : cleanTitle(pl.name) || pl.name }));
+        if (Number.isFinite(pl.lat)) setLinkPlaces((m) => ({ ...m, [key]: { name: text, lat: pl.lat, lng: pl.lng, country: pl.country, countryCode: pl.countryCode } })); // no map position: geocoded from the text when saved
+        // The place fills its field; for Location, the Name too, but only if you haven't typed one
+        setF((x) => ({ ...x, [key]: text, ...(key === 'locationText' ? { title: x.title.trim() ? x.title : cleanTitle(pl.name) || pl.name } : {}) }));
         haptic('light');
       } else {
-        set({ locationText: '' });
+        set({ [key]: '' } as Partial<Form>);
         toast({ label: 'Couldn’t find a place in that link. Type the name or address' });
       }
     } catch { toast({ tone: 'error', label: 'Couldn’t read that link' }); }
-    finally { setReading(false); }
+    finally { setReading(null); }
   };
-  const pasteLocation = async () => {
+  const pasteLocation = async (key: PlaceKey = 'locationText') => {
     try {
       const raw = (await readClipboard()).trim();
       const url = findUrl(raw);
-      if (url) { set({ locationText: url }); fromLink(url); } else if (raw) set({ locationText: raw }); else toast({ label: 'Nothing to paste' });
+      if (url) { set({ [key]: url } as Partial<Form>); fromLink(url, key); } else if (raw) set({ [key]: raw } as Partial<Form>); else toast({ label: 'Nothing to paste' });
     } catch { toast({ label: 'Paste it into the field' }); }
   };
   const days = tripDays(trip.startDate, trip.endDate);
@@ -164,15 +169,17 @@ export function ActivityForm({ open, trip, date, activity, draft, onClose, onCre
     if (!kind || !valid || !info) return;
     setBusy(true);
     try {
-      const find = async (text: string, prev: string | undefined, prevPlace: Place | null | undefined, near: Place | null) =>
-        !text.trim() ? null : text.trim() === (prev ?? '') && prevPlace ? prevPlace : await geocodePlace(text, near);
+      // A place for what was typed: the one a pasted link found, the saved one if unchanged, else looked up (a name or an
+      // address, near the trip), so the event page can still open it in Maps
+      const find = async (text: string, prev: string | undefined, prevPlace: Place | null | undefined, near: Place | null, key?: PlaceKey) =>
+        !text.trim() ? null : key && linkPlaces[key] && linkPlaces[key]!.name === text.trim() ? linkPlaces[key]! : text.trim() === (prev ?? '') && prevPlace ? prevPlace : await geocodePlace(text, near);
       const near = kind === 'flight' ? null : trip.destination;
       const journey = behaviour === 'journey' && !!f.toText.trim();
       const routed = behaviour === 'journey' || vehicle;
       const dropText = vehicle ? (f.toText.trim() || f.fromText.trim()) : f.toText.trim();
       // A journey's (or rental's) place is where it starts; it also remembers where it ends (its country joins the trip's chips)
-      const from = routed ? await find(f.fromText, activity?.fromText, activity?.location, near) : null;
-      const to = journey || vehicle ? (vehicle && !f.toText.trim() ? from : await find(dropText, activity?.toText, activity?.to, near)) : null;
+      const from = routed ? await find(f.fromText, activity?.fromText, activity?.location, near, 'fromText') : null;
+      const to = journey || vehicle ? (vehicle && !f.toText.trim() ? from : await find(dropText, activity?.toText, activity?.to, near, 'toText')) : null;
       const placeText = routed ? f.fromText.trim() : behaviour === 'note' ? '' : f.locationText.trim();
       const location = routed ? from
         : !placeText ? null
@@ -249,7 +256,8 @@ export function ActivityForm({ open, trip, date, activity, draft, onClose, onCre
     }
   };
 
-  const afterEnd = [...days, ...(days.includes(addDays(trip.endDate, 1)) ? [] : [addDays(trip.endDate, 1)])];
+  // End days (check-out, pick-up, drop-off, collect) are the trip's days only: the itinerary shows nothing outside the trip (owner)
+  const afterEnd = days;
   const daySelect = (lbl: string, value: string, onChange: (v: string) => void, list = days) => (
     <Select label={lbl} value={value} onChange={(e) => onChange(e.target.value)}>
       {list.map((d) => <option key={d} value={d}>{dayWord(d, trip.startDate)} · {formatDay(d)}</option>)}
@@ -261,20 +269,22 @@ export function ActivityForm({ open, trip, date, activity, draft, onClose, onCre
   const text = (lbl: string, key: 'fromText' | 'toText' | 'locationText' | 'operator' | 'ref' | 'seats' | 'title', placeholder: string, hint?: string) => (
     <TextField label={lbl} placeholder={placeholder} hint={hint} value={f[key]} onChange={(e) => set({ [key]: e.target.value } as Partial<Form>)} />
   );
-  // Location: an address, a place name or a maps link (read for its place, and its name when Name is empty), with Paste
-  const locationField = (lbl: string, placeholder: string, hint: string) => (
+  // Location, From or To: a place name, an address or a maps link (a link is read for its place, and Location's for the
+  // Name when it's empty), with Paste beside it. A typed name or address is looked up when saved, so it opens in Maps.
+  const locationField = (lbl: string, placeholder: string, hint: string, key: PlaceKey = 'locationText') => (
     <div className={s.locationField}>
       <div className={s.locationRow}>
-        <TextField label={lbl} placeholder={placeholder} value={f.locationText} inputMode="text"
-          onChange={(e) => { const v = e.target.value; set({ locationText: v }); setLinkPlace(null); const url = findUrl(v); if (url && url === v.trim()) fromLink(url); }} />
-        <Button variant="neutral" size="large" icon="copy" onClick={pasteLocation} disabled={reading}>Paste</Button>
+        <TextField label={lbl} placeholder={placeholder} value={f[key]} inputMode="text"
+          onChange={(e) => { const v = e.target.value; set({ [key]: v } as Partial<Form>); setLinkPlaces((m) => ({ ...m, [key]: undefined })); const url = findUrl(v); if (url && url === v.trim()) fromLink(url, key); }} />
+        <Button variant="neutral" size="large" icon="copy" onClick={() => pasteLocation(key)} disabled={reading === key} aria-label={`Paste into ${lbl}`}>Paste</Button>
       </div>
-      <p className="t-body-small t-secondary" aria-live="polite">{reading ? 'Reading the link…' : hint}</p>
+      <p className="t-body-small t-secondary" aria-live="polite">{reading === key ? 'Reading the link…' : hint}</p>
     </div>
   );
+  const PLACE_HINT = 'A place name, an address or a link from Maps';
   const PLACEHOLDERS: Partial<Record<EventKind, [string, string]>> = {
     flight: ['Melbourne (MEL)', 'Lisbon (LIS)'], train: ['Lisbon Oriente', 'Porto Campanhã'], bus: ['Sete Rios, Lisbon', 'Lagos bus station'],
-    ferry: ['Cais do Sodré', 'Cacilhas'], transfer: ['Lisbon airport (LIS)', 'Memmo Alfama'], driver: ['Hotel', 'Sintra'],
+    ferry: ['Cais do Sodré', 'Cacilhas'], transfer: ['Lisbon airport (LIS)', 'Memmo Alfama'], driver: ['Your hotel', 'Sintra'], taxi: ['Your hotel', 'Time Out Market'],
   };
   const PLACE: Partial<Record<EventKind, string>> = {
     cafe: 'Manteigaria, Lisbon', bar: 'Park Bar, Lisbon', restaurant: 'Cervejaria Ramiro, Lisbon', market: 'Time Out Market, Lisbon',
@@ -291,13 +301,13 @@ export function ActivityForm({ open, trip, date, activity, draft, onClose, onCre
       {behaviour !== 'open' && behaviour !== 'note' && <LinkEditor links={f.links} onChange={(links) => set({ links })} />}
     </>
   );
-  const sheetTitle = activity ? `Edit ${info?.label.toLowerCase() ?? 'event'}` : typeInfo?.label ?? 'Add to itinerary';
+  const sheetTitle = activity ? `Edit ${info?.label.toLowerCase() ?? 'event'}` : 'Add to itinerary'; // the type row under it names the type
 
   return (
-    <Sheet open={open} title={sheetTitle}
+    <Sheet open={open} mode={activity ? 'edit' : 'default'} title={sheetTitle}
       subtitle={!f.type ? 'What are you adding?' : undefined}
       onClose={onClose} onSubmit={kind ? submit : undefined} submitLabel={activity ? 'Save' : `Add to ${formatDay(f.date)}`} submitDisabled={!valid || busy}
-      secondary={activity && kind ? <Button variant="destructive" size="large" onClick={remove}>Delete</Button> : undefined}>
+      secondary={activity && kind && (canManage || activity.createdBy === me.uid) ? <Button variant="destructive" size="large" onClick={remove}>Delete</Button> : undefined}>
       {!f.type ? (
         // Step 1: the 6 types, each with what it covers, in its colour
         <div className={s.typeList} role="group" aria-label="Type">
@@ -317,17 +327,22 @@ export function ActivityForm({ open, trip, date, activity, draft, onClose, onCre
             </div>
           )}
           {changingType && (
-            <div className={s.kindChips} role="radiogroup" aria-label="Type">
-              {EVENT_TYPES.map((x) => (
-                <Chip key={x.value} icon={x.icon} tone={TYPE_TONE[x.value]} active={f.type === x.value} label={`${x.label}${f.type === x.value ? ', selected' : ''}`}
-                  onClick={() => { if (f.type !== x.value) pickType(x.value); }}>{x.label}</Chip>
-              ))}
+            <div className={s.kindPicker}>
+              <h3 className={s.pickerLabel} id="event-type">Type</h3>
+              <div className={s.kindChips} role="radiogroup" aria-labelledby="event-type">
+                {EVENT_TYPES.map((x) => (
+                  <Chip key={x.value} icon={x.icon} tone={TYPE_TONE[x.value]} active={f.type === x.value} label={`${x.label}${f.type === x.value ? ', selected' : ''}`}
+                    onClick={() => { if (f.type !== x.value) pickType(x.value); }}>{x.label}</Chip>
+                ))}
+              </div>
             </div>
           )}
-          {/* Step 2: the type's categories, the chosen one in the type's colour, and what it covers */}
+          {/* Step 2: the type's categories, nested under it in a grey panel (changing the type swaps the panel), the chosen
+              one in the type's colour, and what it covers */}
           {typeInfo && typeInfo.kinds.length > 1 && (
-            <div className={s.kindPicker}>
-              <div className={s.kindChips} role="group" aria-label="Category">
+            <div className={[s.kindPicker, s.kindPanel].join(' ')}>
+              <h3 className={s.pickerLabel} id="event-category">{`${typeInfo.label} categories`}</h3>
+              <div className={s.kindChips} role="group" aria-labelledby="event-category">
                 {typeInfo.kinds.map((x) => (
                   <Chip key={x.value} icon={x.icon} tone={TYPE_TONE[typeInfo.value]} active={kind === x.value} label={`${x.label}${kind === x.value ? ', selected' : ''}`}
                     onClick={() => { haptic('selection'); pickKind(x.value); }}>{x.label}</Chip>
@@ -339,10 +354,9 @@ export function ActivityForm({ open, trip, date, activity, draft, onClose, onCre
 
           {behaviour === 'journey' && kind && (
             <>
-              <FieldRow>
-                {text('From', 'fromText', PLACEHOLDERS[kind]?.[0] ?? 'Where it leaves from')}
-                {text(kind === 'flight' ? 'To' : 'To (optional)', 'toText', PLACEHOLDERS[kind]?.[1] ?? 'Where it arrives')}
-              </FieldRow>
+              {/* From and To on their own lines, each with Paste; they open in Maps from the event page */}
+              {locationField('From', PLACEHOLDERS[kind]?.[0] ?? 'Where it leaves from', kind === 'flight' ? 'An airport or city, e.g. Melbourne (MEL)' : PLACE_HINT, 'fromText')}
+              {locationField(kind === 'flight' ? 'To' : 'To (optional)', PLACEHOLDERS[kind]?.[1] ?? 'Where it arrives', kind === 'flight' ? 'An airport or city, e.g. Lisbon (LIS)' : PLACE_HINT, 'toText')}
               <FieldRow>
                 {daySelect('Departs', f.date, (v) => set({ date: v }))}
                 {time('Time', 'startTime')}
@@ -356,8 +370,9 @@ export function ActivityForm({ open, trip, date, activity, draft, onClose, onCre
               <FieldRow>
                 {kind === 'flight'
                   ? <TextField label="Flight number" placeholder="TP1351" autoCapitalize="characters" value={f.ref} onChange={(e) => set({ ref: e.target.value })} />
-                  : text('Operator (optional)', 'operator', kind === 'train' ? 'CP' : kind === 'bus' ? 'FlixBus' : kind === 'ferry' ? 'Transtejo' : 'Company')}
-                {text('Seat (optional)', 'seats', kind === 'flight' ? '23A' : 'Coach 4, seat 32')}
+                  : text(kind === 'taxi' ? 'Company (optional)' : kind === 'driver' ? 'Driver or company (optional)' : 'Operator (optional)', 'operator', kind === 'train' ? 'CP' : kind === 'bus' ? 'FlixBus' : kind === 'ferry' ? 'Transtejo' : kind === 'taxi' ? 'Uber' : 'Company')}
+                {/* A seat only means something on a flight, train, bus or ferry */}
+                {!['taxi', 'driver', 'transfer'].includes(kind) && text('Seat (optional)', 'seats', kind === 'flight' ? '23A' : 'Coach 4, seat 32')}
               </FieldRow>
               {activity && onAddConnection && (
                 <div><Button variant="ghost" size="regular" icon="plus" onClick={() => { onClose(); onAddConnection(); }}>Add a connection</Button></div>
@@ -369,12 +384,12 @@ export function ActivityForm({ open, trip, date, activity, draft, onClose, onCre
             vehicle ? (
               <>
                 {text('Company (optional)', 'operator', kind === 'campervan' ? 'Indie Campers' : 'Hertz')}
-                {text(startWord, 'fromText', 'Lisbon airport (LIS)')}
+                {locationField(startWord, 'Lisbon airport (LIS)', PLACE_HINT, 'fromText')}
                 <FieldRow>
                   {daySelect(`${startWord} day`, f.date, (v) => set({ date: v, endDate: f.endDate >= v ? f.endDate : v }))}
                   {time('Time', 'startTime')}
                 </FieldRow>
-                {text(`${endWord} (optional)`, 'toText', `Same as ${startWord.toLowerCase()}`)}
+                {locationField(`${endWord} (optional)`, `Same as ${startWord.toLowerCase()}`, `${PLACE_HINT}; leave empty if it's the same place`, 'toText')}
                 <FieldRow>
                   {daySelect(`${endWord} day`, f.endDate || f.date, (v) => set({ endDate: v }), afterEnd.filter((d) => d >= f.date))}
                   {time('Time', 'endTime')}

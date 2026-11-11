@@ -67,25 +67,29 @@ The rules have their own automated tests (`tests/rules/`). Run them whenever the
 1. **Done (10 Nov): trip content rules.** Comments can only be edited or deleted by their author (max 150 characters);
    events, ideas and albums can only be deleted by whoever added them or an organiser; titles ≤ 200, notes ≤ 2,000
    characters. Covered by tests in `tests/rules`. Takes effect once the rules are published in the Firebase console.
-2. **Members can still edit each other's events and ideas** (on purpose: planning together, voting). If that's ever a
+2. **Done (11 Nov): Viewer role.** An owner can make someone a Viewer in People: they see the whole trip and can
+   comment (and edit or delete their own comments), but can't add, edit or vote on events, ideas, albums or files. The
+   rules enforce it (`isContributor`), covered by tests in `tests/rules`. **Takes effect once the rules are published**
+   (Firebase console → Firestore → Rules → paste `firestore.rules` → Publish); until then the app only hides the buttons.
+3. **Members can still edit each other's events and ideas** (on purpose: planning together, voting). If that's ever a
    problem, limit updates to the author and organisers, except votes and "who's going".
-3. **Skipped for now (10 Nov): the Worker can be called by anyone who knows its address.** That can't leak data, but it
+4. **Skipped for now (10 Nov): the Worker can be called by anyone who knows its address.** That can't leak data, but it
    can use up the Unsplash and flight quotas. *Fix later:* a Cloudflare rate-limiting rule, and optionally require a
    Firebase sign-in token. On the Planning page under Later.
-4. **Skipped for now (10 Nov): no App Check.** [Firebase's way to prove a request comes from the real Rove app.] The
+5. **Skipped for now (10 Nov): no App Check.** [Firebase's way to prove a request comes from the real Rove app.] The
    rules still protect the data, but App Check stops scripts from hammering the database. *Fix later:* App Check with
    App Attest for iOS, before launch. On the Planning page under Later.
-5. **Done (10 Nov): account deletion.** You → Delete account, after an "are you sure?" sheet. Trips you own go to the
+6. **Done (10 Nov): account deletion.** You → Delete account, after an "are you sure?" sheet. Trips you own go to the
    next member (or are deleted if you're alone); you leave the others and your messages are deleted; saved places a
    trip uses go to someone on that trip, the rest are deleted; then your profile, private settings and the sign-in
    (Google confirms it's you first). The rules allow exactly this hand-over (`handingOver` on trips, `handedOver` on
    places, via a trip you're both on) and nothing more; tests in `tests/rules`. Takes effect once the rules are published.
-6. **Saved places can be read by ID by anyone signed in.** IDs are random and only shared through trips, so this is
+7. **Saved places can be read by ID by anyone signed in.** IDs are random and only shared through trips, so this is
    low risk. If a place's notes ever become sensitive, limit reads to the owner and trip-mates.
-7. **Done (10 Nov): privacy policy.** In the app (You → Privacy policy) and in `src/features/profile/Privacy.tsx`. It
+8. **Done (10 Nov): privacy policy.** In the app (You → Privacy policy) and in `src/features/profile/Privacy.tsx`. It
    lists every service that receives data. The App Store also needs it at a public web address: publish it before
    submitting. Keep it true whenever Rove starts sending data somewhere new.
-8. **Old data after deleting a trip** stays in Firestore (unreachable) until a clean-up job is added. Mention it in the
+9. **Old data after deleting a trip** stays in Firestore (unreachable) until a clean-up job is added. Mention it in the
    privacy policy, or add the job.
 
 ---

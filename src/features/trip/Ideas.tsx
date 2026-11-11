@@ -19,6 +19,7 @@ import { LinkChips, LinkEditor, cleanLinks } from '../shared/Links';
 import { ActivityForm } from './ActivityForm';
 import type { TripCtx } from './TripPage';
 import s from './trip.module.css';
+import { isMapsLink } from '../../lib/links';
 
 type Filter = 'open' | 'approved' | 'rejected';
 
@@ -55,6 +56,7 @@ export function Ideas(ctx: TripCtx) {
   // Swipe the list sideways to move between To decide · Planned · Passed (the list slides like the trip's days)
   const FILTERS: Filter[] = ['open', 'approved', 'rejected'];
   const vote = async (i: Idea) => {
+    if (!ctx.canContribute) { toast({ label: 'Viewers can see the votes but not vote' }); return; }
     const mine = !!i.votes?.[me.uid];
     haptic('light');
     try { await store.setVote(trip.id, i.id, me.uid, mine ? 0 : 1); }
@@ -68,7 +70,7 @@ export function Ideas(ctx: TripCtx) {
   return (
     <>
       <SectionHeader title="Ideas board"
-        action={<Button size="regular" icon="lightbulb" onClick={() => setAdding(true)}>Add idea</Button>} />
+        action={ctx.canContribute ? <Button size="regular" icon="lightbulb" onClick={() => setAdding(true)}>Add idea</Button> : undefined} />
       <SegmentControl label="Show ideas" block value={filter} onChange={setFilter} options={[
         { value: 'open', label: `To decide · ${count('open')}` },
         { value: 'approved', label: `Planned · ${count('approved')}` },
@@ -191,7 +193,7 @@ function IdeaSheet({ idea, place, ctx, onClose, onEdit, onSchedule }: { idea: Id
       <LinkChips links={idea.links} onOpen={(l) => recordView(ctx.trip.id, { url: l.url, kind: isPdf(l.url) ? 'PDF' : 'Link', label: l.label || hostOf(l.url), meta: idea.title })} />
       {place && (
         <div className={s.ideaButtons}>
-          {place.url && <LinkButton href={place.url} variant="neutral" icon="arrow-up-right">{`Open on ${place.source || 'the web'}`}</LinkButton>}
+          {place.url && <LinkButton href={place.url} variant="neutral" icon={isMapsLink(place.url) ? 'map' : 'arrow-up-right'} label={`Open ${place.name}`}>{isMapsLink(place.url) ? 'Open in Maps' : 'Open link'}</LinkButton>}
           <Button variant="neutral" icon="star" onClick={star}>{starred(place) ? 'Favourite' : 'Add to favourites'}</Button>
         </div>
       )}
@@ -234,7 +236,7 @@ function IdeaForm({ open, tripId, currency, idea, onClose }: { open: boolean; tr
   };
 
   return (
-    <Sheet open={open} title={idea ? 'Edit idea' : 'New idea'} onClose={onClose} onSubmit={submit} submitLabel={idea ? 'Save' : 'Add'} submitDisabled={!f.title.trim()}
+    <Sheet open={open} mode={idea ? 'edit' : 'default'} title={idea ? 'Edit idea' : 'New idea'} onClose={onClose} onSubmit={submit} submitLabel={idea ? 'Save' : 'Add'} submitDisabled={!f.title.trim()}
       secondary={idea ? <Button variant="destructive" size="large" onClick={remove}>Delete</Button> : undefined}>
       <TextField label="Idea" placeholder="Dinner at Taberna da Rua das Flores" value={f.title} onChange={(e) => set({ title: e.target.value })} />
       <Select label="Type" value={eventKind(f.category)} onChange={(e) => set({ category: e.target.value as Category })}>

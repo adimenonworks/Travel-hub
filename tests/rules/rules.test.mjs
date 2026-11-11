@@ -57,6 +57,17 @@ await t('owner deletes a member\'s event', assertSucceeds(deleteDoc(doc(A, 'trip
 await t('member cannot rename trip', assertFails(updateDoc(doc(B, 'trips/t1'), { name: 'x' })));
 await t('member cannot promote self', assertFails(updateDoc(doc(B, 'trips/t1'), { 'roles.bob': 'editor' })));
 await t('member cannot delete trip', assertFails(deleteDoc(doc(B, 'trips/t1'))));
+// Viewers: see the trip and chat, but add, edit and vote on nothing
+await t('owner makes carol a viewer', assertSucceeds(updateDoc(doc(A, 'trips/t1'), { memberIds: arrayUnion('carol'), 'roles.carol': 'viewer' })));
+await t('viewer reads trip and events', assertSucceeds(getDocs(collection(C, 'trips/t1/activities'))));
+await t('viewer comments', assertSucceeds(setDoc(doc(C, 'trips/t1/comments/v1'), { targetId: 'a1', text: 'Looks fun', authorId: 'carol', createdBy: 'carol', createdAt: 1 })));
+await t('viewer edits own comment', assertSucceeds(updateDoc(doc(C, 'trips/t1/comments/v1'), { text: 'Looks great', editedAt: 2 })));
+await t('viewer cannot add an event', assertFails(setDoc(doc(C, 'trips/t1/activities/v2'), { title: 'x', createdBy: 'carol' })));
+await t('viewer cannot edit an event', assertFails(updateDoc(doc(C, 'trips/t1/activities/a1'), { title: 'changed' })));
+await t('viewer cannot vote', assertFails(updateDoc(doc(C, 'trips/t1/ideas/i1'), { 'votes.carol': true })));
+await t('viewer cannot add an idea', assertFails(setDoc(doc(C, 'trips/t1/ideas/v3'), { title: 'x', createdBy: 'carol' })));
+await t('viewer cannot add a photo album', assertFails(setDoc(doc(C, 'trips/t1/albums/v4'), { title: 'x', url: 'https://x', createdBy: 'carol' })));
+await t('viewer cannot rename trip', assertFails(updateDoc(doc(C, 'trips/t1'), { name: 'x' })));
 
 await env.withSecurityRulesDisabled(async (c) => setDoc(doc(c.firestore(), 'invites/old'), { tripId: 't1', tripName: 'x', createdBy: 'alice', expiresAt: Timestamp.fromMillis(Date.now() - 1000) }));
 await t('expired invite rejected', assertFails(updateDoc(doc(C, 'trips/t1'), { memberIds: arrayUnion('carol'), 'roles.carol': 'member', joinedVia: 'old' })));
