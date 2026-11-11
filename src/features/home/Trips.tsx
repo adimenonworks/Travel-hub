@@ -1,10 +1,11 @@
 import { useSearchParams } from 'react-router-dom';
 import { SlideSwap } from '../shared/SlideSwap';
 import { Button, Card, EmptyState, Icon, Illustration, PageHeader, PageSkeleton, SegmentControl, Tile } from '../../design/components';
-import { useMyTrips } from '../../data/hooks';
+import { personName, useMe, useMyTrips, useProfiles, useShares } from '../../data/hooks';
 import type { SavedPlace } from '../../data/types';
 import { tripPhase } from '../../lib/dates';
 import { placeCounts, useCountries } from '../saves/Collections';
+import { countryName, flagUrl } from '../../lib/countries';
 import { Content, useNewTrip, useSave } from '../../app/Shell';
 import { TripHero } from '../shared/TripHero';
 import s from './Home.module.css';
@@ -46,6 +47,10 @@ export function Trips() {
   };
   const dated = (trips ?? []).slice().sort((a, b) => a.startDate.localeCompare(b.startDate));
   const countries = useCountries() ?? [];
+  // Collections other people shared with you: a Tile each ("Japan · Alex's"), after your own
+  const me = useMe();
+  const theirs = (useShares() ?? []).filter((x) => x.ownerId !== me.uid);
+  const owners = useProfiles(theirs.map((x) => x.ownerId));
   const upcoming = dated.filter((t) => tripPhase(t.startDate, t.endDate) !== 'past');
   const past = dated.filter((t) => tripPhase(t.startDate, t.endDate) === 'past').reverse();
 
@@ -69,12 +74,16 @@ export function Trips() {
               </div>
             </>
           ))}
-          {seg === 'saved' && (countries.length === 0 ? (
+          {seg === 'saved' && (countries.length === 0 && theirs.length === 0 ? (
             <Card media={<Illustration name="map" size={120} />} title="Looks a little empty" body="Save things to organise your future trip"
               actions={<Button block onClick={() => openSave({ mode: 'link' })}>Save a place</Button>} />
           ) : (
             <div className={ss.tileGrid}>
               {countries.map((c) => <CountryTile key={c.code} country={c} />)}
+              {theirs.map((x) => (
+                <Tile key={x.id} tone="default" to={`/saved/${x.countryCode}/${x.id}`} title={`${countryName(x.countryCode)} · ${personName(owners, x.ownerId).split(' ')[0]}'s`}
+                  media={<img src={flagUrl(x.countryCode)} alt="" />} meta={`Shared with you · ${x.roles[me.uid] === 'member' ? 'Member' : 'Viewer'}`} />
+              ))}
               <Tile tone="add" icon="plus" title="New place to go" onClick={() => openSave({ mode: 'link' })} />
             </div>
           ))}

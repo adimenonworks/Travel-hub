@@ -8,7 +8,7 @@ import {
   initializeFirestore, onSnapshot, persistentLocalCache, persistentMultipleTabManager, query, setDoc, updateDoc, where, writeBatch, type DocumentData,
 } from 'firebase/firestore';
 import type { Store } from './store';
-import type { ChatReads, Invite, LinkPreview, Profile, SavedPlace, SubName, Trip } from './types';
+import type { ChatReads, CollectionShare, Invite, LinkPreview, Profile, SavedPlace, SubName, Trip } from './types';
 import { getFunctions, httpsCallable } from 'firebase/functions';
 import { randomCode } from './util';
 import { googleIosClientId, isNativeApp } from '../lib/native';
@@ -126,7 +126,11 @@ export function createFirebaseStore(config: FirebaseOptions): Store {
         } else if (t.ownerId === uid) await this.deleteTrip(t.id);
         else await this.leaveTrip(t.id, uid);
       }
-      // 3. Your stars, profile and private settings, then the sign-in.
+      // 3. Shared collections: yours stop being shared; you leave the ones you were added to.
+      for (const sh of (await getDocs(query(collection(db, 'collectionShares'), where('ownerId', '==', uid)))).docs) await deleteDoc(sh.ref);
+      for (const sh of (await getDocs(query(collection(db, 'collectionShares'), where('memberIds', 'array-contains', uid)))).docs)
+        await updateDoc(sh.ref, { memberIds: arrayRemove(uid), [`roles.${uid}`]: deleteField() });
+      // 4. Your stars, profile and private settings, then the sign-in.
       const starred = await getDocs(query(collection(db, 'places'), where('starredBy', 'array-contains', uid)));
       for (const p of starred.docs) await updateDoc(p.ref, { starredBy: arrayRemove(uid) });
       for (const id of ['places', 'reads']) await deleteDoc(doc(db, 'users', uid, 'private', id)).catch(() => {});
@@ -348,6 +352,51 @@ export function createFirebaseStore(config: FirebaseOptions): Store {
       });
     },
 
+    watchShares(uid, cb) {
+      // Shares you own, and ones you were added to, merged
+      let own: CollectionShare[] = [], joined: CollectionShare[] = [];
+      const emit = () => cb([...own, ...joined.filter((s) => !own.some((o) => o.id === s.id))]);
+      const list = (docs: { id: string; data: () => DocumentData }[]) => docs.map((d) => withId<CollectionShare>(d.id, d.data()));
+      const a = onSnapshot(query(collection(db, 'collectionShares'), where('ownerId', '==', uid)), (q) => { own = list(q.docs); emit(); }, () => { own = []; emit(); });
+      const b = onSnapshot(query(collection(db, 'collectionShares'), where('memberIds', 'array-contains', uid)), (q) => { joined = list(q.docs); emit(); }, () => { joined = []; emit(); });
+      return () => { a(); b(); };
+    },
+    watchSharedPlaces(shareId, cb) {
+      // Two live queries merged: places added to it, and its owner's own places in that country (not filed elsewhere)
+      const cut = shareId.lastIndexOf('_');
+      const ownerId = shareId.slice(0, cut), countryCode = shareId.slice(cut + 1);
+      let added: SavedPlace[] = [], owners: SavedPlace[] = [];
+      const emit = () => cb([...owners.filter((p) => !p.sharedIn || p.sharedIn === shareId), ...added.filter((p) => !owners.some((o) => o.id === p.id))]);
+      const toList = (docs: { id: string; data: () => DocumentData }[]) => docs.map((d) => withId<SavedPlace>(d.id, d.data()));
+      const offAdded = onSnapshot(query(collection(db, 'places'), where('sharedIn', '==', shareId)), (q) => { added = toList(q.docs); emit(); }, () => { added = []; emit(); });
+      const offOwner = onSnapshot(query(collection(db, 'places'), where('ownerId', '==', ownerId), where('countryCode', '==', countryCode)), (q) => { owners = toList(q.docs); emit(); }, () => { owners = []; emit(); });
+      return () => { offAdded(); offOwner(); };
+    },
+    async shareCollection(countryCode) {
+      const uid = auth.currentUser!.uid;
+      const id = `${uid}_${countryCode}`;
+      const ref = doc(db, 'collectionShares', id);
+      // A share that doesn't exist yet can't be read (the rules need its owner), so a failed read means "make it".
+      // Your own places in that country are in it by being yours; nothing on them changes.
+      const existing = await getDoc(ref).catch(() => null);
+      if (existing?.exists()) return withId<CollectionShare>(id, existing.data());
+      const fresh = { ownerId: uid, countryCode, memberIds: [], roles: {}, createdAt: Date.now() };
+      await setDoc(ref, fresh);
+      return { id, ...fresh };
+    },
+    async createCollectionInvite(share, role, label) {
+      const code = randomCode();
+      await setDoc(doc(db, 'invites', code), {
+        kind: 'collection', shareId: share.id, countryCode: share.countryCode, role, tripName: label,
+        createdBy: auth.currentUser!.uid, expiresAt: Timestamp.fromMillis(Date.now() + INVITE_DAYS * 86400_000),
+      });
+      return code;
+    },
+    async setShareRole(share, uid, role) {
+      const ref = doc(db, 'collectionShares', share.id);
+      if (role) await updateDoc(ref, { memberIds: arrayUnion(uid), [`roles.${uid}`]: role });
+      else await updateDoc(ref, { memberIds: arrayRemove(uid), [`roles.${uid}`]: deleteField() });
+    },
     async createInvite(trip) {
       const code = randomCode();
       await setDoc(doc(db, 'invites', code), {
@@ -362,10 +411,15 @@ export function createFirebaseStore(config: FirebaseOptions): Store {
       const s = await getDoc(doc(db, 'invites', code));
       if (!s.exists()) return null;
       const d = s.data();
-      return { code, tripId: d.tripId, tripName: d.tripName, createdBy: d.createdBy, expiresAt: (d.expiresAt as Timestamp).toMillis() } satisfies Invite;
+      return { code, tripId: d.tripId ?? '', tripName: d.tripName, createdBy: d.createdBy, expiresAt: (d.expiresAt as Timestamp).toMillis(),
+        ...(d.kind === 'collection' ? { kind: 'collection' as const, shareId: d.shareId, countryCode: d.countryCode, role: d.role } : {}) } satisfies Invite;
     },
     async redeemInvite(invite) {
       const uid = auth.currentUser!.uid;
+      if (invite.kind === 'collection') {
+        await updateDoc(doc(db, 'collectionShares', invite.shareId!), { memberIds: arrayUnion(uid), [`roles.${uid}`]: invite.role ?? 'viewer', joinedVia: invite.code });
+        return;
+      }
       await updateDoc(doc(db, 'trips', invite.tripId), {
         memberIds: arrayUnion(uid),
         [`roles.${uid}`]: 'member',

@@ -39,6 +39,7 @@ function Routed() {
         <Route path="/profile/favourites/:country" element={<FavouriteCountry />} />
         <Route path="/profile/collections/*" element={<Navigate to="/profile/favourites" replace />} />
         <Route path="/saved/:country" element={<CountryCollection />} />
+        <Route path="/saved/:country/:shareId" element={<CountryCollection />} />
         <Route path="/design" element={<Suspense fallback={null}><DesignSystem /></Suspense>} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>

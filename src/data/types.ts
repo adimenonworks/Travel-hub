@@ -184,7 +184,19 @@ export type Album = {
   createdAt: number;
 };
 
-export type Invite = { code: string; tripId: string; tripName: string; createdBy: string; expiresAt: number };
+/** An invite link: to a trip (the default), or to someone's collection (`kind: 'collection'`, with the role it gives). */
+export type Invite = {
+  code: string; tripId: string; tripName: string; createdBy: string; expiresAt: number;
+  kind?: 'trip' | 'collection'; shareId?: string; countryCode?: string; role?: CollectionRole;
+};
+
+/** In a shared collection: a Member adds, moves and favourites places; a Viewer looks, favourites and opens Maps. */
+export type CollectionRole = 'member' | 'viewer';
+/**
+ * A shared country collection (`collectionShares/{ownerId}_{countryCode}`): its owner's places in that country and the
+ * places its Members add, all marked `sharedIn: id`, seen by everyone in `memberIds`.
+ */
+export type CollectionShare = { id: string; ownerId: string; countryCode: string; memberIds: string[]; roles: Record<string, CollectionRole>; createdAt: number };
 
 export type SubCollections = {
   activities: Activity;
@@ -230,6 +242,8 @@ export type SavedPlace = {
   kind?: string;
   notes?: string;
   starredBy?: string[];
+  /** The shared collection it's in (`collectionShares` id), so everyone in it can see it */
+  sharedIn?: string;
   createdAt: number;
 };
 

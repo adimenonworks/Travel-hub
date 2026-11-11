@@ -5,7 +5,7 @@ import { flagUrl } from '../../lib/countries';
 import { searchCities } from '../../lib/geocode';
 import { useCountries, placeCounts } from './Collections';
 import { store } from '../../data';
-import { useActivitiesFor, useMe, useMyTrips, usePlaces } from '../../data/hooks';
+import { personName, useActivitiesFor, useMe, useMyTrips, usePlaces, useProfiles, useShares } from '../../data/hooks';
 import type { LinkPreview } from '../../data/types';
 import { behaviourOf, categoryTone, kindInfo, type EventKind } from '../../lib/categories';
 import { countryName } from '../../lib/countries';
@@ -56,12 +56,16 @@ export function SaveSheet({ request, onClose }: { request: SaveRequest | null; o
   const [whereResults, setWhereResults] = useState<Place[] | null>(null);
   const [newCity, setNewCity] = useState<string | null>(null);
   const countries = useCountries() ?? [];
+  // Collections friends shared with you as a Member: you can save into theirs instead of your own ('' = yours)
+  const memberOf = (useShares() ?? []).filter((x) => x.ownerId !== me.uid && x.roles[me.uid] === 'member');
+  const owners = useProfiles(memberOf.map((x) => x.ownerId));
+  const [into, setInto] = useState('');
 
   // Start fresh each time it opens; a shared link is read straight away.
   useEffect(() => {
     if (!request) return;
     setLink(request.url ?? ''); setName('');
-    setPreview(null); setNote(''); resetTrip(); setChosen(null); setStep('preview'); setWhereQuery(''); setNewCity(null);
+    setPreview(null); setNote(''); resetTrip(); setChosen(null); setStep('preview'); setWhereQuery(''); setNewCity(null); setInto('');
     // The clipboard is read only when you tap Paste: reading it here made iOS show its Paste bubble as the sheet opened.
     if (request.url) read(request.url);
   }, [request]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -136,7 +140,8 @@ export function SaveSheet({ request, onClose }: { request: SaveRequest | null; o
   const save = async (mode: 'collections' | 'event' | 'link' | 'idea' = onTrip ? (action === 'new' ? 'event' : action === 'add' ? 'link' : 'idea') : 'collections') => {
     if (!preview) return;
     if (!code) return; // "Choose where to save" first
-    const where = [countryName(code), city].filter(Boolean).join(' · ');
+    const intoShare = memberOf.find((x) => x.id === into && x.countryCode === code);
+    const where = [intoShare ? `${personName(owners, intoShare.ownerId).split(' ')[0]}'s ${countryName(code)}` : countryName(code), city].filter(Boolean).join(' · ');
     const title = name.trim() || place?.name || preview.title;
     // The same place twice: same link, or the same name in the same spot.
     const dupe = places.find((p) => (!!preview.url && p.url === preview.url)
@@ -149,7 +154,7 @@ export function SaveSheet({ request, onClose }: { request: SaveRequest | null; o
         lat: place && Number.isFinite(place.lat) ? place.lat : null, lng: place && Number.isFinite(place.lng) ? place.lng : null,
         ...(preview.url ? { url: preview.url } : {}), ...(preview.image ? { image: preview.image } : {}),
         ...(preview.site ? { source: preview.site } : {}), ...(place?.kind ? { kind: place.kind } : {}),
-        ...(note.trim() ? { notes: note.trim() } : {}),
+        ...(note.trim() ? { notes: note.trim() } : {}), ...(intoShare ? { sharedIn: intoShare.id } : {}),
       });
       saved.catch(() => toast({ tone: 'error', label: "Couldn't save. Check your connection" }));
       const dropPlace = () => { if (!dupe) store.deletePlace(id).catch(() => {}); };
@@ -286,6 +291,16 @@ export function SaveSheet({ request, onClose }: { request: SaveRequest | null; o
             ))}
             <Chip icon="plus" active={newCity !== null} onClick={() => { haptic('selection'); setNewCity(''); }}>New city</Chip>
           </div>
+          {/* A friend shared their collection for this country with you as a Member: save into yours or theirs */}
+          {memberOf.some((x) => x.countryCode === code) && (
+            <div className={s.chipsWrap} role="group" aria-label="Whose collection">
+              <Chip active={!memberOf.some((x) => x.id === into && x.countryCode === code)} onClick={() => { haptic('selection'); setInto(''); }}>Your collection</Chip>
+              {memberOf.filter((x) => x.countryCode === code).map((x) => {
+                const label = `${personName(owners, x.ownerId).split(' ')[0]}'s collection`;
+                return <Chip key={x.id} icon="people" active={into === x.id} onClick={() => { haptic('selection'); setInto(x.id); }} label={`${label}${into === x.id ? ', selected' : ''}`}>{label}</Chip>;
+              })}
+            </div>
+          )}
           {newCity !== null && <TextField label="New city" placeholder="Hobart" value={newCity} autoComplete="off" autoFocus
             onChange={(e) => { setNewCity(e.target.value); setChosen({ code, city: e.target.value.trim() }); }} />}
         </>
