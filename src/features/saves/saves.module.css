@@ -51,3 +51,7 @@
 .sections { display: flex; flex-direction: column; gap: var(--space-stack); }
 .kindGroup { display: flex; flex-direction: column; gap: var(--space-default-300); }
 .kindGroupTitle { margin: 0; font: var(--type-body-small); color: var(--on-light-text-secondary); }
+
+/* A saved place's key info: the category tile, the category and when it was saved, Edit and the Favourite star */
+.placeKey { display: flex; align-items: center; gap: var(--space-default-400); }
+.placeKeyText { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: var(--space-default-100); }

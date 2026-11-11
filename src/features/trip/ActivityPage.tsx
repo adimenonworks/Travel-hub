@@ -1,7 +1,7 @@
 import { Fragment, useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { nextTransition } from '../../app/navigation';
-import { Button, EmptyState, IconButton, JourneyDetails, LayoverBlock, LinkButton, ListGroup, ListItem, PageHeader, PageSection, Sheet, SpanCard, TextField, useToast } from '../../design/components';
+import { Button, EmptyState, IconButton, JourneyDetails, LayoverBlock, LinkButton, ListGroup, ListItem, LocationCard, PageHeader, PageSection, Sheet, SpanCard, TextField, useToast } from '../../design/components';
 import type { Activity } from '../../data/types';
 import { daysBetween } from '../../lib/dates';
 import { store } from '../../data';
@@ -194,26 +194,14 @@ export function ActivityPage(ctx: TripCtx) {
       {/* Figma "Event detail — Location": the map, the address and the two ways to get there, together in one card */}
       {!journey && where && (
         <PageSection title="Location">
-          <div className={[s.whereCard, !a.location && s.whereCardPlain].filter(Boolean).join(' ')}>
-            {a.location && (
-              <div className={s.whereMap}>
-                <MapView pins={[{ lat: a.location.lat, lng: a.location.lng, label: a.title }]} center={a.location} zoom={15} height={160} />
-              </div>
-            )}
-            {/* Figma Location card: the place, with its Favourite star (stars the Place in your Collections, with its category) */}
-            <div className={s.wherePlace}>
-              <div className={s.whereText}>
-                <span className="t-heading-3">{where.split(',')[0]}</span>
-                {where.includes(',') && <span className="t-body t-secondary">{where.split(',').slice(1).join(',').trim()}</span>}
-              </div>
-              {behaviour !== 'open' && behaviour !== 'note' && <IconButton icon="star" state={starred ? 'filled' : 'default'} aria-pressed={starred}
-                label={starred ? `Remove ${where.split(',')[0]} from favourites` : `Add ${where.split(',')[0]} to favourites`} onClick={star} />}
-            </div>
-            <div className={s.whereButtons}>
+          <LocationCard title={where.split(',')[0]} subtitle={where.includes(',') ? where.split(',').slice(1).join(',').trim() : undefined}
+            map={a.location ? <MapView pins={[{ lat: a.location.lat, lng: a.location.lng, label: a.title }]} center={a.location} zoom={15} height={160} /> : undefined}
+            action={behaviour !== 'open' && behaviour !== 'note' ? <IconButton icon="star" state={starred ? 'filled' : 'default'} aria-pressed={starred}
+              label={starred ? `Remove ${where.split(',')[0]} from favourites` : `Add ${where.split(',')[0]} to favourites`} onClick={star} /> : undefined}
+            buttons={<>
               <LinkButton href={mapsUrl(where, a.location, app)} variant="neutral" icon="map" label={`Directions to ${where} in ${mapsAppLabel(app)}`}>{mapsAppLabel(app)}</LinkButton>
               <LinkButton href={uberUrl(where, a.location)} variant="neutral" icon="car" label={`Get an Uber to ${where}`}>Uber</LinkButton>
-            </div>
-          </div>
+            </>} />
         </PageSection>
       )}
 

@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import { Icon, type IconName } from './Icon';
-import { Avatar } from './Misc';
+import { Avatar, AvatarStack } from './Misc';
 import { Badge } from './Misc';
 import s from './Rows.module.css';
 
@@ -204,19 +204,6 @@ export function Tile({ title, meta, icon, media, tone = 'default', ...press }: P
 }
 
 
-/** Figma "Map card": an illustration, a title and meta, and a chevron, on the light grey surface. */
-export function MapCard({ title, meta, media, ...press }: Press & { title: string; meta?: ReactNode; media: ReactNode }) {
-  return (
-    <Pressable {...press} className={s.mapCard}>
-      <span className={s.mapMedia} aria-hidden="true">{media}</span>
-      <span className={s.itemText}>
-        <span className={s.itemTitle}>{title}</span>
-        {meta && <span className={s.itemMeta}>{meta}</span>}
-      </span>
-      <Icon name="chevron-right" size={24} className={s.chevron} />
-    </Pressable>
-  );
-}
 
 /** Figma "Stat strip" of "Stat"s: big numbers (Heading 1) with a label, on the light emerald surface. */
 export function StatStrip({ stats }: { stats: { value: ReactNode; label: string }[] }) {
@@ -311,21 +298,6 @@ export function StepProgress({ step, of = 4 }: { step: number; of?: number }) {
 }
 
 /** Figma "Destination header" (4 tones): flag, title and meta on an accent surface, and one Inverse button. */
-/** Figma "Destination header": a flag in a white circle, "24 saves · 3 cities" and who saved. Tone Neutral (grey) on screens. */
-export function DestinationHeader({ tone = 'neutral', flag, title, meta, action }: { tone?: 'neutral' | 'orange' | 'green' | 'yellow' | 'pink'; flag: ReactNode; title: string; meta?: ReactNode; action?: ReactNode }) {
-  return (
-    <section className={[s.destination, tone === 'neutral' ? s.destinationNeutral : s[`tile-${tone}`]].join(' ')}>
-      <div className={s.destinationTop}>
-        <span className={s.destinationFlag} aria-hidden="true">{flag}</span>
-        <span className={s.itemText}>
-          <span className={s.tileTitleSmall}>{title}</span>
-          {meta && <span className={s.tileMeta}>{meta}</span>}
-        </span>
-      </div>
-      {action}
-    </section>
-  );
-}
 
 /**
  * Figma "Layover block": between the legs of one journey on its detail page. Where and how long (worked out from the
@@ -365,6 +337,43 @@ export function SpanCard({ start, end, footer }: { start: SpanEnd; end: SpanEnd;
     <div className={s.span}>
       <div className={s.spanEnds}>{col(start)}<span className={s.spanDivider} aria-hidden="true" />{col(end)}</div>
       {footer && <p className={s.spanLabel}>{footer}</p>}
+    </div>
+  );
+}
+
+/**
+ * Figma "Collection header": the top of a country's collection. A real map with every place pinned (`map`; tap it for
+ * the full-screen map), "24 places · 3 cities", who it's with (avatars and "Saved by you and Sam") and how much of it
+ * you've visited ("6 of 24 visited", the Budget card's bar).
+ */
+export function CollectionHeader({ map, onMap, title, meta, people, visited }: {
+  map?: ReactNode; onMap?: () => void; title: string; meta?: string;
+  people?: { id: string; name: string; photo?: string | null }[];
+  visited?: { done: number; total: number };
+}) {
+  const ratio = visited && visited.total ? visited.done / visited.total : 0;
+  return (
+    <div className={s.collection}>
+      {map && (onMap
+        ? <button type="button" className={s.collectionMap} onClick={onMap} aria-label="Open the map">{map}</button>
+        : <div className={s.collectionMap}>{map}</div>)}
+      <div className={s.collectionBody}>
+        <div className={s.collectionSummary}>
+          <div className={s.collectionText}>
+            <span className={s.collectionTitle}>{title}</span>
+            {meta && <span className={s.collectionMeta}>{meta}</span>}
+          </div>
+          {people && people.length > 0 && <AvatarStack people={people} />}
+        </div>
+        {visited && visited.total > 0 && (
+          <div className={s.collectionVisited}>
+            <span className={s.collectionMeta}>{`${visited.done} of ${visited.total} visited`}</span>
+            <div className={s.budgetTrack} role="progressbar" aria-label="Places visited" aria-valuemin={0} aria-valuemax={visited.total} aria-valuenow={visited.done}>
+              <span className={s.budgetFill} style={{ width: `${Math.min(1, ratio) * 100}%` }} />
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

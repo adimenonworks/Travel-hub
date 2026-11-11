@@ -109,15 +109,6 @@
 .flowSkip { color: var(--on-dark-text-primary); }
 
 /* Event detail, Location: one grey card with the map (inner corners 24 − 8 = 16), the address, then the buttons */
-.whereCard { display: flex; flex-direction: column; gap: var(--space-default-500); padding: var(--space-default-300); padding-bottom: var(--space-default-500); border-radius: var(--radius-600); background: var(--on-light-surface-secondary); }
-.whereMap { border-radius: var(--radius-500); overflow: hidden; }
-.wherePlace { display: flex; align-items: center; gap: var(--space-default-300); padding-left: var(--space-default-300); }
-.whereText { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: var(--space-default-200); }
-.whereButtons { display: flex; flex-wrap: wrap; gap: var(--space-default-300); padding: 0 var(--space-default-300); }
-.whereButtons > * { flex: 1 1 calc(120rem / 17); }
-/* Without a map the card's content needs the full 16px all round (the 8px frame is only for the map) */
-.whereCardPlain { padding: var(--space-default-500); }
-.whereCardPlain .wherePlace, .whereCardPlain .whereButtons { padding-left: 0; padding-right: 0; }
 
 /* New trip step 4: a city's places drop down under it (indented), each ticked to come along */
 .flowDropdown { display: flex; flex-direction: column; padding-left: var(--space-default-700); }

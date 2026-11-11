@@ -1,6 +1,6 @@
-import { useMemo, useState, type ReactNode } from 'react';
+import { useEffect, useMemo, useState, type ReactNode } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Button, Card, Chip, DestinationHeader, EmptyState, Icon, Illustration, LinkButton, ListGroup, ListItem, MapCard, PageHeader, PageSection, PageSkeleton, Select, Sheet, useToast, Tile } from '../../design/components';
+import { Button, Card, CategoryIcon, Chip, CollectionHeader, EmptyState, Icon, IconButton, Illustration, LinkButton, ListGroup, ListItem, LocationCard, PageHeader, PageSection, PageSkeleton, Select, Sheet, useToast, Tile } from '../../design/components';
 import { hostOf } from '../../lib/format';
 import { store } from '../../data';
 import { useActivitiesFor, useMyTrips, usePlaces } from '../../data/hooks';
@@ -14,6 +14,7 @@ import { Content, useSave } from '../../app/Shell';
 import { MapView } from '../shared/Map';
 import { usePlaceMarks } from './placeMarks';
 import s from './saves.module.css';
+import { mapsUrl } from '../../lib/geocode';
 import { isMapsLink } from '../../lib/links';
 
 /** ✓ visited and ★ starred, as icons with words for screen readers (never colour alone). */
@@ -50,6 +51,8 @@ export function PlaceSheet({ place, onClose }: { place: SavedPlace | null; onClo
   const upcoming = (trips ?? []).filter((t) => t.endDate >= today());
   const acts = useActivitiesFor(upcoming.map((t) => t.id));
   const [tripId, setTripId] = useState('');
+  const [editing, setEditing] = useState(false);
+  useEffect(() => setEditing(false), [place?.id]); // each place opens with its category folded away
   if (!place) return <Sheet open={false} title="" onClose={onClose}>{null}</Sheet>;
   const mine = place.ownerId === me;
   const isStar = starred(place);
@@ -75,33 +78,57 @@ export function PlaceSheet({ place, onClose }: { place: SavedPlace | null; onClo
     try { await store.deletePlace(place.id); toast({ icon: 'trash', label: 'Place deleted' }); onClose(); }
     catch { toast({ tone: 'error', label: "Couldn't delete. Check your connection" }); }
   };
+  const cat = placeCategory(place.category);
+  const savedOn = new Date(place.createdAt).toLocaleDateString(undefined, { day: 'numeric', month: 'short', ...(new Date(place.createdAt).getFullYear() !== new Date().getFullYear() ? { year: 'numeric' } : {}) });
+  const where = [place.city, place.countryCode ? countryName(place.countryCode) : place.country].filter(Boolean).join(', ');
+  const maps = place.url && isMapsLink(place.url);
+  const pos = place.lat != null && place.lng != null ? { lat: place.lat, lng: place.lng, name: place.name } : null;
   return (
     <Sheet open title={place.name}
-      onSubmit={target ? addToTrip : undefined} submitLabel="Add to ideas"
+      onSubmit={target ? addToTrip : undefined} submitLabel={target ? `Add to ${target.name} ideas` : 'Add to ideas'}
       secondary={mine ? <Button variant="destructive" size="large" onClick={remove}>Delete</Button> : undefined}
-      subtitle={[placeCategory(place.category).one, place.city, place.countryCode ? countryName(place.countryCode) : null].filter(Boolean).join(' · ')} onClose={onClose}>
-      {place.image && <img src={place.image} alt="" className={s.saveImage} />}
-      <PlaceMarks visited={visited.has(place.id)} starred={isStar} />
-      {place.notes && <p className="t-body">{place.notes}</p>}
-      <div className={s.row}>
-        {place.url && <LinkButton href={place.url} variant="neutral" icon={isMapsLink(place.url) ? 'map' : 'arrow-up-right'} label={`Open ${place.name}`}>{isMapsLink(place.url) ? 'Open in Maps' : 'Open link'}</LinkButton>}
-        <Button variant="neutral" icon="star" onClick={star}>{isStar ? 'Favourite' : 'Add to favourites'}</Button>
+      subtitle={where || undefined} onClose={onClose}>
+      <div className={s.sections}>
+        {/* Key info: the category (Edit to change it), Favourite, and when and where it was saved */}
+        <section className={s.field} aria-label="About this place">
+          <div className={s.placeKey}>
+            <CategoryIcon icon={cat.icon} tone={cat.tone} />
+            <div className={s.placeKeyText}>
+              <span className="t-heading-4">{cat.one}</span>
+              <span className="t-body-small t-secondary">{[`Saved ${savedOn}`, place.source ? `from ${place.source}` : null, visited.has(place.id) ? 'Visited ✓' : null].filter(Boolean).join(' · ')}</span>
+            </div>
+            {mine && <Button variant="ghost" size="regular" aria-expanded={editing} onClick={() => { haptic('selection'); setEditing((x) => !x); }}>{editing ? 'Done' : 'Edit'}</Button>}
+            <IconButton icon="star" tone="ghost" state={isStar ? 'filled' : 'default'} aria-pressed={isStar} label={isStar ? 'Remove from favourites' : 'Add to favourites'} onClick={star} />
+          </div>
+          {editing && mine && (
+            <PlaceKindPicker id={`kind-${place.id}`} value={placeKind(place.category)} onChange={async (k) => {
+              try { await store.updatePlace(place.id, { category: k }); toast({ icon: 'check', label: 'Category changed' }); }
+              catch { toast({ tone: 'error', label: "Couldn't save. Check your connection" }); }
+            }} />
+          )}
+          {place.image && <img src={place.image} alt="" className={s.saveImage} />}
+          {place.notes && <p className="t-body selectable">{place.notes}</p>}
+        </section>
+        {/* Location: the map and Open in Maps (or the link it came from) */}
+        {(kindOf(place) === 'place' || maps) && (
+          <section className={s.field} aria-labelledby={`where-${place.id}`}>
+            <h3 className="t-heading-4" id={`where-${place.id}`}>Location</h3>
+            <LocationCard title={place.name} subtitle={where || undefined}
+              map={pos ? <MapView pins={[{ lat: pos.lat, lng: pos.lng, label: place.name }]} center={pos} zoom={15} height={160} /> : undefined}
+              buttons={<LinkButton href={maps ? place.url! : mapsUrl([place.name, where].filter(Boolean).join(', '), pos ? { name: place.name, lat: pos.lat, lng: pos.lng } : null)} variant="neutral" icon="map" label={`Open ${place.name} in Maps`}>Open in Maps</LinkButton>} />
+          </section>
+        )}
+        {place.url && !maps && (
+          <ListGroup label="Saved from">
+            <ListItem icon="arrow-up-right" title={place.source ? `Open on ${place.source}` : 'Open link'} meta={hostOf(place.url)} href={place.url} label={`Open the link for ${place.name}`} />
+          </ListGroup>
+        )}
+        {fits.length > 1 && (
+          <Select label="Add to a trip" value={target?.id} onChange={(e) => setTripId(e.target.value)}>
+            {fits.map((t) => <option key={t.id} value={t.id}>{t.name}</option>)}
+          </Select>
+        )}
       </div>
-      {mine && (
-        <PlaceKindPicker id={`kind-${place.id}`} value={placeKind(place.category)} onChange={async (k) => {
-          try { await store.updatePlace(place.id, { category: k }); toast({ icon: 'check', label: 'Category changed' }); }
-          catch { toast({ tone: 'error', label: "Couldn't save. Check your connection" }); }
-        }} />
-      )}
-      {fits.length > 0 && (
-        <div className={s.field}>
-          {fits.length > 1 ? (
-            <Select label="Add to a trip" value={target?.id} onChange={(e) => setTripId(e.target.value)}>
-              {fits.map((t) => <option key={t.id} value={t.id}>{t.name}</option>)}
-            </Select>
-          ) : <p className="t-body-small t-secondary">{`Add to ideas puts it on ${target!.name}, so everyone can vote on it.`}</p>}
-        </div>
-      )}
     </Sheet>
   );
 }
@@ -173,15 +200,17 @@ export function CountryCollection() {
           action={<Button icon="plus" onClick={() => { openSave({ mode: 'link' }); navigate('/trips'); }}>Save a place</Button>} />
       ) : (
         <>
-          <DestinationHeader flag={code ? <img src={flagUrl(code)} alt="" /> : <Icon name="lightbulb" size={24} />}
-            title={`${mine.length} save${mine.length === 1 ? '' : 's'}${cityCount > 1 ? ` · ${cityCount} cities` : ''}`} meta="Saved by you" />
+          {/* Figma "Collection header": the map with every place, the counts, who it's with and how much you've visited */}
+          <CollectionHeader
+            map={pins.length > 0 ? <MapView pins={pins} height={180} /> : undefined} onMap={pins.length > 0 ? () => setMap(true) : undefined}
+            title={[`${places.length || mine.length} ${(places.length || mine.length) === 1 ? (places.length ? 'place' : 'save') : (places.length ? 'places' : 'saves')}`, cityCount > 1 ? `${cityCount} cities` : ''].filter(Boolean).join(' · ')}
+            meta="Saved by you"
+            visited={places.length ? { done: places.filter((p) => visited.has(p.id)).length, total: places.length } : undefined} />
           <ul className={s.chips} aria-label="Filter">
             {filters.map((f) => (
               <li key={f.value}><Chip active={filter === f.value} onClick={() => { haptic('selection'); setFilter(f.value); }} label={`${f.label}, ${f.n}${filter === f.value ? ', selected' : ''}`}>{`${f.label} ${f.n}`}</Chip></li>
             ))}
           </ul>
-          {showPlaces && pins.length > 0 && <MapCard media={<Illustration name="map" size={72} />} title={`See ${pins.length} place${pins.length === 1 ? '' : 's'} on a map`}
-            meta={[...new Set(places.map(cityOf))].slice(0, 3).join(', ')} onClick={() => setMap(true)} />}
           {cities.length === 0 && extras.length === 0 && <p className="t-body t-secondary">Nothing matches this filter.</p>}
           {cities.map(([city, list]) => {
             const shown = expanded.includes(city) ? list : list.slice(0, SHOW);
