@@ -60,7 +60,7 @@
 .event-note { background: var(--on-light-surface-primary); border-color: var(--on-light-border-subtle); }
 .eventIcon { flex: none; display: grid; place-items: center; width: 40px; height: 40px; border-radius: var(--radius-1000); background: var(--on-light-surface-primary); color: var(--on-light-icon-primary); }
 .eventBody { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: var(--space-default-400); }
-.eventHeader { display: flex; gap: var(--space-default-300); align-items: flex-start; }
+.eventHeader { display: flex; gap: var(--space-default-500); align-items: flex-start; }
 .eventText { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: var(--space-default-200); }
 .eventTitle { font: var(--type-heading-3); line-height: 1.25; letter-spacing: -0.02em; color: var(--on-light-text-primary); overflow-wrap: anywhere; } /* wraps rather than cutting off (a 1.0 line height would clip descenders) */
 /* Time and place: a line each, after a small subtle icon (16px box, 12px glyph) */
@@ -69,7 +69,7 @@
 .eventTime { color: var(--on-light-text-primary); }
 .eventPlace { color: var(--on-light-text-secondary); min-width: 0; overflow-wrap: anywhere; }
 .eventTrailing { flex: none; display: flex; flex-direction: column; align-items: flex-end; gap: var(--space-default-100); }
-.eventAmount { font: var(--type-heading-3); letter-spacing: -0.02em; color: var(--on-light-text-primary); }
+.eventAmount { font: var(--type-body-small); color: var(--on-light-text-secondary); white-space: nowrap; } /* subtle, level with the title */
 .eventStatus { font: var(--type-body-small); color: var(--on-light-status-warning); }
 .eventExtras { display: flex; flex-wrap: wrap; gap: var(--space-default-300); }
 .route { display: flex; flex-direction: column; gap: var(--space-default-400); padding-top: var(--space-default-400); border-top: 1px solid var(--on-light-divider-default); }
@@ -184,6 +184,19 @@
 .tone-stays { background: var(--category-stays-surface); color: var(--category-stays-icon); }
 .tone-food { background: var(--category-food-surface); color: var(--category-food-icon); }
 .tone-activities { background: var(--category-activities-surface); color: var(--category-activities-icon); }
+.tone-notes { background: var(--category-notes-surface); color: var(--category-notes-icon); }
+/* On the deep-green Next card: the bright step with a near-black icon (about 6:1 against the green). */
+.event-next .tone-travel { background: var(--category-travel-surface-on-dark); color: var(--category-travel-icon-on-dark); }
+.event-next .tone-stays { background: var(--category-stays-surface-on-dark); color: var(--category-stays-icon-on-dark); }
+.event-next .tone-food { background: var(--category-food-surface-on-dark); color: var(--category-food-icon-on-dark); }
+.event-next .tone-activities { background: var(--category-activities-surface-on-dark); color: var(--category-activities-icon-on-dark); }
+.event-next .tone-notes { background: var(--category-notes-surface-on-dark); color: var(--category-notes-icon-on-dark); }
+/* Budget card rows: the group's icon in its type colour (600 on white, 300 in dark mode). */
+.ink-travel { display: inline-flex; color: var(--category-travel-surface); }
+.ink-stays { display: inline-flex; color: var(--category-stays-surface); }
+.ink-food { display: inline-flex; color: var(--category-food-surface); }
+.ink-activities { display: inline-flex; color: var(--category-activities-surface); }
+.ink-notes { display: inline-flex; color: var(--category-notes-surface); }
 
 /* Search field: pill, 16 / 20, gap 8 */
 .search { display: flex; align-items: center; gap: var(--space-default-300); min-height: 58px; padding: var(--space-default-500) var(--space-default-600); border-radius: var(--radius-1000); background: var(--on-light-surface-primary); border: 1px solid var(--on-light-border-subtle); color: var(--on-light-icon-primary); }

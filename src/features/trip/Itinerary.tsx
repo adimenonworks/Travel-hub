@@ -11,7 +11,8 @@ import { travelEstimate } from '../../lib/trips';
 import { SlideSwap } from '../shared/SlideSwap';
 import { ActivityForm, ConnectionForm } from './ActivityForm';
 import { entryEnd, entryTime, eventCardProps, eventsOn, isFirstLeg, legsOf, type DayEntry } from './events';
-import { behaviourOf, categoryInfo } from '../../lib/categories';
+import { behaviourOf, categoryInfo, isEveryday } from '../../lib/categories';
+import { priceOf, priceText } from '../../lib/currency';
 import { crossesDateLine, localNow, zoneOfDay } from '../../lib/timezone';
 import type { TripCtx } from './TripPage';
 import s from './trip.module.css';
@@ -95,7 +96,9 @@ export function Itinerary(ctx: TripCtx) {
           // On today's plan, the "now" line (Figma Timeline) sits before the next plan. The page doesn't scroll to it.
           const showNow = d === localToday && list.length > 1;
           const nextIndex = d === localToday ? list.findIndex((e) => entryEnd(e) > now) : -1;
-          const stateOf = (i: number): EventState => d < localToday || (d === localToday && entryEnd(list[i]) <= now) ? 'done' : i === nextIndex ? 'next' : 'default';
+          // The price per person, subtle at the top right, on bookings (not everyday spending); a stay shows it at check-in only.
+  const amountOf = (e: DayEntry) => { if (e.part === 'out' || isEveryday(e.a.category)) return undefined; const p = priceOf(e.a, trip); return p && p.amount > 0 ? priceText(p) : undefined; };
+  const stateOf = (i: number): EventState => d < localToday || (d === localToday && entryEnd(list[i]) <= now) ? 'done' : i === nextIndex ? 'next' : 'default';
           // A journey that lands on a later day: a marker at the top of that day. A journey that crosses the date line: a note.
           const arrivals = activities.filter((a) => behaviourOf(a.category) === 'journey' && isFirstLeg(a, activities)).flatMap((a) => {
             const legs = legsOf(a, activities), last = legs[legs.length - 1];
@@ -119,7 +122,7 @@ export function Itinerary(ctx: TripCtx) {
                     {showNow && n === nextIndex && nowLine}
                     {(() => {
                       const card = (
-                        <EventCard {...eventCardProps(e, ctx)} state={state} favourite={!!(a.placeId && places[a.placeId]?.starredBy?.includes(me.uid))}
+                        <EventCard {...eventCardProps(e, ctx)} amount={amountOf(e)} state={state} favourite={!!(a.placeId && places[a.placeId]?.starredBy?.includes(me.uid))}
                           extras={[
                             ...(state === 'next' ? [
                               { icon: 'info' as const, label: `Next · ${startsIn(e)}` },

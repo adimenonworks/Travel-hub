@@ -59,6 +59,11 @@
   border: 1px solid transparent;
 }
 .chip-active { background: var(--interactive-selected-secondary-background); color: var(--interactive-selected-secondary-text); }
+.chip-travel { background: var(--category-travel-surface); color: var(--category-travel-icon); border-color: transparent; }
+.chip-stays { background: var(--category-stays-surface); color: var(--category-stays-icon); border-color: transparent; }
+.chip-food { background: var(--category-food-surface); color: var(--category-food-icon); border-color: transparent; }
+.chip-activities { background: var(--category-activities-surface); color: var(--category-activities-icon); border-color: transparent; }
+.chip-notes { background: var(--category-notes-surface); color: var(--category-notes-icon); border-color: transparent; }
 .chip-inactive { background: var(--interactive-unselected-primary-background); color: var(--interactive-unselected-primary-text); border-color: var(--interactive-unselected-primary-border); }
 .chipFlag { width: 16px; height: 16px; border-radius: 50%; flex: none; }
 .chipButton { position: relative; z-index: 2; cursor: pointer; transition: background var(--motion-fast), transform var(--motion-release); }

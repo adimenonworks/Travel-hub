@@ -5,7 +5,7 @@ import { ActivityForm } from './ActivityForm';
 import { formatDay, today } from '../../lib/dates';
 import { hostOf, isPdf } from '../../lib/format';
 import { recordView } from '../../lib/recent';
-import { BOOKING_GROUPS, eventType } from '../../lib/categories';
+import { BOOKING_GROUPS, bookingGroupOf } from '../../lib/categories';
 import { byTime } from './Itinerary';
 import { eventCardProps } from './events';
 import type { TripCtx } from './TripPage';
@@ -47,15 +47,15 @@ export function Bookings(ctx: TripCtx) {
 
   // Older addresses: 'car' is now under Getting around
   const g = BOOKING_GROUPS.find((x) => x.key === (group === 'car' ? 'transport' : group)) ?? BOOKING_GROUPS[0];
-  const list = activities.filter((a) => eventType(a.category) === g.type).sort((a, b) => a.date.localeCompare(b.date) || byTime(a, b));
+  const list = activities.filter((a) => bookingGroupOf(a.category) === g.key).sort((a, b) => a.date.localeCompare(b.date) || byTime(a, b));
   const days = [...new Set(list.map((a) => a.date))];
   const [adding, setAdding] = useState(false);
-  const addLabel = { flights: 'Add a flight', stays: 'Add a stay', transport: 'Add a way to get around', activities: 'Add an activity', food: 'Add food & drink', free: 'Add free time', notes: 'Add a note' }[g.type];
+  const addLabel = ({ flights: 'Add a flight', stays: 'Add a stay', transport: 'Add a way to get around', activities: 'Add an activity', food: 'Add food & drink' } as Record<string, string>)[g.key];
   const t = today();
   return (
     <>
       <PageHeader title={g.title} size="small" back={back} />
-      <SectionHeader title={`${list.length} ${list.length === 1 ? g.one : g.many}`} meta={g.type === 'flights' ? 'Tap one for tickets, seats and bags' : 'Tap one for its details, tickets and notes'} />
+      <SectionHeader title={`${list.length} ${list.length === 1 ? g.one : g.many}`} meta={g.key === 'flights' ? 'Tap one for tickets, seats and bags' : 'Tap one for its details, tickets and notes'} />
       {list.length === 0 ? <EmptyState illustration="calendar" title={`No ${g.many} yet`} message={`Add an event to the itinerary and choose its type, and it shows here.`} /> : days.map((d) => (
         <PageSection key={d} title={formatDay(d)}>
           <div className={s.eventList}>

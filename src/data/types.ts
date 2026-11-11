@@ -1,3 +1,4 @@
+import type { EventKind } from '../lib/categories';
 /** `countryCode` is the ISO 3166 two-letter code (lowercase), used for flags and the trip's country badges. */
 export type Place = { name: string; lat: number; lng: number; country?: string; countryCode?: string };
 
@@ -58,7 +59,7 @@ export type Trip = {
 /** A link, PDF or booking. `emailUrl` optionally points at the email it came from (e.g. a Gmail message link). */
 export type LinkItem = { label: string; url: string; emailUrl?: string };
 
-/** Event categories (src/lib/categories.ts: 7 types → categories → behaviours). 'stay', 'activity', 'transport', 'food', 'drinks' and 'other' are older values (see LEGACY there). */
+/** Event categories (src/lib/categories.ts: 6 types → categories → behaviours). 'stay', 'activity', 'transport', 'food', 'drinks' and 'other' are older values (see LEGACY there). */
 /**
  * A known price, in the currency it was entered or booked in (an amount of 0 is "Free"). Optional everywhere and never
  * added up: a price belongs to the one item it's on.
@@ -195,7 +196,8 @@ export type SubName = keyof SubCollections;
 export type NewDoc<T> = Omit<T, 'id' | 'createdBy' | 'createdAt'>;
 
 /** The fixed Collections categories. Set from the place type Rove detects when saving; the person can change it. */
-export type PlaceCategory = 'restaurant' | 'cafe' | 'bar' | 'shop' | 'stay' | 'sight';
+/** A saved Place's category: an event category (Food & drink, Stays or Activities; see placeKind()). Older saves may hold 'shop' or 'stay'. */
+export type PlaceCategory = EventKind | 'shop' | 'stay';
 
 /**
  * A saved Place (Collections): a café, bar, restaurant, shop, stay or sight, filed under country → city → category.

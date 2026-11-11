@@ -4,7 +4,8 @@ import { useCountries, placeCounts } from '../saves/Collections';
 import { store } from '../../data';
 import type { Place, Trip } from '../../data/types';
 import { useMe, usePlaces } from '../../data/hooks';
-import { PLACE_CATEGORIES, cityOf, eventCategoryOf, groupBy, placeCategory } from '../../lib/places';
+import { PLACE_TYPES, placeTypeOf, cityOf, eventCategoryOf, groupBy, placeCategory } from '../../lib/places';
+import { TYPE_TONE } from '../../lib/categories';
 import { addDays, daysBetween, formatDay, today } from '../../lib/dates';
 import { countryCodeOf, countryName, flagUrl } from '../../lib/countries';
 import { searchCities } from '../../lib/geocode';
@@ -235,7 +236,7 @@ export function NewTrip({ open, onClose, onOpenTrip }: { open: boolean; onClose:
     );
 
   // Step 4 (Figma "New trip — 4. Bring your saves?"): nothing comes along until you pick it. Country → city (tap to
-  // open; "All of <city>") → category (Restaurants, Cafés…; tap to open; "All …") → places to tick. Skipping is fine: Ideas → Add idea → From saved brings them in later.
+  // open; "All of <city>") → type (Food & drink, Stays, Activities; tap to open; "All …") → places to tick. Skipping is fine: Ideas → Add idea → From saved brings them in later.
   const toggle = (ids: string[], on: boolean) => setPicked((x) => (on ? [...new Set([...x, ...ids])] : x.filter((y) => !ids.includes(y))));
   return (
     <FlowScreen step={5} of={steps} stepKey={4} title="Bring your saves?" subtitle="Pick places you've saved to add to this trip's Ideas." onClose={onClose}
@@ -266,15 +267,15 @@ export function NewTrip({ open, onClose, onOpenTrip }: { open: boolean; onClose:
                     <div className={s.flowDropdown}>
                       <ListItem size="compact" icon={n === list.length ? 'check' : 'plus'} title={`All of ${g === 'Links & notes' ? 'these' : g}`}
                         onClick={() => { haptic('light'); toggle(ids, n !== list.length); }} label={`All of ${g}, ${n === list.length ? 'chosen' : 'not chosen'}`} />
-                      {/* City → category → places: each category opens to its places (links and notes have no category) */}
-                      {(g === 'Links & notes' ? [{ c: null, places: list }] : PLACE_CATEGORIES.map((c) => ({ c, places: list.filter((p) => p.category === c.value) })).filter((x) => x.places.length > 0))
+                      {/* City → type → places: each type opens to its places (links and notes have none) */}
+                      {(g === 'Links & notes' ? [{ c: null, places: list }] : PLACE_TYPES.map((c) => ({ c, places: list.filter((p) => placeTypeOf(p.category) === c.value) })).filter((x) => x.places.length > 0))
                         .map(({ c, places }) => {
                           const catKey = `${key}/${c?.value ?? 'links'}`, catOpen = !c || openCat === catKey;
                           const catIds = places.map((p) => p.id), m = catIds.filter((id) => picked.includes(id)).length;
                           return (
                             <Fragment key={catKey}>
                               {c && (
-                                <ListItem size="compact" icon={c.icon} title={c.label} meta={m ? `${m} of ${places.length} chosen` : `${places.length} saved`}
+                                <ListItem size="compact" icon={c.icon} tone={TYPE_TONE[c.value]} title={c.label} meta={m ? `${m} of ${places.length} chosen` : `${places.length} saved`}
                                   trailing={<Icon name="chevron-down" size={16} className={catOpen ? s.flipped : undefined} />}
                                   onClick={() => { haptic('selection'); setOpenCat(catOpen ? null : catKey); }}
                                   label={`${c.label} in ${g}, ${places.length} saved, ${m} chosen. ${catOpen ? 'Hide' : 'Show'} places`} />
@@ -288,7 +289,7 @@ export function NewTrip({ open, onClose, onOpenTrip }: { open: boolean; onClose:
                                   {places.map((p) => {
                                     const on = picked.includes(p.id);
                                     return (
-                                      <ListItem key={p.id} size="compact" icon={on ? 'check' : placeCategory(p.category).icon} title={p.name}
+                                      <ListItem key={p.id} size="compact" icon={on ? 'check' : placeCategory(p.category).icon} tone={on ? undefined : placeCategory(p.category).tone} title={p.name}
                                         trailing={on ? 'Chosen' : undefined}
                                         onClick={() => { haptic('light'); toggle([p.id], !on); }} label={`${p.name}, ${on ? 'chosen' : 'not chosen'}`} />
                                     );

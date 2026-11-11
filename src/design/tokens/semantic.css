@@ -208,6 +208,13 @@
   --category-stays-surface: var(--color-violet-600); --category-stays-icon: var(--color-neutral-0);
   --category-food-surface: var(--color-yellow-600); --category-food-icon: var(--color-neutral-0);
   --category-activities-surface: var(--color-pink-600); --category-activities-icon: var(--color-neutral-0);
+  --category-notes-surface: var(--color-emerald-600); --category-notes-icon: var(--color-neutral-0);
+  /* On deep green (the Next Event card): the bright step with a near-black icon, in both modes. */
+  --category-travel-surface-on-dark: var(--color-sky-300); --category-travel-icon-on-dark: var(--color-neutral-1000);
+  --category-stays-surface-on-dark: var(--color-violet-300); --category-stays-icon-on-dark: var(--color-neutral-1000);
+  --category-food-surface-on-dark: var(--color-yellow-300); --category-food-icon-on-dark: var(--color-neutral-1000);
+  --category-activities-surface-on-dark: var(--color-pink-300); --category-activities-icon-on-dark: var(--color-neutral-1000);
+  --category-notes-surface-on-dark: var(--color-emerald-300); --category-notes-icon-on-dark: var(--color-neutral-1000);
   --on-accent-surface-sunken: color-mix(in srgb, var(--color-neutral-1000) 10%, transparent);
   --on-accent-text-primary: var(--color-neutral-900);
   --on-accent-text-secondary: var(--color-neutral-800);
@@ -478,6 +485,13 @@
     --category-stays-surface: var(--color-violet-300); --category-stays-icon: var(--color-neutral-1000);
     --category-food-surface: var(--color-yellow-300); --category-food-icon: var(--color-neutral-1000);
     --category-activities-surface: var(--color-pink-300); --category-activities-icon: var(--color-neutral-1000);
+    --category-notes-surface: var(--color-emerald-300); --category-notes-icon: var(--color-neutral-1000);
+    /* On deep green (the Next Event card): the bright step with a near-black icon, in both modes. */
+    --category-travel-surface-on-dark: var(--color-sky-300); --category-travel-icon-on-dark: var(--color-neutral-1000);
+    --category-stays-surface-on-dark: var(--color-violet-300); --category-stays-icon-on-dark: var(--color-neutral-1000);
+    --category-food-surface-on-dark: var(--color-yellow-300); --category-food-icon-on-dark: var(--color-neutral-1000);
+    --category-activities-surface-on-dark: var(--color-pink-300); --category-activities-icon-on-dark: var(--color-neutral-1000);
+    --category-notes-surface-on-dark: var(--color-emerald-300); --category-notes-icon-on-dark: var(--color-neutral-1000);
     --on-accent-surface-sunken: color-mix(in srgb, var(--color-neutral-0) 10%, transparent);
     --on-accent-text-primary: var(--color-neutral-0);
     --on-accent-text-secondary: var(--color-neutral-100);
@@ -705,6 +719,13 @@
   --category-stays-surface: var(--color-violet-300); --category-stays-icon: var(--color-neutral-1000);
   --category-food-surface: var(--color-yellow-300); --category-food-icon: var(--color-neutral-1000);
   --category-activities-surface: var(--color-pink-300); --category-activities-icon: var(--color-neutral-1000);
+  --category-notes-surface: var(--color-emerald-300); --category-notes-icon: var(--color-neutral-1000);
+  /* On deep green (the Next Event card): the bright step with a near-black icon, in both modes. */
+  --category-travel-surface-on-dark: var(--color-sky-300); --category-travel-icon-on-dark: var(--color-neutral-1000);
+  --category-stays-surface-on-dark: var(--color-violet-300); --category-stays-icon-on-dark: var(--color-neutral-1000);
+  --category-food-surface-on-dark: var(--color-yellow-300); --category-food-icon-on-dark: var(--color-neutral-1000);
+  --category-activities-surface-on-dark: var(--color-pink-300); --category-activities-icon-on-dark: var(--color-neutral-1000);
+  --category-notes-surface-on-dark: var(--color-emerald-300); --category-notes-icon-on-dark: var(--color-neutral-1000);
   --on-accent-surface-sunken: color-mix(in srgb, var(--color-neutral-0) 10%, transparent);
   --on-accent-text-primary: var(--color-neutral-0);
   --on-accent-text-secondary: var(--color-neutral-100);

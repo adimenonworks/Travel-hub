@@ -4,11 +4,12 @@ import { Button, Card, Chip, DestinationHeader, EmptyState, Icon, Illustration, 
 import { hostOf } from '../../lib/format';
 import { store } from '../../data';
 import { useActivitiesFor, useMyTrips, usePlaces } from '../../data/hooks';
-import type { PlaceCategory, SavedPlace } from '../../data/types';
+import type { SavedPlace } from '../../data/types';
 import { countryName, flagUrl } from '../../lib/countries';
 import { today } from '../../lib/dates';
 import { haptic, confirmAction } from '../../lib/native';
-import { PLACE_CATEGORIES, cityOf, eventCategoryOf, groupBy, placeCategory, sortPlaces, tripCountryCodes } from '../../lib/places';
+import { PLACE_TYPES, cityOf, eventCategoryOf, groupBy, placeCategory, placeKind, placeTypeOf, sortPlaces, tripCountryCodes, type PlaceType } from '../../lib/places';
+import { PlaceKindPicker } from './PlaceKindPicker';
 import { Content, useSave } from '../../app/Shell';
 import { MapView } from '../shared/Map';
 import { usePlaceMarks } from './placeMarks';
@@ -30,7 +31,7 @@ export function PlaceMarks({ visited, starred }: { visited: boolean; starred: bo
 export function PlaceRow({ place, visited, starred, onClick, meta, trailing }: { place: SavedPlace; visited: boolean; starred: boolean; onClick: () => void; meta?: ReactNode; trailing?: ReactNode }) {
   const c = placeCategory(place.category);
   return (
-    <ListItem icon={c.icon} media={place.image ? <img src={place.image} alt="" /> : undefined} title={place.name}
+    <ListItem icon={c.icon} tone={c.tone} media={place.image ? <img src={place.image} alt="" /> : undefined} title={place.name}
       meta={meta ?? [place.kind || c.one, place.source ? `from ${place.source}` : null].filter(Boolean).join(' · ')}
       trailing={trailing ?? <PlaceMarks visited={visited} starred={starred} />} onClick={onClick}
       label={`${place.name}${visited ? ', visited' : ''}${starred ? ', favourite' : ''}`} />
@@ -86,12 +87,10 @@ export function PlaceSheet({ place, onClose }: { place: SavedPlace | null; onClo
         <Button variant="neutral" icon="star" onClick={star}>{isStar ? 'Favourite' : 'Add to favourites'}</Button>
       </div>
       {mine && (
-        <Select label="Category" value={place.category} onChange={async (e) => {
-          try { await store.updatePlace(place.id, { category: e.target.value as PlaceCategory }); toast({ icon: 'check', label: 'Category changed' }); }
+        <PlaceKindPicker id={`kind-${place.id}`} value={placeKind(place.category)} onChange={async (k) => {
+          try { await store.updatePlace(place.id, { category: k }); toast({ icon: 'check', label: 'Category changed' }); }
           catch { toast({ tone: 'error', label: "Couldn't save. Check your connection" }); }
-        }}>
-          {PLACE_CATEGORIES.map((c) => <option key={c.value} value={c.value}>{c.label}</option>)}
-        </Select>
+        }} />
       )}
       {fits.length > 0 && (
         <div className={s.field}>
@@ -106,13 +105,13 @@ export function PlaceSheet({ place, onClose }: { place: SavedPlace | null; onClo
   );
 }
 
-type Filter = 'all' | PlaceCategory | 'links' | 'notes' | 'visited';
+type Filter = 'all' | PlaceType | 'links' | 'notes' | 'visited';
 const kindOf = (p: SavedPlace) => p.type ?? 'place';
 const SHOW = 3;
 
-/** A city's places split into its categories (Restaurants, Cafés…), each a small titled List group. */
+/** A city's places split into their types (Food & drink, Stays, Activities), each a small titled List group. */
 function CategoryGroups({ list, where, render }: { list: SavedPlace[]; where: string; render: (p: SavedPlace) => ReactNode }) {
-  return <>{PLACE_CATEGORIES.map((c) => ({ c, places: list.filter((p) => p.category === c.value) })).filter((x) => x.places.length > 0).map(({ c, places }) => (
+  return <>{PLACE_TYPES.map((c) => ({ c, places: list.filter((p) => placeTypeOf(p.category) === c.value) })).filter((x) => x.places.length > 0).map(({ c, places }) => (
     <section key={c.value} className={s.favCategory} aria-label={`${c.label} in ${where}`}>
       <h3 className={s.favCategoryTitle}><Icon name={c.icon} size={16} />{c.label}</h3>
       <ListGroup label={`${c.label} in ${where}`}>{places.map(render)}</ListGroup>
@@ -143,11 +142,11 @@ export function CountryCollection() {
   const title = code ? countryName(code) : 'Unsorted';
   const places = mine.filter((p) => kindOf(p) === 'place');
   const links = mine.filter((p) => kindOf(p) === 'link'), notes = mine.filter((p) => kindOf(p) === 'note');
-  const isCategory = PLACE_CATEGORIES.some((c) => c.value === filter);
+  const isCategory = PLACE_TYPES.some((c) => c.value === filter);
   const showPlaces = filter === 'all' || filter === 'visited' || isCategory;
-  const cityList = sortPlaces(places.filter((p) => (filter !== 'visited' || visited.has(p.id)) && (!isCategory || p.category === filter)), visited);
-  // In each city: categories in their usual order, unvisited first inside each.
-  const order = (p: SavedPlace) => PLACE_CATEGORIES.findIndex((c) => c.value === p.category);
+  const cityList = sortPlaces(places.filter((p) => (filter !== 'visited' || visited.has(p.id)) && (!isCategory || placeTypeOf(p.category) === filter)), visited);
+  // In each city: types in their usual order, unvisited first inside each.
+  const order = (p: SavedPlace) => PLACE_TYPES.findIndex((c) => c.value === placeTypeOf(p.category));
   const cities = showPlaces ? groupBy(cityList, cityOf).map(([c, list]) => [c, list.slice().sort((x, y) => order(x) - order(y))] as [string, SavedPlace[]]) : [];
   const extras = filter === 'all' ? [...links, ...notes] : filter === 'links' ? links : filter === 'notes' ? notes : [];
   const pins = places.filter((p) => p.lat != null && p.lng != null).map((p) => ({ lat: p.lat!, lng: p.lng!, label: p.name }));
@@ -155,7 +154,7 @@ export function CountryCollection() {
   const cityCount = new Set(places.map(cityOf)).size;
   const filters: { value: Filter; label: string; n: number }[] = [
     { value: 'all', label: 'All', n: mine.length },
-    ...PLACE_CATEGORIES.map((c) => ({ value: c.value as Filter, label: c.label, n: places.filter((p) => p.category === c.value).length })).filter((f) => f.n > 0),
+    ...PLACE_TYPES.map((c) => ({ value: c.value as Filter, label: c.label, n: places.filter((p) => placeTypeOf(p.category) === c.value).length })).filter((f) => f.n > 0),
     ...(links.length ? [{ value: 'links' as Filter, label: 'Links', n: links.length }] : []),
     ...(notes.length ? [{ value: 'notes' as Filter, label: 'Notes', n: notes.length }] : []),
     ...(places.some((p) => visited.has(p.id)) ? [{ value: 'visited' as Filter, label: 'Visited', n: places.filter((p) => visited.has(p.id)).length }] : []),
@@ -195,7 +194,7 @@ export function CountryCollection() {
             <PageSection title="Links & notes" action={seeAll('links', extras.length)}>
               <ListGroup label="Links and notes">
                 {(expanded.includes('links') ? extras : extras.slice(0, SHOW)).map((p) => (
-                  <ListItem key={p.id} icon={kindOf(p) === 'note' ? 'lightbulb' : 'link'} title={p.name} onClick={() => setOpen(p.id)}
+                  <ListItem key={p.id} icon={kindOf(p) === 'note' ? 'notebook' : 'link'} tone={kindOf(p) === 'note' ? 'notes' : undefined} title={p.name} onClick={() => setOpen(p.id)}
                     meta={[kindOf(p) === 'note' ? 'Note' : p.kind || 'Link', p.notes && kindOf(p) === 'note' ? p.notes.split('\n')[0] : p.url ? hostOf(p.url) : null].filter(Boolean).join(' · ')} />
                 ))}
               </ListGroup>
@@ -230,7 +229,7 @@ export function placeCounts(list: SavedPlace[]) {
 /**
  * Favourites (You → Favourite places → See more): the places you've starred, filed like Collections. A Tile per country
  * (its flag and how many), A to Z; a country opens its favourites by city (or state/province when there's no city),
- * each city split into its categories (Restaurants, Cafés, Bars, Shops, Stays, Sights & activities).
+ * each city split into its types (Food & drink, Stays, Activities), each place in its type's colour.
  */
 export function Favourites() {
   const all = usePlaces();

@@ -3,7 +3,7 @@ import { BudgetCard, CountryModal, EventCard, ListGroup, ListItem, PageSection }
 import type { IconName } from '../../design/components';
 import { useMe, useProfile } from '../../data/hooks';
 import type { Place } from '../../data/types';
-import { BOOKING_GROUPS, eventType, isEveryday } from '../../lib/categories';
+import { BOOKING_GROUPS, TYPE_TONE, bookingGroupOf, categoryInfo, categoryTone, isEveryday } from '../../lib/categories';
 import { countryCodeOf, countryName, flagUrl, tripCountries } from '../../lib/countries';
 import { timeAgo } from '../../lib/dates';
 import { priceOf, useBudgetTotals } from '../../lib/currency';
@@ -31,7 +31,7 @@ export function Overview(ctx: TripCtx) {
   const docs = activities.reduce((n, a) => n + a.links.length, 0);
   const recent = useRecentViews(trip.id);
   // Budget (per person): the prices of the events you book ahead, by group. Food, drink and free time are everyday spending.
-  const priced = activities.flatMap((a) => { const g = eventType(a.category); const p = isEveryday(a.category) ? null : priceOf(a, trip); return p && p.amount > 0 ? [{ price: p, group: g }] : []; });
+  const priced = activities.flatMap((a) => { const g = bookingGroupOf(a.category); const p = isEveryday(a.category) ? null : priceOf(a, trip); return p && p.amount > 0 ? [{ price: p, group: g }] : []; });
   const totals = useBudgetTotals(trip.budget, priced);
   const left = (trip.budget?.amount ?? 0) - totals.planned;
   const over = left < 0;
@@ -61,15 +61,15 @@ export function Overview(ctx: TripCtx) {
           <BudgetCard label={over ? 'Over budget' : 'Left to spend'} amount={money(Math.round(Math.abs(left)), trip.budget.currency)} over={over}
             caption={`of ${money(trip.budget.amount, trip.budget.currency)} per person · ${money(Math.round(totals.planned), trip.budget.currency)} planned`}
             ratio={trip.budget.amount > 0 ? totals.planned / trip.budget.amount : 1}
-            rows={BOOKING_GROUPS.filter((g) => g.type !== 'food' && (totals.byGroup[g.type] ?? 0) > 0).map((g) => ({ icon: g.icon, label: g.title, amount: money(Math.round(totals.byGroup[g.type]), trip.budget!.currency) }))} />
+            rows={BOOKING_GROUPS.filter((g) => g.key !== 'food' && (totals.byGroup[g.key] ?? 0) > 0).map((g) => ({ icon: g.icon, label: g.title, tone: TYPE_TONE[g.type], amount: money(Math.round(totals.byGroup[g.key]), trip.budget!.currency) }))} />
         </PageSection>
       )}
 
       <PageSection title="Bookings" meta="Tickets, confirmations and PDFs, by type">
         <ListGroup label="Bookings">
           {BOOKING_GROUPS.map((g) => {
-            const n = activities.filter((a) => eventType(a.category) === g.type).length;
-            return <ListItem key={g.key} icon={g.icon} title={g.title} meta={`${n} ${n === 1 ? g.one : g.many}`} to={`${base}/bookings/${g.key}`} />;
+            const n = activities.filter((a) => bookingGroupOf(a.category) === g.key).length;
+            return <ListItem key={g.key} icon={g.icon} tone={TYPE_TONE[g.type]} title={g.title} meta={`${n} ${n === 1 ? g.one : g.many}`} to={`${base}/bookings/${g.key}`} />;
           })}
           <ListItem icon="doc" title="Documents" meta={`${docs} ${docs === 1 ? 'file' : 'files'}`} to={`${base}/bookings/documents`} />
         </ListGroup>
@@ -81,8 +81,10 @@ export function Overview(ctx: TripCtx) {
             {recent.map((v) => {
               const kind = v.kind ?? 'Link';
               const trailing = `${kind} · ${timeAgo(v.at)}`;
+              // A booking you opened shows in its event type's icon and colour
+              const ev = activities.find((a) => v.url.endsWith(`/plan/${a.id}`));
               return isInApp(v)
-                ? <ListItem key={v.url} size="compact" icon={KIND_ICON[kind]} title={v.label} trailing={trailing} to={v.url} />
+                ? <ListItem key={v.url} size="compact" icon={ev ? categoryInfo(ev.category).icon : KIND_ICON[kind]} tone={ev ? categoryTone(ev.category) : undefined} title={v.label} trailing={trailing} to={v.url} />
                 : <ListItem key={v.url} size="compact" icon={KIND_ICON[kind]} title={v.label} trailing={trailing} href={v.url} label={`${v.label} (opens in a new tab)`}
                     onClick={() => recordView(trip.id, { url: v.url, label: v.label, meta: v.meta, kind })} />;
             })}

@@ -3,6 +3,7 @@ import { Icon, type IconName } from './Icon';
 import { Illustration, type IllustrationName } from './Illustration';
 import { Card } from './Card';
 import s from './Misc.module.css';
+import type { CategoryTone } from './Rows';
 
 function initials(name: string) {
   const parts = name.trim().split(/\s+/).filter(Boolean);
@@ -54,12 +55,14 @@ export function Badge({ tone = 'neutral', icon, iconState, flag, children }: {
 }
 
 /** Figma Chip (Type=Action): a country or filter with a flag or icon. Active is filled deep emerald. */
-export function Chip({ active, icon, flag, onClick, label, children }: {
+export function Chip({ active, icon, flag, onClick, label, tone, children }: {
   active?: boolean; icon?: IconName; /** Image URL of a country flag */ flag?: string;
+  /** Figma "Category": when active, the chip takes an event type's colour (the category chips when adding an event or saving a place). */
+  tone?: CategoryTone;
   /** Makes the chip a button (e.g. a country chip opens its quick-info modal) */ onClick?: () => void; /** Fuller name for screen readers */ label?: string;
   children: ReactNode;
 }) {
-  const cls = [s.chip, active ? s['chip-active'] : s['chip-inactive'], onClick && s.chipButton].filter(Boolean).join(' ');
+  const cls = [s.chip, active ? s['chip-active'] : s['chip-inactive'], active && tone && tone !== 'neutral' && s[`chip-${tone}`], onClick && s.chipButton].filter(Boolean).join(' ');
   const body = <>{flag ? <img src={flag} alt="" className={s.chipFlag} /> : icon && <Icon name={icon} size={16} />}{children}</>;
   return onClick
     ? <button type="button" className={cls} onClick={onClick} aria-label={label}>{body}</button>
