@@ -27,6 +27,8 @@ export type TripPhoto = { id: string; url: string; small: string; color?: string
 
 export type Trip = {
   id: string;
+  /** In Recently deleted since then (ms), by whom; gone for good after 30 days */
+  deletedAt?: number; deletedBy?: string;
   name: string;
   destination: Place | null;
   startDate: string; // YYYY-MM-DD
@@ -79,6 +81,8 @@ export type Category =
 
 export type Activity = {
   id: string;
+  /** In Recently deleted since then (ms), by whom; gone for good after 30 days */
+  deletedAt?: number; deletedBy?: string;
   date: string;
   startTime: string; // HH:mm or ''
   endTime: string;
@@ -192,6 +196,11 @@ export type Invite = {
 
 /** In a shared collection: a Member adds, moves and favourites places; a Viewer looks, favourites and opens Maps. */
 export type CollectionRole = 'member' | 'viewer';
+
+/** Something that can go to Recently deleted (and come back) */
+export type Deletable = { kind: 'trip'; id: string } | { kind: 'event'; tripId: string; id: string } | { kind: 'place'; id: string };
+/** How long Recently deleted keeps things */
+export const KEEP_DELETED_MS = 30 * 86400_000;
 /**
  * A shared country collection (`collectionShares/{ownerId}_{countryCode}`): its owner's places in that country and the
  * places its Members add, all marked `sharedIn: id`, seen by everyone in `memberIds`.
@@ -222,6 +231,8 @@ export type PlaceCategory = EventKind | 'shop' | 'stay';
  */
 export type SavedPlace = {
   id: string;
+  /** In Recently deleted since then (ms), by whom; gone for good after 30 days */
+  deletedAt?: number; deletedBy?: string;
   ownerId: string;
   /** 'place' (a real place; the default when missing), 'link' (an article or video with no place) or 'note'.
    *  Links and notes sit on their country, in "Links & notes", and have no city. */

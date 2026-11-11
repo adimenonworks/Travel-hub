@@ -90,6 +90,14 @@ await t('owner cannot just leave (hands it over instead)', assertFails(updateDoc
 await env.withSecurityRulesDisabled(async (c) => setDoc(doc(c.firestore(), 'trips/t9'), { name: 'Rome', ownerId: 'alice', memberIds: ['alice', 'bob', 'carol'], roles: { alice: 'owner', bob: 'member', carol: 'member' } }));
 await t('a Planner removes another Planner', assertSucceeds(updateDoc(doc(B, 'trips/t9'), { memberIds: arrayRemove('carol'), 'roles.carol': deleteField() })));
 await t('a Planner cannot delete the trip', assertFails(deleteDoc(doc(B, 'trips/t9'))));
+// Recently deleted: the creator bins the trip, any Planner restores it; Planners bin events
+await env.withSecurityRulesDisabled(async (c) => setDoc(doc(c.firestore(), 'trips/t8'), { name: 'Oslo', ownerId: 'alice', memberIds: ['alice', 'bob'], roles: { alice: 'owner', bob: 'member' } }));
+await env.withSecurityRulesDisabled(async (c) => setDoc(doc(c.firestore(), 'trips/t8/activities/e1'), { title: 'Fjord', createdBy: 'alice' }));
+await t('a Planner cannot bin the trip', assertFails(updateDoc(doc(B, 'trips/t8'), { deletedAt: 1, deletedBy: 'bob' })));
+await t('the creator bins the trip', assertSucceeds(updateDoc(doc(A, 'trips/t8'), { deletedAt: 1, deletedBy: 'alice' })));
+await t('a Planner restores the trip', assertSucceeds(updateDoc(doc(B, 'trips/t8'), { deletedAt: deleteField(), deletedBy: deleteField() })));
+await t('a Planner bins someone else\'s event', assertSucceeds(updateDoc(doc(B, 'trips/t8/activities/e1'), { deletedAt: 1, deletedBy: 'bob' })));
+await t('a Planner restores it', assertSucceeds(updateDoc(doc(B, 'trips/t8/activities/e1'), { deletedAt: deleteField(), deletedBy: deleteField() })));
 await t('creator leaves by handing the trip to a Planner', assertSucceeds(updateDoc(doc(A, 'trips/t9'), { ownerId: 'bob', memberIds: ['bob'], roles: { bob: 'owner' } })));
 
 // Saved Places (Collections)

@@ -245,10 +245,11 @@ export function ActivityForm({ open, trip, date, activity, draft, onClose, onCre
   };
 
   const remove = async () => {
-    if (!activity || !confirmAction(`Delete "${activity.title}"?`)) return;
+    if (!activity || !confirmAction(`Delete "${activity.title}"? It stays in Recently deleted for 30 days.`)) return;
     try {
-      await store.deleteSub(trip.id, 'activities', activity.id);
-      toast({ icon: 'trash', label: 'Event deleted' });
+      const item = { kind: 'event' as const, tripId: trip.id, id: activity.id };
+      await store.setDeleted(item, true);
+      toast({ icon: 'trash', label: 'Event deleted', action: { label: 'Undo', onClick: () => { store.setDeleted(item, false).catch(() => {}); } } });
       onClose();
       onDeleted?.(activity);
     } catch {

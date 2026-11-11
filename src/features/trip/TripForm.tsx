@@ -66,10 +66,11 @@ export function TripForm({ open, trip, onClose, onSaved, onDeleted }: { open: bo
   };
 
   const remove = async () => {
-    if (!trip || !confirmAction(`Delete "${trip.name}" for everyone? This can't be undone.`)) return;
+    const others = trip ? trip.memberIds.length - 1 : 0;
+    if (!trip || !confirmAction(`Delete "${trip.name}"${others ? ` for all ${others + 1} people on it` : ''}? It stays in Recently deleted (You → Recently deleted) for 30 days, then it's gone for good.`)) return;
     try {
-      await store.deleteTrip(trip.id);
-      toast({ icon: 'trash', label: 'Trip deleted' });
+      await store.setDeleted({ kind: 'trip', id: trip.id }, true);
+      toast({ icon: 'trash', label: 'Trip deleted', action: { label: 'Undo', onClick: () => { store.setDeleted({ kind: 'trip', id: trip.id }, false).catch(() => {}); } } });
       onClose();
       onDeleted?.();
     } catch (e) {

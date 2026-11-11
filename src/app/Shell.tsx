@@ -8,6 +8,7 @@ import { ChatAlerts } from './ChatAlerts';
 import { NewTrip } from '../features/trip/NewTrip';
 import { SaveSheet, type SaveRequest } from '../features/saves/SaveSheet';
 import { onOpenPath, onSharedLink } from '../lib/native';
+import { usePurgeDeleted } from '../features/profile/RecentlyDeleted';
 import s from './Shell.module.css';
 
 /** Opens the full-screen New trip flow from anywhere (Home, Trips). */
@@ -34,6 +35,7 @@ export function Shell({ children }: { children: ReactNode }) {
   useEffect(() => onSharedLink((url) => setSaving({ mode: 'link', url })), []);
   // The website's "Open in Rove" (rove://go?path=/join/abc) opens that page here
   useEffect(() => onOpenPath((path) => navigate(path)), [navigate]);
+  usePurgeDeleted();
   const { pathname } = useLocation();
   const tabs = TABS;
   const showNav = !pathname.startsWith('/join/') && pathname !== '/design';

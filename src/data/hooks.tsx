@@ -32,7 +32,11 @@ function useCached<T>(key: string, fallback: T): [T, (v: T) => void] {
   return [v, (next: T) => { memo.set(key, next); setV(next); }];
 }
 
-export function useMyTrips() {
+/** Things in Recently deleted are hidden everywhere else */
+const live = <T extends { deletedAt?: number }>(list: T[] | null) => (list ? list.filter((x) => !x.deletedAt) : list);
+
+/** Your trips, including ones in Recently deleted (for that page) */
+export function useMyTripsAll() {
   const me = useMe();
   const [trips, setTrips] = useCached<Trip[] | null>(`trips:${me.uid}`, null);
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -40,23 +44,28 @@ export function useMyTrips() {
   return trips;
 }
 
+export function useMyTrips() {
+  const all = useMyTripsAll();
+  return useMemo(() => live(all), [all]);
+}
+
 export function useTrip(id: string) {
   const [trip, setTrip] = useCached<Trip | null | undefined>(`trip:${id}`, undefined);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => store.watchTrip(id, setTrip, () => setTrip(null)), [id]);
-  return trip; // undefined = loading, null = missing or no access
+  return trip?.deletedAt ? null : trip; // undefined = loading, null = missing, deleted or no access
 }
 
 export function useSub<K extends SubName>(tripId: string, name: K) {
   const [items, setItems] = useCached<SubCollections[K][] | null>(`sub:${tripId}:${name}`, null);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => store.watchSub(tripId, name, setItems), [tripId, name]);
-  return items;
+  return useMemo(() => live(items as (SubCollections[K] & { deletedAt?: number })[] | null), [items]);
 }
 
 /** Activities for several trips, keyed by trip id (used for the travel metrics on Home). */
 /** One kind of sub-collection for several trips at once (e.g. the saves of every saved place), by trip id. */
-export function useSubFor<K extends SubName>(tripIds: string[], name: K) {
+export function useSubFor<K extends SubName>(tripIds: string[], name: K, includeDeleted = false) {
   const key = tripIds.join(',');
   const [byTrip, setByTrip] = useState<Record<string, SubCollections[K][]>>(() =>
     Object.fromEntries(tripIds.flatMap((id) => (memo.has(`sub:${id}:${name}`) ? [[id, memo.get(`sub:${id}:${name}`) as SubCollections[K][]]] : []))));
@@ -65,7 +74,8 @@ export function useSubFor<K extends SubName>(tripIds: string[], name: K) {
     return () => offs.forEach((off) => off());
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [key, name]);
-  return byTrip;
+  return useMemo(() => includeDeleted ? byTrip
+    : Object.fromEntries(Object.entries(byTrip).map(([id, l]) => [id, live(l as (SubCollections[K] & { deletedAt?: number })[])!])) as Record<string, SubCollections[K][]>, [byTrip, includeDeleted]);
 }
 
 export const useActivitiesFor = (tripIds: string[]) => useSubFor(tripIds, 'activities');
@@ -104,12 +114,18 @@ export function personName(profiles: Record<string, Profile>, id: string) {
 }
 
 /** Your Collections: Places you saved and the ones you starred, live (cached for the session). */
-export function usePlaces() {
+/** Your places, including ones in Recently deleted (for that page) */
+export function usePlacesAll() {
   const me = useMe();
   const [places, setPlaces] = useCached<SavedPlace[] | null>(`places:${me.uid}`, null);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => store.watchPlaces(me.uid, setPlaces), [me.uid]);
   return places;
+}
+
+export function usePlaces() {
+  const all = usePlacesAll();
+  return useMemo(() => live(all), [all]);
 }
 
 /** Shared collections you own or were added to (null while loading). */
@@ -129,7 +145,7 @@ export function useSharedPlaces(shareId: string | undefined) {
     return store.watchSharedPlaces(shareId, setPlaces);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [shareId]);
-  return places;
+  return useMemo(() => live(places), [places]);
 }
 
 /**
@@ -143,7 +159,7 @@ export function usePlacesById(ids: string[]) {
   useEffect(() => {
     const own = new Set((mine ?? []).map((p) => p.id));
     const missing = key ? key.split(',').filter((id) => !own.has(id) && !others[id]) : [];
-    if (missing.length) store.getPlaces(missing).then((got) => setOthers((m) => ({ ...m, ...got })));
+    if (missing.length) store.getPlaces(missing).then((got) => setOthers((m) => ({ ...m, ...Object.fromEntries(Object.entries(got).filter(([, p]) => !p.deletedAt)) })));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [key, mine]);
   return useMemo(() => ({ ...others, ...Object.fromEntries((mine ?? []).map((p) => [p.id, p])) }), [others, mine]);

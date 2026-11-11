@@ -56,7 +56,14 @@ service cloud.firestore {
           && request.resource.data.ownerId == resource.data.ownerId
           && resource.data.ownerId in request.resource.data.memberIds
           && request.resource.data.roles[resource.data.ownerId] == 'owner'
-          && validCover(request.resource.data);
+          && validCover(request.resource.data)
+          && binOk();
+      }
+      // Recently deleted: only whoever created the trip moves it there; any Planner brings it back
+      function binOk() {
+        return !request.resource.data.diff(resource.data).affectedKeys().hasAny(['deletedAt', 'deletedBy'])
+          || resource.data.ownerId == uid()
+          || !('deletedAt' in request.resource.data);
       }
 
       // A non-member joins with a valid, unexpired invite for this trip.

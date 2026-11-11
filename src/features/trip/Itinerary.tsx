@@ -56,8 +56,11 @@ export function Itinerary(ctx: TripCtx) {
   const [connectFrom, setConnectFrom] = useState<Activity | null>(null);
   const toast = useToast();
   const remove = async (a: Activity) => {
-    if (!confirmAction(`Delete "${a.title}"?`)) return;
-    try { await store.deleteSub(trip.id, 'activities', a.id); toast({ icon: 'trash', label: 'Event deleted' }); }
+    if (!confirmAction(`Delete "${a.title}"? It stays in Recently deleted for 30 days.`)) return;
+    try {
+      await store.setDeleted({ kind: 'event', tripId: trip.id, id: a.id }, true);
+      toast({ icon: 'trash', label: 'Event deleted', action: { label: 'Undo', onClick: () => { store.setDeleted({ kind: 'event', tripId: trip.id, id: a.id }, false).catch(() => {}); } } });
+    }
     catch { toast({ tone: 'error', label: "Couldn't delete. Check your connection" }); }
   };
 
