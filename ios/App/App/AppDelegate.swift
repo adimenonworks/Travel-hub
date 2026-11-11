@@ -54,6 +54,13 @@ class RoveViewController: CAPBridgeViewController {
         webView.allowsBackForwardNavigationGestures = false
         // Like a native app: no long-press link previews, and nothing can be dragged out of the app (links, photos).
         webView.allowsLinkPreview = false
+        // The iPhone's rubber-band scroll, like Wise and every native app: pull past the top or bottom and the page
+        // stretches and springs back. Capacitor turns this off (scrollView.bounces = false in its own setup, before
+        // this runs), so it's switched back on here. alwaysBounceVertical makes short pages bounce too; sideways
+        // never bounces (the page never scrolls sideways).
+        webView.scrollView.bounces = true
+        webView.scrollView.alwaysBounceVertical = true
+        webView.scrollView.alwaysBounceHorizontal = false
         let views: [UIView] = [webView, webView.scrollView] + webView.scrollView.subviews
         for view in views {
             for interaction in view.interactions {
