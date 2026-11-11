@@ -335,9 +335,9 @@ export function DesignSystem() {
 
         <Section title="Event page header and Context menu" footer="Page Header Title small with Show icon (the Category icon: a 40px round tile in the type's colour) and Show subtitle (the time). Context menu: what a long press on your own comment opens (Edit, Delete in red); tap the bubble to see it.">
           <div className={s.chipRow}>
-            {(['neutral', 'travel', 'stays', 'food', 'activities', 'notes'] as const).map((t) => <CategoryIcon key={t} icon={t === 'food' ? 'wine-bottle' : 'plane'} tone={t} />)}
+            {(['neutral', 'travel', 'stays', 'food', 'activities', 'notes'] as const).map((t) => <CategoryIcon key={t} icon={t === 'food' ? 'grape' : 'plane'} tone={t} />)}
           </div>
-          <PageHeader size="small" icon="wine-bottle" tone="food" title="Quinta da Pacheca" subtitle="Thu 12 Nov, 15:00 – 17:00" back={{ to: '/design', label: 'Itinerary' }} action={{ icon: 'pencil', label: 'Example edit button', onClick: () => {} }} />
+          <PageHeader size="small" icon="grape" tone="food" title="Quinta da Pacheca" subtitle="Thu 12 Nov, 15:00 – 17:00" back={{ to: '/design', label: 'Itinerary' }} action={{ icon: 'pencil', label: 'Example edit button', onClick: () => {} }} />
           <div>
             {menu ? (
               <ContextMenu label="Message actions" onClose={() => setMenu(false)} items={[{ label: 'Edit', icon: 'pencil', onClick: () => {} }, { label: 'Delete', icon: 'trash', destructive: true, onClick: () => {} }]}>

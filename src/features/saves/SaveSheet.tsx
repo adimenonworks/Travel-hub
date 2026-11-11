@@ -1,15 +1,16 @@
-import { useEffect, useMemo, useState } from 'react';
-import { Button, Chip, Icon, ListGroup, ListItem, Sheet, Skeleton, Switch, TextArea, TextField, useToast } from '../../design/components';
-import type { Place } from '../../data/types';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { Button, Chip, Icon, ListGroup, ListItem, OptionCard, SegmentedControl, Sheet, Skeleton, TextArea, TextField, useToast } from '../../design/components';
+import type { Activity, LinkItem, Place } from '../../data/types';
 import { flagUrl } from '../../lib/countries';
 import { searchCities } from '../../lib/geocode';
 import { useCountries, placeCounts } from './Collections';
 import { store } from '../../data';
-import { useActivitiesFor, useMyTrips, usePlaces } from '../../data/hooks';
+import { useActivitiesFor, useMe, useMyTrips, usePlaces } from '../../data/hooks';
 import type { LinkPreview } from '../../data/types';
-import type { EventKind } from '../../lib/categories';
+import { behaviourOf, categoryTone, kindInfo, type EventKind } from '../../lib/categories';
 import { countryName } from '../../lib/countries';
-import { today } from '../../lib/dates';
+import { addDays, formatDay, formatTime, today, tripDays } from '../../lib/dates';
+import { zoneAt } from '../../lib/timezone';
 import { findUrl, readLink } from '../../lib/links';
 import { haptic, readClipboard } from '../../lib/native';
 import { detectCategory, eventCategoryOf, placeCategory, tripCoversCity } from '../../lib/places';
@@ -22,9 +23,11 @@ export type SaveRequest = { mode: 'link'; url?: string };
  * Save a place: a link field with Paste (Neutral) and Continue (Primary, disabled until there's a link). While Rove reads
  * the link only a skeleton shows. The preview has the place's name (cleaned of ratings and addresses, editable), where
  * it's filed (country · city, Rove's pick from the link, with Change) and its category (chips, always shown). It's
- * filed into Collections under country → city → category; a new country simply starts a new collection. Saving never asks for dates. If an upcoming trip covers that city, a switch offers "Also add to
- * <trip> ideas" (off by default). The same place saved twice isn't duplicated. Offline, it saves on the device and
- * syncs later. Opened by Save a place and by links shared to Rove from other apps.
+ * filed into Collections under country → city → category; a new country simply starts a new collection. Saving never asks for dates.
+ * With an upcoming trip, a Segmented control switches to **Trip** (picked first when that trip covers the place's city):
+ * a new event filled in from the link (pick the day), the link added to an event you already have, or "Add to ideas
+ * instead". Every trip action also files the place in Collections. The same place saved twice isn't duplicated.
+ * Offline, it saves on the device and syncs later. Opened by Save a place and by links shared to Rove from other apps.
  */
 export function SaveSheet({ request, onClose }: { request: SaveRequest | null; onClose: () => void }) {
   const toast = useToast();
@@ -35,7 +38,16 @@ export function SaveSheet({ request, onClose }: { request: SaveRequest | null; o
   const [preview, setPreview] = useState<LinkPreview | null>(null);
   const [reading, setReading] = useState(false);
   const [category, setCategory] = useState<EventKind>('sight');
-  const [alsoTrip, setAlsoTrip] = useState(false);
+  // Collections or Trip, and on the Trip side: which trip, a new event (its day, time, check-out) or an existing one
+  const [dest, setDest] = useState<'collections' | 'trip'>('collections');
+  const [tripId, setTripId] = useState('');
+  const [action, setAction] = useState<'new' | 'add'>('new');
+  const [day, setDay] = useState('');
+  const [time, setTime] = useState('');
+  const [checkout, setCheckout] = useState('');
+  const [eventId, setEventId] = useState('');
+  const defaulted = useRef(false);
+  const me = useMe();
   const [note, setNote] = useState('');
   // Where it goes: Rove's pick from the link, or the person's choice in "Where should it go?"
   const [chosen, setChosen] = useState<{ code: string; city: string } | null>(null);
@@ -49,14 +61,15 @@ export function SaveSheet({ request, onClose }: { request: SaveRequest | null; o
   useEffect(() => {
     if (!request) return;
     setLink(request.url ?? ''); setName('');
-    setPreview(null); setAlsoTrip(false); setNote(''); setChosen(null); setStep('preview'); setWhereQuery(''); setNewCity(null);
+    setPreview(null); setNote(''); resetTrip(); setChosen(null); setStep('preview'); setWhereQuery(''); setNewCity(null);
     // The clipboard is read only when you tap Paste: reading it here made iOS show its Paste bubble as the sheet opened.
     if (request.url) read(request.url);
   }, [request]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  function resetTrip() { setDest('collections'); setTripId(''); setAction('new'); setDay(''); setTime(''); setCheckout(''); setEventId(''); defaulted.current = false; }
   const show = (p: LinkPreview) => {
     setPreview(p); setName(p.place && !p.place.isArea ? p.place.name : p.title); setCategory(detectCategory(p.place));
-    setAlsoTrip(false); setChosen(null); setStep('preview');
+    resetTrip(); setChosen(null); setStep('preview');
   };
   const read = async (raw: string) => {
     const url = findUrl(raw) ?? raw.trim();
@@ -87,7 +100,30 @@ export function SaveSheet({ request, onClose }: { request: SaveRequest | null; o
   const city = target.city;
   // A place when Rove found one or you chose a city; otherwise a link filed under its country ("Links & notes")
   const kind: 'place' | 'link' = place || city ? 'place' : 'link';
-  const trip = city ? upcoming.find((t) => tripCoversCity(t, acts[t.id] ?? [], city)) : undefined;
+  const covering = city ? upcoming.find((t) => tripCoversCity(t, acts[t.id] ?? [], city)) : undefined;
+  // The Trip side: only with an upcoming trip and a place Rove found. It opens there when a trip covers the city.
+  const canTrip = kind === 'place' && upcoming.length > 0;
+  useEffect(() => {
+    if (!preview || defaulted.current || !canTrip) return;
+    if (covering) { defaulted.current = true; setDest('trip'); setTripId(covering.id); }
+  }, [preview, covering, canTrip]);
+  const onTrip = canTrip && dest === 'trip';
+  const tripChoices = covering ? [covering, ...upcoming.filter((t) => t.id !== covering.id)] : upcoming;
+  const trip = tripChoices.find((t) => t.id === tripId) ?? tripChoices[0];
+  const days = trip ? tripDays(trip.startDate, trip.endDate) : [];
+  const theDay = day && days.includes(day) ? day : days.includes(today()) ? today() : days[0] ?? '';
+  const stay = behaviourOf(category) === 'span';
+  const out = checkout && checkout > theDay ? checkout : addDays(theDay, 1);
+  // Its events, by day; the likely match first: same place, else same name, else same category, else the next one
+  const events = useMemo(() => (trip ? acts[trip.id] ?? [] : []).filter((a) => behaviourOf(a.category) !== 'note')
+    .sort((a, b) => `${a.date}${a.startTime}`.localeCompare(`${b.date}${b.startTime}`)), [acts, trip]);
+  const title0 = (name.trim() || place?.name || preview?.title || '').toLowerCase();
+  const same = (a: Activity) => !!title0 && (a.title.toLowerCase().includes(title0) || (a.locationText ?? '').toLowerCase().includes(title0));
+  const likely = events.find((a) => !!a.placeId && places.some((p) => p.id === a.placeId && !!preview?.url && p.url === preview.url))
+    ?? events.find(same) ?? events.find((a) => a.category === category && a.date >= today()) ?? events.find((a) => a.date >= today()) ?? events[0];
+  const picked2 = events.find((a) => a.id === eventId) ?? likely;
+  const dayLabel = (d: string) => formatDay(d, { weekday: 'short', day: 'numeric' });
+  const longDay = (d: string) => formatDay(d, { weekday: 'short', day: 'numeric', month: 'short' });
 
   const paste = async () => {
     try {
@@ -96,7 +132,7 @@ export function SaveSheet({ request, onClose }: { request: SaveRequest | null; o
     } catch { toast({ label: 'Paste the link into the field' }); }
   };
 
-  const save = async () => {
+  const save = async (mode: 'collections' | 'event' | 'link' | 'idea' = onTrip ? (action === 'new' ? 'event' : 'link') : 'collections') => {
     if (!preview) return;
     if (!code) return; // "Choose where to save" first
     const where = [countryName(code), city].filter(Boolean).join(' · ');
@@ -104,9 +140,10 @@ export function SaveSheet({ request, onClose }: { request: SaveRequest | null; o
     // The same place twice: same link, or the same name in the same spot.
     const dupe = places.find((p) => (!!preview.url && p.url === preview.url)
       || (!!place && p.name === title && p.lat != null && Math.abs(p.lat - place.lat) < 0.002 && Math.abs((p.lng ?? 0) - place.lng) < 0.002));
-    if (dupe) { toast({ icon: 'check', label: `Already in your ${dupe.countryCode ? countryName(dupe.countryCode) : 'Unsorted'} collection` }); onClose(); return; }
+    if (dupe && mode === 'collections') { toast({ icon: 'check', label: `Already in your ${dupe.countryCode ? countryName(dupe.countryCode) : 'Unsorted'} collection` }); onClose(); return; }
     try {
-      const { id, saved } = store.addPlace({
+      // Every trip action files the place in Collections too (or reuses the one already there)
+      const { id, saved } = dupe ? { id: dupe.id, saved: Promise.resolve() } : store.addPlace({
         name: title, category, city: kind === 'place' ? city : '', country: countryName(code), countryCode: code, ...(kind === 'link' ? { type: 'link' as const } : {}),
         lat: place?.lat ?? null, lng: place?.lng ?? null,
         ...(preview.url ? { url: preview.url } : {}), ...(preview.image ? { image: preview.image } : {}),
@@ -114,15 +151,38 @@ export function SaveSheet({ request, onClose }: { request: SaveRequest | null; o
         ...(note.trim() ? { notes: note.trim() } : {}),
       });
       saved.catch(() => toast({ tone: 'error', label: "Couldn't save. Check your connection" }));
-      // "Also add to <trip> ideas": an Idea that points at the Place (never a copy).
-      const idea = alsoTrip && trip ? store.queueSub(trip.id, 'ideas', {
-        title, category: eventCategoryOf(category), notes: '', links: [], votes: {}, status: 'open', placeId: id,
-      }) : null;
-      haptic('success');
-      toast({
-        icon: 'check', label: `Saved to ${where}${idea ? ` and ${trip!.name}` : ''}`,
-        action: { label: 'Undo', onClick: () => { store.deletePlace(id).catch(() => {}); if (idea && trip) store.deleteSub(trip.id, 'ideas', idea.id).catch(() => {}); } },
-      });
+      const dropPlace = () => { if (!dupe) store.deletePlace(id).catch(() => {}); };
+      const fail = () => toast({ tone: 'error', label: "Couldn't add it. Check your connection" });
+      const link: LinkItem = { label: preview.site || 'Link', url: preview.url };
+      if (mode === 'collections') {
+        haptic('success');
+        toast({ icon: 'check', label: `Saved to ${where}`, action: { label: 'Undo', onClick: dropPlace } });
+      } else if (mode === 'idea' && trip) {
+        // An Idea that points at the Place (never a copy)
+        const idea = store.queueSub(trip.id, 'ideas', { title, category: eventCategoryOf(category), notes: '', links: [], votes: {}, status: 'open', placeId: id });
+        idea.saved.catch(fail);
+        haptic('success');
+        toast({ icon: 'check', label: `Added to ${trip.name} ideas`, action: { label: 'Undo', onClick: () => { store.deleteSub(trip.id, 'ideas', idea.id).catch(() => {}); dropPlace(); } } });
+      } else if (mode === 'event' && trip && place) {
+        // A new event, filled in from the link: the place, its name and the link; you picked the day (and a time)
+        const info = kindInfo(category);
+        const location: Place = { name: place.name, lat: place.lat, lng: place.lng, country: place.country, countryCode: place.countryCode };
+        const tz = await Promise.race([zoneAt(location).catch(() => undefined), new Promise<undefined>((r) => setTimeout(() => r(undefined), 2500))]);
+        const ev = store.queueSub(trip.id, 'activities', {
+          title, category, type: info.type, behaviour: info.behaviour, date: theDay, startTime: time, endTime: '',
+          locationText: [place.name, place.city].filter(Boolean).join(', '), location, notes: '', links: preview.url ? [link] : [],
+          attendeeIds: [me.uid], placeId: id, ...(stay ? { endDate: out } : {}), ...(tz ? { tz } : {}),
+        });
+        ev.saved.catch(fail);
+        haptic('success');
+        toast({ icon: 'check', label: `Added to ${longDay(theDay)} · ${trip.name}`, action: { label: 'Undo', onClick: () => { store.deleteSub(trip.id, 'activities', ev.id).catch(() => {}); dropPlace(); } } });
+      } else if (mode === 'link' && trip && picked2) {
+        // The link goes into that event's Files & links (once)
+        const before = picked2.links ?? [];
+        if (preview.url && !before.some((l) => l.url === preview.url)) store.updateSub(trip.id, 'activities', picked2.id, { links: [...before, link] }).catch(fail);
+        haptic('success');
+        toast({ icon: 'check', label: `Added to ${picked2.title}`, action: { label: 'Undo', onClick: () => { store.updateSub(trip.id, 'activities', picked2.id, { links: before }).catch(() => {}); dropPlace(); } } });
+      }
       onClose();
     } catch {
       haptic('error');
@@ -135,13 +195,68 @@ export function SaveSheet({ request, onClose }: { request: SaveRequest | null; o
   // Cities to offer for the chosen country: Rove's pick, then the cities you've saved there
   const cityChips = [...new Set([picked.code === code ? picked.city : '', ...places.filter((p) => p.countryCode === code && (p.type ?? 'place') === 'place').map((p) => p.city), chosen?.city ?? ''].filter(Boolean))];
   const whereSheet = step === 'where';
+  const shared = !!request?.url;
   const icon = placeCategory(category).icon;
 
+  const cat = placeCategory(category);
+  const byDay = events.reduce<Record<string, Activity[]>>((m, a) => { (m[a.date] ??= []).push(a); return m; }, {});
+  const order = Object.keys(byDay).sort();
+  if (picked2) { const d = picked2.date; order.splice(order.indexOf(d), 1); order.unshift(d); }
+  const tripSide = trip && (
+    <>
+      {tripChoices.length > 1 && (
+        <section className={s.field} aria-labelledby="save-trip">
+          <h3 className="t-heading-4" id="save-trip">Which trip?</h3>
+          <div className={s.chipsWrap} role="group" aria-labelledby="save-trip">
+            {tripChoices.map((t) => <Chip key={t.id} active={t.id === trip.id} onClick={() => { haptic('selection'); setTripId(t.id); setDay(''); setEventId(''); }}>{t.name}</Chip>)}
+          </div>
+        </section>
+      )}
+      <div className={s.options}>
+        <OptionCard icon={cat.icon} tone={cat.tone} label="New event" description={`${cat.label} · ${name.trim() || place?.name || preview?.title}, filled in from the link`} selected={action === 'new'} onClick={() => { haptic('selection'); setAction('new'); }} />
+        {events.length > 0 && <OptionCard icon="link" tone="neutral" label="Add to an event" description="Attach the link to something already planned" selected={action === 'add'} onClick={() => { haptic('selection'); setAction('add'); }} />}
+      </div>
+      {action === 'new' && (
+        <>
+          <section className={s.field} aria-labelledby="save-day">
+            <h3 className="t-heading-4" id="save-day">{stay ? 'Check-in' : 'Which day?'}</h3>
+            <div className={s.chipsWrap} role="group" aria-labelledby="save-day">
+              {days.map((d) => <Chip key={d} active={d === theDay} label={`${longDay(d)}${d === theDay ? ', selected' : ''}`} onClick={() => { haptic('selection'); setDay(d); }}>{dayLabel(d)}</Chip>)}
+            </div>
+          </section>
+          {stay && (
+            <section className={s.field} aria-labelledby="save-out">
+              <h3 className="t-heading-4" id="save-out">Check-out</h3>
+              <div className={s.chipsWrap} role="group" aria-labelledby="save-out">
+                {[...days.filter((d) => d > theDay), addDays(days[days.length - 1] ?? theDay, 1)].map((d) => <Chip key={d} active={d === out} label={`${longDay(d)}${d === out ? ', selected' : ''}`} onClick={() => { haptic('selection'); setCheckout(d); }}>{dayLabel(d)}</Chip>)}
+              </div>
+            </section>
+          )}
+          <TextField label={stay ? 'Check-in time (optional)' : 'Time (optional)'} type="time" value={time} onChange={(e) => setTime(e.target.value)} />
+        </>
+      )}
+      {action === 'add' && order.map((d) => (
+        <section key={d} className={s.field} aria-labelledby={`save-ev-${d}`}>
+          <h3 className="t-heading-4" id={`save-ev-${d}`}>{longDay(d)}</h3>
+          <ListGroup label={longDay(d)}>
+            {byDay[d].map((a) => {
+              const t = kindInfo(a.category);
+              const meta = [a.startTime ? formatTime(a.startTime) : null, t.label, a === likely ? 'Likely match' : null].filter(Boolean).join(' · ');
+              return <ListItem key={a.id} icon={t.icon} tone={categoryTone(a.category)} title={a.title} meta={meta}
+                trailing={a.id === picked2?.id ? 'Selected' : undefined} onClick={() => { haptic('selection'); setEventId(a.id); }} />;
+            })}
+          </ListGroup>
+        </section>
+      ))}
+      <div><Button variant="ghost" size="regular" icon="lightbulb" onClick={() => save('idea')}>Add to ideas instead</Button></div>
+    </>
+  );
+
   return (
-    <Sheet open={open} title={whereSheet ? 'Where should it go?' : 'Save a place'}
-      subtitle={whereSheet ? (picked.code ? `Rove picked ${countryName(picked.code)} from the link` : 'Rove couldn’t tell from the link') : preview || reading ? undefined : 'Paste a link from TikTok, Instagram, Google Maps or any site'}
-      onClose={onClose} onSubmit={preview ? save : undefined} submitDisabled={!!preview && !code}
-      submitLabel={code ? `Save to ${whereSheet && city ? city : countryName(code)}` : 'Save'}>
+    <Sheet open={open} title={whereSheet ? 'Where should it go?' : shared ? 'Save to Rove' : 'Save a place'}
+      subtitle={whereSheet ? (picked.code ? `Rove picked ${countryName(picked.code)} from the link` : 'Rove couldn’t tell from the link') : preview && shared && preview.site ? `Shared from ${preview.site}` : preview || reading ? undefined : 'Paste a link from TikTok, Instagram, Google Maps or any site'}
+      onClose={onClose} onSubmit={preview ? () => save() : undefined} submitDisabled={!!preview && (!code || (onTrip && !whereSheet && action === 'add' && !picked2))}
+      submitLabel={onTrip && !whereSheet ? (action === 'new' ? `Add to ${longDay(theDay)}` : picked2 ? `Add to ${picked2.title}` : 'Add') : code ? `Save to ${whereSheet && city ? city : countryName(code)}` : 'Save'}>
       {/* Reading the link: only the skeleton (the preview's shape) */}
       {!preview && reading && (
         <div className={s.reading} role="status" aria-label="Reading the link">
@@ -171,6 +286,9 @@ export function SaveSheet({ request, onClose }: { request: SaveRequest | null; o
               {meta && <span className={s.previewMeta}>{meta}</span>}
             </span>
           </div>
+          {canTrip && <SegmentedControl block label="Save to" value={dest} onChange={(v) => { haptic('selection'); setDest(v); }}
+            options={[{ value: 'collections', label: 'Collections' }, { value: 'trip', label: 'Trip' }]} />}
+          {onTrip && trip ? tripSide : <>
           <TextField label="Name" value={name} autoComplete="off" onChange={(e) => setName(e.target.value)} />
           {/* Saving to: Rove's pick, with Change. With nothing found, Save waits until a country is chosen. */}
           <div className={s.preview}>
@@ -182,8 +300,8 @@ export function SaveSheet({ request, onClose }: { request: SaveRequest | null; o
             <Button variant="ghost" size="regular" onClick={() => { setStep('where'); setNewCity(null); }}>{code ? 'Change' : 'Choose'}</Button>
           </div>
           <PlaceKindPicker id="save-category" value={category} onChange={setCategory} />
-          {kind === 'place' && trip && <Switch checked={alsoTrip} onChange={setAlsoTrip} label={`Also add to ${trip.name} ideas`} hint="So everyone on the trip can vote on it" />}
           <TextArea label="Note (optional)" placeholder="Why did you save this?" value={note} onChange={(e) => setNote(e.target.value)} rows={2} />
+          </>}
         </>
       )}
 

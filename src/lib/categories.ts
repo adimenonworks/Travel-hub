@@ -68,7 +68,7 @@ export const EVENT_KINDS: KindInfo[] = [
   k('bar', 'Bar', 'cocktail', 'food', 'place', 'Bars, pubs and rooftops.', false),
   k('market', 'Food market or street food', 'shop', 'food', 'place', 'Food halls, night markets and street stalls.', false),
   k('tasting', 'Tasting', 'glass-cheers', 'food', 'place', 'Breweries, distilleries and tastings.'),
-  k('winery', 'Winery', 'wine-bottle', 'food', 'place', 'Wineries and cellar doors, with or without a tasting.'),
+  k('winery', 'Winery', 'grape', 'food', 'place', 'Wineries and cellar doors, with or without a tasting.'),
 
   k('sight', 'Sight or landmark', 'camera', 'activities', 'place', 'Landmarks, viewpoints, churches and monuments.'),
   k('museum', 'Museum or gallery', 'bank', 'activities', 'place', 'Museums, galleries and exhibitions.'),
