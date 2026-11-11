@@ -46,3 +46,4 @@
 /* Favourites: inside a city, a small titled group per category (icon + label, Label style) */
 .favCategory { display: flex; flex-direction: column; gap: var(--space-default-300); }
 .favCategoryTitle { display: flex; align-items: center; gap: var(--space-default-200); margin: 0; font: var(--type-label); color: var(--on-light-text-secondary); }
+.options { display: flex; flex-direction: column; gap: var(--space-default-300); }
