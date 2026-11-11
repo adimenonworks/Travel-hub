@@ -11,7 +11,7 @@ import { LinkEditor, cleanLinks } from '../shared/Links';
 import { zoneAt, zoneOfDay } from '../../lib/timezone';
 import { PriceField, fromPriceDraft, toPriceDraft, type PriceDraft } from '../shared/Price';
 import { priceOf } from '../../lib/currency';
-import { eventsOn, entryEnd, entryTime, legsOf } from './events';
+import { eventsOn, entryEnd, entryTime, legsOf, sameDaySpan } from './events';
 import s from './trip.module.css';
 
 export type ActivityDraft = Partial<Pick<Activity, 'title' | 'category' | 'notes' | 'links' | 'date' | 'startTime' | 'endTime' | 'locationText' | 'placeId' | 'fromText' | 'journeyId'>>;
@@ -33,7 +33,7 @@ const toForm = (a: ActivityDraft | Activity | undefined, date: string, currency:
     title: a?.title ?? '',
     date: a?.date ?? date,
     // A span starts out a night long (a rental: same day) until its end is picked
-    endDate: full?.endDate || (kind && behaviourOf(kind) === 'span' ? (kind === 'car' || kind === 'campervan' ? a?.date ?? date : addDays(a?.date ?? date, 1)) : ''),
+    endDate: full?.endDate || (kind && behaviourOf(kind) === 'span' ? (kind === 'car' || kind === 'campervan' || sameDaySpan(kind) ? a?.date ?? date : addDays(a?.date ?? date, 1)) : ''),
     startTime: a?.startTime ?? '',
     endTime: a?.endTime ?? '',
     locationText: a?.locationText ?? '',
@@ -103,6 +103,7 @@ export function ActivityForm({ open, trip, date, activity, draft, onClose, onCre
   const behaviour = info?.behaviour;
   const typeInfo = EVENT_TYPES.find((t) => t.value === f.type);
   const vehicle = kind === 'car' || kind === 'campervan';
+  const sameDay = !!kind && sameDaySpan(kind); // parking and luggage can be collected the same day
   const [startWord, endWord] = kind ? spanWords(kind) : ['Starts', 'Ends'];
 
   // Free time and rest: suggest the day's first free gap (when the times are still empty)
@@ -112,7 +113,7 @@ export function ActivityForm({ open, trip, date, activity, draft, onClose, onCre
     const free = b === 'open' && !f.startTime ? suggestFreeTime(activities, f.date, activity?.id) : null;
     set({
       kind: k,
-      endDate: b === 'span' ? (f.endDate && f.endDate >= f.date ? f.endDate : k === 'car' || k === 'campervan' ? f.date : addDays(f.date, 1)) : f.endDate,
+      endDate: b === 'span' ? (f.endDate && f.endDate >= f.date ? f.endDate : k === 'car' || k === 'campervan' || sameDaySpan(k) ? f.date : addDays(f.date, 1)) : f.endDate,
       ...(free ? { startTime: free.start, endTime: free.end } : {}),
     });
   };
@@ -122,7 +123,7 @@ export function ActivityForm({ open, trip, date, activity, draft, onClose, onCre
   const priced = !!kind && !isEveryday(kind);
   const valid = !!kind && (
     behaviour === 'journey' ? !!(f.fromText.trim() && (kind !== 'flight' || f.toText.trim()))
-      : behaviour === 'span' ? (vehicle ? !!(f.fromText.trim() && f.endDate && f.endDate >= f.date) : !!(f.locationText.trim() && f.endDate && f.endDate > f.date))
+      : behaviour === 'span' ? (vehicle ? !!(f.fromText.trim() && f.endDate && f.endDate >= f.date) : !!(f.locationText.trim() && f.endDate && (f.endDate > f.date || (sameDay && f.endDate === f.date))))
         : behaviour === 'open' ? true
           : behaviour === 'note' ? !!f.notes.trim()
             : !!f.locationText.trim());
@@ -232,7 +233,7 @@ export function ActivityForm({ open, trip, date, activity, draft, onClose, onCre
   };
   const PLACE: Partial<Record<EventKind, string>> = {
     cafe: 'Manteigaria, Lisbon', bar: 'Park Bar, Lisbon', restaurant: 'Cervejaria Ramiro, Lisbon', market: 'Time Out Market, Lisbon',
-    taxi: 'Your hotel', metro: 'Baixa-Chiado station', bike: 'Gira station, Cais do Sodré', errand: 'Luggage storage, Rossio', cruise: 'Lisbon cruise terminal',
+    taxi: 'Your hotel', metro: 'Baixa-Chiado station', bike: 'Gira station, Cais do Sodré', errand: 'Vodafone, Rossio', cruise: 'Lisbon cruise terminal', parking: 'Melbourne Airport long-term parking', luggage: 'Bounce, Rossio station',
   };
   const extras = (
     <>
@@ -319,11 +320,11 @@ export function ActivityForm({ open, trip, date, activity, draft, onClose, onCre
               <>
                 {text(kind === 'cruise' ? 'Ship or port' : 'Place', 'locationText', PLACE[kind!] ?? 'Memmo Alfama, Lisbon', `It shows as ${startWord.toLowerCase()} and ${endWord.toLowerCase()} in the itinerary.`)}
                 <FieldRow>
-                  {daySelect(startWord, f.date, (v) => set({ date: v, endDate: f.endDate > v ? f.endDate : addDays(v, 1) }))}
+                  {daySelect(`${startWord} day`, f.date, (v) => set({ date: v, endDate: f.endDate > v || (sameDay && f.endDate === v) ? f.endDate : sameDay ? v : addDays(v, 1) }))}
                   {time('Time', 'startTime')}
                 </FieldRow>
                 <FieldRow>
-                  {daySelect(endWord, f.endDate, (v) => set({ endDate: v }), afterEnd.filter((d) => d > f.date))}
+                  {daySelect(`${endWord} day`, f.endDate, (v) => set({ endDate: v }), afterEnd.filter((d) => d > f.date || (sameDay && d === f.date)))}
                   {time('Time', 'endTime')}
                 </FieldRow>
               </>

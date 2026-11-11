@@ -7,6 +7,7 @@ import {
   OptionCard, BudgetCard, Switch, SearchField, StepProgress, DestinationHeader, TripHeader, DayCard, CountryModal,
 } from '../../design/components';
 import { flagUrl } from '../../lib/countries';
+import { EVENT_TYPES, TYPE_TONE } from '../../lib/categories';
 import type { ReactNode } from 'react';
 import s from './DesignSystem.module.css';
 
@@ -292,6 +293,15 @@ export function DesignSystem() {
           <EventCard icon="plane" layout="journey" title="Lisbon → Porto" time="TP1946" place="TAP Air Portugal" amount="€89" status="Check-in open" to="/design"
             journey={{ fromTime: '08:30', fromPlace: 'LIS · T1', duration: '55m · direct', toTime: '09:25', toPlace: 'OPO' }} />
           <EventCard icon="notebook" layout="note" title="Bag drop closes 40 min before" place="Sam has the passports" />
+        </Section>
+
+        <Section title="Event categories" footer="Every category, by type, with its icon and the type's colour (src/lib/categories.ts). The icon tells categories apart; the colour tells types apart.">
+          {EVENT_TYPES.map((t) => (
+            <ListGroup key={t.value} label={t.label}>
+              <h3 className="t-heading-3">{t.label}</h3>
+              {t.kinds.map((k) => <ListItem key={k.value} size="compact" icon={k.icon} tone={TYPE_TONE[t.value]} title={k.label} meta={k.behaviour === 'span' ? 'Shown twice: start and end' : undefined} />)}
+            </ListGroup>
+          ))}
         </Section>
 
         <Section title="Event types" footer="Type sets the icon tile's colour (--category-<type>-surface / -icon): Getting around (flights included) sky, Stays violet, Food & drink yellow, Activities pink, Notes emerald; Free time stays Neutral. On the deep-green Next card the tile takes the bright step. List items, Idea rows and active Chips use the same colours; the price sits subtle at the top right. Option cards in the Add to itinerary picker use the same tiles, 16px above the text.">
