@@ -4,3 +4,6 @@
 /* Trips tab: the Segmented Control, the button, then trips 16 apart */
 .list { display: flex; flex-direction: column; gap: var(--space-default-500); }
 .segments { display: flex; flex-direction: column; gap: var(--space-default-700); }
+/* Happening now: "Next up" (a small heading) and the next event, above the trip's card */
+.nextUp { display: flex; flex-direction: column; gap: var(--space-default-300); }
+.nextUpTitle { margin: 0; font: var(--type-heading-4); color: var(--on-light-text-primary); }

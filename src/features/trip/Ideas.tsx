@@ -1,4 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { stepTab, useSwipeTabs } from '../../app/useSwipeTabs';
+import { SlideSwap } from '../shared/SlideSwap';
 import { useSearchParams } from 'react-router-dom';
 import { Button, EmptyState, IdeaRow, LinkButton, ListGroup, ListItem, PageSection, SectionHeader, SegmentedControl, Select, Sheet, TextArea, TextField, useToast } from '../../design/components';
 import { store } from '../../data';
@@ -48,11 +50,13 @@ export function Ideas(ctx: TripCtx) {
   const [scheduling, setScheduling] = useState<Idea | null>(null);
   const toast = useToast();
 
-  const shown = ideas
-    .filter((i) => i.status === filter)
-    .sort((a, b) => ups(b) - ups(a) || b.createdAt - a.createdAt);
+  const shownFor = (f: Filter) => ideas.filter((i) => i.status === f).sort((a, b) => ups(b) - ups(a) || b.createdAt - a.createdAt);
   const count = (f: Filter) => ideas.filter((i) => i.status === f).length;
-  const top = shown[0] && ups(shown[0]) > 0 && (shown.length === 1 || ups(shown[0]) > ups(shown[1])) ? shown[0].id : null;
+  const topOf = (shown: Idea[]) => shown[0] && ups(shown[0]) > 0 && (shown.length === 1 || ups(shown[0]) > ups(shown[1])) ? shown[0].id : null;
+  // Swipe the list sideways to move between To decide · Planned · Passed (the list slides like the trip's days)
+  const FILTERS: Filter[] = ['open', 'approved', 'rejected'];
+  const swipeBox = useRef<HTMLDivElement>(null);
+  useSwipeTabs(swipeBox, (dir) => { const n = stepTab(FILTERS, filter, dir); if (n) setFilter(n); });
   const vote = async (i: Idea) => {
     const mine = !!i.votes?.[me.uid];
     haptic('light');
@@ -73,6 +77,8 @@ export function Ideas(ctx: TripCtx) {
         { value: 'approved', label: `Planned · ${count('approved')}` },
         { value: 'rejected', label: `Passed · ${count('rejected')}` },
       ]} />
+      <div ref={swipeBox} className={s.swipeArea}>
+      <SlideSwap value={filter} id={filter} rank={FILTERS.indexOf(filter)}>{(filter) => { const shown = shownFor(filter); const top = topOf(shown); return (<div className={s.ideaList}>
       {shown.length === 0 ? (
         <EmptyState illustration="ideas" title={filter === 'open' ? 'No ideas to decide on' : 'Nothing here yet'}
           message={filter === 'open' ? 'Saw a great restaurant or tour? Add it so everyone can vote.' : undefined} />
@@ -98,6 +104,8 @@ export function Ideas(ctx: TripCtx) {
           </PageSection>
         ))
       )}
+      </div>); }}</SlideSwap>
+      </div>
       <AddIdeaSheet open={adding} ctx={ctx} onClose={() => setAdding(false)} onNew={() => { setAdding(false); setEditing('new'); }} />
       <IdeaSheet idea={live} place={live?.placeId ? places[live.placeId] : undefined} ctx={ctx} onClose={() => setViewing(null)}
         onEdit={() => { setEditing(live); setViewing(null); }}

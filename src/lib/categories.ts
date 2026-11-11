@@ -22,7 +22,7 @@ export type EventKind =
   | 'flight'
   | 'train' | 'bus' | 'ferry' | 'taxi' | 'transfer' | 'metro' | 'driver' | 'bike' | 'car' | 'campervan' | 'parking' | 'luggage'
   | 'hotel' | 'apartment' | 'airbnb' | 'resort' | 'hostel' | 'camping' | 'cruise' | 'friends'
-  | 'restaurant' | 'cafe' | 'bar' | 'market' | 'tasting'
+  | 'restaurant' | 'cafe' | 'bar' | 'market' | 'tasting' | 'winery'
   | 'sight' | 'museum' | 'tour' | 'hike' | 'nature' | 'show' | 'sports' | 'festival' | 'themepark' | 'spa' | 'class' | 'adventure' | 'nightlife' | 'shopping' | 'meetup'
   | 'free' | 'rest'
   | 'note' | 'errand';
@@ -67,7 +67,8 @@ export const EVENT_KINDS: KindInfo[] = [
   k('cafe', 'Café', 'coffee', 'food', 'place', 'Coffee, breakfast or a bakery stop.', false),
   k('bar', 'Bar', 'cocktail', 'food', 'place', 'Bars, pubs and rooftops.', false),
   k('market', 'Food market or street food', 'shop', 'food', 'place', 'Food halls, night markets and street stalls.', false),
-  k('tasting', 'Tasting', 'glass-cheers', 'food', 'place', 'Wineries, breweries, distilleries and tastings.'),
+  k('tasting', 'Tasting', 'glass-cheers', 'food', 'place', 'Breweries, distilleries and tastings.'),
+  k('winery', 'Winery', 'wine-bottle', 'food', 'place', 'Wineries and cellar doors, with or without a tasting.'),
 
   k('sight', 'Sight or landmark', 'camera', 'activities', 'place', 'Landmarks, viewpoints, churches and monuments.'),
   k('museum', 'Museum or gallery', 'bank', 'activities', 'place', 'Museums, galleries and exhibitions.'),

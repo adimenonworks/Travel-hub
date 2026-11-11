@@ -85,6 +85,11 @@ export type EventState = 'default' | 'next' | 'done';
 /** Figma "Type" on the Event card and Option card: the colour of the icon tile (an event's type; see categoryTone()). */
 export type CategoryTone = 'neutral' | 'travel' | 'stays' | 'food' | 'activities' | 'notes';
 
+/** Figma "Category icon": a 40px round tile with an event type's icon, in its colour (Neutral: the grey tile), e.g. in an event page's header. */
+export function CategoryIcon({ icon, tone = 'neutral' }: { icon: IconName; tone?: CategoryTone }) {
+  return <span className={`${s.optionTile} ${s[`tone-${tone}`] ?? ''}`} aria-hidden="true"><Icon name={icon} size={24} /></span>;
+}
+
 export function EventCard({ title, time, timeIcon = 'clock', place, placeIcon = 'pin', amount, icon, layout = 'standard', state = 'default', tone = 'neutral', journey, extras, status, favourite, to, onClick }: {
   title: string; time?: string; place?: string; amount?: string; icon: IconName;
   /** Figma Event card: the time and the place sit on their own lines, each after a small icon. The place's icon is a pin

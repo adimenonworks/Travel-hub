@@ -70,7 +70,7 @@ export type Category =
   | 'flight'
   | 'train' | 'bus' | 'ferry' | 'taxi' | 'transfer' | 'metro' | 'driver' | 'bike' | 'car' | 'campervan' | 'parking' | 'luggage'
   | 'hotel' | 'apartment' | 'airbnb' | 'resort' | 'hostel' | 'camping' | 'cruise' | 'friends'
-  | 'restaurant' | 'cafe' | 'bar' | 'market' | 'tasting'
+  | 'restaurant' | 'cafe' | 'bar' | 'market' | 'tasting' | 'winery'
   | 'sight' | 'museum' | 'tour' | 'hike' | 'nature' | 'show' | 'sports' | 'festival' | 'themepark' | 'spa' | 'class' | 'adventure' | 'nightlife' | 'shopping' | 'meetup'
   | 'free' | 'rest' | 'note' | 'errand'
   // older values, read through LEGACY in categories.ts
@@ -170,6 +170,8 @@ export type Comment = {
   text: string;
   authorId: string;
   createdAt: number;
+  /** Set when the author edits it ("edited" shows by the bubble). */
+  editedAt?: number;
 };
 
 /** A shared photo album (Google Photos, iCloud…). Only the link is stored; the photos stay with that service. */

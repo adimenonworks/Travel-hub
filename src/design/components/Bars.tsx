@@ -3,6 +3,7 @@ import { NavLink, Link, useLocation, useNavigate } from 'react-router-dom';
 import { goBack } from '../../app/navigation';
 import { Icon, type IconName } from './Icon';
 import { IconButton, LinkButton } from './Button';
+import { CategoryIcon, type CategoryTone } from './Rows';
 import { haptic } from '../../lib/native';
 import s from './Bars.module.css';
 
@@ -12,7 +13,7 @@ import s from './Bars.module.css';
  * Figma "Page Header": an optional ghost back button, then the title row: the title (Type=Title Large: Display 48;
  * Title small: Heading 1, both in the brand text colour) with an optional Label subtitle, and one optional secondary icon button.
  */
-export function PageHeader({ title, subtitle, back, action, fit, size = 'large' }: {
+export function PageHeader({ title, subtitle, back, action, fit, size = 'large', icon, tone }: {
   title: ReactNode;
   subtitle?: ReactNode;
   back?: { to: string; label: string };
@@ -22,6 +23,8 @@ export function PageHeader({ title, subtitle, back, action, fit, size = 'large' 
   fit?: boolean;
   /** Figma "Type": large = Title Large (tabs), small = Title small (a trip's pages) */
   size?: 'large' | 'small';
+  /** Figma "Show icon" (Size Small): the event's category icon tile, in its type's colour, before the title */
+  icon?: IconName; tone?: CategoryTone;
 }) {
   const navigate = useNavigate();
   const titleRef = useRef<HTMLHeadingElement>(null);
@@ -40,6 +43,7 @@ export function PageHeader({ title, subtitle, back, action, fit, size = 'large' 
     <header className={s.header}>
       {back && <div className={s.back}><LinkButton to={back.to} variant="ghost" size="regular" icon="chevron-left" onClick={(e) => { e.preventDefault(); goBack(navigate, back.to); }}>{back.label}</LinkButton></div>}
       <div className={s.titleRow}>
+        {icon && <span className={s.leadIcon}><CategoryIcon icon={icon} tone={tone} /></span>}
         <div className={s.titleText}>
           <h1 ref={titleRef} className={[s.title, size === 'small' && s.titleSmall, fit && s.fit, fit && smaller && s.fitSmaller].filter(Boolean).join(' ')}>{title}</h1>
           {subtitle && <div className={s.subtitle}>{subtitle}</div>}

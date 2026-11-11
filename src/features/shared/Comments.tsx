@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
-import { Avatar, IconButton, Notification, useToast } from '../../design/components';
+import { haptic } from '../../lib/native';
+import { Avatar, ContextMenu, IconButton, Notification, useToast } from '../../design/components';
 import { store } from '../../data';
 import { personName, useMe } from '../../data/hooks';
 import type { Comment, Profile } from '../../data/types';
@@ -8,8 +9,10 @@ import s from './shared.module.css';
 
 /**
  * Figma "Comments", styled like Messages in Rove's colours: your comments sit on the right in deep green bubbles,
- * everyone else's on the left in grey ones with their avatar lined up with the top of the bubble. Only the message
- * is in the bubble; who and when sit above it. You can delete your own (a small ghost button).
+ * everyone else's on the left in white ones. Messages from one person within 5 minutes of each other, with nobody in
+ * between, form a stack: one line above it with who and when (left for theirs, right for yours), the bubbles close
+ * together, and their avatar once, top-aligned with the most recent bubble. Press and hold one of your own bubbles
+ * for Edit and Delete (a Context menu, like iOS).
  * The box to write in stays in the grey section. While you type, the whole page scrolls so the grey section sits just
  * above the keyboard (16px), like Messages; sending adds the bubble, the grey section grows and the box stays where it is.
  */
@@ -21,6 +24,8 @@ export function Comments({ tripId, targetId, comments, profiles }: { tripId: str
   const toast = useToast();
   const [text, setText] = useState('');
   const [typing, setTyping] = useState(false);
+  const [menu, setMenu] = useState<string | null>(null); // the comment whose long-press menu is open
+  const [editing, setEditing] = useState<Comment | null>(null);
   const list = comments.filter((c) => c.targetId === targetId).sort((a, b) => a.createdAt - b.createdAt);
   const box = useRef<HTMLDivElement>(null);
   const input = useRef<HTMLInputElement>(null);
@@ -49,56 +54,104 @@ export function Comments({ tripId, targetId, comments, profiles }: { tripId: str
   const send = async () => {
     const t = text.trim();
     if (!t || t.length > MAX_MESSAGE) return;
-    setText('');
-    try { await store.addSub(tripId, 'comments', { targetId, text: t, authorId: me.uid }); }
-    catch { setText(t); toast({ tone: 'error', label: "Couldn't send. Check your connection" }); }
+    const was = editing;
+    setText(''); setEditing(null);
+    input.current?.blur(); // one tap sends and closes the keyboard
+    try {
+      if (was) { if (t !== was.text) await store.updateSub(tripId, 'comments', was.id, { text: t, editedAt: Date.now() }); }
+      else await store.addSub(tripId, 'comments', { targetId, text: t, authorId: me.uid });
+    } catch { setText(t); setEditing(was); toast({ tone: 'error', label: was ? "Couldn't save. Check your connection" : "Couldn't send. Check your connection" }); }
   };
   const remove = async (c: Comment) => {
     try { await store.deleteSub(tripId, 'comments', c.id); toast({ icon: 'trash', label: 'Comment deleted' }); }
     catch { toast({ tone: 'error', label: "Couldn't delete. Check your connection" }); }
   };
+  const edit = (c: Comment) => { setEditing(c); setText(c.text); requestAnimationFrame(() => input.current?.focus()); };
+
+  // Press and hold your own bubble (about half a second, a light tap of haptics) to open its menu
+  const hold = useRef<{ id: string; x: number; y: number; t: number } | null>(null);
+  const pressStart = (c: Comment) => (e: React.PointerEvent) => {
+    const id = c.id, x = e.clientX, y = e.clientY;
+    hold.current = { id, x, y, t: window.setTimeout(() => { hold.current = null; haptic('light'); setMenu(id); }, 450) };
+  };
+  const pressMove = (e: React.PointerEvent) => {
+    const h = hold.current;
+    if (h && Math.hypot(e.clientX - h.x, e.clientY - h.y) > 10) { window.clearTimeout(h.t); hold.current = null; } // scrolling, not holding
+  };
+  const pressEnd = () => { if (hold.current) { window.clearTimeout(hold.current.t); hold.current = null; } };
+
+  // Stacks: the same person, each message within 5 minutes of the one before, nobody else in between
+  const stacks: Comment[][] = [];
+  for (const c of list) {
+    const last = stacks[stacks.length - 1];
+    const prev = last?.[last.length - 1];
+    if (prev && prev.authorId === c.authorId && c.createdAt - prev.createdAt <= 5 * 60e3) last.push(c); else stacks.push([c]);
+  }
 
   return (
     <>
     <div className={s.comments}>
-      {list.length > 0 && (
+      {stacks.length > 0 && (
         <ol className={s.thread} aria-label="Comments">
-          {list.map((c) => {
-            const mine = c.authorId === me.uid;
-            const name = personName(profiles, c.authorId);
-            const when = timeAgo(c.createdAt);
+          {stacks.map((stack) => {
+            const first = stack[0], mine = first.authorId === me.uid;
+            const name = personName(profiles, first.authorId);
+            const when = timeAgo(first.createdAt);
             return (
-              <li key={c.id} className={`${s.message} ${mine ? s.mine : s.theirs}`}>
-                {!mine && <Avatar name={name} photo={profiles[c.authorId]?.photo} seed={c.authorId} size={32} />}
-                <div className={s.messageBody}>
-                  <span className={s.messageMeta}>{mine ? when : `${name.split(' ')[0]} · ${when}`}</span>
-                  <div className={s.messageRow}>
-                    {mine && <IconButton icon="x" tone="ghost" small label="Delete your comment" onClick={() => remove(c)} />}
-                    <p className={s.bubble}>{c.text}</p>
-                  </div>
-                </div>
+              <li key={first.id} className={`${s.message} ${mine ? s.mine : s.theirs}`}>
+                <span className={s.messageMeta}>{mine ? when : `${name.split(' ')[0]} · ${when}`}</span>
+                {stack.map((c, i) => {
+                  const lastOne = i === stack.length - 1;
+                  const bubble = (
+                    <p className={s.bubble} {...(mine ? {
+                      onPointerDown: pressStart(c), onPointerMove: pressMove, onPointerUp: pressEnd, onPointerCancel: pressEnd, onPointerLeave: pressEnd,
+                      onContextMenu: (e: React.MouseEvent) => { e.preventDefault(); setMenu(c.id); },
+                      tabIndex: 0, role: 'button', 'aria-haspopup': 'menu' as const, 'aria-label': `${c.text}. Press and hold for Edit and Delete`,
+                      onKeyDown: (e: React.KeyboardEvent) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setMenu(c.id); } },
+                    } : {})}>{c.text}</p>
+                  );
+                  return (
+                    <div key={c.id} className={s.messageRow}>
+                      {!mine && (lastOne ? <Avatar name={name} photo={profiles[c.authorId]?.photo} seed={c.authorId} size={32} /> : <span className={s.avatarSpace} aria-hidden="true" />)}
+                      {c.editedAt && mine && <span className={s.edited}>Edited</span>}
+                      {menu === c.id
+                        ? <ContextMenu label="Message" align="end" onClose={() => setMenu(null)} items={[
+                            { label: 'Edit', icon: 'pencil', onClick: () => edit(c) },
+                            { label: 'Delete', icon: 'trash', destructive: true, onClick: () => remove(c) },
+                          ]}>{bubble}</ContextMenu>
+                        : bubble}
+                      {c.editedAt && !mine && <span className={s.edited}>Edited</span>}
+                    </div>
+                  );
+                })}
               </li>
             );
           })}
         </ol>
       )}
       <div ref={box} className={s.composer}>
+        {editing && (
+          <div className={s.editingLine}>
+            <span>Editing message</span>
+            <button type="button" className={s.editingCancel} onPointerDown={(e) => e.preventDefault()} onClick={() => { setEditing(null); setText(''); }}>Cancel</button>
+          </div>
+        )}
         {/* Over the limit: a Warning Notification above the box, and Send is disabled */}
         {over > 0 && (
           <div className={s.composerWarning} id="comment-limit">
             <Notification state="warning">{`Messages can be up to ${MAX_MESSAGE} characters. Remove ${over} to send.`}</Notification>
           </div>
         )}
-        <input ref={input} aria-describedby={over > 0 ? 'comment-limit' : undefined} aria-invalid={over > 0 || undefined} className={s.commentInput} placeholder="Add a comment" aria-label="Add a comment" value={text} enterKeyHint="send"
+        <input ref={input} aria-describedby={over > 0 ? 'comment-limit' : undefined} aria-invalid={over > 0 || undefined} className={s.commentInput} placeholder="Add a comment" aria-label={editing ? 'Edit your comment' : 'Add a comment'} value={text} enterKeyHint="send"
           onFocus={() => setTyping(true)} onBlur={() => setTyping(false)}
           onChange={(e) => setText(e.target.value)}
           onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); send(); } }} />
         {text.trim().length >= MAX_MESSAGE - 20 && (
           <span className={[s.commentCount, over > 0 && s.commentCountOver].filter(Boolean).join(' ')} aria-live="polite">{`${text.trim().length}/${MAX_MESSAGE}`}</span>
         )}
-        {/* Keeps the keyboard up: pressing Send doesn't take focus from the box */}
-        <span onPointerDown={(e) => { if (typing) e.preventDefault(); }}>
-          <IconButton icon="send" tone="primary" label="Send comment" onClick={send} disabled={!text.trim() || over > 0} />
+        {/* The box keeps focus while Send is pressed, so one tap sends (the keyboard then closes) */}
+        <span className={s.sendWrap} onPointerDown={(e) => e.preventDefault()} onMouseDown={(e) => e.preventDefault()}>
+          <IconButton icon="send" tone="primary" label={editing ? 'Save comment' : 'Send comment'} onClick={send} disabled={!text.trim() || over > 0} />
         </span>
       </div>
     </div>

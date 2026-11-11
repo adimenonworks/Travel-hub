@@ -6,7 +6,8 @@ import type { Activity, Category, LinkItem, Place, Trip } from '../../data/types
 import { addDays, dayWord, formatDay, formatTime, tripDays } from '../../lib/dates';
 import { geocodePlace } from '../../lib/geocode';
 import { EVENT_TYPES, TYPE_TONE, behaviourOf, eventKind, isEveryday, kindInfo, spanWords, type EventKind, type EventType } from '../../lib/categories';
-import { haptic, confirmAction } from '../../lib/native';
+import { haptic, confirmAction, readClipboard } from '../../lib/native';
+import { cleanTitle, findUrl, readLink } from '../../lib/links';
 import { LinkEditor, cleanLinks } from '../shared/Links';
 import { zoneAt, zoneOfDay } from '../../lib/timezone';
 import { PriceField, fromPriceDraft, toPriceDraft, type PriceDraft } from '../shared/Price';
@@ -97,6 +98,35 @@ export function ActivityForm({ open, trip, date, activity, draft, onClose, onCre
   // At a place: an end time only when asked for ("+ Add end time" turns into the field)
   const [withEnd, setWithEnd] = useState(false);
   useEffect(() => { if (open) setWithEnd(!!(activity ?? draft)?.endTime); }, [open, activity, draft]);
+  // Location from a link (Google or Apple Maps, or any page about a place): the place it points at, and its name
+  const [linkPlace, setLinkPlace] = useState<Place | null>(null);
+  const [reading, setReading] = useState(false);
+  useEffect(() => { if (open) { setLinkPlace(null); setReading(false); } }, [open]);
+  const fromLink = async (url: string) => {
+    setReading(true);
+    try {
+      const p = await readLink(url);
+      const pl = p.place;
+      if (pl && !pl.isArea && pl.name) {
+        const text = [pl.name, pl.city].filter(Boolean).join(', ');
+        setLinkPlace({ name: text, lat: pl.lat, lng: pl.lng, country: pl.country, countryCode: pl.countryCode });
+        // The place fills Location; the Name too, but only if you haven't typed one
+        setF((x) => ({ ...x, locationText: text, title: x.title.trim() ? x.title : cleanTitle(pl.name) || pl.name }));
+        haptic('light');
+      } else {
+        set({ locationText: '' });
+        toast({ label: 'Couldn’t find a place in that link. Type the name or address' });
+      }
+    } catch { toast({ tone: 'error', label: 'Couldn’t read that link' }); }
+    finally { setReading(false); }
+  };
+  const pasteLocation = async () => {
+    try {
+      const raw = (await readClipboard()).trim();
+      const url = findUrl(raw);
+      if (url) { set({ locationText: url }); fromLink(url); } else if (raw) set({ locationText: raw }); else toast({ label: 'Nothing to paste' });
+    } catch { toast({ label: 'Paste it into the field' }); }
+  };
   const days = tripDays(trip.startDate, trip.endDate);
   const kind = f.kind;
   const info = kind ? kindInfo(kind) : null;
@@ -144,7 +174,8 @@ export function ActivityForm({ open, trip, date, activity, draft, onClose, onCre
       const placeText = routed ? f.fromText.trim() : behaviour === 'note' ? '' : f.locationText.trim();
       const location = routed ? from
         : !placeText ? null
-          : placeText === (activity?.locationText ?? '') && activity?.location ? activity.location : await geocodePlace(placeText, trip.destination);
+          : linkPlace && placeText === linkPlace.name ? linkPlace
+            : placeText === (activity?.locationText ?? '') && activity?.location ? activity.location : await geocodePlace(placeText, trip.destination);
       // Titles come from the places. An event (or idea) keeps its own title while its place is unchanged.
       const src = activity ?? draft;
       const keep = src?.title && placeText === (src.locationText ?? '').trim() ? src.title : '';
@@ -154,6 +185,7 @@ export function ActivityForm({ open, trip, date, activity, draft, onClose, onCre
           : journey ? `${city(f.fromText)} → ${city(f.toText)}`
             : behaviour === 'journey' ? `${info.label} from ${city(f.fromText)}`
               : vehicle ? (f.operator.trim() ? `${f.operator.trim()} ${info.label.toLowerCase()}` : `${info.label} · ${city(f.fromText)}`)
+                : f.title.trim() ? f.title.trim() // its own name, when you gave it one
                 : info.type === 'transport' ? `${info.label} · ${city(placeText)}`
                   : keep || city(placeText);
       const ends = behaviour === 'span' || (behaviour === 'journey' && f.endDate > f.date);
@@ -226,6 +258,17 @@ export function ActivityForm({ open, trip, date, activity, draft, onClose, onCre
   );
   const text = (lbl: string, key: 'fromText' | 'toText' | 'locationText' | 'operator' | 'ref' | 'seats' | 'title', placeholder: string, hint?: string) => (
     <TextField label={lbl} placeholder={placeholder} hint={hint} value={f[key]} onChange={(e) => set({ [key]: e.target.value } as Partial<Form>)} />
+  );
+  // Location: an address, a place name or a maps link (read for its place, and its name when Name is empty), with Paste
+  const locationField = (lbl: string, placeholder: string, hint: string) => (
+    <div className={s.locationField}>
+      <div className={s.locationRow}>
+        <TextField label={lbl} placeholder={placeholder} value={f.locationText} inputMode="text"
+          onChange={(e) => { const v = e.target.value; set({ locationText: v }); setLinkPlace(null); const url = findUrl(v); if (url && url === v.trim()) fromLink(url); }} />
+        <Button variant="neutral" size="large" icon="copy" onClick={pasteLocation} disabled={reading}>Paste</Button>
+      </div>
+      <p className="t-body-small t-secondary" aria-live="polite">{reading ? 'Reading the link…' : hint}</p>
+    </div>
   );
   const PLACEHOLDERS: Partial<Record<EventKind, [string, string]>> = {
     flight: ['Melbourne (MEL)', 'Lisbon (LIS)'], train: ['Lisbon Oriente', 'Porto Campanhã'], bus: ['Sete Rios, Lisbon', 'Lagos bus station'],
@@ -318,7 +361,8 @@ export function ActivityForm({ open, trip, date, activity, draft, onClose, onCre
               </>
             ) : (
               <>
-                {text(kind === 'cruise' ? 'Ship or port' : 'Place', 'locationText', PLACE[kind!] ?? 'Memmo Alfama, Lisbon', `It shows as ${startWord.toLowerCase()} and ${endWord.toLowerCase()} in the itinerary.`)}
+                {text('Name (optional)', 'title', PLACE[kind!]?.split(',')[0] ?? 'Memmo Alfama')}
+                {locationField(kind === 'cruise' ? 'Ship or port' : 'Location', PLACE[kind!] ?? 'Memmo Alfama, Lisbon', `An address, a place or a link from Maps. It shows as ${startWord.toLowerCase()} and ${endWord.toLowerCase()} in the itinerary.`)}
                 <FieldRow>
                   {daySelect(`${startWord} day`, f.date, (v) => set({ date: v, endDate: f.endDate > v || (sameDay && f.endDate === v) ? f.endDate : sameDay ? v : addDays(v, 1) }))}
                   {time('Time', 'startTime')}
@@ -333,7 +377,8 @@ export function ActivityForm({ open, trip, date, activity, draft, onClose, onCre
 
           {behaviour === 'place' && kind && (
             <>
-              {text(kind === 'taxi' ? 'Pick-up' : 'Place', 'locationText', PLACE[kind] ?? 'Belém Tower, Lisbon', 'Its name, or an address. A place in a new country adds it to the trip.')}
+              {text('Name (optional)', 'title', PLACE[kind]?.split(',')[0] ?? 'Belém Tower')}
+              {locationField(kind === 'taxi' ? 'Pick-up' : 'Location', PLACE[kind] ?? 'Belém Tower, Lisbon', 'An address, a place or a link from Maps. A place in a new country adds it to the trip.')}
               {daySelect('Day', f.date, (v) => set({ date: v }))}
               {/* Figma "Add event — end time": the chip sits where the end time goes, and becomes that field when tapped */}
               <FieldRow>

@@ -18,6 +18,9 @@
 .destructive:active { background: var(--interactive-button-destructive-background-pressed); }
 
 /* Up and down still scroll the page; sideways belongs to the row */
-.front { position: relative; touch-action: pan-y; transition: transform var(--duration-base) var(--ease-fluid); }
+.front { position: relative; touch-action: pan-y; transition: transform var(--duration-slow) var(--ease-settle); will-change: transform; }
 .dragging { transition: none; }
+/* The actions grow in as they're uncovered, like Mail's */
+.actions .action { transform: scale(calc(0.85 + 0.15 * var(--reveal, 1))); opacity: calc(0.4 + 0.6 * var(--reveal, 1)); }
+.actions .action:active { transform: scale(calc(0.96 * (0.85 + 0.15 * var(--reveal, 1)))); }
 @media (prefers-reduced-motion: reduce) { .front { transition-duration: 1ms; } }

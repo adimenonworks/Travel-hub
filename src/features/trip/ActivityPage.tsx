@@ -1,7 +1,7 @@
 import { Fragment, useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { nextTransition } from '../../app/navigation';
-import { Button, EmptyState, EventCard, IconButton, JourneyDetails, LayoverBlock, LinkButton, ListGroup, ListItem, PageHeader, PageSection, Sheet, TextField, useToast } from '../../design/components';
+import { Button, EmptyState, IconButton, JourneyDetails, LayoverBlock, LinkButton, ListGroup, ListItem, PageHeader, PageSection, Sheet, TextField, useToast } from '../../design/components';
 import type { Activity } from '../../data/types';
 import { daysBetween } from '../../lib/dates';
 import { store } from '../../data';
@@ -19,7 +19,7 @@ import { markRead } from '../../lib/reads';
 import { flightTag, updatedAgo, useFlightStatus } from '../../lib/api';
 import { durationLabel, journeyMs } from '../../lib/timezone';
 import { layovers, legsOf, type Layover } from './events';
-import { behaviourOf, eventKind, isEveryday, kindInfo, spanWords } from '../../lib/categories';
+import { behaviourOf, categoryTone, eventKind, isEveryday, kindInfo, spanWords } from '../../lib/categories';
 import { priceOf } from '../../lib/currency';
 import { PriceWithConversion } from '../shared/Price';
 import { getMapsApp, mapsAppLabel } from '../../lib/prefs';
@@ -126,7 +126,10 @@ export function ActivityPage(ctx: TripCtx) {
 
   return (
     <>
+      {/* The category icon in its type's colour beside the title, the time under it; the place is in the Location card */}
       <PageHeader title={journey ? `${city(legs[0].fromText)} to ${city(lastLeg.toText)}` : a.title} size="small" back={backTo}
+        icon={kindInfo(a.category).icon} tone={categoryTone(a.category)}
+        subtitle={journey ? formatDay(a.date) : eventCardProps(a, ctx, true).time}
         action={{ icon: 'pencil', label: 'Edit event', onClick: () => setEditing(true) }} />
 
       {/* Figma "Journey detail" for flights and trains; every other type shows its Event card. No price anywhere. */}
@@ -154,9 +157,7 @@ export function ActivityPage(ctx: TripCtx) {
             );
           })}
         </div>
-      ) : (
-        <EventCard {...eventCardProps(a, ctx, true)} {...(behaviour !== 'open' && behaviour !== 'note' && where ? { place: undefined } : {})} to={undefined} favourite={starred} />
-      )}
+      ) : null}
 
       {/* Figma "Event detail — Location": the map, the address and the two ways to get there, together in one card */}
       {!journey && where && (

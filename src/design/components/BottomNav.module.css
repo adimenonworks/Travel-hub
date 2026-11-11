@@ -14,6 +14,7 @@
   border-radius: var(--radius-1000); border: 1px solid var(--on-light-border-subtle);
   background: var(--overlay-bar); box-shadow: var(--elevation-floating-bar);
   -webkit-backdrop-filter: blur(var(--blur-overlay)); backdrop-filter: blur(var(--blur-overlay));
+  touch-action: pan-y; /* a sideways drag moves the pill (the page can still be scrolled from the bar) */
 }
 /* Figma "Nav Item": icon over a Label small label */
 .item {
@@ -32,6 +33,8 @@
   border-radius: var(--radius-1000); background: var(--on-light-surface-sunken);
   transition: transform var(--duration-slow) var(--ease-spring);
 }
+/* While dragging, the pill follows the finger exactly (no easing) and grows a touch, like iOS */
+.dragging .indicator { transition: none; }
 @media (prefers-reduced-motion: reduce) { .indicator { transition: none; } }
 .item span { overflow-wrap: anywhere; text-align: center; }
 /* Out of the way while typing (the app shrinks above the keyboard) */

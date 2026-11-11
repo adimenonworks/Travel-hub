@@ -1,4 +1,3 @@
-import { stepTab, useSwipeTabs } from '../../app/useSwipeTabs';
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { Navigate, Route, Routes, useLocation, useMatch, useNavigate, useParams, type Location } from 'react-router-dom';
 import { savedScroll } from '../../app/navigation';
@@ -147,7 +146,6 @@ function StickyTabs({ children }: { children: React.ReactNode }) {
  */
 function TabPanels({ location, section, children }: { location: Location; section: string; children: (loc: Location) => React.ReactNode }) {
   const box = useRef<HTMLDivElement>(null);
-  useTabSwipe(box, section, location.pathname);
   const shown = useRef(location.pathname);
   useLayoutEffect(() => {
     if (shown.current === location.pathname) return;
@@ -169,12 +167,3 @@ function TabPanels({ location, section, children }: { location: Location; sectio
   );
 }
 
-/** Swipe across a trip's tab content to go to the next or previous tab (the panel then slides as when a tab is tapped). */
-function useTabSwipe(box: React.RefObject<HTMLDivElement | null>, section: string, pathname: string) {
-  const navigate = useNavigate();
-  const base = pathname.slice(0, pathname.length - (section ? section.length + 1 : 0));
-  useSwipeTabs(box, (dir) => {
-    const t = stepTab(TAB_ORDER, section, dir);
-    if (t !== null) navigate(t ? `${base}/${t}` : base, { replace: true }); // tabs never add history: Back leaves the trip
-  });
-}

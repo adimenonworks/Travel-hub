@@ -36,13 +36,22 @@
 .comments { display: flex; flex-direction: column; gap: var(--space-default-500); padding: var(--space-default-500); border-radius: var(--radius-600); background: var(--on-light-surface-secondary); }
 /* Messages-style thread: theirs on the left (avatar at the top of the bubble), yours on the right in deep green */
 .thread { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: var(--space-default-400); }
-.message { display: flex; gap: var(--space-default-300); align-items: flex-start; }
-.theirs .messageBody { align-items: flex-start; }
-.mine { justify-content: flex-end; }
-.mine .messageBody { align-items: flex-end; }
-.messageBody { display: flex; flex-direction: column; gap: var(--space-default-200); max-width: 80%; min-width: 0; }
-.messageMeta { font: var(--type-body-small); color: var(--on-light-text-secondary); padding: 0 var(--space-default-300); }
-.messageRow { display: flex; align-items: center; gap: var(--space-default-200); min-width: 0; }
+/* A stack: who and when above (left for theirs, right for yours), then the bubbles 4px apart */
+.message { display: flex; flex-direction: column; gap: var(--space-default-100); }
+.mine { align-items: flex-end; }
+.theirs { align-items: flex-start; }
+.messageMeta { font: var(--type-body-small); color: var(--on-light-text-secondary); padding: 0 var(--space-default-300); margin-bottom: var(--space-default-100); }
+.theirs .messageMeta { padding-left: calc(32px + var(--space-default-300) + var(--space-default-300)); } /* lines up with the bubbles, past the avatar column */
+/* A bubble's row: theirs have the avatar column (the avatar only beside the most recent bubble, top-aligned) */
+.messageRow { display: flex; align-items: flex-start; gap: var(--space-default-300); max-width: 85%; min-width: 0; }
+.mine .messageRow { justify-content: flex-end; align-items: center; }
+.avatarSpace { flex: none; width: 32px; }
+.edited { flex: none; font: var(--type-body-small); color: var(--on-light-text-secondary); }
+.mine .bubble { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; touch-action: manipulation; cursor: default; }
+.bubble:focus-visible { outline: 3px solid var(--on-light-border-focus); outline-offset: 2px; }
+.editingLine { flex-basis: 100%; display: flex; align-items: center; justify-content: space-between; font: var(--type-body-small); color: var(--on-light-text-secondary); }
+.editingCancel { background: none; border: 0; padding: 0 var(--space-default-200); min-height: var(--size-tap); font: var(--type-label); color: var(--on-light-link-default); cursor: pointer; }
+.sendWrap { display: inline-flex; }
 .bubble {
   margin: 0; min-width: 0; overflow-wrap: anywhere; white-space: pre-wrap;
   padding: var(--space-default-300) var(--space-default-500); border-radius: var(--radius-600);

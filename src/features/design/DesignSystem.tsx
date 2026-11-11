@@ -5,6 +5,7 @@ import {
   type IllustrationName, COVER_ILLUSTRATIONS, ICON_NAMES, useToast, BottomNav, Skeleton,
   ListItem, ListGroup, SectionHeader, EventCard, TravelConnector, IdeaRow, Tile, MapCard, StatStrip, ProfileCard,
   OptionCard, BudgetCard, Switch, SearchField, StepProgress, DestinationHeader, TripHeader, DayCard, CountryModal,
+  CategoryIcon, ContextMenu,
 } from '../../design/components';
 import { flagUrl } from '../../lib/countries';
 import { EVENT_TYPES, TYPE_TONE } from '../../lib/categories';
@@ -68,6 +69,7 @@ const icons = ICON_NAMES;
 export function DesignSystem() {
   const [seg, setSeg] = useState<'a' | 'b' | 'c'>('a');
   const [sheet, setSheet] = useState(false);
+  const [menu, setMenu] = useState(false);
   const [on, setOn] = useState(false);
   const [country, setCountry] = useState<string | null>(null);
   const [opt, setOpt] = useState('others');
@@ -268,11 +270,10 @@ export function DesignSystem() {
           </div>
         </Section>
 
-        <Section title="Trip components" footer="Hero Card (phase-aware: countdown, then the next thing; Size Compact for lists), Trip header, Day Card, Timeline.">
+        <Section title="Trip components" footer="Hero Card (phase-aware countdown, an optional heads-up row; no next-up row since 11 Nov 2026: Home shows the Next card on its own; Size Compact for lists), Trip header, Day Card, Timeline.">
           <HeroCard cover={<Illustration name={COVER_ILLUSTRATIONS[1]} />} countdown={{ label: 'In 9 days' }} title="Portugal & Spain" meta="Nov 2 – 11 · 10 days"
-            people={[{ id: 'a', name: 'Alex Menon' }, { id: 'j', name: 'Jo Ma' }, { id: 's', name: 'Sam Lee' }, { id: 'p', name: 'Priya Shah' }]} next={{ icon: 'plane', title: 'Flight to Lisbon', meta: 'Mon 2 Nov, 08:30 · TP1351', to: '/design' }} to="/design" />
-          <HeroCard countdown={{ label: 'Day 3 of 15' }} title="Japan" meta="Mar 20 – Apr 3 · 15 days" people={[{ id: 'a', name: 'Alex Menon' }, { id: 'j', name: 'Jo Ma' }, { id: 's', name: 'Sam Lee' }, { id: 'p', name: 'Priya Shah' }]}
-            next={{ icon: 'lightbulb', title: '24 ideas to sort', meta: 'Brought over from your Japan saves' }} />
+            people={[{ id: 'a', name: 'Alex Menon' }, { id: 'j', name: 'Jo Ma' }, { id: 's', name: 'Sam Lee' }, { id: 'p', name: 'Priya Shah' }]} to="/design" />
+          <HeroCard countdown={{ label: 'Day 3 of 15' }} title="Japan" meta="Mar 20 – Apr 3 · 15 days" people={[{ id: 'a', name: 'Alex Menon' }, { id: 'j', name: 'Jo Ma' }, { id: 's', name: 'Sam Lee' }, { id: 'p', name: 'Priya Shah' }]} />
           <HeroCard size="compact" cover={<Illustration name={COVER_ILLUSTRATIONS[2]} />} countdown={{ label: 'In 40 days' }} title="Japan" meta="Dec 17 – 31 · 15 days" to="/design" />
           <TripHeader title="Portugal & Spain" back={{ to: '/design', label: 'Trips' }} action={{ icon: 'pencil', label: 'Edit trip', onClick: () => {} }}
             meta="2 – 11 Nov · 10 days" />
@@ -332,8 +333,22 @@ export function DesignSystem() {
           </div>
         </Section>
 
+        <Section title="Event page header and Context menu" footer="Page Header Title small with Show icon (the Category icon: a 40px round tile in the type's colour) and Show subtitle (the time). Context menu: what a long press on your own comment opens (Edit, Delete in red); tap the bubble to see it.">
+          <div className={s.chipRow}>
+            {(['neutral', 'travel', 'stays', 'food', 'activities', 'notes'] as const).map((t) => <CategoryIcon key={t} icon={t === 'food' ? 'wine-bottle' : 'plane'} tone={t} />)}
+          </div>
+          <PageHeader size="small" icon="wine-bottle" tone="food" title="Quinta da Pacheca" subtitle="Thu 12 Nov, 15:00 – 17:00" back={{ to: '/design', label: 'Itinerary' }} action={{ icon: 'pencil', label: 'Example edit button', onClick: () => {} }} />
+          <div>
+            {menu ? (
+              <ContextMenu label="Message actions" onClose={() => setMenu(false)} items={[{ label: 'Edit', icon: 'pencil', onClick: () => {} }, { label: 'Delete', icon: 'trash', destructive: true, onClick: () => {} }]}>
+                <Button variant="neutral">Perfect, see you there</Button>
+              </ContextMenu>
+            ) : <Button variant="neutral" onClick={() => setMenu(true)}>Perfect, see you there</Button>}
+          </div>
+        </Section>
+
         <Section title="Rows, groups and tiles" footer="Section header, List group of List items (Default / Compact), Idea rows with Vote buttons, Tiles, Map card, Stat strip, Profile Card.">
-          <SectionHeader title="Saved for later" meta="4 places · 61 saves" action={<LinkButton to="/design" variant="ghost" size="regular" iconEnd="chevron-right">See all</LinkButton>} />
+          <SectionHeader title="Collections" meta="4 places · 61 saves" action={<LinkButton to="/design" variant="ghost" size="regular" iconEnd="chevron-right">See all</LinkButton>} />
           <ListGroup>
             <ListItem icon="utensils" title="Ichiran Shibuya" meta="Ramen · Tokyo · from TikTok" trailing="2h" onClick={() => {}} />
             <ListItem icon="link" title="10 things to do in Cusco" meta="Article · Peru · cntraveler.com" trailing="Yesterday" />

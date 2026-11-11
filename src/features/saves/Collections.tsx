@@ -166,7 +166,7 @@ export function CountryCollection() {
 
   return (
     <Content>
-      <PageHeader title={title} back={{ to: '/trips', label: 'Saved' }} fit />
+      <PageHeader title={title} back={{ to: '/trips', label: 'Collections' }} fit />
       {mine.length === 0 ? (
         <EmptyState illustration="map" title={`Nothing saved in ${title}`} message="Save cafés, bars, stays and sights you find online."
           action={<Button icon="plus" onClick={() => { openSave({ mode: 'link' }); navigate('/trips'); }}>Save a place</Button>} />
