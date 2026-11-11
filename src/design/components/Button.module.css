@@ -73,8 +73,13 @@
 .icon-ghost:hover:not(:disabled) { background: var(--interactive-button-ghost-background-hover); }
 .icon-ghost:active:not(:disabled) { background: var(--interactive-button-ghost-background-pressed); }
 .icon-on-brand { background: var(--on-mid-surface-sunken); color: var(--on-mid-icon-primary); }
+/* Figma Icon button Primary: emerald, for the one main action in a row (Send a comment) */
+.icon-primary { background: var(--interactive-button-primary-background); color: var(--interactive-button-primary-icon); }
+.icon-primary:hover:not(:disabled) { background: var(--interactive-button-primary-background-hover); }
+.icon-primary:active:not(:disabled) { background: var(--interactive-button-primary-background-pressed); }
 .icon-on-brand:hover:not(:disabled) { background: var(--interactive-button-ghost-background-pressed); }
 .iconButton:disabled { cursor: default; color: var(--interactive-button-ghost-disabled-foreground); }
+.icon-primary:disabled { background: var(--interactive-button-primary-disabled-background); color: var(--interactive-button-primary-disabled-foreground); }
 
 /* Each variant's icons use its own icon token (Figma: …/icon), separate from the label colour. */
 .primary .glyph { color: var(--interactive-button-primary-icon); }

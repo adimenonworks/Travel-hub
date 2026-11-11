@@ -9,7 +9,7 @@ import { unreadCount, unreadTag, useReads } from '../../lib/reads';
 import { store } from '../../data';
 import { travelEstimate } from '../../lib/trips';
 import { SlideSwap } from '../shared/SlideSwap';
-import { ActivityForm } from './ActivityForm';
+import { ActivityForm, ConnectionForm } from './ActivityForm';
 import { entryEnd, entryTime, eventCardProps, eventsOn, isFirstLeg, legsOf, type DayEntry } from './events';
 import { behaviourOf, categoryInfo } from '../../lib/categories';
 import { crossesDateLine, localNow, zoneOfDay } from '../../lib/timezone';
@@ -45,6 +45,7 @@ export function Itinerary(ctx: TripCtx) {
 
   const [adding, setAdding] = useState(false);
   const [editing, setEditing] = useState<Activity | null>(null);
+  const [connectFrom, setConnectFrom] = useState<Activity | null>(null);
   const toast = useToast();
   const remove = async (a: Activity) => {
     if (!confirmAction(`Delete "${a.title}"?`)) return;
@@ -145,7 +146,9 @@ export function Itinerary(ctx: TripCtx) {
       </section>
 
       <ActivityForm open={adding} trip={trip} date={day} onClose={() => setAdding(false)} />
-      <ActivityForm open={!!editing} trip={trip} date={editing?.date ?? day} activity={editing ?? undefined} onClose={() => setEditing(null)} />
+      <ActivityForm open={!!editing} trip={trip} date={editing?.date ?? day} activity={editing ?? undefined} onClose={() => setEditing(null)}
+        onAddConnection={() => setConnectFrom(editing)} />
+      {connectFrom && <ConnectionForm open trip={trip} activity={connectFrom} activities={activities} onClose={() => setConnectFrom(null)} />}
     </div>
   );
 }

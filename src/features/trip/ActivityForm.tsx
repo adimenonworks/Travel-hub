@@ -11,7 +11,7 @@ import { LinkEditor, cleanLinks } from '../shared/Links';
 import { zoneAt, zoneOfDay } from '../../lib/timezone';
 import { PriceField, fromPriceDraft, toPriceDraft, type PriceDraft } from '../shared/Price';
 import { priceOf } from '../../lib/currency';
-import { eventsOn, entryEnd, entryTime } from './events';
+import { eventsOn, entryEnd, entryTime, legsOf } from './events';
 import s from './trip.module.css';
 
 export type ActivityDraft = Partial<Pick<Activity, 'title' | 'category' | 'notes' | 'links' | 'date' | 'startTime' | 'endTime' | 'locationText' | 'placeId' | 'fromText' | 'journeyId'>>;
@@ -81,8 +81,9 @@ export function suggestFreeTime(activities: Activity[], day: string, except?: st
  * then the fields for its behaviour (journey, span, at a place, open, note). Saved events get their category, type and
  * behaviour. `draft` prefills a new one (e.g. from an idea added to a day); `onCreated` gets the new id.
  */
-export function ActivityForm({ open, trip, date, activity, draft, onClose, onCreated, onDeleted }: {
+export function ActivityForm({ open, trip, date, activity, draft, onClose, onCreated, onDeleted, onAddConnection }: {
   open: boolean; trip: Trip; date: string; activity?: Activity; draft?: ActivityDraft; onClose: () => void; onCreated?: (id: string) => void;
+  /** Editing a journey: "+ Add a connection" closes this sheet and opens the next leg's (see ConnectionForm) */ onAddConnection?: () => void;
   /** After a delete: e.g. the event's own page goes back to its day in the itinerary */ onDeleted?: (a: Activity) => void;
 }) {
   const me = useMe();
@@ -293,6 +294,9 @@ export function ActivityForm({ open, trip, date, activity, draft, onClose, onCre
                   : text('Operator (optional)', 'operator', kind === 'train' ? 'CP' : kind === 'bus' ? 'FlixBus' : kind === 'ferry' ? 'Transtejo' : 'Company')}
                 {text('Seat (optional)', 'seats', kind === 'flight' ? '23A' : 'Coach 4, seat 32')}
               </FieldRow>
+              {activity && onAddConnection && (
+                <div><Button variant="ghost" size="regular" icon="plus" onClick={() => { onClose(); onAddConnection(); }}>Add a connection</Button></div>
+              )}
             </>
           )}
 
@@ -369,5 +373,21 @@ export function ActivityForm({ open, trip, date, activity, draft, onClose, onCre
         </>
       )}
     </Sheet>
+  );
+}
+
+/**
+ * The next leg of a journey (a flight with a connection): leaves from where the journey lands, on that day, and joins
+ * the journey (`journeyId`; the first leg gets one too if it had none). Opened from "+ Add a connection" in the edit sheet.
+ */
+export function ConnectionForm({ open, trip, activity, activities, onClose }: { open: boolean; trip: Trip; activity: Activity; activities: Activity[]; onClose: () => void }) {
+  const legs = legsOf(activity, activities);
+  const last = legs[legs.length - 1];
+  const first = legs[0];
+  const day = last.endDate || last.date;
+  return (
+    <ActivityForm open={open} trip={trip} date={day} onClose={onClose}
+      draft={{ category: activity.category, fromText: last.toText ?? '', date: day, journeyId: first.journeyId ?? first.id }}
+      onCreated={() => { if (!first.journeyId) store.updateSub(trip.id, 'activities', first.id, { journeyId: first.id }).catch(() => {}); }} />
   );
 }

@@ -214,6 +214,8 @@ export function DesignSystem() {
             <LinkButton to="/" variant="neutral">Link button</LinkButton>
             <IconButton icon="x" label="Close (Ghost)" />
             <IconButton icon="pencil" label="Edit (Secondary)" tone="secondary" />
+            <IconButton icon="send" label="Send (Primary)" tone="primary" />
+            <IconButton icon="send" label="Send (Primary, disabled)" tone="primary" disabled />
             <Select compact aria-label="Compact select (matches a small button)"><option>Organizer</option><option>Member</option></Select>
           </Card>
           <Card tone="accent" className={s.row}><Button variant="inverse">Inverse</Button><IconButton icon="x" label="Close (On brand)" tone="on-brand" /></Card>

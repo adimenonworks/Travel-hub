@@ -23,7 +23,7 @@ import { behaviourOf, eventKind, isEveryday, kindInfo, spanWords } from '../../l
 import { priceOf } from '../../lib/currency';
 import { PriceWithConversion } from '../shared/Price';
 import { getMapsApp, mapsAppLabel } from '../../lib/prefs';
-import { ActivityForm } from './ActivityForm';
+import { ActivityForm, ConnectionForm } from './ActivityForm';
 import { eventCardProps } from './events';
 import type { TripCtx } from './TripPage';
 import s from './trip.module.css';
@@ -153,7 +153,6 @@ export function ActivityPage(ctx: TripCtx) {
               </Fragment>
             );
           })}
-          {ctx.canManage && <Button variant="neutral" icon="plus" onClick={() => setConnecting(true)}>Add a connection</Button>}
         </div>
       ) : (
         <EventCard {...eventCardProps(a, ctx, true)} {...(behaviour !== 'open' && behaviour !== 'note' && where ? { place: undefined } : {})} to={undefined} favourite={starred} />
@@ -162,7 +161,7 @@ export function ActivityPage(ctx: TripCtx) {
       {/* Figma "Event detail — Location": the map, the address and the two ways to get there, together in one card */}
       {!journey && where && (
         <PageSection title="Location">
-          <div className={s.whereCard}>
+          <div className={[s.whereCard, !a.location && s.whereCardPlain].filter(Boolean).join(' ')}>
             {a.location && (
               <div className={s.whereMap}>
                 <MapView pins={[{ lat: a.location.lat, lng: a.location.lng, label: a.title }]} center={a.location} zoom={15} height={160} />
@@ -235,13 +234,11 @@ export function ActivityPage(ctx: TripCtx) {
       </PageSection>
 
       {/* A connection: the next leg leaves from where this journey lands, and joins this journey */}
-      <ActivityForm open={connecting} trip={trip} date={lastLeg.endDate || lastLeg.date}
-        draft={{ category: a.category, fromText: lastLeg.toText ?? '', date: lastLeg.endDate || lastLeg.date, journeyId: a.journeyId ?? a.id }}
-        onCreated={() => { if (!a.journeyId) store.updateSub(trip.id, 'activities', a.id, { journeyId: a.id }).catch(() => {}); }}
-        onClose={() => setConnecting(false)} />
+      <ConnectionForm open={connecting} trip={trip} activity={a} activities={ctx.activities} onClose={() => setConnecting(false)} />
       <ActivityForm open={!!stayAt} trip={trip} date={stayAt ? stayAt.arrives.endDate || stayAt.arrives.date : a.date}
         draft={stayAt ? { category: 'hotel', locationText: stayAt.at } : undefined} onClose={() => setStayAt(null)} />
       <ActivityForm open={editing} trip={trip} date={a.date} activity={a} onClose={() => setEditing(false)}
+        onAddConnection={() => { setEditing(false); setConnecting(true); }}
         onDeleted={(gone) => { nextTransition('back'); navigate(`/trip/${trip.id}/itinerary?day=${gone.date}`, { replace: true }); }} />
       <DocumentForm open={addingDoc} onClose={() => setAddingDoc(false)}
         onAdd={async (d) => {
