@@ -3,7 +3,8 @@
  * (color/emerald/300 → --color-emerald-300, space/16 → --space-16, radius/24 → --radius-24).
  * Components never use these directly: they use the semantic tokens in semantic.css.
  * Every palette's steps sit at the same contrast against white (neutral is pure grey, no brand tint);
- * yellow and pink were made to match emerald step for step, so the accents share one tone.
+ * yellow and pink were made to match emerald step for step, so the accents share one tone; sky (hue 232°) and violet
+ * (hue 295°) were solved the same way (OKLCH, emerald's colour-strength curve) for event categories. Only neutral has a 1000.
  */
 :root {
   --color-emerald-50: #e9fef6; --color-emerald-100: #d4fded; --color-emerald-200: #74fed2; --color-emerald-300: #2ee6b6; --color-emerald-400: #00c69a; --color-emerald-500: #00a983; --color-emerald-600: #168669; --color-emerald-700: #1f6450; --color-emerald-800: #214a3c; --color-emerald-900: #1e332b;
@@ -12,6 +13,8 @@
   --color-red-50: #fef8f8; --color-red-100: #fdf1f1; --color-red-200: #fedfde; --color-red-300: #ffbcbb; --color-red-400: #ff8e90; --color-red-500: #fc606a; --color-red-600: #d3424f; --color-red-700: #a72837; --color-red-800: #76272d; --color-red-900: #4b2223;
   --color-yellow-50: #fff9de; --color-yellow-100: #fff5c2; --color-yellow-200: #ffe66e; --color-yellow-300: #eacc04; --color-yellow-400: #c9af0a; --color-yellow-500: #ac9401; --color-yellow-600: #897603; --color-yellow-700: #675904; --color-yellow-800: #4e4201; --color-yellow-900: #372e01;
   --color-pink-50: #fef8fa; --color-pink-100: #fef1f6; --color-pink-200: #feddeb; --color-pink-300: #feb9d6; --color-pink-400: #ff88c0; --color-pink-500: #e769a7; --color-pink-600: #c44887; --color-pink-700: #a12669; --color-pink-800: #840152; --color-pink-900: #60013a;
+  --color-sky-50: #f3faff; --color-sky-100: #e7f6ff; --color-sky-200: #c8ebff; --color-sky-300: #88d6ff; --color-sky-400: #10bbfa; --color-sky-500: #00a0d7; --color-sky-600: #007fac; --color-sky-700: #006082; --color-sky-800: #004763; --color-sky-900: #023247;
+  --color-violet-50: #faf9ff; --color-violet-100: #f5f2ff; --color-violet-200: #e8e3ff; --color-violet-300: #d2c4ff; --color-violet-400: #b9a0ff; --color-violet-500: #a085e6; --color-violet-600: #8069bb; --color-violet-700: #604e90; --color-violet-800: #483a6c; --color-violet-900: #32294b;
   --color-neutral-0: #ffffff; --color-neutral-50: #fafafa; --color-neutral-100: #f4f4f4; --color-neutral-200: #e6e6e6; --color-neutral-300: #cdcdcd; --color-neutral-400: #afafaf; --color-neutral-500: #959595; --color-neutral-600: #767676; --color-neutral-700: #595959; --color-neutral-800: #434343; --color-neutral-900: #2e2e2e; --color-neutral-1000: #1c1c1c;
   --space--40: -40px; --space--24: -24px; --space--16: -16px; --space--10: -10px; --space--8: -8px; --space--6: -6px; --space--4: -4px; --space--2: -2px;
   --space-0: 0px; --space-2: 2px; --space-4: 4px; --space-6: 6px; --space-8: 8px; --space-10: 10px; --space-12: 12px; --space-16: 16px; --space-18: 18px; --space-20: 20px; --space-24: 24px; --space-32: 32px; --space-40: 40px; --space-48: 48px; --space-96: 96px; --space-120: 120px;
