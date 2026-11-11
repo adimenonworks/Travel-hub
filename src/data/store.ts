@@ -1,4 +1,4 @@
-import type { ChatReads, Vote, Invite, LinkPreview, NewDoc, Profile, SavedPlace, SubCollections, SubName, Trip, User } from './types';
+import type { ChatReads, CollectionRole, CollectionShare, Invite, LinkPreview, NewDoc, Profile, SavedPlace, SubCollections, SubName, Trip, User, Vote } from './types';
 
 export type Unsubscribe = () => void;
 
@@ -69,6 +69,16 @@ export interface Store {
   /** Read a shared link (title, photo, place) with the readLink Cloud Function. Demo mode and errors: null. */
   readLink(url: string): Promise<LinkPreview | null>;
 
+  /** Shared collections you own or were added to, live. */
+  watchShares(uid: string, cb: (shares: CollectionShare[]) => void): Unsubscribe;
+  /** Every place in a shared collection (yours and its Members'), live. */
+  watchSharedPlaces(shareId: string, cb: (places: SavedPlace[]) => void): Unsubscribe;
+  /** Share your collection for a country: makes the share (once) and marks your places there as in it. */
+  shareCollection(countryCode: string): Promise<CollectionShare>;
+  /** An invite link to your shared collection, as a Member or a Viewer. */
+  createCollectionInvite(share: CollectionShare, role: CollectionRole, label: string): Promise<string>;
+  /** The owner changes someone's role, or removes them (role null); anyone can remove themselves (leave). */
+  setShareRole(share: CollectionShare, uid: string, role: CollectionRole | null): Promise<void>;
   createInvite(trip: Trip): Promise<string>;
   getInvite(code: string): Promise<Invite | null>;
   redeemInvite(invite: Invite): Promise<void>;

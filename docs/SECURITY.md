@@ -37,8 +37,9 @@ personal data.
 | Deleting a trip | – | The owner only |
 | Public profile (name, photo) | Anyone signed in, one person at a time, by ID (nobody can list all users) | You; only `name` and `photo` are allowed |
 | Private profile (home, visited, currency, reads) | You only | You only |
-| Saved places | You, and people you've added the place to a trip with (read by ID). Lists only ever return your own or ones you starred | You (deleting your account hands one a trip uses to someone on that trip). Others can only add or remove their own star |
-| Invites | Anyone signed in, by code (no listing) | Created by the trip's owner/organisers; deleted by whoever made it |
+| Saved places | You, people you've added the place to a trip with (read by ID), and the people in a collection you shared (your places in that country, and places they added to it). Lists only return your own, ones you starred, and ones in a collection shared with you | You (deleting your account hands one a trip uses to someone on that trip). In a shared collection its owner and Members may also change a place's city or category; only whoever saved a place deletes it. Others can only add or remove their own star |
+| Shared collections (`collectionShares/{owner}_{country}`) | Its owner and the people in it | The owner adds roles (Member / Viewer) or removes people; you join only with a valid collection invite, as its role; anyone can leave |
+| Invites | Anyone signed in, by code (no listing) | Trip invites by the trip's owner/organisers; collection invites by the collection's owner (as Member or Viewer); deleted by whoever made it |
 
 The rules have their own automated tests (`tests/rules/`). Run them whenever the rules change.
 

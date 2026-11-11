@@ -1,5 +1,5 @@
 import type { Store } from './store';
-import type { ChatReads, Invite, Profile, SavedPlace, SubName, Trip, User } from './types';
+import type { ChatReads, CollectionShare, Invite, Profile, SavedPlace, SubName, Trip, User } from './types';
 import { randomCode } from './util';
 
 /**
@@ -15,6 +15,7 @@ type DB = {
   trips: Record<string, Trip>;
   subs: Record<string, Record<string, Record<string, Record<string, unknown>>>>; // tripId -> sub -> id -> doc
   invites: Record<string, Invite>;
+  shares?: Record<string, CollectionShare>;
 };
 
 const KEY = 'triphub-demo-db';
@@ -251,6 +252,34 @@ export function createLocalStore(): Store {
       save();
     },
 
+    watchShares(uid, cb) {
+      return watch(() => Object.values(db.shares ?? {}).filter((s) => s.ownerId === uid || s.memberIds.includes(uid)), cb);
+    },
+    watchSharedPlaces(shareId, cb) {
+      const cut = shareId.lastIndexOf('_');
+      const ownerId = shareId.slice(0, cut), cc = shareId.slice(cut + 1);
+      return watch(() => Object.values(db.places ?? {}).filter((p) => p.sharedIn === shareId || (!p.sharedIn && p.ownerId === ownerId && p.countryCode === cc)), cb);
+    },
+    async shareCollection(countryCode) {
+      const id = `${me()}_${countryCode}`;
+      const shares = (db.shares ??= {});
+      shares[id] ??= { id, ownerId: me(), countryCode, memberIds: [], roles: {}, createdAt: Date.now() };
+      save();
+      return structuredClone(shares[id]);
+    },
+    async createCollectionInvite(share, role, label) {
+      const code = randomCode();
+      db.invites[code] = { code, kind: 'collection', shareId: share.id, countryCode: share.countryCode, role, tripId: '', tripName: label, createdBy: me(), expiresAt: Date.now() + 14 * 86400_000 };
+      save();
+      return code;
+    },
+    async setShareRole(share, uid, role) {
+      const s = db.shares?.[share.id];
+      if (!s) return;
+      if (role) { if (!s.memberIds.includes(uid)) s.memberIds.push(uid); s.roles[uid] = role; }
+      else { s.memberIds = s.memberIds.filter((x) => x !== uid); delete s.roles[uid]; }
+      save();
+    },
     async createInvite(trip) {
       const code = randomCode();
       db.invites[code] = { code, tripId: trip.id, tripName: trip.name, createdBy: me(), expiresAt: Date.now() + 14 * 86400_000 };
@@ -261,6 +290,12 @@ export function createLocalStore(): Store {
       return db.invites[code] ?? null;
     },
     async redeemInvite(invite) {
+      if (invite.kind === 'collection') {
+        const s = db.shares?.[invite.shareId ?? ''];
+        if (!s) throw new Error('This collection is no longer shared.');
+        if (s.ownerId !== me() && !s.memberIds.includes(me())) { s.memberIds.push(me()); s.roles[me()] = invite.role ?? 'viewer'; save(); }
+        return;
+      }
       const t = db.trips[invite.tripId];
       if (!t) throw new Error('This trip no longer exists.');
       const uid = me();

@@ -3,7 +3,7 @@ import { Content } from '../../app/Shell';
 import s from './Profile.module.css';
 
 /** When the policy last changed. Update it with every change to the text below. */
-const UPDATED = '10 November 2026';
+const UPDATED = '11 November 2026';
 
 /**
  * Rove's privacy policy (You → Privacy policy, the small link under the version). Plain language, following the
@@ -18,7 +18,7 @@ export function Privacy() {
         <Section title="The short version">
           <ul>
             <li>Rove keeps what you put in it (trips, plans, saved places) so you can plan with the people you invite.</li>
-            <li>Only people on a trip can see that trip. Your saved places and settings are yours.</li>
+            <li>Only people on a trip can see that trip. Your saved places and settings are yours, unless you share a country's collection with someone.</li>
             <li>No ads, no tracking, no selling or renting your data. Rove has no analytics tools.</li>
             <li>You can delete your account and data at any time: You → Delete account.</li>
           </ul>
@@ -48,6 +48,7 @@ export function Privacy() {
           <ul>
             <li><b>People on your trips</b> see that trip, everything in it, and your name and photo.</li>
             <li><b>Saved places</b> you add to a trip can be seen by the people on that trip.</li>
+            <li><b>A collection you share</b> (your saved places in one country) can be seen by the people you invite to it, and they see each other's names. Remove someone and they lose access.</li>
             <li><b>Nobody else.</b> This is enforced by the database itself, not just the app.</li>
           </ul>
         </Section>

@@ -8,6 +8,13 @@ service cloud.firestore {
     function tripData(tripId) { return get(/databases/$(database)/documents/trips/$(tripId)).data; }
     function isMember(tripId) { return signedIn() && uid() in tripData(tripId).memberIds; }
     function isManager(tripId) { return signedIn() && tripData(tripId).roles[uid()] in ['owner', 'editor']; }
+    // A shared collection (collectionShares/{ownerId}_{countryCode}): your role in it ('owner', 'member', 'viewer' or '')
+    function shareDoc(id) { return /databases/$(database)/documents/collectionShares/$(id); }
+    function shareRole(id) {
+      return id is string && id != '' && exists(shareDoc(id))
+        ? (get(shareDoc(id)).data.ownerId == uid() ? 'owner' : get(shareDoc(id)).data.roles.get(uid(), ''))
+        : '';
+    }
     // A Viewer sees the trip and chats, but adds, edits and votes on nothing
     function isContributor(tripId) { return isMember(tripId) && tripData(tripId).roles[uid()] != 'viewer'; }
 
@@ -112,35 +119,87 @@ service cloud.firestore {
       }
     }
 
-    // Saved Places (Collections): personal. Each belongs to the person who saved it. Anyone signed in can read one
-    // by id (trip-mates see a Place that's been added to their trip's ideas), but a list only returns your own Places
-    // and the ones you've starred. Only the owner edits or deletes it; anyone else may only add or remove their own star.
+    // Saved Places (Collections). Each belongs to the person who saved it. Anyone signed in can read one by id
+    // (trip-mates see a Place added to their trip's ideas). A list returns your own Places, the ones you've starred,
+    // and the ones in a collection shared with you: added to it (`sharedIn`), or its owner's own Places in that country.
+    // Only whoever saved it deletes it; in a shared collection its owner or a Member may also move it (city) or change its category; anyone may add or remove their own star.
     match /places/{placeId} {
       function stars(d) { return d.get('starredBy', []); }
       allow get: if signedIn();
-      allow list: if signedIn() && (resource.data.ownerId == uid() || uid() in stars(resource.data));
+      function sharedIn(d) { return d.get('sharedIn', ''); }
+      // The collection a Place is in: the one it was added to (`sharedIn`), else its owner's own for its country
+      function inShare(d) { return sharedIn(d) != '' ? sharedIn(d) : d.ownerId + '_' + d.get('countryCode', ''); }
+      allow list: if signedIn() && (resource.data.ownerId == uid() || uid() in stars(resource.data)
+        || shareRole(inShare(resource.data)) in ['owner', 'member', 'viewer']);
+      // Into a shared collection only as its owner or a Member
       allow create: if signedIn()
         && request.resource.data.ownerId == uid()
-        && stars(request.resource.data).toSet().difference([uid()].toSet()).size() == 0;
+        && stars(request.resource.data).toSet().difference([uid()].toSet()).size() == 0
+        && (sharedIn(request.resource.data) == '' || shareRole(sharedIn(request.resource.data)) in ['owner', 'member']);
       // When its owner deletes their account, a Place a trip still uses goes to someone on that trip (handedVia).
       function handedOver() {
         let trip = get(/databases/$(database)/documents/trips/$(request.resource.data.handedVia)).data;
         return uid() in trip.memberIds && request.resource.data.ownerId in trip.memberIds;
       }
+      // A changed `sharedIn` must be a collection you own or are a Member of
+      function sharedInOk() {
+        return sharedIn(request.resource.data) == sharedIn(resource.data) || sharedIn(request.resource.data) == ''
+          || shareRole(sharedIn(request.resource.data)) in ['owner', 'member'];
+      }
       allow update: if signedIn() && (
-        (resource.data.ownerId == uid() && (request.resource.data.ownerId == resource.data.ownerId || handedOver()))
+        (resource.data.ownerId == uid() && (request.resource.data.ownerId == resource.data.ownerId || handedOver()) && sharedInOk())
+        || (shareRole(inShare(resource.data)) in ['owner', 'member']
+            && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['category', 'city', 'starredBy'])
+            && stars(request.resource.data).toSet().difference(stars(resource.data).toSet())
+                 .union(stars(resource.data).toSet().difference(stars(request.resource.data).toSet())).hasOnly([uid()]))
         || (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['starredBy'])
             && stars(request.resource.data).toSet().difference(stars(resource.data).toSet())
                  .union(stars(resource.data).toSet().difference(stars(request.resource.data).toSet())).hasOnly([uid()])));
       allow delete: if signedIn() && resource.data.ownerId == uid();
     }
 
+    // A shared collection: its owner manages who's in it and their role; you join with a valid collection invite (as the
+    // invite's role) and can leave. Only the owner and the people in it can read it.
+    match /collectionShares/{shareId} {
+      allow get, list: if signedIn() && (resource.data.ownerId == uid() || uid() in resource.data.memberIds);
+      allow create: if signedIn()
+        && request.resource.data.ownerId == uid()
+        && shareId == uid() + '_' + request.resource.data.countryCode
+        && request.resource.data.memberIds.size() == 0;
+      function ownerChange() {
+        return resource.data.ownerId == uid()
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['memberIds', 'roles']);
+      }
+      function joiningShare() {
+        let invite = get(/databases/$(database)/documents/invites/$(request.resource.data.joinedVia)).data;
+        return !(uid() in resource.data.memberIds)
+          && invite.get('kind', 'trip') == 'collection'
+          && invite.shareId == shareId
+          && invite.expiresAt > request.time
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['memberIds', 'roles', 'joinedVia'])
+          && request.resource.data.memberIds.toSet() == resource.data.memberIds.toSet().union([uid()].toSet())
+          && request.resource.data.roles.diff(resource.data.roles).affectedKeys().hasOnly([uid()])
+          && request.resource.data.roles[uid()] == invite.role;
+      }
+      function leavingShare() {
+        return uid() in resource.data.memberIds
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['memberIds', 'roles'])
+          && request.resource.data.memberIds.toSet() == resource.data.memberIds.toSet().difference([uid()].toSet())
+          && !(uid() in request.resource.data.roles);
+      }
+      allow update: if signedIn() && (ownerChange() || joiningShare() || leavingShare());
+      allow delete: if signedIn() && resource.data.ownerId == uid();
+    }
+
     match /invites/{code} {
       allow get: if signedIn();
       allow list: if false;
+      // A trip invite by its owner or an organiser; a collection invite by the collection's owner, as Member or Viewer
       allow create: if signedIn()
         && request.resource.data.createdBy == uid()
-        && isManager(request.resource.data.tripId);
+        && (request.resource.data.get('kind', 'trip') == 'collection'
+            ? (shareRole(request.resource.data.shareId) == 'owner' && request.resource.data.role in ['member', 'viewer'])
+            : isManager(request.resource.data.tripId));
       allow delete: if signedIn() && resource.data.createdBy == uid();
     }
   }

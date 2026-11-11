@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
 import { store } from './index';
-import type { Profile, Role, SavedPlace, SubCollections, SubName, Trip, User } from './types';
+import type { CollectionShare, Profile, Role, SavedPlace, SubCollections, SubName, Trip, User } from './types';
 
 type AuthState = { user: User | null; loading: boolean };
 const AuthContext = createContext<AuthState>({ user: null, loading: true });
@@ -107,6 +107,26 @@ export function usePlaces() {
   const [places, setPlaces] = useCached<SavedPlace[] | null>(`places:${me.uid}`, null);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => store.watchPlaces(me.uid, setPlaces), [me.uid]);
+  return places;
+}
+
+/** Shared collections you own or were added to (null while loading). */
+export function useShares() {
+  const me = useMe();
+  const [shares, setShares] = useCached<CollectionShare[] | null>(`shares:${me.uid}`, null);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => store.watchShares(me.uid, setShares), [me.uid]);
+  return shares;
+}
+
+/** Every place in one shared collection (yours and its Members'); [] with no share. */
+export function useSharedPlaces(shareId: string | undefined) {
+  const [places, setPlaces] = useCached<SavedPlace[] | null>(`shared:${shareId ?? ''}`, shareId ? null : []);
+  useEffect(() => {
+    if (!shareId) { setPlaces([]); return; }
+    return store.watchSharedPlaces(shareId, setPlaces);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [shareId]);
   return places;
 }
 

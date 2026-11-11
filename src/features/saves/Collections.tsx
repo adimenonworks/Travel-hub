@@ -1,10 +1,11 @@
 import { useEffect, useMemo, useState, type ReactNode } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Button, Card, CategoryIcon, Chip, CollectionHeader, EmptyState, Icon, IconButton, Illustration, LinkButton, ListGroup, ListItem, LocationCard, PageHeader, PageSection, PageSkeleton, Select, Sheet, useToast, Tile } from '../../design/components';
+import { Button, Card, CategoryIcon, Chip, CollectionHeader, TextField, EmptyState, Icon, IconButton, Illustration, LinkButton, ListGroup, ListItem, LocationCard, PageHeader, PageSection, PageSkeleton, Select, Sheet, useToast, Tile } from '../../design/components';
 import { hostOf } from '../../lib/format';
 import { store } from '../../data';
-import { useActivitiesFor, useMyTrips, usePlaces } from '../../data/hooks';
-import type { SavedPlace } from '../../data/types';
+import { personName, useActivitiesFor, useMe, useMyTrips, usePlaces, useProfiles, useShares, useSharedPlaces } from '../../data/hooks';
+import { CollectionPeople, savedBy } from './CollectionPeople';
+import type { CollectionRole, SavedPlace } from '../../data/types';
 import { countryName, flagUrl } from '../../lib/countries';
 import { today } from '../../lib/dates';
 import { haptic, confirmAction } from '../../lib/native';
@@ -44,7 +45,13 @@ export function PlaceRow({ place, visited, starred, onClick, meta, trailing }: {
  * One Place opened: open its link, star it, change its category (your own Places), add it to an upcoming trip's
  * ideas (it points at this Place, never a copy), or delete it. Deleting a trip never deletes Places.
  */
-export function PlaceSheet({ place, onClose }: { place: SavedPlace | null; onClose: () => void }) {
+export function PlaceSheet({ place, onClose, role = 'owner', cities = [] }: {
+  place: SavedPlace | null; onClose: () => void;
+  /** Your role in the collection it's opened from: a Member moves and recategorises; a Viewer only stars and opens Maps */
+  role?: CollectionRole | 'owner';
+  /** The collection's cities, to move it to another one */
+  cities?: string[];
+}) {
   const toast = useToast();
   const { visited, starred, me } = usePlaceMarks();
   const trips = useMyTrips();
@@ -52,9 +59,19 @@ export function PlaceSheet({ place, onClose }: { place: SavedPlace | null; onClo
   const acts = useActivitiesFor(upcoming.map((t) => t.id));
   const [tripId, setTripId] = useState('');
   const [editing, setEditing] = useState(false);
-  useEffect(() => setEditing(false), [place?.id]); // each place opens with its category folded away
+  const [newCity, setNewCity] = useState<string | null>(null);
+  useEffect(() => { setEditing(false); setNewCity(null); }, [place?.id]); // each place opens with its category folded away
   if (!place) return <Sheet open={false} title="" onClose={onClose}>{null}</Sheet>;
   const mine = place.ownerId === me;
+  // Change its category or city: whoever saved it, or the collection's owner or a Member (the rules say the same)
+  const canEdit = mine || (role !== 'viewer' && (role === 'member' || !!place.sharedIn));
+  const viewer = role === 'viewer';
+  const moveTo = async (city: string) => {
+    if (!city.trim() || city.trim() === place.city) return;
+    try { await store.updatePlace(place.id, { city: city.trim() }); haptic('success'); toast({ icon: 'check', label: `Moved to ${city.trim()}` }); setNewCity(null); }
+    catch { toast({ tone: 'error', label: "Couldn't move it. Check your connection" }); }
+  };
+  const cityChips = [...new Set([place.city, ...cities].filter(Boolean))].sort((a, b) => a.localeCompare(b));
   const isStar = starred(place);
   // Trips that cover this Place's country (a trip can span several countries).
   const fits = upcoming.filter((t) => place.countryCode && tripCountryCodes(t, acts[t.id] ?? []).has(place.countryCode));
@@ -85,7 +102,7 @@ export function PlaceSheet({ place, onClose }: { place: SavedPlace | null; onClo
   const pos = place.lat != null && place.lng != null ? { lat: place.lat, lng: place.lng, name: place.name } : null;
   return (
     <Sheet open title={place.name}
-      onSubmit={target ? addToTrip : undefined} submitLabel={target ? `Add to ${target.name} ideas` : 'Add to ideas'}
+      onSubmit={target && !viewer ? addToTrip : undefined} submitLabel={target ? `Add to ${target.name} ideas` : 'Add to ideas'}
       secondary={mine ? <Button variant="destructive" size="large" onClick={remove}>Delete</Button> : undefined}
       subtitle={where || undefined} onClose={onClose}>
       <div className={s.sections}>
@@ -97,14 +114,31 @@ export function PlaceSheet({ place, onClose }: { place: SavedPlace | null; onClo
               <span className="t-heading-4">{cat.one}</span>
               <span className="t-body-small t-secondary">{[`Saved ${savedOn}`, place.source ? `from ${place.source}` : null, visited.has(place.id) ? 'Visited ✓' : null].filter(Boolean).join(' · ')}</span>
             </div>
-            {mine && <Button variant="ghost" size="regular" aria-expanded={editing} onClick={() => { haptic('selection'); setEditing((x) => !x); }}>{editing ? 'Done' : 'Edit'}</Button>}
+            {canEdit && <Button variant="ghost" size="regular" aria-expanded={editing} onClick={() => { haptic('selection'); setEditing((x) => !x); }}>{editing ? 'Done' : 'Edit'}</Button>}
             <IconButton icon="star" tone="ghost" state={isStar ? 'filled' : 'default'} aria-pressed={isStar} label={isStar ? 'Remove from favourites' : 'Add to favourites'} onClick={star} />
           </div>
-          {editing && mine && (
+          {editing && canEdit && (
             <PlaceKindPicker id={`kind-${place.id}`} value={placeKind(place.category)} onChange={async (k) => {
               try { await store.updatePlace(place.id, { category: k }); toast({ icon: 'check', label: 'Category changed' }); }
               catch { toast({ tone: 'error', label: "Couldn't save. Check your connection" }); }
             }} />
+          )}
+          {/* Move it to another city in this collection, or a new one */}
+          {editing && canEdit && kindOf(place) === 'place' && (
+            <div className={s.field}>
+              <h4 className="t-heading-4">City</h4>
+              <ul className={s.chips} aria-label="City">
+                {cityChips.map((c) => <li key={c}><Chip active={c === place.city && newCity === null} onClick={() => { haptic('selection'); moveTo(c); }}>{c}</Chip></li>)}
+                <li><Chip icon="plus" active={newCity !== null} onClick={() => setNewCity((x) => (x === null ? '' : null))}>New city</Chip></li>
+              </ul>
+              {newCity !== null && (
+                <div className={s.field}>
+                  <TextField label="New city" value={newCity} autoFocus enterKeyHint="done" onChange={(e) => setNewCity(e.target.value)}
+                    onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); moveTo(newCity); } }} />
+                  <Button type="button" variant="neutral" disabled={!newCity.trim()} onClick={() => moveTo(newCity)}>{newCity.trim() ? `Move to ${newCity.trim()}` : 'Move'}</Button>
+                </div>
+              )}
+            </div>
           )}
           {place.image && <img src={place.image} alt="" className={s.saveImage} />}
           {place.notes && <p className="t-body selectable">{place.notes}</p>}
@@ -123,7 +157,7 @@ export function PlaceSheet({ place, onClose }: { place: SavedPlace | null; onClo
             <ListItem icon="arrow-up-right" title={place.source ? `Open on ${place.source}` : 'Open link'} meta={hostOf(place.url)} href={place.url} label={`Open the link for ${place.name}`} />
           </ListGroup>
         )}
-        {fits.length > 1 && (
+        {fits.length > 1 && !viewer && (
           <Select label="Add to a trip" value={target?.id} onChange={(e) => setTripId(e.target.value)}>
             {fits.map((t) => <option key={t.id} value={t.id}>{t.name}</option>)}
           </Select>
@@ -155,8 +189,11 @@ function CategoryGroups({ list, where, render }: { list: SavedPlace[]; where: st
  * sheet, where it's moved, recategorised or deleted.
  */
 export function CountryCollection() {
-  const { country = '' } = useParams();
+  const { country = '', shareId } = useParams();
   const all = usePlaces();
+  const me = useMe();
+  const shares = useShares();
+  const [people, setPeople] = useState(false);
   const { visited, starred } = usePlaceMarks();
   const navigate = useNavigate();
   const openSave = useSave();
@@ -165,9 +202,30 @@ export function CountryCollection() {
   const [open, setOpen] = useState<string | null>(null);
   const [map, setMap] = useState(false);
   const code = country === 'unsorted' ? '' : country;
-  const mine = useMemo(() => (all ?? []).filter((p) => p.countryCode === code), [all, code]);
-  if (all === null) return <PageSkeleton />;
+  // Your own collection for this country, or (with a share id) one someone shared with you
+  const ownId = `${me.uid}_${code}`;
+  const share = (shares ?? []).find((x) => x.id === (shareId ?? ownId));
+  const role: CollectionRole | 'owner' = shareId && shareId !== ownId ? (share?.roles[me.uid] ?? 'viewer') : 'owner';
+  const shared = useSharedPlaces(share?.id);
+  const mine = useMemo(() => {
+    if (role !== 'owner') return shared ?? [];
+    // Yours (not ones you added to a friend's collection) and what Members added to yours
+    const own = (all ?? []).filter((p) => p.countryCode === code && (!p.sharedIn || p.sharedIn === ownId));
+    return [...own, ...(shared ?? []).filter((p) => !own.some((o) => o.id === p.id))];
+  }, [all, shared, code, ownId, role]);
+  const everyone = share ? [share.ownerId, ...share.memberIds] : [me.uid];
+  const profiles = useProfiles(everyone);
+  if (all === null || (shareId && (shares === null || shared === null))) return <PageSkeleton />;
+  if (shareId && !share) return (
+    <Content>
+      <PageHeader title={code ? countryName(code) : 'Collection'} back={{ to: '/trips', label: 'Collections' }} fit />
+      <EmptyState illustration="map" title="This collection isn't shared with you" message="Ask whoever shared it for a new invite link." />
+    </Content>
+  );
   const title = code ? countryName(code) : 'Unsorted';
+  const owner = role === 'owner';
+  const ownerFirst = share && !owner ? personName(profiles, share.ownerId).split(' ')[0] : '';
+  const shareable = !!code && (owner ? mine.length > 0 : true);
   const places = mine.filter((p) => kindOf(p) === 'place');
   const links = mine.filter((p) => kindOf(p) === 'link'), notes = mine.filter((p) => kindOf(p) === 'note');
   const isCategory = PLACE_TYPES.some((c) => c.value === filter);
@@ -194,17 +252,19 @@ export function CountryCollection() {
 
   return (
     <Content>
-      <PageHeader title={title} back={{ to: '/trips', label: 'Collections' }} fit />
+      <PageHeader title={title} subtitle={ownerFirst ? `${ownerFirst}'s collection · ${role === 'member' ? 'Member' : 'Viewer'}` : undefined} back={{ to: '/trips', label: 'Collections' }} fit
+        action={shareable ? { icon: 'user-add', label: owner ? 'Share this collection' : 'People in this collection', onClick: () => { haptic('selection'); setPeople(true); } } : undefined} />
       {mine.length === 0 ? (
         <EmptyState illustration="map" title={`Nothing saved in ${title}`} message="Save cafés, bars, stays and sights you find online."
-          action={<Button icon="plus" onClick={() => { openSave({ mode: 'link' }); navigate('/trips'); }}>Save a place</Button>} />
+          action={role === 'viewer' ? undefined : <Button icon="plus" onClick={() => { openSave({ mode: 'link' }); navigate('/trips'); }}>Save a place</Button>} />
       ) : (
         <>
           {/* Figma "Collection header": the map with every place, the counts, who it's with and how much you've visited */}
           <CollectionHeader
             map={pins.length > 0 ? <MapView pins={pins} height={180} /> : undefined} onMap={pins.length > 0 ? () => setMap(true) : undefined}
             title={[`${places.length || mine.length} ${(places.length || mine.length) === 1 ? (places.length ? 'place' : 'save') : (places.length ? 'places' : 'saves')}`, cityCount > 1 ? `${cityCount} cities` : ''].filter(Boolean).join(' · ')}
-            meta="Saved by you"
+            meta={`Saved by ${savedBy(everyone, me.uid, profiles)}`}
+            people={everyone.length > 1 ? everyone.map((id) => ({ id, name: id === me.uid ? me.name || 'You' : personName(profiles, id), photo: id === me.uid ? me.photo : profiles[id]?.photo })) : undefined}
             visited={places.length ? { done: places.filter((p) => visited.has(p.id)).length, total: places.length } : undefined} />
           <ul className={s.chips} aria-label="Filter">
             {filters.map((f) => (
@@ -232,7 +292,8 @@ export function CountryCollection() {
           )}
         </>
       )}
-      <PlaceSheet place={live} onClose={() => setOpen(null)} />
+      <PlaceSheet place={live} onClose={() => setOpen(null)} role={role} cities={[...new Set(places.map((p) => p.city).filter(Boolean))]} />
+      {code && <CollectionPeople open={people} onClose={() => setPeople(false)} code={code} share={share} profiles={profiles} />}
       <Sheet open={map} title={`${title} on a map`} onClose={() => setMap(false)}>
         {map && <div className={s.map}><MapView pins={pins} height={360} /></div>}
       </Sheet>
@@ -243,11 +304,13 @@ export function CountryCollection() {
 /** The countries you've saved in, for country Cards: code ('' = Unsorted), name, flag and how many places. */
 export function useCountries() {
   const all = usePlaces();
+  const me = useMe();
   return useMemo(() => {
     if (all === null) return null;
-    return groupBy((all ?? []).slice().sort((a, b) => a.createdAt - b.createdAt), (p) => p.countryCode)
+    // Places you added to a friend's shared collection live there, not in yours
+    return groupBy((all ?? []).filter((p) => !p.sharedIn || p.sharedIn.startsWith(`${me.uid}_`)).sort((a, b) => a.createdAt - b.createdAt), (p) => p.countryCode)
       .map(([code, list]) => ({ code, name: code ? countryName(code) : 'Unsorted', flag: code ? flagUrl(code) : undefined, places: list }));
-  }, [all]);
+  }, [all, me.uid]);
 }
 
 /** "12 places · 3 cities" */
