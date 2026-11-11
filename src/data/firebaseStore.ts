@@ -251,6 +251,10 @@ export function createFirebaseStore(config: FirebaseOptions): Store {
       const { id: _id, ...rest } = patch;
       await updateDoc(doc(db, 'trips', id), rest);
     },
+    async setDeleted(item, on) {
+      const ref = item.kind === 'trip' ? doc(db, 'trips', item.id) : item.kind === 'event' ? doc(db, 'trips', item.tripId, 'activities', item.id) : doc(db, 'places', item.id);
+      await updateDoc(ref, on ? { deletedAt: Date.now(), deletedBy: auth.currentUser!.uid } : { deletedAt: deleteField(), deletedBy: deleteField() });
+    },
     async deleteTrip(id) {
       for (const name of SUBS) {
         const snap = await getDocs(collection(db, 'trips', id, name));

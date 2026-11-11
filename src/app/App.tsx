@@ -10,6 +10,7 @@ import { TripPage } from '../features/trip/TripPage';
 import { CountryCollection, Favourites, FavouriteCountry } from '../features/saves/Collections';
 import { ProfilePage } from '../features/profile/ProfilePage';
 import { Privacy } from '../features/profile/Privacy';
+import { RecentlyDeleted } from '../features/profile/RecentlyDeleted';
 import { Shell } from './Shell';
 import { GetApp } from '../features/auth/GetApp';
 import { joinOnly } from '../lib/site';
@@ -49,6 +50,7 @@ function Routed() {
         <Route path="/join/:code" element={<Join />} />
         <Route path="/profile" element={<ProfilePage />} />
         <Route path="/privacy" element={<Privacy />} />
+        <Route path="/profile/deleted" element={<RecentlyDeleted />} />
         <Route path="/profile/favourites" element={<Favourites />} />
         <Route path="/profile/favourites/:country" element={<FavouriteCountry />} />
         <Route path="/profile/collections/*" element={<Navigate to="/profile/favourites" replace />} />

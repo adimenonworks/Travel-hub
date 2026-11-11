@@ -39,6 +39,7 @@ personal data.
 | Private profile (home, visited, currency, reads) | You only | You only |
 | Saved places | You, people you've added the place to a trip with (read by ID), and the people in a collection you shared (your places in that country, and places they added to it). Lists only return your own, ones you starred, and ones in a collection shared with you | You (deleting your account hands one a trip uses to someone on that trip). In a shared collection its owner and Members may also change a place's city or category; only whoever saved a place deletes it. Others can only add or remove their own star |
 | Shared collections (`collectionShares/{owner}_{country}`) | Its owner and the people in it | The owner adds roles (Member / Viewer) or removes people; you join only with a valid collection invite, as its role; anyone can leave |
+| Recently deleted (`deletedAt`, `deletedBy` on a trip, event or place) | Same as the thing itself | A trip: only its creator moves it there, any Planner brings it back. Events: Planners. Places: whoever saved them. Cleared for good after 30 days by the first allowed person's device to open Rove (`usePurgeDeleted`; there's no server) |
 | Invites | Anyone signed in, by code (no listing) | Trip invites by its Planners; collection invites by the collection's owner (Can edit or Can view); deleted by whoever made it |
 
 The rules have their own automated tests (`tests/rules/`). Run them whenever the rules change.

@@ -153,6 +153,12 @@ export function createLocalStore(): Store {
       delete db.subs[id];
       save();
     },
+    async setDeleted(item, on) {
+      const d = (item.kind === 'trip' ? db.trips[item.id] : item.kind === 'event' ? sub(item.tripId, 'activities')[item.id] : db.places?.[item.id]) as { deletedAt?: number; deletedBy?: string } | undefined;
+      if (!d) return;
+      if (on) { d.deletedAt = Date.now(); d.deletedBy = me(); } else { delete d.deletedAt; delete d.deletedBy; }
+      save();
+    },
     async leaveTrip(id, uid) {
       const t = db.trips[id];
       const others = t.memberIds.filter((m) => m !== uid);

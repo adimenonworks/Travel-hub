@@ -91,8 +91,12 @@ export function PlaceSheet({ place, onClose, role = 'owner', cities = [] }: {
     } catch { toast({ tone: 'error', label: "Couldn't save. Check your connection" }); }
   };
   const remove = async () => {
-    if (!confirmAction(`Delete "${place.name}" from your collection?`)) return;
-    try { await store.deletePlace(place.id); toast({ icon: 'trash', label: 'Place deleted' }); onClose(); }
+    if (!confirmAction(`Delete "${place.name}" from your collection? It stays in Recently deleted for 30 days.`)) return;
+    try {
+      await store.setDeleted({ kind: 'place', id: place.id }, true);
+      toast({ icon: 'trash', label: 'Place deleted', action: { label: 'Undo', onClick: () => { store.setDeleted({ kind: 'place', id: place.id }, false).catch(() => {}); } } });
+      onClose();
+    }
     catch { toast({ tone: 'error', label: "Couldn't delete. Check your connection" }); }
   };
   const cat = placeCategory(place.category);

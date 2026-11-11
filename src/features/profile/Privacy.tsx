@@ -21,6 +21,7 @@ export function Privacy() {
             <li>Only people on a trip can see that trip. Your saved places and settings are yours, unless you share a country's collection with someone.</li>
             <li>No ads, no tracking, no selling or renting your data. Rove has no analytics tools.</li>
             <li>You can delete your account and data at any time: You → Delete account.</li>
+            <li>A trip, event or saved place you delete stays in You → Recently deleted for 30 days so it can be brought back, then it's deleted for good. Deleting your account deletes it straight away.</li>
           </ul>
         </Section>
 

@@ -105,6 +105,7 @@ export function ProfilePage() {
           <ListItem icon="wallet" title="Currency" meta={home ? `${currencyName(home)} (${home})` : undefined} onClick={() => setOpen('currency')} />
           <ListItem icon="map" title="Maps app" meta={MAPS_APPS.find((m) => m.value === maps)?.label} onClick={() => setOpen('maps')} />
           <ListItem icon="sun" title="Appearance" meta={themeLabel} onClick={() => setOpen('appearance')} />
+          <ListItem icon="trash" title="Recently deleted" meta="Trips, events and places, kept for 30 days" to="/profile/deleted" />
         </ListGroup>
       </PageSection>
 

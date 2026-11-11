@@ -1,4 +1,4 @@
-import type { ChatReads, CollectionRole, CollectionShare, Invite, LinkPreview, NewDoc, Profile, SavedPlace, SubCollections, SubName, Trip, User, Vote } from './types';
+import type { Deletable, ChatReads, CollectionRole, CollectionShare, Invite, LinkPreview, NewDoc, Profile, SavedPlace, SubCollections, SubName, Trip, User, Vote } from './types';
 
 export type Unsubscribe = () => void;
 
@@ -35,6 +35,8 @@ export interface Store {
   createTrip(data: Omit<Trip, 'id' | 'ownerId' | 'memberIds' | 'roles' | 'createdAt'>): Promise<string>;
   updateTrip(id: string, patch: Partial<Trip>): Promise<void>;
   deleteTrip(id: string): Promise<void>;
+  /** Move a trip, event or place to Recently deleted (on) or bring it back (off). It's deleted for good after 30 days. */
+  setDeleted(item: Deletable, on: boolean): Promise<void>;
   leaveTrip(id: string, uid: string): Promise<void>;
   removeMember(trip: Trip, uid: string): Promise<void>;
   setRole(trip: Trip, uid: string, role: 'editor' | 'member' | 'viewer'): Promise<void>;
