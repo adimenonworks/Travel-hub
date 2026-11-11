@@ -80,7 +80,10 @@ export type EventState = 'default' | 'next' | 'done';
  * the title (Heading 3), time · place (Body), an optional amount; Journey adds the from → to times; Extras show tags.
  * Next has the brand border; Done fades the content. The whole card opens the event.
  */
-export function EventCard({ title, time, timeIcon = 'clock', place, placeIcon = 'pin', amount, icon, layout = 'standard', state = 'default', journey, extras, status, favourite, to, onClick }: {
+/** Figma "Type" on the Event card and Option card: the colour of the icon tile (an event's type; see categoryTone()). */
+export type CategoryTone = 'neutral' | 'travel' | 'stays' | 'food' | 'activities';
+
+export function EventCard({ title, time, timeIcon = 'clock', place, placeIcon = 'pin', amount, icon, layout = 'standard', state = 'default', tone = 'neutral', journey, extras, status, favourite, to, onClick }: {
   title: string; time?: string; place?: string; amount?: string; icon: IconName;
   /** Figma Event card: the time and the place sit on their own lines, each after a small icon. The place's icon is a pin
    *  unless it isn't a place (a note's text, a stay's nights): pass null for no icon. */
@@ -89,6 +92,8 @@ export function EventCard({ title, time, timeIcon = 'clock', place, placeIcon = 
   /** Figma "Favourite": a filled star after the title (the event's Place is starred). */
   favourite?: boolean;
   layout?: 'standard' | 'journey' | 'note'; state?: EventState;
+  /** Figma "Type": the icon tile's colour. The Next state ignores it (it stays deep green). */
+  tone?: CategoryTone;
   journey?: { fromTime: string; fromPlace?: string; duration?: string; toTime: string; toPlace?: string; mode?: IconName };
   /** Figma "Show extras": Tag 1, Tag 2 */
   extras?: { icon?: IconName; label: string }[];
@@ -100,7 +105,7 @@ export function EventCard({ title, time, timeIcon = 'clock', place, placeIcon = 
   const stateText = state === 'next' ? ', up next' : state === 'done' ? ', done' : '';
   return (
     <Pressable to={to} onClick={onClick} className={cls} label={`${title}${favourite ? ', favourite' : ''}${time ? `, ${time}` : ''}${place ? `, ${place}` : ''}${amount ? `, ${amount}` : ''}${stateText}`}>
-      <span className={s.eventIcon} aria-hidden="true"><Icon name={icon} size={24} /></span>
+      <span className={[s.eventIcon, state !== 'next' && s[`tone-${tone}`]].filter(Boolean).join(' ')} aria-hidden="true"><Icon name={icon} size={24} /></span>
       <span className={s.eventBody} aria-hidden="true">
         <span className={s.eventHeader}>
           <span className={s.eventText}>
@@ -234,10 +239,11 @@ export function ProfileCard({ name, email, photo, avatar, ...press }: Press & { 
 
 /** Figma "Option card" (Selected No / Yes): a big tappable choice with an icon, a Heading 3 label and, with "Show
  *  description", a Body small line under it. Leave `selected` out when it's a one-tap choice (e.g. the add-event picker). */
-export function OptionCard({ icon, label, description, selected, onClick }: { icon: IconName; label: string; description?: string; selected?: boolean; onClick: () => void }) {
+/** Figma "Option card". `tone` (Figma "Type" other than Plain) puts the icon in a coloured 40px tile, 16px above the text: the "Add to itinerary" type picker. */
+export function OptionCard({ icon, label, description, selected, tone, onClick }: { icon: IconName; label: string; description?: string; selected?: boolean; tone?: CategoryTone; onClick: () => void }) {
   return (
-    <button type="button" className={[s.option, selected && s.optionSelected].filter(Boolean).join(' ')} aria-pressed={selected} onClick={onClick}>
-      <Icon name={icon} size={24} />
+    <button type="button" className={[s.option, tone && s.optionTiled, selected && s.optionSelected].filter(Boolean).join(' ')} aria-pressed={selected} onClick={onClick}>
+      {tone ? <span className={`${s.optionTile} ${s[`tone-${tone}`]}`} aria-hidden="true"><Icon name={icon} size={24} /></span> : <Icon name={icon} size={24} />}
       <span className={s.optionLabel}>{label}</span>
       {description && <span className={s.optionDescription}>{description}</span>}
     </button>

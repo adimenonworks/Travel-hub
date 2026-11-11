@@ -1,6 +1,6 @@
 import type { Activity } from '../../data/types';
 import { daysBetween, formatDay, formatTime, today } from '../../lib/dates';
-import { behaviourOf, categoryInfo, eventKind, spanWords } from '../../lib/categories';
+import { behaviourOf, categoryInfo, categoryTone, eventKind, spanWords } from '../../lib/categories';
 import { durationLabel, journeyMs, toInstant } from '../../lib/timezone';
 import type { TripCtx } from './TripPage';
 
@@ -100,7 +100,7 @@ export function eventCardProps(input: Activity | DayEntry, ctx: TripCtx, showDay
   const moment = behaviour === 'open' || behaviour === 'note';
   const range = a.startTime ? `${formatTime(a.startTime)}${a.endTime ? ` – ${formatTime(a.endTime)}` : moment ? '' : ' onwards'}` : undefined;
   const base = {
-    title: a.title, icon: info.icon,
+    title: a.title, icon: info.icon, tone: categoryTone(a.category),
     to: `/trip/${ctx.trip.id}/plan/${a.id}`,
   };
   const withDay = (t?: string) => (showDay ? [day(a.date), t].filter(Boolean).join(', ') : t);

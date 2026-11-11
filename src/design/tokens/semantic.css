@@ -203,6 +203,11 @@
   --on-accent-surface-orange: var(--color-orange-300);
   --on-accent-surface-green: var(--color-green-300);
   --on-accent-surface-pink: var(--color-pink-300);
+  /* Event types (Figma Color → category): the icon tile on Event cards and the type picker. Free time and notes stay neutral. */
+  --category-travel-surface: var(--color-sky-600); --category-travel-icon: var(--color-neutral-0);
+  --category-stays-surface: var(--color-violet-600); --category-stays-icon: var(--color-neutral-0);
+  --category-food-surface: var(--color-yellow-600); --category-food-icon: var(--color-neutral-0);
+  --category-activities-surface: var(--color-pink-600); --category-activities-icon: var(--color-neutral-0);
   --on-accent-surface-sunken: color-mix(in srgb, var(--color-neutral-1000) 10%, transparent);
   --on-accent-text-primary: var(--color-neutral-900);
   --on-accent-text-secondary: var(--color-neutral-800);
@@ -468,6 +473,11 @@
     --on-accent-surface-orange: var(--color-orange-800);
     --on-accent-surface-green: var(--color-green-800);
     --on-accent-surface-pink: var(--color-pink-800);
+    /* Event types (Figma Color → category): the icon tile on Event cards and the type picker. Free time and notes stay neutral. */
+    --category-travel-surface: var(--color-sky-300); --category-travel-icon: var(--color-neutral-1000);
+    --category-stays-surface: var(--color-violet-300); --category-stays-icon: var(--color-neutral-1000);
+    --category-food-surface: var(--color-yellow-300); --category-food-icon: var(--color-neutral-1000);
+    --category-activities-surface: var(--color-pink-300); --category-activities-icon: var(--color-neutral-1000);
     --on-accent-surface-sunken: color-mix(in srgb, var(--color-neutral-0) 10%, transparent);
     --on-accent-text-primary: var(--color-neutral-0);
     --on-accent-text-secondary: var(--color-neutral-100);
@@ -690,6 +700,11 @@
   --on-accent-surface-orange: var(--color-orange-800);
   --on-accent-surface-green: var(--color-green-800);
   --on-accent-surface-pink: var(--color-pink-800);
+  /* Event types (Figma Color → category): the icon tile on Event cards and the type picker. Free time and notes stay neutral. */
+  --category-travel-surface: var(--color-sky-300); --category-travel-icon: var(--color-neutral-1000);
+  --category-stays-surface: var(--color-violet-300); --category-stays-icon: var(--color-neutral-1000);
+  --category-food-surface: var(--color-yellow-300); --category-food-icon: var(--color-neutral-1000);
+  --category-activities-surface: var(--color-pink-300); --category-activities-icon: var(--color-neutral-1000);
   --on-accent-surface-sunken: color-mix(in srgb, var(--color-neutral-0) 10%, transparent);
   --on-accent-text-primary: var(--color-neutral-0);
   --on-accent-text-secondary: var(--color-neutral-100);
