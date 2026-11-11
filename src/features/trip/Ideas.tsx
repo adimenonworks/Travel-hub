@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { stepTab, useSwipeTabs } from '../../app/useSwipeTabs';
+import { hasStep, stepTab, useSwipeTabs } from '../../app/useSwipeTabs';
 import { SlideSwap } from '../shared/SlideSwap';
 import { useSearchParams } from 'react-router-dom';
 import { Button, EmptyState, IdeaRow, LinkButton, ListGroup, ListItem, PageSection, SectionHeader, SegmentControl, Select, Sheet, TextArea, TextField, useToast } from '../../design/components';
@@ -56,7 +56,7 @@ export function Ideas(ctx: TripCtx) {
   // Swipe the list sideways to move between To decide · Planned · Passed (the list slides like the trip's days)
   const FILTERS: Filter[] = ['open', 'approved', 'rejected'];
   const swipeBox = useRef<HTMLDivElement>(null);
-  useSwipeTabs(swipeBox, (dir) => { const n = stepTab(FILTERS, filter, dir); if (n) setFilter(n); });
+  useSwipeTabs(swipeBox, (dir) => { const n = stepTab(FILTERS, filter, dir); if (n) setFilter(n); }, (dir) => hasStep(FILTERS, filter, dir));
   const vote = async (i: Idea) => {
     const mine = !!i.votes?.[me.uid];
     haptic('light');

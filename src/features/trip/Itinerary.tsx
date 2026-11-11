@@ -1,7 +1,7 @@
-import { stepTab, useSwipeTabs } from '../../app/useSwipeTabs';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { hasStep, stepTab, useSwipeTabs } from '../../app/useSwipeTabs';
+import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { Button, DayCard, EmptyState, EventCard, SectionHeader, SwipeRow, Timeline, TravelConnector, useToast, type EventState } from '../../design/components';
+import { Button, ContextMenu, DayCard, EmptyState, EventCard, SectionHeader, Timeline, TravelConnector, useToast, type ContextMenuItem, type EventState } from '../../design/components';
 import { useMe, usePlacesById } from '../../data/hooks';
 import type { Activity } from '../../data/types';
 import { dayWord, formatDay, formatTime, parseDay, today, tripDays } from '../../lib/dates';
@@ -39,7 +39,7 @@ export function Itinerary(ctx: TripCtx) {
 
   // Swipe the day's plan sideways to go to the next or previous day (the plan slides, the strip follows)
   const planBox = useRef<HTMLDivElement>(null);
-  useSwipeTabs(planBox, (dir) => { const n = stepTab(days, day, dir); if (n) setDay(n); });
+  useSwipeTabs(planBox, (dir) => { const n = stepTab(days, day, dir); if (n) setDay(n); }, (dir) => hasStep(days, day, dir));
 
   // On arrival, slide the strip (sideways only, never the page) so the selected day starts fully in view.
   useEffect(() => {
@@ -137,12 +137,12 @@ export function Itinerary(ctx: TripCtx) {
                             ...unreadTag(unreadCount(reads, me.uid, a.id, ctx.comments)),
                           ]} />
                       );
-                      // Swipe left (like Mail) for Edit and Delete; only organizers can change the itinerary
+                      // Press and hold for Edit and Delete (organizers: they can change the itinerary); sideways swipes change day
                       return ctx.canManage ? (
-                        <SwipeRow actions={[
-                          { label: 'Edit', icon: 'pencil', tone: 'neutral', onClick: () => setEditing(a) },
-                          { label: 'Delete', icon: 'trash', tone: 'destructive', onClick: () => remove(a) },
-                        ]}>{card}</SwipeRow>
+                        <HoldMenu label={`${a.title} actions`} items={[
+                          { label: 'Edit', icon: 'pencil', onClick: () => setEditing(a) },
+                          { label: 'Delete', icon: 'trash', destructive: true, onClick: () => remove(a) },
+                        ]}>{card}</HoldMenu>
                       ) : card;
                     })()}
                   </div>
@@ -173,3 +173,29 @@ function useTick() {
   return now;
 }
 
+
+/**
+ * Press and hold an event card (about half a second, like iOS) for its menu: the card lifts, the rest dims, and Edit
+ * and Delete appear under it. Moving the finger first (a scroll or a day swipe) cancels it, and the tap that ends a
+ * hold never opens the event.
+ */
+function HoldMenu({ items, label, children }: { items: ContextMenuItem[]; label: string; children: ReactNode }) {
+  const [open, setOpen] = useState(false);
+  const timer = useRef<number | undefined>(undefined);
+  const start = useRef<{ x: number; y: number } | null>(null);
+  const held = useRef(false);
+  const cancel = () => { window.clearTimeout(timer.current); start.current = null; };
+  return (
+    <div onContextMenu={(e) => { e.preventDefault(); setOpen(true); }}
+      onPointerDown={(e) => {
+        if (e.pointerType === 'mouse') return;
+        held.current = false; start.current = { x: e.clientX, y: e.clientY };
+        timer.current = window.setTimeout(() => { held.current = true; haptic('medium'); setOpen(true); }, 450);
+      }}
+      onPointerMove={(e) => { const s0 = start.current; if (s0 && Math.hypot(e.clientX - s0.x, e.clientY - s0.y) > 10) cancel(); }}
+      onPointerUp={cancel} onPointerCancel={cancel}
+      onClickCapture={(e) => { if (held.current || open) { held.current = false; e.preventDefault(); if (!(e.target as HTMLElement).closest('[role=menu]')) e.stopPropagation(); } }}>
+      {open ? <ContextMenu label={label} items={items} onClose={() => setOpen(false)}>{children}</ContextMenu> : children}
+    </div>
+  );
+}

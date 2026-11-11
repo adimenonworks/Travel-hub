@@ -345,3 +345,26 @@ export function LayoverBlock({ title, meta, warning, action }: { title: string; 
     </div>
   );
 }
+
+type SpanEnd = { label: string; date: string; time?: string; place?: string };
+/**
+ * Figma "Span card": the two ends of something that spans time, side by side (Check-in / Check-out, Pick-up / Drop-off,
+ * Embark / Disembark, Drop-off / Collect): a Body small label, the date (Heading 3), the time and, for a car, the place.
+ * An optional footer says how long (2 nights). Grey card, 24 corners, a divider between the two ends.
+ */
+export function SpanCard({ start, end, footer }: { start: SpanEnd; end: SpanEnd; footer?: string }) {
+  const col = (e: SpanEnd) => (
+    <div className={s.spanEnd}>
+      <span className={s.spanLabel}>{e.label}</span>
+      <span className={s.spanDate}>{e.date}</span>
+      {e.time && <span className={s.spanTime}>{e.time}</span>}
+      {e.place && <span className={s.spanLabel}>{e.place}</span>}
+    </div>
+  );
+  return (
+    <div className={s.span}>
+      <div className={s.spanEnds}>{col(start)}<span className={s.spanDivider} aria-hidden="true" />{col(end)}</div>
+      {footer && <p className={s.spanLabel}>{footer}</p>}
+    </div>
+  );
+}

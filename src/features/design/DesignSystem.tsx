@@ -5,7 +5,7 @@ import {
   type IllustrationName, COVER_ILLUSTRATIONS, ICON_NAMES, useToast, BottomNav, Skeleton,
   ListItem, ListGroup, SectionHeader, EventCard, TravelConnector, IdeaRow, Tile, MapCard, StatStrip, ProfileCard,
   OptionCard, BudgetCard, Switch, SearchField, StepProgress, DestinationHeader, TripHeader, DayCard, CountryModal,
-  CategoryIcon, ContextMenu, Accordion,
+  CategoryIcon, ContextMenu, Accordion, SpanCard,
 } from '../../design/components';
 import { flagUrl } from '../../lib/countries';
 import { EVENT_TYPES, TYPE_TONE } from '../../lib/categories';
@@ -345,6 +345,11 @@ export function DesignSystem() {
               </ContextMenu>
             ) : <Button variant="neutral" onClick={() => setMenu(true)}>Perfect, see you there</Button>}
           </div>
+        </Section>
+
+        <Section title="Span card" footer="Figma Span card: the two ends of a stay, car, cruise, parking or luggage, at the top of its event page. A car shows its places; the footer says how long.">
+          <SpanCard start={{ label: 'Check-in', date: 'Thu 12 Nov', time: '15:00' }} end={{ label: 'Check-out', date: 'Sat 14 Nov', time: '11:00' }} footer="2 nights" />
+          <SpanCard start={{ label: 'Pick-up', date: 'Fri 13 Nov', time: '10:00', place: 'Porto Campanhã' }} end={{ label: 'Drop-off', date: 'Mon 16 Nov', time: '18:00', place: 'Barcelona Sants' }} footer="4 days" />
         </Section>
 
         <Section title="Accordion" footer="Figma Accordion: a grey card that folds a group away (a day of events in Save to Rove → Add to an event). Starts collapsed; the chevron turns over when open.">
