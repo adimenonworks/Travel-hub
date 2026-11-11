@@ -109,7 +109,7 @@ export function ActivityForm({ open, trip, date, activity, draft, onClose, onCre
       const pl = p.place;
       if (pl && !pl.isArea && pl.name) {
         const text = [pl.name, pl.city].filter(Boolean).join(', ');
-        setLinkPlace({ name: text, lat: pl.lat, lng: pl.lng, country: pl.country, countryCode: pl.countryCode });
+        if (Number.isFinite(pl.lat)) setLinkPlace({ name: text, lat: pl.lat, lng: pl.lng, country: pl.country, countryCode: pl.countryCode }); // no map position: geocoded from the text when saved
         // The place fills Location; the Name too, but only if you haven't typed one
         setF((x) => ({ ...x, locationText: text, title: x.title.trim() ? x.title : cleanTitle(pl.name) || pl.name }));
         haptic('light');

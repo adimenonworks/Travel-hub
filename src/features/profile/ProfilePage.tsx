@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Avatar, Button, Card, Select, LinkButton, ListGroup, ListItem, PageHeader, PageSection, ProfileCard as FigmaProfileCard, SegmentedControl, Sheet, StatStrip, TextField, useToast } from '../../design/components';
+import { Avatar, Button, Card, IconButton, Select, LinkButton, ListGroup, ListItem, PageHeader, PageSection, ProfileCard as FigmaProfileCard, SegmentControl, Sheet, StatStrip, TextField, useToast } from '../../design/components';
 import { store } from '../../data';
 import { useMe, useMyTrips, usePlaces, useProfile } from '../../data/hooks';
 import { countryName } from '../../lib/countries';
@@ -136,11 +136,11 @@ export function ProfilePage() {
       </Sheet>
 
       <Sheet open={open === 'maps'} title="Maps app" subtitle="Events open their location in this app. Saved on this device." onClose={() => setOpen(null)}>
-        <SegmentedControl block label="Maps app" value={maps} onChange={(m) => { setMaps(m); setMapsApp(m); }} options={MAPS_APPS} />
+        <SegmentControl block label="Maps app" value={maps} onChange={(m) => { setMaps(m); setMapsApp(m); }} options={MAPS_APPS} />
       </Sheet>
 
       <Sheet open={open === 'appearance'} title="Appearance" subtitle="Saved on this device" onClose={() => setOpen(null)}>
-        <SegmentedControl block label="Appearance" value={theme} onChange={(t) => { setTheme(t); applyTheme(t); }}
+        <SegmentControl block label="Appearance" value={theme} onChange={(t) => { setTheme(t); applyTheme(t); }}
           options={[{ value: 'auto', label: 'Automatic' }, { value: 'light', label: 'Light' }, { value: 'dark', label: 'Dark' }]} />
       </Sheet>
     </Content>
@@ -204,7 +204,7 @@ function ProfileEditor({ uid, name, photo, email }: { uid: string; name: string;
             onChange={(e) => { setDraft(e.target.value); setSaved(false); }}
             onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); saveName(); } }} />
         </div>
-        <Button type="button" iconEnd="check" aria-label="Save nickname" title="Save nickname" disabled={!trimmed || trimmed === name} onClick={saveName} />
+        <IconButton icon="check" tone="primary" label="Save nickname" title="Save nickname" disabled={!trimmed || trimmed === name} onClick={saveName} />
       </div>
       <p id="nickname-hint" className="t-label-small t-secondary" role="status">{saved && draft === name ? 'Saved.' : 'What people on your trips see.'}</p>
     </Card>

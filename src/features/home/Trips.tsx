@@ -2,7 +2,7 @@ import { useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { stepTab, useSwipeTabs } from '../../app/useSwipeTabs';
 import { SlideSwap } from '../shared/SlideSwap';
-import { Button, Card, Icon, Illustration, PageHeader, PageSkeleton, SegmentedControl, Tile } from '../../design/components';
+import { Button, Card, Icon, Illustration, PageHeader, PageSkeleton, SegmentControl, Tile } from '../../design/components';
 import { useMyTrips } from '../../data/hooks';
 import type { SavedPlace } from '../../data/types';
 import { tripPhase } from '../../lib/dates';
@@ -58,7 +58,7 @@ export function Trips() {
       <PageHeader title="Trips" fit />
       {trips === null ? <PageSkeleton bare /> : (
         <div className={s.segments} ref={box}>
-          <SegmentedControl label="Show trips" block value={segment} onChange={pick}
+          <SegmentControl label="Show trips" block value={segment} onChange={pick}
             options={[{ value: 'upcoming', label: 'Upcoming' }, { value: 'saved', label: 'Collections' }, { value: 'past', label: 'Past' }]} />
           <SlideSwap value={segment} id={segment} rank={SEGMENTS.indexOf(segment)}>{(seg) => <>
           {seg === 'upcoming' && (upcoming.length === 0 ? (

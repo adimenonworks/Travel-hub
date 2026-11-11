@@ -1,0 +1,21 @@
+/* Figma "Accordion": grey card (on-light/surface/secondary, 24 corners); header 56px min (padding 16 / 20): Heading 4
+   title, Body small meta, a chevron that turns over when open. Content: List items. */
+.accordion { border-radius: var(--radius-600); background: var(--on-light-surface-secondary); overflow: hidden; }
+.header {
+  width: 100%; min-height: calc(56rem / 17); display: flex; align-items: center; gap: var(--space-default-400);
+  padding: var(--space-default-500) var(--space-default-600); border: 0; background: none; text-align: left; cursor: pointer;
+  color: var(--on-light-text-primary); transition: background var(--motion-fast);
+}
+.header:active { background: var(--interactive-button-ghost-background-pressed); }
+.header:focus-visible { outline: 3px solid var(--on-light-border-focus); outline-offset: -3px; border-radius: var(--radius-600); }
+.text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: var(--space-default-100); }
+.title { font: var(--type-heading-4); }
+.meta { font: var(--type-body-small); color: var(--on-light-text-secondary); }
+.chevron { flex: none; display: grid; place-items: center; color: var(--on-light-icon-primary); transition: transform var(--duration-base) var(--ease-spring); }
+.open .chevron { transform: rotate(180deg); }
+/* The panel eases open from nothing to its own height */
+.panel { display: grid; grid-template-rows: 0fr; transition: grid-template-rows var(--duration-base) var(--ease-spring); }
+.open .panel { grid-template-rows: 1fr; }
+.inner { min-height: 0; overflow: hidden; display: flex; flex-direction: column; padding: 0 var(--space-default-600); }
+.inner > :last-child { margin-bottom: var(--space-default-300); }
+@media (prefers-reduced-motion: reduce) { .panel, .chevron { transition: none; } }
