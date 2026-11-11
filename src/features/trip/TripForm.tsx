@@ -78,7 +78,7 @@ export function TripForm({ open, trip, onClose, onSaved, onDeleted }: { open: bo
   };
 
   return (
-    <Sheet open={open} title={trip ? 'Edit trip' : 'New trip'} onClose={onClose} onSubmit={submit} submitLabel={trip ? 'Save' : 'Create'} submitDisabled={!valid}
+    <Sheet open={open} mode={trip ? 'edit' : 'default'} title={trip ? 'Edit trip' : 'New trip'} onClose={onClose} onSubmit={submit} submitLabel={trip ? 'Save' : 'Create'} submitDisabled={!valid}
       secondary={trip && onDeleted ? <Button variant="destructive" size="large" onClick={remove}>Delete trip</Button> : undefined}>
       <TextField label="Trip name" placeholder="Summer in Lisbon" value={d.name} onChange={(e) => set({ name: e.target.value })} required />
       <CityPicker hint="Your first stop. Add more stops to the itinerary and they'll show on the trip header." value={d.destination} onChange={(p) => set({ destination: p, name: d.name || (p ? `${p.name.split(',')[0]} trip` : '') })} />

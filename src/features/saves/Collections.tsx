@@ -14,6 +14,7 @@ import { Content, useSave } from '../../app/Shell';
 import { MapView } from '../shared/Map';
 import { usePlaceMarks } from './placeMarks';
 import s from './saves.module.css';
+import { isMapsLink } from '../../lib/links';
 
 /** ✓ visited and ★ starred, as icons with words for screen readers (never colour alone). */
 export function PlaceMarks({ visited, starred }: { visited: boolean; starred: boolean }) {
@@ -83,7 +84,7 @@ export function PlaceSheet({ place, onClose }: { place: SavedPlace | null; onClo
       <PlaceMarks visited={visited.has(place.id)} starred={isStar} />
       {place.notes && <p className="t-body">{place.notes}</p>}
       <div className={s.row}>
-        {place.url && <LinkButton href={place.url} variant="neutral" icon="arrow-up-right">{`Open on ${place.source || 'the web'}`}</LinkButton>}
+        {place.url && <LinkButton href={place.url} variant="neutral" icon={isMapsLink(place.url) ? 'map' : 'arrow-up-right'} label={`Open ${place.name}`}>{isMapsLink(place.url) ? 'Open in Maps' : 'Open link'}</LinkButton>}
         <Button variant="neutral" icon="star" onClick={star}>{isStar ? 'Favourite' : 'Add to favourites'}</Button>
       </div>
       {mine && (

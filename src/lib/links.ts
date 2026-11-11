@@ -53,6 +53,14 @@ export async function searchPlaces(q: string, signal?: AbortSignal): Promise<Fou
 
 const SITES: [RegExp, string][] = [[/tiktok\.com$/, 'TikTok'], [/instagram\.com$/, 'Instagram'], [/youtube\.com$|youtu\.be$/, 'YouTube'], [/google\.[a-z.]+$|goo\.gl$/, 'Google Maps']];
 
+/** A link to Google Maps or Apple Maps (a place to open in the maps app, not a web page). */
+export function isMapsLink(url: string) {
+  try {
+    const u = new URL(url);
+    return /(^|\.)maps\.app\.goo\.gl$|(^|\.)goo\.gl$|^maps\.google\.|(^|\.)maps\.apple\.com$/.test(u.hostname) || (/(^|\.)google\./.test(u.hostname) && u.pathname.startsWith('/maps'));
+  } catch { return false; }
+}
+
 /** The site a link is from, as people say it ("TikTok", "cntraveler.com"). */
 export function siteOf(url: string) {
   try {
@@ -209,7 +217,8 @@ async function readOnPhone(url: string): Promise<LinkPreview | null> {
     const finalUrl = res.url || url;
     const html = typeof res.data === 'string' ? res.data.slice(0, 1_500_000) : '';
     const host = new URL(finalUrl).hostname.replace(/^www\./, '');
-    let site = meta(html, 'og:site_name') || siteOf(finalUrl);
+    // Google Maps puts the place's whole title in og:site_name ("Lēoht · 4.4★(283) · Cafe"): a maps link is just "Google Maps"
+    let site = (isMapsLink(finalUrl) ? '' : meta(html, 'og:site_name')) || siteOf(finalUrl);
     let title = meta(html, 'og:title', 'twitter:title') || decode(html.match(/<title[^>]*>([^<]*)<\/title>/i)?.[1] ?? '');
     let image = meta(html, 'og:image', 'og:image:url', 'twitter:image');
     if (/(^|\.)tiktok\.com$/.test(host)) {

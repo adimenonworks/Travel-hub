@@ -33,6 +33,8 @@
   scroll-padding-inline: var(--space-gutter);
 }
 .days::-webkit-scrollbar { display: none; }
+/* A month marker between Day cards ("Dec"): small secondary text, centred on the cards */
+.monthMark { flex: none; align-self: center; font: var(--type-label-small); color: var(--on-light-text-secondary); padding: 0 var(--space-default-100); }
 
 .itinLayout { display: flex; flex-direction: column; gap: var(--space-stack); } /* 40 from the day cards to the day's plan */
 
@@ -127,6 +129,9 @@
 .typeList { display: flex; flex-direction: column; gap: var(--space-default-300); }
 .kindPicker { display: flex; flex-direction: column; gap: var(--space-default-300); }
 .kindChips { display: flex; flex-wrap: wrap; gap: var(--space-default-300); }
+/* The categories sit inside the chosen type: a grey inset panel (inner radius = the sheet's 24 − 0, a card in the sheet) */
+.kindPanel { padding: var(--space-default-500); border-radius: var(--radius-600); background: var(--on-light-surface-secondary); }
+.pickerLabel { margin: 0; font: var(--type-body-small); color: var(--on-light-text-secondary); }
 .legs { display: flex; flex-direction: column; gap: var(--space-default-300); }
 .legs > button:last-child { align-self: flex-start; } /* Add a connection hugs its label */
 /* Event form: Location with Paste beside it (both 48px tall, bottoms lined up), the hint under both */

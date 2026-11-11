@@ -90,7 +90,7 @@ export function SaveSheet({ request, onClose }: { request: SaveRequest | null; o
   }, [whereQuery, step]);
 
   // An upcoming trip that covers this city gets the "Also add to … ideas" switch.
-  const upcoming = useMemo(() => (trips ?? []).filter((t) => t.endDate >= today()).sort((a, b) => a.startDate.localeCompare(b.startDate)), [trips]);
+  const upcoming = useMemo(() => (trips ?? []).filter((t) => t.endDate >= today() && t.roles[me.uid] !== 'viewer').sort((a, b) => a.startDate.localeCompare(b.startDate)), [trips, me.uid]);
   const acts = useActivitiesFor(upcoming.map((t) => t.id));
   const place = preview?.place && !preview.place.isArea ? preview.place : null;
   // Rove's pick: the place's country and city (an area the link is about counts too); the person can change it.
@@ -101,11 +101,12 @@ export function SaveSheet({ request, onClose }: { request: SaveRequest | null; o
   // A place when Rove found one or you chose a city; otherwise a link filed under its country ("Links & notes")
   const kind: 'place' | 'link' = place || city ? 'place' : 'link';
   const covering = city ? upcoming.find((t) => tripCoversCity(t, acts[t.id] ?? [], city)) : undefined;
-  // The Trip side: only with an upcoming trip and a place Rove found. It opens there when a trip covers the city.
+  // The Trip side: only with an upcoming trip and a place Rove found.
   const canTrip = kind === 'place' && upcoming.length > 0;
   useEffect(() => {
     if (!preview || defaulted.current || !canTrip) return;
-    if (covering) { defaulted.current = true; setDest('trip'); setTripId(covering.id); }
+    // It always opens on Collections (owner); the trip that covers the city is the one picked when you tap Trip
+    if (covering) { defaulted.current = true; setTripId(covering.id); }
   }, [preview, covering, canTrip]);
   const onTrip = canTrip && dest === 'trip';
   const tripChoices = covering ? [covering, ...upcoming.filter((t) => t.id !== covering.id)] : upcoming;

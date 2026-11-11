@@ -1,5 +1,5 @@
 import { hasStep, stepTab, useSwipeTabs } from '../../app/useSwipeTabs';
-import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
+import { Fragment, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Button, ContextMenu, DayCard, EmptyState, EventCard, SectionHeader, Timeline, TravelConnector, useToast, type ContextMenuItem, type EventState } from '../../design/components';
 import { useMe, usePlacesById } from '../../data/hooks';
@@ -23,6 +23,8 @@ export const byTime = (a: Activity, b: Activity) => (a.startTime || '99').locale
 export function Itinerary(ctx: TripCtx) {
   const { trip, activities } = ctx;
   const days = tripDays(trip.startDate, trip.endDate);
+  // Month markers in the Day strip: when the trip runs over two months, or isn't in this month
+  const showMonths = trip.startDate.slice(0, 7) !== trip.endDate.slice(0, 7) || trip.startDate.slice(0, 7) !== today().slice(0, 7);
   const [params, setParams] = useSearchParams();
   const t = today();
   const fallback = days.includes(t) ? t : days[0];
@@ -83,17 +85,23 @@ export function Itinerary(ctx: TripCtx) {
   return (
     <div className={s.itinLayout}>
       <div ref={stripRef} className={s.days} role="group" aria-label="Trip days">
-        {days.map((d) => (
-          <DayCard key={d} dataDay={d} day={parseDay(d).getDate()} weekday={formatDay(d, { weekday: 'short' })} selected={d === day}
+        {days.map((d, i) => (
+          <Fragment key={d}>
+          {/* A month marker where the month changes (and before the first day, when the trip isn't all in this month) */}
+          {showMonths && (i === 0 || d.slice(0, 7) !== days[i - 1].slice(0, 7)) && (
+            <span className={s.monthMark} aria-hidden="true">{formatDay(d, { month: 'short' })}</span>
+          )}
+          <DayCard dataDay={d} day={parseDay(d).getDate()} weekday={formatDay(d, { weekday: 'short' })} selected={d === day}
             label={`${word(d)}, ${formatDay(d, { weekday: 'long', day: 'numeric', month: 'long' })}`}
             onClick={() => { haptic('selection'); setDay(d); }} />
+          </Fragment>
         ))}
       </div>
 
       <section className={s.timeline} aria-label={word(day)}>
         <SectionHeader title={word(day)}
           meta={[formatDay(day), `${list.length} plan${list.length === 1 ? '' : 's'}`].filter(Boolean).join(' · ')}
-          action={<Button size="regular" icon="plus" onClick={() => setAdding(true)}>Add event</Button>} />
+          action={ctx.canContribute ? <Button size="regular" icon="plus" onClick={() => setAdding(true)}>Add event</Button> : undefined} />
 
         {/* Changing day slides only the plan, from the side of the day you picked */}
         <div ref={planBox}>
@@ -113,7 +121,7 @@ export function Itinerary(ctx: TripCtx) {
           const dateLine = list.some((e) => legsOf(e.a, activities).some(crossesDateLine));
           return list.length === 0 ? (
             <EmptyState illustration="calendar" title="Nothing planned yet" message="Add something to do, or schedule an idea from the Ideas board."
-              action={<Button variant="neutral" icon="plus" onClick={() => setAdding(true)}>Add event</Button>} />
+              action={ctx.canContribute ? <Button variant="neutral" icon="plus" onClick={() => setAdding(true)}>Add event</Button> : undefined} />
           ) : (
             <div className={s.eventList}>
               {arrivals.map(({ a, last }) => <TravelConnector key={`arr-${a.id}`} icon={categoryInfo(a.category).icon} label={`Arrives ${formatTime(last.endTime)} from ${(a.fromText ?? '').split(',')[0].replace(/\s*\([^)]*\)/, '')}`} />)}

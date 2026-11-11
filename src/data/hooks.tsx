@@ -89,11 +89,11 @@ export function useProfiles(ids: string[]) {
   return profiles;
 }
 
-export function useRole(trip: Trip): { role: Role | undefined; canManage: boolean; isOwner: boolean } {
+export function useRole(trip: Trip): { role: Role | undefined; canManage: boolean; isOwner: boolean; canContribute: boolean } {
   const me = useMe();
   return useMemo(() => {
     const role = trip.roles[me.uid];
-    return { role, canManage: role === 'owner' || role === 'editor', isOwner: role === 'owner' };
+    return { role, canManage: role === 'owner' || role === 'editor', isOwner: role === 'owner', canContribute: !!role && role !== 'viewer' };
   }, [trip.roles, me.uid]);
 }
 

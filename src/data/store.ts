@@ -37,7 +37,7 @@ export interface Store {
   deleteTrip(id: string): Promise<void>;
   leaveTrip(id: string, uid: string): Promise<void>;
   removeMember(trip: Trip, uid: string): Promise<void>;
-  setRole(trip: Trip, uid: string, role: 'editor' | 'member'): Promise<void>;
+  setRole(trip: Trip, uid: string, role: 'editor' | 'member' | 'viewer'): Promise<void>;
 
   watchSub<K extends SubName>(tripId: string, name: K, cb: (items: SubCollections[K][]) => void): Unsubscribe;
   addSub<K extends SubName>(tripId: string, name: K, data: NewDoc<SubCollections[K]>): Promise<string>;

@@ -1,6 +1,6 @@
 import { useSearchParams } from 'react-router-dom';
 import { SlideSwap } from '../shared/SlideSwap';
-import { Button, Card, Icon, Illustration, PageHeader, PageSkeleton, SegmentControl, Tile } from '../../design/components';
+import { Button, Card, EmptyState, Icon, Illustration, PageHeader, PageSkeleton, SegmentControl, Tile } from '../../design/components';
 import { useMyTrips } from '../../data/hooks';
 import type { SavedPlace } from '../../data/types';
 import { tripPhase } from '../../lib/dates';
@@ -31,7 +31,7 @@ const remembered = (): Segment | null => {
 /**
  * Trips tab: the library. Upcoming · Saved · Past (Upcoming first; the segment you picked is remembered on this device).
  * Upcoming: a compact Hero Card per trip, soonest first, under "Plan a new trip". Saved: your Collections, one country
- * Tile each. Past: compact Hero Cards, most recent first. Swiping the list sideways changes segment, like a trip's tabs.
+ * Tile each. Past: compact Hero Cards, most recent first (an illustrated empty card until there's one). Segments are tap only.
  */
 export function Trips() {
   const trips = useMyTrips();
@@ -79,7 +79,7 @@ export function Trips() {
             </div>
           ))}
           {seg === 'past' && (past.length === 0 ? (
-            <p className="t-body t-secondary">Trips you’ve taken will show up here</p>
+            <EmptyState illustration="memories" title="No past trips yet" message="When a trip ends it moves here, with its plans and photos, so you can look back on it." />
           ) : (
             <div className={s.list}>{past.map((t) => <TripHero key={t.id} trip={t} size="compact" />)}</div>
           ))}

@@ -8,7 +8,7 @@ import type { Category } from '../data/types';
  *
  * - journey: from → to (Journey card): flights, trains, buses, ferries, transfers, private drivers
  * - span: one booking shown twice, at its start and end (stays, cruises, car rental, campervans)
- * - place: at one place and time (food, drink, activities, errands, taxis, metro, bike hire)
+ * - place: at one place and time (food, drink, activities, errands, metro, bike hire)
  * - open: quiet time with no place needed (free time, rest)
  * - note: a note, with an optional time
  */
@@ -44,10 +44,10 @@ export const EVENT_KINDS: KindInfo[] = [
   k('train', 'Train', 'train', 'transport', 'journey', 'Trains, from city hops to high-speed and sleepers.'),
   k('bus', 'Bus or coach', 'bus-alt', 'transport', 'journey', 'Long-distance buses and coaches between towns.'),
   k('ferry', 'Ferry', 'ship', 'transport', 'journey', 'Ferries and boat crossings.'),
-  k('taxi', 'Taxi or rideshare', 'taxi', 'transport', 'place', 'A taxi, Uber or Bolt from where you’re picked up.', false),
+  k('taxi', 'Taxi or rideshare', 'taxi', 'transport', 'journey', 'A taxi, Uber or Bolt from where you’re picked up to where you’re going.', false),
   k('transfer', 'Airport transfer', 'shuttle-van', 'transport', 'journey', 'A booked ride to or from the airport.'),
   k('metro', 'Metro or tram', 'train-subway-tunnel', 'transport', 'place', 'A local metro, tram or city train ride.', false),
-  k('driver', 'Private driver', 'car-side', 'transport', 'journey', 'A driver booked to take you somewhere.'),
+  k('driver', 'Private car', 'car-side', 'transport', 'journey', 'Your own car, or a private driver taking you from A to B.'),
   k('bike', 'Bike or scooter hire', 'bike', 'transport', 'place', 'Bikes or scooters to get around for a while.'),
   k('car', 'Car rental', 'car', 'transport', 'span', 'A hire car: shown at pick-up and drop-off.'),
   k('campervan', 'Campervan', 'rv', 'transport', 'span', 'A campervan or motorhome: shown at pick-up and drop-off.'),

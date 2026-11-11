@@ -2,7 +2,8 @@ import type { EventKind } from '../lib/categories';
 /** `countryCode` is the ISO 3166 two-letter code (lowercase), used for flags and the trip's country badges. */
 export type Place = { name: string; lat: number; lng: number; country?: string; countryCode?: string };
 
-export type Role = 'owner' | 'editor' | 'member';
+/** owner and editor ("Organiser") manage the trip; member adds and edits; viewer only looks and chats. */
+export type Role = 'owner' | 'editor' | 'member' | 'viewer';
 
 export type User = { uid: string; name: string; photo: string | null; email?: string | null };
 

@@ -3,10 +3,10 @@
  * shorthand in CSS (font: var(--type-heading-1)); letter-spacing is set by the class only.
  */
 :root {
-  --type-display: var(--weight-black) var(--size-display)/1 var(--font-display);
+  --type-display: var(--weight-black) var(--size-display)/1.25 var(--font-display);
   --type-display-tiny: var(--weight-black) var(--size-display-tiny)/1 var(--font-display);
-  --type-heading-1: var(--weight-black) var(--size-heading-1)/1 var(--font-display);
-  --type-heading-2: var(--weight-bold) var(--size-heading-2)/1 var(--font-display);
+  --type-heading-1: var(--weight-black) var(--size-heading-1)/1.25 var(--font-display);
+  --type-heading-2: var(--weight-bold) var(--size-heading-2)/1.25 var(--font-display);
   --type-heading-3: var(--weight-semibold) var(--size-heading-3)/1 var(--font-family);
   --type-heading-4: var(--weight-bold) var(--size-heading-3)/1 var(--font-family);
   --type-body: var(--weight-regular) var(--size-body)/1.5 var(--font-family);

@@ -47,6 +47,14 @@ export function mapsUrl(q: string, p?: Place | null, app: MapsApp = getMapsApp()
   return `https://www.google.com/maps/search/?api=1&query=${p ? ll : text}`;
 }
 
+/** Directions from one place to another in the chosen maps app (a route's From → To). */
+export function directionsUrl(from: { q: string; p?: Place | null }, to: { q: string; p?: Place | null }, app: MapsApp = getMapsApp()) {
+  const at = (x: { q: string; p?: Place | null }) => (x.p ? `${x.p.lat},${x.p.lng}` : x.q);
+  if (app === 'apple') return `https://maps.apple.com/?saddr=${encodeURIComponent(at(from))}&daddr=${encodeURIComponent(at(to))}`;
+  if (app === 'waze') return to.p ? `https://waze.com/ul?ll=${to.p.lat},${to.p.lng}&navigate=yes` : `https://waze.com/ul?q=${encodeURIComponent(to.q)}&navigate=yes`;
+  return `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(at(from))}&destination=${encodeURIComponent(at(to))}`;
+}
+
 /** Opens Uber (app or website) with the place as the drop-off and the rider's current location as pickup. */
 export function uberUrl(q: string, p?: Place | null) {
   const u = new URLSearchParams({ action: 'setPickup', pickup: 'my_location' });

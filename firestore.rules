@@ -8,6 +8,8 @@ service cloud.firestore {
     function tripData(tripId) { return get(/databases/$(database)/documents/trips/$(tripId)).data; }
     function isMember(tripId) { return signedIn() && uid() in tripData(tripId).memberIds; }
     function isManager(tripId) { return signedIn() && tripData(tripId).roles[uid()] in ['owner', 'editor']; }
+    // A Viewer sees the trip and chats, but adds, edits and votes on nothing
+    function isContributor(tripId) { return isMember(tripId) && tripData(tripId).roles[uid()] != 'viewer'; }
 
     // Public profile: just name and photo, so trip-mates can see who's who.
     // It can be fetched by id but never listed, so nobody can browse all users.
@@ -86,7 +88,8 @@ service cloud.firestore {
       allow delete: if signedIn() && resource.data.ownerId == uid();
 
       // Activities, ideas, albums, comments (and old expenses): members only.
-      // Anyone on the trip can add and update (votes, who's going), but only the person who added something, or an
+      // Anyone on the trip but a Viewer can add and update (votes, who's going); Viewers can only comment. Only the
+      // person who added something, or an
       // owner/organiser, can delete it; comments can only be edited or deleted by their author. Text has size limits:
       // comments 150 characters, titles 200, notes 2,000 (so nobody can store huge documents everyone has to load).
       match /{sub}/{docId} {
@@ -98,9 +101,11 @@ service cloud.firestore {
 
         allow read: if isMember(tripId);
         allow create: if isMember(tripId) && sizesOk()
+          && (sub == 'comments' || isContributor(tripId))
           && d().get('createdBy', uid()) == uid()
           && (sub != 'comments' || (d().authorId == uid() && d().text is string && d().text.size() > 0));
         allow update: if isMember(tripId) && sizesOk()
+          && (sub == 'comments' || isContributor(tripId))
           && d().get('createdBy', '') == resource.data.get('createdBy', '')
           && (sub != 'comments' || addedByMe());
         allow delete: if isMember(tripId) && (addedByMe() || noAuthor() || (sub != 'comments' && isManager(tripId)));

@@ -23,7 +23,7 @@ export function Photos(ctx: TripCtx) {
   return (
     <>
       <SectionHeader title="Shared albums" meta="Anyone on the trip can add one"
-        action={<Button size="regular" icon="camera" onClick={() => setEditing("new")}>Add photos</Button>} />
+        action={ctx.canContribute ? <Button size="regular" icon="camera" onClick={() => setEditing("new")}>Add photos</Button> : undefined} />
       {sorted.length === 0 ? (
         <EmptyState illustration="memories" title="No albums yet"
           message="Make a shared album in Google Photos or Apple Photos, then add its link here so everyone can find the pictures." />
@@ -83,7 +83,7 @@ function AlbumForm({ open, tripId, album, canDelete, onClose }: { open: boolean;
   };
 
   return (
-    <Sheet open={open} title={album ? 'Edit album' : 'Add album'} onClose={onClose} onSubmit={submit} submitLabel={album ? 'Save' : 'Add'} submitDisabled={!valid}
+    <Sheet open={open} mode={album ? 'edit' : 'default'} title={album ? 'Edit album' : 'Add album'} onClose={onClose} onSubmit={submit} submitLabel={album ? 'Save' : 'Add'} submitDisabled={!valid}
       secondary={album && canDelete ? <Button variant="destructive" size="large" onClick={remove}>Remove</Button> : undefined}>
       <TextField label="Album name" placeholder="Lisbon 2026" value={title} onChange={(e) => setTitle(e.target.value)} />
       <TextField label="Share link" placeholder="https://photos.app.goo.gl/…" inputMode="url" autoComplete="off" value={url}
