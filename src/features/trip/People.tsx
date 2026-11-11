@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Avatar, Button, Card, Illustration, ListGroup, ListItem, SectionHeader, SegmentedControl, Sheet, useToast } from '../../design/components';
+import { Avatar, Button, Card, Illustration, ListGroup, ListItem, SectionHeader, SegmentControl, Sheet, useToast } from '../../design/components';
 import { store } from '../../data';
 import { personName, useMe } from '../../data/hooks';
 import type { TripCtx } from './TripPage';
@@ -89,7 +89,7 @@ export function People({ trip, profiles, canManage, isOwner }: TripCtx) {
 
       <Sheet open={!!person} title={person ? personName(profiles, person) : ''} subtitle="What they can do on this trip" onClose={() => setPerson(null)} onSubmit={saveRole} submitLabel="Save"
         secondary={person ? <Button variant="destructive" size="large" onClick={removePerson}>Remove</Button> : undefined}>
-        <SegmentedControl label="Role" block value={role} onChange={setRoleDraft} options={[{ value: 'member', label: 'Member' }, { value: 'editor', label: 'Organiser' }]} />
+        <SegmentControl label="Role" block value={role} onChange={setRoleDraft} options={[{ value: 'member', label: 'Member' }, { value: 'editor', label: 'Organiser' }]} />
         <p className="t-body-small t-secondary">Organisers can edit the trip and the itinerary, and add ideas to days.</p>
       </Sheet>
     </>

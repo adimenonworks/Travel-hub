@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { stepTab, useSwipeTabs } from '../../app/useSwipeTabs';
 import { SlideSwap } from '../shared/SlideSwap';
 import { useSearchParams } from 'react-router-dom';
-import { Button, EmptyState, IdeaRow, LinkButton, ListGroup, ListItem, PageSection, SectionHeader, SegmentedControl, Select, Sheet, TextArea, TextField, useToast } from '../../design/components';
+import { Button, EmptyState, IdeaRow, LinkButton, ListGroup, ListItem, PageSection, SectionHeader, SegmentControl, Select, Sheet, TextArea, TextField, useToast } from '../../design/components';
 import { store } from '../../data';
 import { personName, useMe, usePlaces, usePlacesById } from '../../data/hooks';
 import type { Category, Idea, LinkItem, SavedPlace } from '../../data/types';
@@ -72,7 +72,7 @@ export function Ideas(ctx: TripCtx) {
     <>
       <SectionHeader title="Ideas board"
         action={<Button size="regular" icon="lightbulb" onClick={() => setAdding(true)}>Add idea</Button>} />
-      <SegmentedControl label="Show ideas" block value={filter} onChange={setFilter} options={[
+      <SegmentControl label="Show ideas" block value={filter} onChange={setFilter} options={[
         { value: 'open', label: `To decide · ${count('open')}` },
         { value: 'approved', label: `Planned · ${count('approved')}` },
         { value: 'rejected', label: `Passed · ${count('rejected')}` },

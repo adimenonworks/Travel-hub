@@ -12,7 +12,8 @@ export type NavTab = { to: string; label: string; icon: IconName; active: (path:
  * always on top while the page scrolls under it. Each tab is a Figma "Nav Item": the current one sits on a grey pill
  * (which slides between tabs) with its filled icon. Tapping the current tab scrolls it back to the top, as on iPhone.
  * You can also press and drag along the bar, like iOS: the pill follows your finger, the tab under it lights up (a
- * selection tick as it crosses each one), and letting go opens that tab. Taps stay silent.
+ * selection tick as it crosses each one), and letting go opens the nearest tab. Once dragging it keeps hold wherever
+ * your thumb goes on the screen (above or beside the bar) until you lift it. Taps stay silent.
  */
 export function BottomNav({ tabs, inline }: { tabs: NavTab[]; /** In the page flow instead of fixed to the bottom (the /#/design page) */ inline?: boolean }) {
   const { pathname } = useLocation();
@@ -49,13 +50,14 @@ export function BottomNav({ tabs, inline }: { tabs: NavTab[]; /** In the page fl
     }
     follow(e.clientX);
   };
-  const up = (e: React.PointerEvent) => {
+  const up = () => {
     const p = press.current;
     press.current = null;
     if (!p?.drag) return;
+    // Letting go, or iOS taking the touch away, snaps to the nearest tab: the drag is never lost halfway
     const over = drag?.over ?? current;
     setDrag(null);
-    if (e.type !== 'pointercancel' && over >= 0 && over !== current) { nextTransition('tab'); navigate(tabs[over].to); }
+    if (over >= 0 && over !== current) { nextTransition('tab'); navigate(tabs[over].to); }
   };
   const shown = drag ? drag.over : current;
   return (

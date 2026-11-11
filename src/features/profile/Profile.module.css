@@ -5,6 +5,7 @@
 .avatarButton:active { transform: scale(0.94); transition: transform var(--motion-press); }
 .nameRow { display: flex; flex-wrap: wrap; gap: var(--space-default-400); align-items: flex-end; margin-bottom: calc(var(--space-default-400) * -1); }
 .addField { flex: 1 1 calc(160rem / 17); min-width: 0; }
+.nameRow > button { margin-bottom: var(--space-default-100); } /* the 40px Icon button centred on the 48px field */
 .appearance { display: flex; flex-direction: column; gap: var(--space-default-700); padding: var(--space-default-500); } /* Figma: card padding 16 */
 /* The map of places you've been: a deliberate viewport, 24 corners */
 .map { border-radius: var(--radius-600); overflow: hidden; border: 1px solid var(--on-light-border-subtle); }

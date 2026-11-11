@@ -33,7 +33,7 @@
 .tileRow > * { scroll-snap-align: start; min-height: calc(180rem / 17); }
 .tileGrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(calc(140rem / 17), 1fr)); gap: var(--space-default-300); }
 .tileGrid > * { min-height: calc(180rem / 17); }
-.field { display: flex; flex-direction: column; gap: var(--space-default-300); }
+.field { display: flex; flex-direction: column; gap: var(--space-default-500); }
 /* Collections */
 .marks { display: inline-flex; align-items: center; gap: var(--space-default-200); color: var(--on-light-text-secondary); font: var(--type-body-small); }
 .marks svg { color: var(--on-light-icon-brand); }
@@ -47,3 +47,7 @@
 .favCategory { display: flex; flex-direction: column; gap: var(--space-default-300); }
 .favCategoryTitle { display: flex; align-items: center; gap: var(--space-default-200); margin: 0; font: var(--type-label); color: var(--on-light-text-secondary); }
 .options { display: flex; flex-direction: column; gap: var(--space-default-300); }
+/* Sections 40 apart (--space-stack), things inside a section 16 apart: the rule on every screen and sheet */
+.sections { display: flex; flex-direction: column; gap: var(--space-stack); }
+.kindGroup { display: flex; flex-direction: column; gap: var(--space-default-300); }
+.kindGroupTitle { margin: 0; font: var(--type-body-small); color: var(--on-light-text-secondary); }

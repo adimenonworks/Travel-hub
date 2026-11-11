@@ -2,7 +2,7 @@
   position: relative;
   display: inline-grid;
   grid-auto-flow: column;
-  grid-auto-columns: minmax(0, auto); /* columns fit their labels and share the spare room; big text wraps between words */
+  grid-auto-columns: minmax(0, 1fr); /* equal widths, like iOS: the pill only ever slides; big text wraps between words */
   padding: var(--space-default-200);
   gap: var(--space-default-200);
   background: transparent;
@@ -28,14 +28,16 @@
 .option:active { background: var(--interactive-selected-ghost-background-pressed); }
 .option[aria-checked='true'], .option[aria-checked='true']:hover, .option[aria-checked='true']:active { background: transparent; color: var(--interactive-selected-primary-text); }
 
-/* The sliding pill: placed on the chosen option (position and width measured in SegmentedControl.tsx). */
+/* The sliding pill: one segment wide, moved by whole segments (segment width + the gap) on the GPU. */
 .thumb {
-  position: absolute; top: var(--space-default-200); bottom: var(--space-default-200); left: 0;
-  width: var(--w); transform: translateX(var(--x));
+  position: absolute; top: var(--space-default-200); bottom: var(--space-default-200); left: var(--space-default-200);
+  width: calc((100% - 2 * var(--space-default-200) - (var(--n) - 1) * var(--space-default-200)) / var(--n));
+  transform: translateX(calc(var(--i) * (100% + var(--space-default-200))));
   border-radius: var(--radius-1000);
   background: var(--interactive-selected-primary-background);
-  transition: background var(--motion-fast);
+  transition: transform var(--duration-slow) var(--ease-spring), background var(--motion-fast);
+  will-change: transform;
 }
-.animate { transition: transform var(--motion-fluid), width var(--motion-fluid), background var(--motion-fast); }
+@media (prefers-reduced-motion: reduce) { .thumb { transition: background var(--motion-fast); } }
 .control:has(.option[aria-checked='true']:hover) .thumb { background: var(--interactive-selected-primary-background-hover); }
 .control:has(.option[aria-checked='true']:active) .thumb { background: var(--interactive-selected-primary-background-pressed); }

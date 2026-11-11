@@ -1,11 +1,11 @@
 import { useState, type CSSProperties } from 'react';
 import {
   Avatar, AvatarStack, Badge, Chip, Notification, Button, Card, EmptyState, FieldRow, HeroCard, Icon, IconButton,
-  LinkButton, PageHeader, PageSection, SegmentedControl, Select, Sheet, Tabs, TextArea, TextField, Timeline, Illustration,
+  LinkButton, PageHeader, PageSection, SegmentControl, Select, Sheet, Tabs, TextArea, TextField, Timeline, Illustration,
   type IllustrationName, COVER_ILLUSTRATIONS, ICON_NAMES, useToast, BottomNav, Skeleton,
   ListItem, ListGroup, SectionHeader, EventCard, TravelConnector, IdeaRow, Tile, MapCard, StatStrip, ProfileCard,
   OptionCard, BudgetCard, Switch, SearchField, StepProgress, DestinationHeader, TripHeader, DayCard, CountryModal,
-  CategoryIcon, ContextMenu,
+  CategoryIcon, ContextMenu, Accordion,
 } from '../../design/components';
 import { flagUrl } from '../../lib/countries';
 import { EVENT_TYPES, TYPE_TONE } from '../../lib/categories';
@@ -347,6 +347,16 @@ export function DesignSystem() {
           </div>
         </Section>
 
+        <Section title="Accordion" footer="Figma Accordion: a grey card that folds a group away (a day of events in Save to Rove → Add to an event). Starts collapsed; the chevron turns over when open.">
+          <Accordion title="Fri 13 Nov" meta="2 events">
+            <ListItem icon="utensils" tone="food" title="Dinner at Ramiro" meta="19:30 · Restaurant" onClick={() => {}} />
+            <ListItem icon="bank" tone="activities" title="Tile museum" meta="14:00 · Museum or gallery" onClick={() => {}} />
+          </Accordion>
+          <Accordion title="Sat 14 Nov" meta="1 event" defaultOpen>
+            <ListItem icon="train" tone="travel" title="Train to Porto" meta="09:10 · Train" onClick={() => {}} />
+          </Accordion>
+        </Section>
+
         <Section title="Rows, groups and tiles" footer="Section header, List group of List items (Default / Compact), Idea rows with Vote buttons, Tiles, Map card, Stat strip, Profile Card.">
           <SectionHeader title="Collections" meta="4 places · 61 saves" action={<LinkButton to="/design" variant="ghost" size="regular" iconEnd="chevron-right">See all</LinkButton>} />
           <ListGroup>
@@ -398,7 +408,7 @@ export function DesignSystem() {
               <TextField label="Time" type="time" />
             </FieldRow>
             <TextArea label="Text area" placeholder="Notes" />
-            <SegmentedControl label="Demo" value={seg} onChange={setSeg} options={[{ value: 'a', label: 'First' }, { value: 'b', label: 'Second' }, { value: 'c', label: 'Third' }]} />
+            <SegmentControl label="Demo" value={seg} onChange={setSeg} options={[{ value: 'a', label: 'First' }, { value: 'b', label: 'Second' }, { value: 'c', label: 'Third' }]} />
           </Card>
         </Section>
 

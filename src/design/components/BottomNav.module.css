@@ -14,7 +14,7 @@
   border-radius: var(--radius-1000); border: 1px solid var(--on-light-border-subtle);
   background: var(--overlay-bar); box-shadow: var(--elevation-floating-bar);
   -webkit-backdrop-filter: blur(var(--blur-overlay)); backdrop-filter: blur(var(--blur-overlay));
-  touch-action: pan-y; /* a sideways drag moves the pill (the page can still be scrolled from the bar) */
+  touch-action: none; /* the bar's touches are all ours: iOS never takes a drag over to scroll (which dropped the pill) */
 }
 /* Figma "Nav Item": icon over a Label small label */
 .item {

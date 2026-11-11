@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Button, Chip, Icon, ListGroup, ListItem, OptionCard, SegmentedControl, Sheet, Skeleton, TextArea, TextField, useToast } from '../../design/components';
+import { Accordion, Chip, Icon, ListGroup, ListItem, OptionCard, SegmentControl, Sheet, Skeleton, TextArea, TextField, Button, useToast } from '../../design/components';
 import type { Activity, LinkItem, Place } from '../../data/types';
 import { flagUrl } from '../../lib/countries';
 import { searchCities } from '../../lib/geocode';
@@ -24,7 +24,7 @@ export type SaveRequest = { mode: 'link'; url?: string };
  * the link only a skeleton shows. The preview has the place's name (cleaned of ratings and addresses, editable), where
  * it's filed (country · city, Rove's pick from the link, with Change) and its category (chips, always shown). It's
  * filed into Collections under country → city → category; a new country simply starts a new collection. Saving never asks for dates.
- * With an upcoming trip, a Segmented control switches to **Trip** (picked first when that trip covers the place's city):
+ * With an upcoming trip, a Segment control switches to **Trip** (picked first when that trip covers the place's city):
  * a new event filled in from the link (pick the day), the link added to an event you already have, or "Add to ideas
  * instead". Every trip action also files the place in Collections. The same place saved twice isn't duplicated.
  * Offline, it saves on the device and syncs later. Opened by Save a place and by links shared to Rove from other apps.
@@ -41,7 +41,7 @@ export function SaveSheet({ request, onClose }: { request: SaveRequest | null; o
   // Collections or Trip, and on the Trip side: which trip, a new event (its day, time, check-out) or an existing one
   const [dest, setDest] = useState<'collections' | 'trip'>('collections');
   const [tripId, setTripId] = useState('');
-  const [action, setAction] = useState<'new' | 'add'>('new');
+  const [action, setAction] = useState<'new' | 'add' | 'idea'>('new');
   const [day, setDay] = useState('');
   const [time, setTime] = useState('');
   const [checkout, setCheckout] = useState('');
@@ -132,7 +132,7 @@ export function SaveSheet({ request, onClose }: { request: SaveRequest | null; o
     } catch { toast({ label: 'Paste the link into the field' }); }
   };
 
-  const save = async (mode: 'collections' | 'event' | 'link' | 'idea' = onTrip ? (action === 'new' ? 'event' : 'link') : 'collections') => {
+  const save = async (mode: 'collections' | 'event' | 'link' | 'idea' = onTrip ? (action === 'new' ? 'event' : action === 'add' ? 'link' : 'idea') : 'collections') => {
     if (!preview) return;
     if (!code) return; // "Choose where to save" first
     const where = [countryName(code), city].filter(Boolean).join(' · ');
@@ -145,7 +145,7 @@ export function SaveSheet({ request, onClose }: { request: SaveRequest | null; o
       // Every trip action files the place in Collections too (or reuses the one already there)
       const { id, saved } = dupe ? { id: dupe.id, saved: Promise.resolve() } : store.addPlace({
         name: title, category, city: kind === 'place' ? city : '', country: countryName(code), countryCode: code, ...(kind === 'link' ? { type: 'link' as const } : {}),
-        lat: place?.lat ?? null, lng: place?.lng ?? null,
+        lat: place && Number.isFinite(place.lat) ? place.lat : null, lng: place && Number.isFinite(place.lng) ? place.lng : null,
         ...(preview.url ? { url: preview.url } : {}), ...(preview.image ? { image: preview.image } : {}),
         ...(preview.site ? { source: preview.site } : {}), ...(place?.kind ? { kind: place.kind } : {}),
         ...(note.trim() ? { notes: note.trim() } : {}),
@@ -166,11 +166,11 @@ export function SaveSheet({ request, onClose }: { request: SaveRequest | null; o
       } else if (mode === 'event' && trip && place) {
         // A new event, filled in from the link: the place, its name and the link; you picked the day (and a time)
         const info = kindInfo(category);
-        const location: Place = { name: place.name, lat: place.lat, lng: place.lng, country: place.country, countryCode: place.countryCode };
-        const tz = await Promise.race([zoneAt(location).catch(() => undefined), new Promise<undefined>((r) => setTimeout(() => r(undefined), 2500))]);
+        const location: Place | null = Number.isFinite(place.lat) ? { name: place.name, lat: place.lat, lng: place.lng, country: place.country, countryCode: place.countryCode } : null;
+        const tz = location ? await Promise.race([zoneAt(location).catch(() => undefined), new Promise<undefined>((r) => setTimeout(() => r(undefined), 2500))]) : undefined;
         const ev = store.queueSub(trip.id, 'activities', {
           title, category, type: info.type, behaviour: info.behaviour, date: theDay, startTime: time, endTime: '',
-          locationText: [place.name, place.city].filter(Boolean).join(', '), location, notes: '', links: preview.url ? [link] : [],
+          locationText: [place.name, city || place.city].filter(Boolean).join(', '), location, notes: '', links: preview.url ? [link] : [],
           attendeeIds: [me.uid], placeId: id, ...(stay ? { endDate: out } : {}), ...(tz ? { tz } : {}),
         });
         ev.saved.catch(fail);
@@ -202,6 +202,13 @@ export function SaveSheet({ request, onClose }: { request: SaveRequest | null; o
   const byDay = events.reduce<Record<string, Activity[]>>((m, a) => { (m[a.date] ??= []).push(a); return m; }, {});
   const order = Object.keys(byDay).sort();
   if (picked2) { const d = picked2.date; order.splice(order.indexOf(d), 1); order.unshift(d); }
+  const suggested = action === 'add' ? likely : undefined;
+  const eventRow = (a: Activity, extra?: string) => {
+    const k = kindInfo(a.category);
+    const meta = [longDay(a.date), a.startTime ? formatTime(a.startTime) : null, extra ?? k.label].filter(Boolean).join(' · ');
+    return <ListItem key={a.id} icon={k.icon} tone={categoryTone(a.category)} title={a.title} meta={meta}
+      trailing={a.id === picked2?.id ? 'Selected' : undefined} onClick={() => { haptic('selection'); setEventId(a.id); }} />;
+  };
   const tripSide = trip && (
     <>
       {tripChoices.length > 1 && (
@@ -212,9 +219,10 @@ export function SaveSheet({ request, onClose }: { request: SaveRequest | null; o
           </div>
         </section>
       )}
-      <div className={s.options}>
+      <div className={s.field} role="group" aria-label="How to add it">
         <OptionCard icon={cat.icon} tone={cat.tone} label="New event" description={`${cat.label} · ${name.trim() || place?.name || preview?.title}, filled in from the link`} selected={action === 'new'} onClick={() => { haptic('selection'); setAction('new'); }} />
         {events.length > 0 && <OptionCard icon="link" tone="neutral" label="Add to an event" description="Attach the link to something already planned" selected={action === 'add'} onClick={() => { haptic('selection'); setAction('add'); }} />}
+        <OptionCard icon="lightbulb" tone="notes" label="Add to ideas" description="So everyone on the trip can vote on it" selected={action === 'idea'} onClick={() => { haptic('selection'); setAction('idea'); }} />
       </div>
       {action === 'new' && (
         <>
@@ -223,6 +231,7 @@ export function SaveSheet({ request, onClose }: { request: SaveRequest | null; o
             <div className={s.chipsWrap} role="group" aria-labelledby="save-day">
               {days.map((d) => <Chip key={d} active={d === theDay} label={`${longDay(d)}${d === theDay ? ', selected' : ''}`} onClick={() => { haptic('selection'); setDay(d); }}>{dayLabel(d)}</Chip>)}
             </div>
+            {!stay && <TextField label="Time (optional)" type="time" value={time} onChange={(e) => setTime(e.target.value)} />}
           </section>
           {stay && (
             <section className={s.field} aria-labelledby="save-out">
@@ -230,33 +239,65 @@ export function SaveSheet({ request, onClose }: { request: SaveRequest | null; o
               <div className={s.chipsWrap} role="group" aria-labelledby="save-out">
                 {[...days.filter((d) => d > theDay), addDays(days[days.length - 1] ?? theDay, 1)].map((d) => <Chip key={d} active={d === out} label={`${longDay(d)}${d === out ? ', selected' : ''}`} onClick={() => { haptic('selection'); setCheckout(d); }}>{dayLabel(d)}</Chip>)}
               </div>
+              <TextField label="Check-in time (optional)" type="time" value={time} onChange={(e) => setTime(e.target.value)} />
             </section>
           )}
-          <TextField label={stay ? 'Check-in time (optional)' : 'Time (optional)'} type="time" value={time} onChange={(e) => setTime(e.target.value)} />
         </>
       )}
-      {action === 'add' && order.map((d) => (
-        <section key={d} className={s.field} aria-labelledby={`save-ev-${d}`}>
-          <h3 className="t-heading-4" id={`save-ev-${d}`}>{longDay(d)}</h3>
-          <ListGroup label={longDay(d)}>
-            {byDay[d].map((a) => {
-              const t = kindInfo(a.category);
-              const meta = [a.startTime ? formatTime(a.startTime) : null, t.label, a === likely ? 'Likely match' : null].filter(Boolean).join(' · ');
-              return <ListItem key={a.id} icon={t.icon} tone={categoryTone(a.category)} title={a.title} meta={meta}
-                trailing={a.id === picked2?.id ? 'Selected' : undefined} onClick={() => { haptic('selection'); setEventId(a.id); }} />;
-            })}
-          </ListGroup>
-        </section>
-      ))}
-      <div><Button variant="ghost" size="regular" icon="lightbulb" onClick={() => save('idea')}>Add to ideas instead</Button></div>
+      {action === 'add' && (
+        <>
+          {suggested && (
+            <section className={s.field} aria-labelledby="save-suggested">
+              <h3 className="t-heading-4" id="save-suggested">Suggested</h3>
+              <ListGroup label="Suggested event">{eventRow(suggested, 'Likely match')}</ListGroup>
+            </section>
+          )}
+          {/* Every day of the trip, folded up so a long trip stays short: open a day to pick from it */}
+          <section className={s.field} aria-labelledby="save-days">
+            <h3 className="t-heading-4" id="save-days">All events</h3>
+            {Object.keys(byDay).sort().map((d) => (
+              <Accordion key={d} title={longDay(d)} meta={`${byDay[d].length} ${byDay[d].length === 1 ? 'event' : 'events'}${byDay[d].some((a) => a.id === picked2?.id) ? ' · Selected' : ''}`}>
+                {byDay[d].map((a) => eventRow(a))}
+              </Accordion>
+            ))}
+          </section>
+        </>
+      )}
     </>
+  );
+  // Where it's filed: the country (Change picks another) and its city, right here on the sheet
+  const whereSection = (
+    <section className={s.field} aria-labelledby="save-where">
+      <h3 className="t-heading-4" id="save-where">Saving to</h3>
+      <div className={s.preview}>
+        <span className={[s.previewThumb, s.previewRound].join(' ')} aria-hidden="true">{code ? <img src={flagUrl(code)} alt="" className={s.flag} /> : <Icon name="pin" size={24} />}</span>
+        <span className={s.previewText}>
+          <span className={s.previewTitle}>{code ? countryName(code) : 'Choose a country'}</span>
+          <span className={s.previewMeta}>{code ? (chosen ? 'You chose' : 'Found in the link') : 'Rove couldn’t find a place in the link'}</span>
+        </span>
+        <Button variant="ghost" size="regular" onClick={() => { setStep('where'); setWhereQuery(''); }}>{code ? 'Change' : 'Choose'}</Button>
+      </div>
+      {code && (
+        <>
+          <div className={s.chipsWrap} role="group" aria-label={`City in ${countryName(code)}`}>
+            {cityChips.map((c) => (
+              <Chip key={c} active={city === c && newCity === null} onClick={() => { haptic('selection'); setChosen({ code, city: c }); setNewCity(null); }} label={`${c}${city === c ? ', selected' : ''}`}>{c}</Chip>
+            ))}
+            <Chip icon="plus" active={newCity !== null} onClick={() => { haptic('selection'); setNewCity(''); }}>New city</Chip>
+          </div>
+          {newCity !== null && <TextField label="New city" placeholder="Hobart" value={newCity} autoComplete="off" autoFocus
+            onChange={(e) => { setNewCity(e.target.value); setChosen({ code, city: e.target.value.trim() }); }} />}
+        </>
+      )}
+    </section>
   );
 
   return (
-    <Sheet open={open} title={whereSheet ? 'Where should it go?' : shared ? 'Save to Rove' : 'Save a place'}
+    <Sheet open={open} title={whereSheet ? 'Choose a country' : shared ? 'Save to Rove' : 'Save a place'}
       subtitle={whereSheet ? (picked.code ? `Rove picked ${countryName(picked.code)} from the link` : 'Rove couldn’t tell from the link') : preview && shared && preview.site ? `Shared from ${preview.site}` : preview || reading ? undefined : 'Paste a link from TikTok, Instagram, Google Maps or any site'}
-      onClose={onClose} onSubmit={preview ? () => save() : undefined} submitDisabled={!!preview && (!code || (onTrip && !whereSheet && action === 'add' && !picked2))}
-      submitLabel={onTrip && !whereSheet ? (action === 'new' ? `Add to ${longDay(theDay)}` : picked2 ? `Add to ${picked2.title}` : 'Add') : code ? `Save to ${whereSheet && city ? city : countryName(code)}` : 'Save'}>
+      onClose={whereSheet ? () => setStep('preview') : onClose} onSubmit={!preview ? undefined : whereSheet ? () => setStep('preview') : () => save()}
+      submitDisabled={!!preview && !whereSheet && (!code || (onTrip && action === 'add' && !picked2))}
+      submitLabel={whereSheet ? 'Done' : onTrip ? (action === 'new' ? `Add to ${longDay(theDay)}` : action === 'idea' ? `Add to ${trip?.name} ideas` : picked2 ? `Add to ${picked2.title}` : 'Add') : code ? `Save to ${countryName(code)}` : 'Save'}>
       {/* Reading the link: only the skeleton (the preview's shape) */}
       {!preview && reading && (
         <div className={s.reading} role="status" aria-label="Reading the link">
@@ -278,7 +319,7 @@ export function SaveSheet({ request, onClose }: { request: SaveRequest | null; o
       )}
 
       {preview && !whereSheet && (
-        <>
+        <div className={s.sections}>
           <div className={s.preview}>
             <span className={s.previewThumb} aria-hidden="true">{preview.image ? <img src={preview.image} alt="" /> : <Icon name={kind === 'link' ? 'link' : icon} size={24} />}</span>
             <span className={s.previewText}>
@@ -286,23 +327,22 @@ export function SaveSheet({ request, onClose }: { request: SaveRequest | null; o
               {meta && <span className={s.previewMeta}>{meta}</span>}
             </span>
           </div>
-          {canTrip && <SegmentedControl block label="Save to" value={dest} onChange={(v) => { haptic('selection'); setDest(v); }}
-            options={[{ value: 'collections', label: 'Collections' }, { value: 'trip', label: 'Trip' }]} />}
-          {onTrip && trip ? tripSide : <>
-          <TextField label="Name" value={name} autoComplete="off" onChange={(e) => setName(e.target.value)} />
-          {/* Saving to: Rove's pick, with Change. With nothing found, Save waits until a country is chosen. */}
-          <div className={s.preview}>
-            <span className={[s.previewThumb, s.previewRound].join(' ')} aria-hidden="true">{code ? <img src={flagUrl(code)} alt="" className={s.flag} /> : <Icon name="pin" size={24} />}</span>
-            <span className={s.previewText}>
-              <span className={s.previewTitle}>{code ? [countryName(code), kind === 'place' ? city : ''].filter(Boolean).join(' · ') : 'Choose where to save'}</span>
-              <span className={s.previewMeta}>{code ? `Saving to · ${chosen ? 'you chose' : 'found in the link'}` : 'Rove couldn’t find a place in the link'}</span>
-            </span>
-            <Button variant="ghost" size="regular" onClick={() => { setStep('where'); setNewCity(null); }}>{code ? 'Change' : 'Choose'}</Button>
-          </div>
-          <PlaceKindPicker id="save-category" value={category} onChange={setCategory} />
-          <TextArea label="Note (optional)" placeholder="Why did you save this?" value={note} onChange={(e) => setNote(e.target.value)} rows={2} />
-          </>}
-        </>
+          {canTrip && (
+            <section className={s.field} aria-labelledby="save-dest">
+              <h3 className="t-heading-4" id="save-dest">Choose where to save this</h3>
+              <SegmentControl block label="Choose where to save this" value={dest} onChange={setDest}
+                options={[{ value: 'collections', label: 'Collections' }, { value: 'trip', label: 'Trip' }]} />
+            </section>
+          )}
+          {onTrip && trip ? tripSide : (
+            <>
+              <TextField label="Name" value={name} autoComplete="off" onChange={(e) => setName(e.target.value)} />
+              {whereSection}
+              <PlaceKindPicker id="save-category" value={category} onChange={setCategory} />
+              <TextArea label="Note (optional)" placeholder="Why did you save this?" value={note} onChange={(e) => setNote(e.target.value)} rows={2} />
+            </>
+          )}
+        </div>
       )}
 
       {preview && whereSheet && (
@@ -313,34 +353,20 @@ export function SaveSheet({ request, onClose }: { request: SaveRequest | null; o
               {whereResults.slice(0, 5).map((r) => (
                 <ListItem key={`${r.lat},${r.lng}`} round media={r.countryCode ? <img src={flagUrl(r.countryCode)} alt="" className={s.flag} /> : undefined} icon="pin"
                   title={r.name.split(',')[0]} meta={r.name.split(',').slice(1).join(',').trim() || undefined}
-                  onClick={() => { haptic('selection'); setChosen({ code: (r.countryCode ?? '').toLowerCase(), city: r.name.split(',')[0] }); setWhereQuery(''); setWhereResults(null); }} />
+                  onClick={() => { haptic('selection'); setChosen({ code: (r.countryCode ?? '').toLowerCase(), city: r.name.split(',')[0] }); setNewCity(null); setWhereQuery(''); setWhereResults(null); setStep('preview'); }} />
               ))}
             </ListGroup>
           )}
           {countries.filter((c) => c.code).length > 0 && (
             <section className={s.field} aria-labelledby="save-countries">
-              <h3 className="t-heading-2" id="save-countries">Your saved countries</h3>
+              <h3 className="t-heading-4" id="save-countries">Your saved countries</h3>
               <ListGroup label="Your saved countries">
                 {countries.filter((c) => c.code).map((c) => (
                   <ListItem key={c.code} round media={<img src={c.flag} alt="" className={s.flag} />} title={c.name} meta={placeCounts(c.places)}
                     trailing={c.code === code ? 'Selected' : undefined}
-                    onClick={() => { haptic('selection'); setChosen({ code: c.code, city: c.code === picked.code ? picked.city : '' }); }} />
+                    onClick={() => { haptic('selection'); setChosen({ code: c.code, city: c.code === picked.code ? picked.city : '' }); setNewCity(null); setStep('preview'); }} />
                 ))}
               </ListGroup>
-            </section>
-          )}
-          {code && kind === 'place' && (
-            <section className={s.field} aria-labelledby="save-city">
-              <h3 className="t-heading-2" id="save-city">{`City in ${countryName(code)}`}</h3>
-              {picked.city && picked.code === code && <p className="t-body-small t-secondary">{`Rove found ${picked.city}`}</p>}
-              <div className={s.chipsWrap} role="group" aria-labelledby="save-city">
-                {cityChips.map((c) => (
-                  <Chip key={c} active={city === c} onClick={() => { haptic('selection'); setChosen({ code, city: c }); setNewCity(null); }} label={`${c}${city === c ? ', selected' : ''}`}>{c}</Chip>
-                ))}
-                <Chip icon="plus" active={newCity !== null} onClick={() => setNewCity('')}>New city</Chip>
-              </div>
-              {newCity !== null && <TextField label="New city" placeholder="Kyoto" value={newCity} autoComplete="off"
-                onChange={(e) => { setNewCity(e.target.value); setChosen({ code, city: e.target.value.trim() }); }} />}
             </section>
           )}
         </>

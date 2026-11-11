@@ -7,8 +7,9 @@
 /* Figma "Sheet": 12 / 24 / 40 / 24 padding, gap 20, 24px top corners, Shadow/Overlay */
 .sheet {
   width: 100%; max-width: calc(var(--size-content-max) + 2 * var(--space-gutter)); /* the phone column on a computer */
-  /* Of the visible area, less the keyboard (iPhone app), so the sheet never runs under it */
-  max-height: calc(100% - var(--space-default-900) - var(--keyboard-height, 0px));
+  /* Stops 24px below the status bar / Dynamic Island (its grabber always reachable) and above the keyboard; anything
+     taller scrolls inside the sheet */
+  max-height: calc(100% - env(safe-area-inset-top) - var(--space-default-550) - var(--keyboard-height, 0px));
   display: flex; flex-direction: column;
   background: var(--on-light-surface-primary);
   border-radius: var(--radius-600) var(--radius-600) 0 0;
