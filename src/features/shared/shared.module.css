@@ -32,7 +32,8 @@
 .suggestItem { display: block; width: 100%; text-align: left; padding: var(--space-default-400) var(--space-default-500); background: none; border: 0; border-radius: var(--radius-1000); min-height: var(--size-tap); }
 .suggestItem:hover, .suggestItem[aria-selected='true'] { background: var(--interactive-button-ghost-background-hover); }
 
-.comments { display: flex; flex-direction: column; gap: var(--space-default-500); }
+/* The comment area is one grey section: the thread and the box to write in */
+.comments { display: flex; flex-direction: column; gap: var(--space-default-500); padding: var(--space-default-500); border-radius: var(--radius-600); background: var(--on-light-surface-secondary); }
 /* Messages-style thread: theirs on the left (avatar at the top of the bubble), yours on the right in deep green */
 .thread { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: var(--space-default-400); }
 .message { display: flex; gap: var(--space-default-300); align-items: flex-start; }
@@ -45,12 +46,12 @@
 .bubble {
   margin: 0; min-width: 0; overflow-wrap: anywhere; white-space: pre-wrap;
   padding: var(--space-default-300) var(--space-default-500); border-radius: var(--radius-600);
-  font: var(--type-body); background: var(--on-light-surface-secondary); color: var(--on-light-text-primary);
+  font: var(--type-body); background: var(--on-light-surface-primary); color: var(--on-light-text-primary); /* white on the grey section */
 }
 .theirs .bubble { border-top-left-radius: var(--radius-200); } /* the corner by the avatar, like a speech tail */
 .mine .bubble { background: var(--interactive-selected-primary-background); color: var(--interactive-selected-primary-text); border-bottom-right-radius: var(--radius-200); }
 /* Writing a comment: while the keyboard is up the box stays on top of it */
-.composer { display: flex; flex-wrap: wrap; gap: var(--space-default-300); align-items: center; background: var(--on-light-surface-primary); }
+.composer { display: flex; flex-wrap: wrap; gap: var(--space-default-300); align-items: center; }
 .composerWarning { flex-basis: 100%; } /* the limit warning sits above the box, riding the keyboard with it */
 .commentCount { font: var(--type-label-small); color: var(--on-light-text-secondary); }
 .commentCountOver { color: var(--on-light-status-error); }
@@ -60,6 +61,7 @@
   position: fixed; z-index: 60; left: 0; right: 0; bottom: var(--keyboard-height, 0px);
   max-width: calc(var(--size-content-max) + 2 * var(--space-gutter)); margin: 0 auto;
   padding: var(--space-default-300) var(--space-gutter); box-shadow: 0 -1px 0 var(--on-light-divider-default);
+  background: var(--on-light-surface-primary); /* above the keyboard it's a white bar, as before */
 }
 .composerSpacer { height: calc(var(--keyboard-height, 0px) + var(--size-tap) + 2 * var(--space-default-300)); }
 .commentInput { flex: 1; min-height: var(--size-tap); border-radius: var(--radius-1000); border: 1px solid var(--on-light-border-bold); background: var(--on-light-surface-primary); padding: 0 var(--space-default-500); font-size: var(--size-body-small); outline: none; min-width: 0; }

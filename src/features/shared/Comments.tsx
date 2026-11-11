@@ -73,7 +73,7 @@ export function Comments({ tripId, targetId, comments, profiles }: { tripId: str
         {text.trim().length >= MAX_MESSAGE - 20 && (
           <span className={[s.commentCount, over > 0 && s.commentCountOver].filter(Boolean).join(' ')} aria-live="polite">{`${text.trim().length}/${MAX_MESSAGE}`}</span>
         )}
-        <IconButton icon="send" tone="brand" label="Send comment" onClick={send} disabled={!text.trim() || over > 0} />
+        <IconButton icon="send" tone="primary" label="Send comment" onClick={send} disabled={!text.trim() || over > 0} />
       </div>
     </div>
   );
