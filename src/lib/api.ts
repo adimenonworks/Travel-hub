@@ -71,7 +71,10 @@ export function useFlightStatus(a: Activity | undefined) {
     const load = () => getFlightStatus(a.ref!, a.date).then((s) => { if (live) setStatus(s); });
     load();
     const id = setInterval(() => { if (shouldPoll(a)) load(); }, TEN_MIN);
-    return () => { live = false; clearInterval(id); };
+    // Coming back to Rove (from another app or the lock screen) checks again at once, instead of waiting for the timer.
+    const back = () => { if (document.visibilityState === 'visible' && shouldPoll(a)) load(); };
+    document.addEventListener('visibilitychange', back);
+    return () => { live = false; clearInterval(id); document.removeEventListener('visibilitychange', back); };
   }, [a?.id, a?.ref, a?.date, a?.startTime]); // eslint-disable-line react-hooks/exhaustive-deps
   return status;
 }

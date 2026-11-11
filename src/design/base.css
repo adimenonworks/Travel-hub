@@ -13,9 +13,9 @@ html { font-size: 106.25%; }
   html { font: -apple-system-body; }
 }
 html {
-  /* App feel: no double-tap zoom or tap delay, no page bounce (scrolling inside the page still works). */
+  /* App feel: no double-tap zoom or tap delay. The page keeps the iPhone's own rubber-band bounce at the top and
+     bottom (native feel); sheets and the New trip flow contain theirs (overscroll-behavior: contain). */
   touch-action: manipulation;
-  overscroll-behavior: none;
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
   -webkit-tap-highlight-color: transparent;
@@ -23,7 +23,6 @@ html {
 
 body {
   margin: 0;
-  overscroll-behavior: none;
   /* Apps don't let you select button or card text, or long-press it for a menu.
      Fields stay selectable, and so does text people copy: addresses, notes, booking links, invite links (.selectable). */
   -webkit-user-select: none; user-select: none;
