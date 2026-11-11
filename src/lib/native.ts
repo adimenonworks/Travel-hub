@@ -107,6 +107,26 @@ export function onSharedLink(cb: (url: string) => void): () => void {
   return () => { window.removeEventListener('hashchange', fromHash); remove?.(); };
 }
 
+/**
+ * Links that open a page in the app: rove://go?path=/join/abc (the website's "Open in Rove"). Calls back with the path.
+ */
+export function onOpenPath(cb: (path: string) => void): () => void {
+  if (!isNativeApp) return () => {};
+  const take = (raw: string) => {
+    try {
+      const u = new URL(raw);
+      const path = u.searchParams.get('path');
+      if (u.protocol === 'rove:' && u.host === 'go' && path?.startsWith('/')) cb(path);
+    } catch { /* not ours */ }
+  };
+  let remove: (() => void) | undefined;
+  import('@capacitor/app').then(({ App }) => {
+    App.getLaunchUrl().then((r) => r?.url && take(r.url)).catch(() => {});
+    App.addListener('appUrlOpen', (e) => take(e.url)).then((h) => { remove = () => h.remove(); });
+  });
+  return () => remove?.();
+}
+
 /** A destructive confirmation (delete, remove, leave) with the Warning haptic first, as in the Figma Haptics map. */
 export function confirmAction(message: string): boolean {
   haptic('warning');

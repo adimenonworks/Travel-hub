@@ -155,7 +155,12 @@ export function createLocalStore(): Store {
     },
     async leaveTrip(id, uid) {
       const t = db.trips[id];
-      t.memberIds = t.memberIds.filter((m) => m !== uid);
+      const others = t.memberIds.filter((m) => m !== uid);
+      if (t.ownerId === uid && others.length) {
+        const to = others.find((m) => t.roles[m] !== 'viewer') ?? others[0];
+        t.ownerId = to; t.roles[to] = 'owner';
+      }
+      t.memberIds = others;
       delete t.roles[uid];
       save();
     },

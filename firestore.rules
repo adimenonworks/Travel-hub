@@ -7,7 +7,8 @@ service cloud.firestore {
     function uid() { return request.auth.uid; }
     function tripData(tripId) { return get(/databases/$(database)/documents/trips/$(tripId)).data; }
     function isMember(tripId) { return signedIn() && uid() in tripData(tripId).memberIds; }
-    function isManager(tripId) { return signedIn() && tripData(tripId).roles[uid()] in ['owner', 'editor']; }
+    // A Planner: everyone on the trip but a Viewer ('owner', 'editor' and 'member' are stored; they plan alike)
+    function isManager(tripId) { return signedIn() && tripData(tripId).roles[uid()] in ['owner', 'editor', 'member']; }
     // A shared collection (collectionShares/{ownerId}_{countryCode}): your role in it ('owner', 'member', 'viewer' or '')
     function shareDoc(id) { return /databases/$(database)/documents/collectionShares/$(id); }
     function shareRole(id) {
@@ -49,9 +50,9 @@ service cloud.firestore {
         && request.resource.data.roles == { (uid()): 'owner' }
         && validCover(request.resource.data);
 
-      // Owner/organizers edit anything except ownership, and can't drop the owner.
+      // Planners edit anything except ownership, and can't drop whoever created the trip (only they delete it).
       function managerUpdate() {
-        return resource.data.roles[uid()] in ['owner', 'editor']
+        return resource.data.roles[uid()] in ['owner', 'editor', 'member']
           && request.resource.data.ownerId == resource.data.ownerId
           && resource.data.ownerId in request.resource.data.memberIds
           && request.resource.data.roles[resource.data.ownerId] == 'owner'

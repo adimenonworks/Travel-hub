@@ -82,7 +82,7 @@ export function Trips() {
               {countries.map((c) => <CountryTile key={c.code} country={c} />)}
               {theirs.map((x) => (
                 <Tile key={x.id} tone="default" to={`/saved/${x.countryCode}/${x.id}`} title={`${countryName(x.countryCode)} · ${personName(owners, x.ownerId).split(' ')[0]}'s`}
-                  media={<img src={flagUrl(x.countryCode)} alt="" />} meta={`Shared with you · ${x.roles[me.uid] === 'member' ? 'Member' : 'Viewer'}`} />
+                  media={<img src={flagUrl(x.countryCode)} alt="" />} meta={`Shared with you · ${x.roles[me.uid] === 'member' ? 'Can edit' : 'Can view'}`} />
               ))}
               <Tile tone="add" icon="plus" title="New place to go" onClick={() => openSave({ mode: 'link' })} />
             </div>

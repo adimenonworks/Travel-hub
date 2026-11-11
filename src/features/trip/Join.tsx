@@ -5,6 +5,7 @@ import { store } from '../../data';
 import { useMe, useMyTrips, useShares } from '../../data/hooks';
 import type { Invite } from '../../data/types';
 import { Content } from '../../app/Shell';
+import { joinOnly } from '../../lib/site';
 
 export function Join() {
   const { code = '' } = useParams();
@@ -25,9 +26,11 @@ export function Join() {
   const own = !!invite?.shareId?.startsWith(`${me.uid}_`);
   const destination = invite ? (isCollection ? (own ? `/saved/${invite.countryCode}` : `/saved/${invite.countryCode}/${invite.shareId}`) : `/trip/${invite.tripId}`) : '/';
   const alreadyIn = !!invite && (isCollection ? own || !!shares?.some((x) => x.id === invite.shareId) : !!trips?.some((t) => t.id === invite.tripId));
+  // On the join-only website, joining ends on "You're in!" with Open in Rove (the app opens this invite again and goes straight in)
+  const done = (label: string) => joinOnly() ? `/get?${new URLSearchParams({ path: `/join/${code}`, joined: label })}` : destination;
   useEffect(() => {
-    if (alreadyIn) navigate(destination, { replace: true });
-  }, [alreadyIn, destination, navigate]);
+    if (alreadyIn && invite) navigate(done(invite.tripName), { replace: true });
+  }, [alreadyIn, invite, destination, navigate]); // eslint-disable-line react-hooks/exhaustive-deps
 
   if (invite === undefined || trips === null || shares === null) return <PageSkeleton />;
 
@@ -37,7 +40,7 @@ export function Join() {
       <Content>
         <Card>
           <EmptyState illustration="ticket" title={expired ? 'This invite has expired' : 'Invite not found'} message={invite?.kind === 'collection' ? 'Ask whoever shared it for a new link.' : 'Ask the trip organizer for a new link.'}
-            action={<LinkButton to="/" variant="neutral">Go to my trips</LinkButton>} />
+            action={<LinkButton to="/" variant="neutral">{joinOnly() ? 'Get Rove' : 'Go to my trips'}</LinkButton>} />
         </Card>
       </Content>
     );
@@ -47,7 +50,7 @@ export function Join() {
     setError('');
     try {
       await store.redeemInvite(invite);
-      navigate(destination, { replace: true });
+      navigate(done(invite.tripName), { replace: true });
     } catch (e) {
       setError(e instanceof Error ? e.message : isCollection ? 'Could not join this collection' : 'Could not join this trip');
       setBusy(false);
@@ -60,7 +63,7 @@ export function Join() {
       <Card>
         {isCollection ? (
           <EmptyState illustration="map" title={`Join “${invite.tripName}”`}
-            message={invite.role === 'member' ? "You've been invited as a Member: see every place, add your own, move them and star them." : "You've been invited as a Viewer: see every place, star them and open them in Maps."}
+            message={invite.role === 'member' ? 'You can see every place, add your own, move them and star them.' : 'You can see every place, star them and open them in Maps.'}
             action={<Button size="large" onClick={join} disabled={busy}>Join collection</Button>} />
         ) : (
           <EmptyState illustration="suitcase" title={`Join “${invite.tripName}”`} message="You've been invited to plan this trip together."
