@@ -36,10 +36,12 @@ export async function setupNative() {
   Keyboard.addListener('keyboardWillShow', ({ keyboardHeight }) => {
     root.style.setProperty('--keyboard-height', `${keyboardHeight}px`);
     root.classList.add('keyboard-open');
+    window.dispatchEvent(new CustomEvent('rove:keyboard', { detail: keyboardHeight }));
   });
   Keyboard.addListener('keyboardWillHide', () => {
     root.style.setProperty('--keyboard-height', '0px');
     root.classList.remove('keyboard-open');
+    window.dispatchEvent(new CustomEvent('rove:keyboard', { detail: 0 }));
   });
 }
 
