@@ -59,7 +59,7 @@ export function Trips() {
       {trips === null ? <PageSkeleton bare /> : (
         <div className={s.segments} ref={box}>
           <SegmentedControl label="Show trips" block value={segment} onChange={pick}
-            options={[{ value: 'upcoming', label: 'Upcoming' }, { value: 'saved', label: 'Saved' }, { value: 'past', label: 'Past' }]} />
+            options={[{ value: 'upcoming', label: 'Upcoming' }, { value: 'saved', label: 'Collections' }, { value: 'past', label: 'Past' }]} />
           <SlideSwap value={segment} id={segment} rank={SEGMENTS.indexOf(segment)}>{(seg) => <>
           {seg === 'upcoming' && (upcoming.length === 0 ? (
             <Card tone="accent" title="No trips planned yet" body="Pick where, when and who. Your saves come with you."

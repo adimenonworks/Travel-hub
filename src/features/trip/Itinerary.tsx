@@ -1,3 +1,4 @@
+import { stepTab, useSwipeTabs } from '../../app/useSwipeTabs';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Button, DayCard, EmptyState, EventCard, SectionHeader, SwipeRow, Timeline, TravelConnector, useToast, type EventState } from '../../design/components';
@@ -35,6 +36,10 @@ export function Itinerary(ctx: TripCtx) {
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     stripRef.current?.querySelector(`[data-day="${d}"]`)?.scrollIntoView({ block: 'nearest', inline: 'nearest', behavior: reduce ? 'auto' : 'smooth' });
   };
+
+  // Swipe the day's plan sideways to go to the next or previous day (the plan slides, the strip follows)
+  const planBox = useRef<HTMLDivElement>(null);
+  useSwipeTabs(planBox, (dir) => { const n = stepTab(days, day, dir); if (n) setDay(n); });
 
   // On arrival, slide the strip (sideways only, never the page) so the selected day starts fully in view.
   useEffect(() => {
@@ -91,6 +96,7 @@ export function Itinerary(ctx: TripCtx) {
           action={<Button size="regular" icon="plus" onClick={() => setAdding(true)}>Add event</Button>} />
 
         {/* Changing day slides only the plan, from the side of the day you picked */}
+        <div ref={planBox}>
         <SlideSwap value={day} id={day} rank={days.indexOf(day)}>{(d) => {
           const list: DayEntry[] = byDay[d] ?? [];
           // On today's plan, the "now" line (Figma Timeline) sits before the next plan. The page doesn't scroll to it.
@@ -146,6 +152,7 @@ export function Itinerary(ctx: TripCtx) {
             </div>
           );
         }}</SlideSwap>
+        </div>
       </section>
 
       <ActivityForm open={adding} trip={trip} date={day} onClose={() => setAdding(false)} />

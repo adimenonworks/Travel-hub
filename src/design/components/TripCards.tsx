@@ -11,10 +11,10 @@ type Person = { id: string; name: string; photo?: string | null };
 
 /**
  * Figma "Hero Card": the trip's cover (an illustration, or a photo with its credit) with a countdown Tag ("In 9 days"),
- * then the name (Heading 2), dates, who's going and, under a divider, one row: what's next (Show next up), plus a
- * heads-up row for one time-sensitive thing. Phase-aware: the caller passes the countdown and the rows.
+ * then the name (Heading 2), dates, who's going and, under a divider, a heads-up row for one time-sensitive thing
+ * (no next-up row: Home shows the next event on its own, 11 Nov 2026). Phase-aware: the caller passes the countdown and the rows.
  */
-export function HeroCard({ size = 'regular', cover, photo, countdown, title, meta, people, to, next, headsUp }: {
+export function HeroCard({ size = 'regular', cover, photo, countdown, title, meta, people, to, headsUp }: {
   /** Figma "Size": Regular, or Compact (a shorter cover, the name, dates and countdown; no people, no next up) for lists */
   size?: 'regular' | 'compact';
   /** Figma "Show cover": a photo or Cover Scene; leave out for the panel alone */
@@ -26,8 +26,6 @@ export function HeroCard({ size = 'regular', cover, photo, countdown, title, met
   /** Figma "Show people" */
   people?: Person[];
   to?: string;
-  /** Figma "Show next up": one List item, e.g. the next event */
-  next?: { icon: IconName; title: string; meta?: string; to?: string; tone?: CategoryTone };
   /** Figma "Show heads-up": one time-sensitive row (check-in open, a flight change…) */
   headsUp?: { icon: IconName; title: string; meta?: string; to?: string; tone?: CategoryTone };
 }) {
@@ -51,9 +49,8 @@ export function HeroCard({ size = 'regular', cover, photo, countdown, title, met
           {size === 'regular' && people && people.length > 0 && <AvatarStack people={people} />}
         </div>
         {!cover && countdown && <div><Badge tone="neutral" icon={countdown.icon ?? 'calendar'}>{countdown.label}</Badge></div>}
-        {size === 'regular' && (next || headsUp) && (
+        {size === 'regular' && headsUp && (
           <div className={s.rows}>
-            {next && <ListItem icon={next.icon} tone={next.tone} title={next.title} meta={next.meta} to={next.to} round />}
             {headsUp && <ListItem icon={headsUp.icon} tone={headsUp.tone} title={headsUp.title} meta={headsUp.meta} to={headsUp.to} round />}
           </div>
         )}

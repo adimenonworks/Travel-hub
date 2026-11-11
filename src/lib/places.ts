@@ -30,6 +30,7 @@ export function placeCategory(c: PlaceCategory | string | undefined): { value: E
 export const placeTypeInfo = (t: PlaceType) => PLACE_TYPES.find((x) => x.value === t)!;
 
 const KEYWORDS: [EventKind, string[]][] = [
+  ['winery', ['winery', 'vineyard', 'cellar door', 'wine estate', 'bodega', 'quinta']],
   ['cafe', ['cafe', 'café', 'bakery', 'ice cream', 'coffee', 'tea']],
   ['bar', ['bar', 'pub', 'biergarten', 'wine bar', 'cocktail']],
   ['nightlife', ['nightclub', 'club']],

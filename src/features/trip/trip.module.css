@@ -129,3 +129,10 @@
 .kindChips { display: flex; flex-wrap: wrap; gap: var(--space-default-300); }
 .legs { display: flex; flex-direction: column; gap: var(--space-default-300); }
 .legs > button:last-child { align-self: flex-start; } /* Add a connection hugs its label */
+/* Event form: Location with Paste beside it (both 48px tall, bottoms lined up), the hint under both */
+.locationField { display: flex; flex-direction: column; gap: var(--space-default-200); }
+.locationRow { display: flex; align-items: flex-end; gap: var(--space-default-300); }
+.locationRow > :first-child { flex: 1; min-width: 0; }
+/* Ideas: the list under the segments, one view per segment (it slides when you swipe or pick a segment) */
+.swipeArea { min-width: 0; }
+.ideaList { display: flex; flex-direction: column; gap: var(--space-stack); }

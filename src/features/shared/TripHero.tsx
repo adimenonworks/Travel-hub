@@ -6,11 +6,10 @@ import { useMe } from '../../data/hooks';
 import { findCoverPhoto, flightTag, hasApi, photographerUrl, trackCoverDownload, unsplashUrl, useFlightStatus } from '../../lib/api';
 import { personName, useProfiles, useSub } from '../../data/hooks';
 import type { Trip } from '../../data/types';
-import { daysBetween, formatDay, formatTime, today, tripPhase } from '../../lib/dates';
+import { daysBetween, today, tripPhase } from '../../lib/dates';
 import { eventKind } from '../../lib/categories';
 import { countryName, tripCountries } from '../../lib/countries';
-import { categoryInfo, categoryTone } from '../../lib/categories';
-import { heroCountdown, nextEvent, tripDatesLabel } from '../../lib/trips';
+import { heroCountdown, tripDatesLabel } from '../../lib/trips';
 import { TripCover } from './TripCover';
 
 
@@ -25,8 +24,8 @@ export function coverQuery(trip: Pick<Trip, 'destination' | 'name'>) {
 }
 
 /**
- * A trip as the Figma "Hero Card", phase-aware on one layout: before the trip, the countdown and the next thing planned;
- * during it, "Day 3 of 10" and the next event; after it, a nudge to add the photos. `cover` off shows the panel alone.
+ * A trip as the Figma "Hero Card", phase-aware on one layout: the countdown ("In 9 days", then "Day 3 of 10") and, when
+ * something is time-sensitive, one heads-up row. The next event lives on Home's "Happening now", not on the card.
  * `size="compact"` is for lists (Trips tab): a shorter cover, the name, dates and countdown only.
  */
 export function TripHero({ trip, cover = true, size = 'regular' }: { trip: Trip; cover?: boolean; size?: 'regular' | 'compact' }) {
@@ -34,14 +33,7 @@ export function TripHero({ trip, cover = true, size = 'regular' }: { trip: Trip;
   const activities = useSub(trip.id, 'activities') ?? [];
   const phase = tripPhase(trip.startDate, trip.endDate);
   const base = `/trip/${trip.id}`;
-  const upNext = phase !== 'past' ? nextEvent(activities) : undefined;
   const t = today();
-  const when = (d: string, time: string) => `${d === t ? 'Today' : formatDay(d)}${time ? `, ${formatTime(time)}` : ''}`;
-  const next = upNext
-    ? { icon: categoryInfo(upNext.category).icon, tone: categoryTone(upNext.category), title: upNext.title, meta: [when(upNext.date, upNext.startTime), upNext.locationText || upNext.location?.name?.split(',')[0]].filter(Boolean).join(' · '), to: `${base}/plan/${upNext.id}` }
-    : phase === 'past'
-      ? { icon: 'photo' as const, title: 'Add your photos', meta: 'Share an album with everyone who went', to: `${base}/photos` }
-      : { icon: 'plus' as const, title: 'Plan the first day', meta: 'Add events to the itinerary', to: `${base}/itinerary` };
   // Heads-up: one time-sensitive thing at a time. A flight leaving within 24 hours ("Check-in open", the usual airline
   // window; Rove never says whether you've checked in), else, in the fortnight before the trip, the entry rules.
   const soon = Date.now() + 24 * 3600e3;
@@ -78,6 +70,6 @@ export function TripHero({ trip, cover = true, size = 'regular' }: { trip: Trip;
       title={trip.name}
       meta={tripDatesLabel(trip)}
       people={trip.memberIds.map((id) => ({ id, name: personName(profiles, id), photo: profiles[id]?.photo }))}
-      next={next} headsUp={headsUp} />
+      headsUp={headsUp} />
   );
 }
