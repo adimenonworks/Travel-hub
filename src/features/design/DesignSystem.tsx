@@ -3,9 +3,9 @@ import {
   Avatar, AvatarStack, Badge, Chip, Notification, Button, Card, EmptyState, FieldRow, HeroCard, Icon, IconButton,
   LinkButton, PageHeader, PageSection, SegmentControl, Select, Sheet, Tabs, TextArea, TextField, Timeline, Illustration,
   type IllustrationName, COVER_ILLUSTRATIONS, ICON_NAMES, useToast, BottomNav, Skeleton,
-  ListItem, ListGroup, SectionHeader, EventCard, TravelConnector, IdeaRow, Tile, MapCard, StatStrip, ProfileCard,
-  OptionCard, BudgetCard, Switch, SearchField, StepProgress, DestinationHeader, TripHeader, DayCard, CountryModal,
-  CategoryIcon, ContextMenu, Accordion, SpanCard,
+  ListItem, ListGroup, SectionHeader, EventCard, TravelConnector, IdeaRow, Tile, StatStrip, ProfileCard,
+  OptionCard, BudgetCard, Switch, SearchField, StepProgress, TripHeader, DayCard, CountryModal,
+  CategoryIcon, ContextMenu, Accordion, SpanCard, CollectionHeader,
 } from '../../design/components';
 import { flagUrl } from '../../lib/countries';
 import { EVENT_TYPES, TYPE_TONE } from '../../lib/categories';
@@ -347,6 +347,10 @@ export function DesignSystem() {
           </div>
         </Section>
 
+        <Section title="Collection header" footer="Figma Collection header: the top of a country's collection. The map with every place (tap for the full map), the counts, who it's with and how much you've visited.">
+          <CollectionHeader title="24 places · 3 cities" meta="Saved by you and Sam" people={[{ id: 'a', name: 'Alex Menon' }, { id: 's', name: 'Sam Lee' }]} visited={{ done: 6, total: 24 }} />
+        </Section>
+
         <Section title="Span card" footer="Figma Span card: the two ends of a stay, car, cruise, parking or luggage, at the top of its event page. A car shows its places; the footer says how long.">
           <SpanCard start={{ label: 'Check-in', date: 'Thu 12 Nov', time: '15:00' }} end={{ label: 'Check-out', date: 'Sat 14 Nov', time: '11:00' }} footer="2 nights" />
           <SpanCard start={{ label: 'Pick-up', date: 'Fri 13 Nov', time: '10:00', place: 'Porto Campanhã' }} end={{ label: 'Drop-off', date: 'Mon 16 Nov', time: '18:00', place: 'Barcelona Sants' }} footer="4 days" />
@@ -387,10 +391,8 @@ export function DesignSystem() {
           </div>
           <div className={s.quickRow}>
           </div>
-          <MapCard media={<Illustration name="map" size={72} />} title="See 15 places on a map" meta="Tokyo, Kyoto, Osaka" onClick={() => {}} />
           <StatStrip stats={[{ value: 12, label: 'countries' }, { value: 31, label: 'cities' }, { value: 96, label: 'days away' }]} />
           <ProfileCard name="Alex Menon" email="alex.menon@gmail.com · Google" onClick={() => {}} />
-          <DestinationHeader tone="orange" flag={<img src={flagUrl('jp')} alt="" />} title="24 saves · 3 cities" meta="Saved by you and Sam" />
         </Section>
 
         <Section title="Flow" footer="Search field, Option cards and Step progress (shown on the bright emerald Flow screen).">
