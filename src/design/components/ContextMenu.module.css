@@ -7,6 +7,9 @@
   background: var(--on-light-surface-primary); box-shadow: var(--shadow-overlay); animation: pop var(--motion-release);
 }
 .start { left: 0; transform-origin: top left; }
+.above { top: auto; bottom: calc(100% + var(--space-default-200)); }
+.above.start { transform-origin: bottom left; }
+.above.end { transform-origin: bottom right; }
 .end { right: 0; transform-origin: top right; }
 .item {
   display: flex; align-items: center; justify-content: space-between; gap: var(--space-default-400);

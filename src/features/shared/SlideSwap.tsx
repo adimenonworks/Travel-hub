@@ -22,7 +22,7 @@ export function SlideSwap<T>({ value, id, rank, children, className }: {
   const views = [...(st.prev ? [{ v: st.prev.v, key: st.prev.id, out: true }] : []), { v: st.cur, key: st.id, out: false }];
   const anim = (out: boolean) => !st.prev ? undefined : out ? (st.dir > 0 ? s.outLeft : s.outRight) : (st.dir > 0 ? s.inRight : s.inLeft);
   return (
-    <div className={s.swap}>
+    <div className={s.swap} data-swap="">
       {views.map(({ v, key, out }) => (
         <div key={key} className={[className, anim(out)].filter(Boolean).join(' ')} aria-hidden={out || undefined} inert={out || undefined}>
           {children(v)}

@@ -42,7 +42,7 @@ export function PageHeader({ title, subtitle, back, action, fit, size = 'large',
   return (
     <header className={s.header}>
       {back && <div className={s.back}><LinkButton to={back.to} variant="ghost" size="regular" icon="chevron-left" onClick={(e) => { e.preventDefault(); goBack(navigate, back.to); }}>{back.label}</LinkButton></div>}
-      <div className={s.titleRow}>
+      <div className={[s.titleRow, size === 'small' && s.titleRowSmall].filter(Boolean).join(' ')}>
         {icon && <span className={s.leadIcon}><CategoryIcon icon={icon} tone={tone} /></span>}
         <div className={s.titleText}>
           <h1 ref={titleRef} className={[s.title, size === 'small' && s.titleSmall, fit && s.fit, fit && smaller && s.fitSmaller].filter(Boolean).join(' ')}>{title}</h1>

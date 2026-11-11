@@ -1,7 +1,7 @@
 import { Fragment, useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { nextTransition } from '../../app/navigation';
-import { Button, EmptyState, IconButton, JourneyDetails, LayoverBlock, LinkButton, ListGroup, ListItem, PageHeader, PageSection, Sheet, TextField, useToast } from '../../design/components';
+import { Button, EmptyState, IconButton, JourneyDetails, LayoverBlock, LinkButton, ListGroup, ListItem, PageHeader, PageSection, Sheet, SpanCard, TextField, useToast } from '../../design/components';
 import type { Activity } from '../../data/types';
 import { daysBetween } from '../../lib/dates';
 import { store } from '../../data';
@@ -18,8 +18,8 @@ import { recordView } from '../../lib/recent';
 import { markRead } from '../../lib/reads';
 import { flightTag, updatedAgo, useFlightStatus } from '../../lib/api';
 import { durationLabel, journeyMs } from '../../lib/timezone';
-import { layovers, legsOf, type Layover } from './events';
-import { behaviourOf, categoryTone, eventKind, isEveryday, kindInfo, spanWords } from '../../lib/categories';
+import { layovers, legsOf, sameDaySpan, type Layover } from './events';
+import { behaviourOf, categoryTone, eventKind, eventType, isEveryday, kindInfo, spanWords } from '../../lib/categories';
 import { priceOf } from '../../lib/currency';
 import { PriceWithConversion } from '../shared/Price';
 import { getMapsApp, mapsAppLabel } from '../../lib/prefs';
@@ -39,9 +39,10 @@ function journeyDuration(a: Activity) {
 }
 
 /**
- * An event's own page. Flights and trains (with a from and to): Figma "Journey detail" — the Journey details card,
- * Booking (reference, seats, bags), Files & links (with Manage booking), Notes. Other types: the Event card, then one
- * List group (address, booking reference, who's going, notes; rows with nothing are hidden), files and links. No price.
+ * An event's own page, in sections (rows with nothing are hidden). The header: its category icon, title and when (just
+ * the dates for something with two ends). Flights and trains (with a from and to): the Journey details cards. Stays,
+ * cars, cruises, parking and luggage: the Span card (Check-in / Check-out, Pick-up / Drop-off… with times, and a car's
+ * places). Then Location; Booking (company, references, seats, bags); Price & people; Notes; Files & links; Comments.
  */
 export function ActivityPage(ctx: TripCtx) {
   const { activityId = '' } = useParams();
@@ -114,22 +115,31 @@ export function ActivityPage(ctx: TripCtx) {
   // Figma List item with "Show action": the reference as the title, what it is under it, and a small Copy button
   const price = isEveryday(a.category) ? null : priceOf(a, trip);
   const booking = [
+    a.operator && !journey && <ListItem key="op" icon={kindInfo(a.category).icon} title={a.operator} meta="Company" />,
     a.ref && <ListItem key="num" icon="plane" title={<span className={s.selectable}>{a.ref}</span>} meta="Flight number"
       action={<IconButton small icon="copy" label="Copy flight number" onClick={() => copy(a.ref!, 'Flight number')} />} />,
     a.bookingRef && <ListItem key="ref" icon="ticket" title={<span className={s.selectable}>{a.bookingRef}</span>} meta={kind === 'restaurant' ? 'Reservation reference' : 'Booking reference'}
       action={<IconButton small icon="copy" label="Copy booking reference" onClick={() => copy(a.bookingRef!, kind === 'restaurant' ? 'Reservation reference' : 'Booking reference')} />} />,
-    price && <ListItem key="price" icon="wallet" title={<PriceWithConversion price={price} />} meta="Price per person" />,
-    a.operator && !journey && <ListItem key="op" icon={kindInfo(a.category).icon} title={a.operator} meta="Company" />,
     a.seats && <ListItem key="seats" icon="user-add" title="Seats" meta={a.seats} />,
     a.bags && <ListItem key="bags" icon="info" title="Bags" meta={a.bags} />,
   ].filter(Boolean);
+
+  // Something with two ends (a stay, a car, a cruise, parking, luggage): the Span card at the top says when (and for a
+  // car, where) each end is, so the header only gives the dates.
+  const spans = behaviour === 'span' && !journey;
+  const at = (d: string, tm?: string) => ({ date: formatDay(d, { weekday: 'short', day: 'numeric', month: 'short' }), time: tm ? formatTime(tm) : undefined });
+  const length = !a.endDate || a.endDate === a.date ? undefined
+    : eventType(a.category) === 'stays' ? `${daysBetween(a.date, a.endDate)} ${daysBetween(a.date, a.endDate) === 1 ? 'night' : 'nights'}`
+      : sameDaySpan(a.category) ? undefined : `${daysBetween(a.date, a.endDate) + 1} days`;
+  const goingRow = a.attendeeIds.length > 0 && <ListItem icon="people" title="Who’s going" meta={`${a.attendeeIds.length} of ${trip.memberIds.length}: ${goingNames.join(', ')}`} />;
+  const priceRow = price && <ListItem icon="wallet" title={<PriceWithConversion price={price} />} meta="Price per person" />;
 
   return (
     <>
       {/* The category icon in its type's colour beside the title, the time under it; the place is in the Location card */}
       <PageHeader title={journey ? `${city(legs[0].fromText)} to ${city(lastLeg.toText)}` : a.title} size="small" back={backTo}
         icon={kindInfo(a.category).icon} tone={categoryTone(a.category)}
-        subtitle={journey ? formatDay(a.date) : eventCardProps(a, ctx, true).time}
+        subtitle={journey ? formatDay(a.date) : spans ? (a.endDate && a.endDate !== a.date ? `${formatDay(a.date)} – ${formatDay(a.endDate)}` : formatDay(a.date)) : eventCardProps(a, ctx, true).time}
         action={{ icon: 'pencil', label: 'Edit event', onClick: () => setEditing(true) }} />
 
       {/* Figma "Journey detail" for flights and trains; every other type shows its Event card. No price anywhere. */}
@@ -159,6 +169,12 @@ export function ActivityPage(ctx: TripCtx) {
         </div>
       ) : null}
 
+      {spans && a.endDate && (
+        <SpanCard footer={length}
+          start={{ label: startWord, ...at(a.date, a.startTime), place: vehicle ? a.fromText?.split(',')[0] : undefined }}
+          end={{ label: endWord, ...at(a.endDate, a.endTime), place: vehicle ? (a.toText || a.fromText)?.split(',')[0] : undefined }} />
+      )}
+
       {/* Figma "Event detail — Location": the map, the address and the two ways to get there, together in one card */}
       {!journey && where && (
         <PageSection title="Location">
@@ -185,20 +201,25 @@ export function ActivityPage(ctx: TripCtx) {
         </PageSection>
       )}
 
-      {!journey && ((behaviour === 'span' && !vehicle && a.endDate) || vehicle || booking.length > 0 || a.attendeeIds.length > 0 || a.notes) && (
-        <ListGroup label="Details">
-          {behaviour === 'span' && !vehicle && a.endDate && <ListItem icon="calendar" title={`${startWord} and ${endWord.toLowerCase()}`} meta={`${formatDay(a.date)}${a.startTime ? `, ${formatTime(a.startTime)}` : ''} → ${formatDay(a.endDate)}${a.endTime ? `, ${formatTime(a.endTime)}` : ''}`} />}
-          {vehicle && <ListItem icon={kindInfo(a.category).icon} title={startWord} meta={[a.fromText, `${formatDay(a.date)}${a.startTime ? `, ${formatTime(a.startTime)}` : ''}`].filter(Boolean).join(' · ')} />}
-          {vehicle && <ListItem icon={kindInfo(a.category).icon} title={endWord} meta={[a.toText || a.fromText, `${formatDay(a.endDate || a.date)}${a.endTime ? `, ${formatTime(a.endTime)}` : ''}`].filter(Boolean).join(' · ')} />}
-          {booking}
-          {a.attendeeIds.length > 0 && <ListItem icon="people" title="Who’s going" meta={`${a.attendeeIds.length} of ${trip.memberIds.length}: ${goingNames.join(', ')}`} />}
-          {a.notes && <ListItem icon="notebook" title="Notes" meta={<span className={s.selectable}>{`${a.notes} · added by ${adder}`}</span>} />}
-        </ListGroup>
-      )}
-
-      {journey && booking.length > 0 && (
+      {/* Booking: who it's with and the references, together */}
+      {booking.length > 0 && (
         <PageSection title="Booking">
           <ListGroup label="Booking">{booking}</ListGroup>
+        </PageSection>
+      )}
+
+      {/* What it costs and who's going */}
+      {(priceRow || goingRow) && (
+        <PageSection title={priceRow ? 'Price & people' : 'People'}>
+          <ListGroup label={priceRow ? 'Price and people' : 'People'}>{priceRow}{goingRow}</ListGroup>
+        </PageSection>
+      )}
+
+      {a.notes && (
+        <PageSection title="Notes">
+          <ListGroup label="Notes">
+            <ListItem icon="notebook" title={<span className={s.selectable}>{a.notes}</span>} meta={`Added by ${adder}`} />
+          </ListGroup>
         </PageSection>
       )}
 
@@ -221,14 +242,6 @@ export function ActivityPage(ctx: TripCtx) {
           </ListGroup>
         ) : <p className="t-body-small t-secondary">Nothing attached yet. Add a ticket, confirmation or booking link.</p>}
       </PageSection>
-
-      {journey && a.notes && (
-        <PageSection title="Notes" action={<Button variant="ghost" size="regular" iconEnd="chevron-right" onClick={() => setEditing(true)}>Edit</Button>}>
-          <ListGroup label="Notes">
-            <ListItem icon="pencil" title={a.notes.split('\n')[0]} meta={[a.notes.split('\n').slice(1).join(' '), `added by ${adder}`].filter(Boolean).join(' · ')} />
-          </ListGroup>
-        </PageSection>
-      )}
 
       <PageSection title="Comments">
         <Comments tripId={trip.id} targetId={a.id} comments={ctx.comments} profiles={profiles} />

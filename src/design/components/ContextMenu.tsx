@@ -1,4 +1,4 @@
-import { useEffect, type ReactNode } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 'react';
 import { Icon, type IconName } from './Icon';
 import s from './ContextMenu.module.css';
 
@@ -12,6 +12,13 @@ export type ContextMenuItem = { label: string; icon: IconName; destructive?: boo
 export function ContextMenu({ items, onClose, align = 'end', children, label }: {
   items: ContextMenuItem[]; onClose: () => void; align?: 'start' | 'end'; children: ReactNode; label: string;
 }) {
+  // Under the pressed thing, unless that runs into the tab bar or off the screen: then above it
+  const menu = useRef<HTMLDivElement>(null);
+  const [above, setAbove] = useState(false);
+  useLayoutEffect(() => {
+    const r = menu.current?.getBoundingClientRect();
+    if (r && r.bottom > window.innerHeight - 110) setAbove(true);
+  }, []);
   useEffect(() => {
     const key = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
     document.addEventListener('keydown', key);
@@ -22,7 +29,7 @@ export function ContextMenu({ items, onClose, align = 'end', children, label }: 
       <div className={s.dim} onPointerDown={(e) => { e.preventDefault(); onClose(); }} aria-hidden="true" />
       <div className={s.lifted}>
         {children}
-        <div role="menu" aria-label={label} className={`${s.menu} ${align === 'start' ? s.start : s.end}`}>
+        <div ref={menu} role="menu" aria-label={label} className={[s.menu, align === 'start' ? s.start : s.end, above && s.above].filter(Boolean).join(' ')}>
           {items.map((it) => (
             <button key={it.label} type="button" role="menuitem" autoFocus={it === items[0]} className={[s.item, it.destructive && s.destructive].filter(Boolean).join(' ')}
               onClick={() => { onClose(); it.onClick(); }}>

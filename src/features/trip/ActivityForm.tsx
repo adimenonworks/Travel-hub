@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Button, Chip, FieldRow, OptionCard, Select, Sheet, TextArea, TextField, useToast } from '../../design/components';
+import { Button, CategoryIcon, Chip, FieldRow, OptionCard, Select, Sheet, TextArea, TextField, useToast } from '../../design/components';
 import { store } from '../../data';
 import { useMe, useSub } from '../../data/hooks';
 import type { Activity, Category, LinkItem, Place, Trip } from '../../data/types';
@@ -93,6 +93,8 @@ export function ActivityForm({ open, trip, date, activity, draft, onClose, onCre
   const budgetCurrency = trip.budget?.currency ?? trip.currency;
   const [f, setF] = useState<Form>(() => toForm(activity ?? draft, date, budgetCurrency));
   const [busy, setBusy] = useState(false);
+  const [changingType, setChangingType] = useState(false);
+  useEffect(() => { if (open) setChangingType(false); }, [open]);
   useEffect(() => { if (open) setF(toForm(activity ?? draft, date, budgetCurrency)); }, [open, activity, draft, date]); // eslint-disable-line react-hooks/exhaustive-deps
   const set = (p: Partial<Form>) => setF((x) => ({ ...x, ...p }));
   // At a place: an end time only when asked for ("+ Add end time" turns into the field)
@@ -303,6 +305,25 @@ export function ActivityForm({ open, trip, date, activity, draft, onClose, onCre
         </div>
       ) : (
         <>
+          {/* The type it is, with Change type: a mistake is one tap to fix (the six types as chips, in their colours) */}
+          {typeInfo && (
+            <div className={s.typeRow}>
+              <CategoryIcon icon={info?.icon ?? typeInfo.icon} tone={TYPE_TONE[typeInfo.value]} />
+              <div className={s.typeRowText}>
+                <span className="t-heading-4">{typeInfo.label}</span>
+                {info && <span className="t-body-small t-secondary">{info.label}</span>}
+              </div>
+              <Button variant="ghost" size="regular" aria-expanded={changingType} onClick={() => { haptic('selection'); setChangingType((v) => !v); }}>{changingType ? 'Done' : 'Change type'}</Button>
+            </div>
+          )}
+          {changingType && (
+            <div className={s.kindChips} role="radiogroup" aria-label="Type">
+              {EVENT_TYPES.map((x) => (
+                <Chip key={x.value} icon={x.icon} tone={TYPE_TONE[x.value]} active={f.type === x.value} label={`${x.label}${f.type === x.value ? ', selected' : ''}`}
+                  onClick={() => { if (f.type !== x.value) pickType(x.value); }}>{x.label}</Chip>
+              ))}
+            </div>
+          )}
           {/* Step 2: the type's categories, the chosen one in the type's colour, and what it covers */}
           {typeInfo && typeInfo.kinds.length > 1 && (
             <div className={s.kindPicker}>
