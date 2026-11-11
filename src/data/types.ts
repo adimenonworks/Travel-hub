@@ -68,7 +68,7 @@ export type Price = { amount: number; currency: string };
 export type Category =
   | 'flight'
   | 'train' | 'bus' | 'ferry' | 'taxi' | 'transfer' | 'metro' | 'driver' | 'bike' | 'car' | 'campervan'
-  | 'hotel' | 'apartment' | 'hostel' | 'camping' | 'cruise' | 'friends'
+  | 'hotel' | 'apartment' | 'airbnb' | 'resort' | 'hostel' | 'camping' | 'cruise' | 'friends'
   | 'restaurant' | 'cafe' | 'bar' | 'market' | 'tasting'
   | 'sight' | 'museum' | 'tour' | 'hike' | 'nature' | 'show' | 'sports' | 'festival' | 'themepark' | 'spa' | 'class' | 'adventure' | 'nightlife' | 'shopping' | 'meetup'
   | 'free' | 'rest' | 'note' | 'errand'
