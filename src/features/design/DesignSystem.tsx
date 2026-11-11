@@ -25,6 +25,8 @@ const surfaceSets: { name: string; title: string; note: string }[] = [
 ];
 // On accent: one set shared by every accent surface (they share one tone), so only the surface changes.
 const ACCENTS = ['yellow', 'orange', 'green', 'pink'];
+const PALETTES = ['emerald', 'green', 'orange', 'red', 'yellow', 'pink', 'sky', 'violet', 'neutral'];
+const STEPS = [0, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000];
 const ACCENT_TOKENS = ["surface-sunken", "text-primary", "text-secondary", "text-brand-yellow", "text-brand-orange", "text-brand-green", "text-brand-pink", "link-default", "link-hover", "link-pressed", "icon-primary", "icon-secondary", "icon-brand-yellow", "icon-brand-orange", "icon-brand-green", "icon-brand-pink", "border-subtle", "border-bold", "border-focus", "border-brand", "divider-default", "illustration-primary", "illustration-secondary", "illustration-accent", "illustration-accent-bold", "illustration-accent-subtle", "illustration-warm", "illustration-warm-bold", "illustration-border"];
 const colorGroups: { title: string; tokens: string[] }[] = [
   { title: 'Interactive / button (hover lighter, pressed darker)', tokens: ['--interactive-button-primary-background', '--interactive-button-primary-background-hover', '--interactive-button-primary-background-pressed', '--interactive-button-ghost-background-hover', '--interactive-button-ghost-background-pressed', '--interactive-button-inverse-neutral-background', '--interactive-button-inverse-brand-background', '--interactive-button-tertiary-background', '--interactive-button-destructive-background', '--interactive-button-destructive-background-hover', '--interactive-button-destructive-background-pressed'] },
@@ -74,6 +76,18 @@ export function DesignSystem() {
     <>
       <div className={s.page}>
         <PageHeader title="Design system" action={{ icon: 'pencil', label: 'Example header button', onClick: () => {} }} subtitle="Primitives → semantic tokens → components. One brand colour (emerald), light and dark mode. Every text pairing meets WCAG 2.2 AA." />
+        <Section title="Palettes" footer="Primitives from src/design/tokens/primitives.css. Every step sits at the same contrast against white in every palette (600 is the first that passes for text on white). Components use semantic tokens, never these.">
+          {PALETTES.map((p) => (
+            <div key={p} className={s.paletteRow}>
+              <div className="t-body-small">{p[0].toUpperCase() + p.slice(1)}</div>
+              <div className={s.paletteSteps}>
+                {STEPS.map((n) => (p === 'neutral' || (n > 0 && n < 1000))
+                  ? <div key={n} className={s.paletteChip} title={`--color-${p}-${n}`} style={{ background: `var(--color-${p}-${n})` }} />
+                  : <div key={n} aria-hidden="true" />)}
+              </div>
+            </div>
+          ))}
+        </Section>
         <Section title="Colour" footer="Semantic tokens from src/design/tokens/semantic.css, organised by the surface they sit on. Switch light/dark mode in Profile → Appearance.">
           {surfaceSets.map((set) => (
             <div key={set.name} className={s.surfaceSet} style={{ background: `var(--${set.name}-surface-primary)`, color: `var(--${set.name}-text-primary)` }}>
