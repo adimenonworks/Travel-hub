@@ -1,6 +1,6 @@
 import type { Activity } from '../../data/types';
 import { daysBetween, formatDay, formatTime, today } from '../../lib/dates';
-import { behaviourOf, categoryInfo, categoryTone, eventKind, spanWords } from '../../lib/categories';
+import { behaviourOf, categoryInfo, categoryTone, eventKind, eventType, spanWords } from '../../lib/categories';
 import { durationLabel, journeyMs, toInstant } from '../../lib/timezone';
 import type { TripCtx } from './TripPage';
 
@@ -32,6 +32,9 @@ export function entryEnd(e: DayEntry) {
   if (a.endDate && a.endDate > a.date) return '99:99';
   return a.endTime && a.endTime >= a.startTime ? a.endTime : a.endTime ? '99:99' : a.startTime || '99:99';
 }
+
+/** Spans that can end the same day they start (you can collect bags or a parked car that afternoon). */
+export const sameDaySpan = (c: string) => { const k = eventKind(c); return k === 'parking' || k === 'luggage'; };
 
 /** Everything on one day, in time order (events without a time go last). */
 export function eventsOn(activities: Activity[], day: string): DayEntry[] {
@@ -136,6 +139,8 @@ export function eventCardProps(input: Activity | DayEntry, ctx: TripCtx, showDay
   if (behaviour === 'span') {
     const [start, end] = spanWords(a.category);
     const vehicle = kind === 'car' || kind === 'campervan';
+    // Stays count nights; parking and luggage storage show where you left the car or bags instead
+    const nightsWord = eventType(a.category) === 'stays';
     const nights = a.endDate ? daysBetween(a.date, a.endDate) : 0;
     const where = (part?: 'in' | 'out') => short(vehicle ? (part === 'out' ? a.toText || a.fromText || a.locationText : a.fromText || a.locationText) : a.locationText || a.location?.name);
     if (e.part) {
@@ -143,11 +148,16 @@ export function eventCardProps(input: Activity | DayEntry, ctx: TripCtx, showDay
       return {
         ...base, layout: 'standard' as const,
         time: entryTime(e) ? `${word} · ${formatTime(entryTime(e))}` : word,
-        place: !vehicle && e.part === 'in' ? `${nights} night${nights === 1 ? '' : 's'}` : where(e.part),
-        placeIcon: !vehicle && e.part === 'in' ? null : undefined,
+        place: nightsWord && e.part === 'in' ? `${nights} night${nights === 1 ? '' : 's'}` : where(e.part),
+        placeIcon: nightsWord && e.part === 'in' ? null : undefined,
       };
     }
-    if (!vehicle && isStay(a)) return { ...base, layout: 'standard' as const, time: `${formatDay(a.date)} → ${formatDay(a.endDate!)}`, place: `${nights} night${nights === 1 ? '' : 's'}`, placeIcon: null };
+    if (nightsWord && isStay(a)) return { ...base, layout: 'standard' as const, time: `${formatDay(a.date)} → ${formatDay(a.endDate!)}`, place: `${nights} night${nights === 1 ? '' : 's'}`, placeIcon: null };
+    // Parking or luggage collected the same day: one card with both times ("Drop-off 10:00 · Collect 15:00")
+    if (sameDaySpan(a.category) && (!a.endDate || a.endDate === a.date)) {
+      const both = [a.startTime ? `${start} ${formatTime(a.startTime)}` : start, a.endTime ? `${end} ${formatTime(a.endTime)}` : ''].filter(Boolean).join(' · ');
+      return { ...base, layout: 'standard' as const, time: withDay(both), place: where('in') };
+    }
     // A one-day rental: one card
     const first = a.endDate && a.endDate > a.date ? (a.startTime ? formatTime(a.startTime) : undefined) : range;
     return { ...base, layout: 'standard' as const, time: withDay(first ? `${start} · ${first}` : start), place: where('in') };

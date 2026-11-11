@@ -20,7 +20,7 @@ export type EventType = 'transport' | 'stays' | 'food' | 'activities' | 'free' |
 /** The stored category ids (Activity.category), plus the older values read through LEGACY. */
 export type EventKind =
   | 'flight'
-  | 'train' | 'bus' | 'ferry' | 'taxi' | 'transfer' | 'metro' | 'driver' | 'bike' | 'car' | 'campervan'
+  | 'train' | 'bus' | 'ferry' | 'taxi' | 'transfer' | 'metro' | 'driver' | 'bike' | 'car' | 'campervan' | 'parking' | 'luggage'
   | 'hotel' | 'apartment' | 'airbnb' | 'resort' | 'hostel' | 'camping' | 'cruise' | 'friends'
   | 'restaurant' | 'cafe' | 'bar' | 'market' | 'tasting'
   | 'sight' | 'museum' | 'tour' | 'hike' | 'nature' | 'show' | 'sports' | 'festival' | 'themepark' | 'spa' | 'class' | 'adventure' | 'nightlife' | 'shopping' | 'meetup'
@@ -46,11 +46,13 @@ export const EVENT_KINDS: KindInfo[] = [
   k('ferry', 'Ferry', 'ship', 'transport', 'journey', 'Ferries and boat crossings.'),
   k('taxi', 'Taxi or rideshare', 'taxi', 'transport', 'place', 'A taxi, Uber or Bolt from where you’re picked up.', false),
   k('transfer', 'Airport transfer', 'shuttle-van', 'transport', 'journey', 'A booked ride to or from the airport.'),
-  k('metro', 'Metro or tram', 'train-side', 'transport', 'place', 'A local metro, tram or city train ride.', false),
+  k('metro', 'Metro or tram', 'train-subway-tunnel', 'transport', 'place', 'A local metro, tram or city train ride.', false),
   k('driver', 'Private driver', 'car-side', 'transport', 'journey', 'A driver booked to take you somewhere.'),
   k('bike', 'Bike or scooter hire', 'bike', 'transport', 'place', 'Bikes or scooters to get around for a while.'),
-  k('car', 'Car rental', 'key', 'transport', 'span', 'A hire car: shown at pick-up and drop-off.'),
+  k('car', 'Car rental', 'car', 'transport', 'span', 'A hire car: shown at pick-up and drop-off.'),
   k('campervan', 'Campervan', 'rv', 'transport', 'span', 'A campervan or motorhome: shown at pick-up and drop-off.'),
+  k('parking', 'Parking', 'car-garage', 'transport', 'span', 'Airport, hotel or valet parking for your own car: shown at drop-off and pick-up.'),
+  k('luggage', 'Luggage storage', 'luggage-cart', 'transport', 'span', 'Lockers or a bag drop: shown when you drop your bags and when you collect them.'),
 
   k('hotel', 'Hotel', 'hotel', 'stays', 'span', 'Hotels and B&Bs: shown at check-in and check-out.'),
   k('apartment', 'Apartment', 'apartment', 'stays', 'span', 'Serviced apartments and flats.'),
@@ -74,25 +76,25 @@ export const EVENT_KINDS: KindInfo[] = [
   k('nature', 'Beach or nature', 'umbrella-beach', 'activities', 'place', 'Beaches, parks, lakes and gardens.', false),
   k('show', 'Show or gig', 'music', 'activities', 'place', 'Concerts, theatre, comedy and gigs.'),
   k('sports', 'Sports event', 'trophy', 'activities', 'place', 'A match, race or game to watch.'),
-  k('festival', 'Festival', 'mask', 'activities', 'place', 'Festivals, carnivals and celebrations.'),
+  k('festival', 'Festival', 'party-horn', 'activities', 'place', 'Festivals, carnivals and celebrations.'),
   k('themepark', 'Theme park', 'ferris-wheel', 'activities', 'place', 'Theme parks, water parks and zoos.'),
   k('spa', 'Spa or wellness', 'spa', 'activities', 'place', 'Spas, baths, massages and yoga.'),
   k('class', 'Class or workshop', 'graduation-cap', 'activities', 'place', 'Cooking classes, lessons and workshops.'),
   k('adventure', 'Adventure', 'rocket', 'activities', 'place', 'Diving, surfing, skiing and other thrills.'),
   k('nightlife', 'Nightlife', 'disco-ball', 'activities', 'place', 'Clubs and late nights out.'),
   k('shopping', 'Shopping', 'shopping-bag', 'activities', 'place', 'Shops, malls and markets that aren’t food.', false),
-  k('meetup', 'Meet-up or event', 'comment-user', 'activities', 'place', 'Meeting people, or an event you’re going to.', false),
+  k('meetup', 'Meet-up or event', 'handshake', 'activities', 'place', 'Meeting people, or an event you’re going to.', false),
 
   k('free', 'Free time', 'hourglass', 'free', 'open', 'Time to wander or keep open. No place needed.', false),
   k('rest', 'Rest', 'moon', 'free', 'open', 'A lie-in, a nap or a slow afternoon.', false),
 
   k('note', 'Note', 'notebook', 'notes', 'note', 'Something to remember, with an optional time.', false),
-  k('errand', 'Errand', 'list-check', 'notes', 'place', 'A small task: luggage storage, a SIM card, laundry.', false),
+  k('errand', 'Errand', 'list-check', 'notes', 'place', 'A small task: a SIM card, laundry, a pharmacy run.', false),
 ];
 
 /** The 6 types, in the picker's order, with the subtext shown on their Option cards. */
 export const EVENT_TYPES: { value: EventType; label: string; icon: IconName; hint: string; kinds: KindInfo[] }[] = ([
-  ['transport', 'Getting around', 'plane', 'Flights, trains, buses, ferries, taxis, transfers and car hire'],
+  ['transport', 'Getting around', 'plane', 'Flights, trains, buses, ferries, taxis, transfers, car hire and parking'],
   ['stays', 'Stays', 'bed', 'Hotels, apartments, hostels, camping and cruises'],
   ['food', 'Food & drink', 'utensils', 'Restaurants, cafés, bars and markets'],
   ['activities', 'Activities', 'ticket', 'Sights, tours, walks, hikes, shows and experiences'],
@@ -133,7 +135,8 @@ export const isEveryday = (c: Category | string) => { const t = eventType(c); re
 /** The start and end words of a span ("Check-in" / "Check-out"). */
 export function spanWords(c: Category | string): [string, string] {
   const kind = eventKind(c);
-  return kind === 'cruise' ? ['Embark', 'Disembark'] : kind === 'car' || kind === 'campervan' ? ['Pick-up', 'Drop-off'] : ['Check-in', 'Check-out'];
+  return kind === 'cruise' ? ['Embark', 'Disembark'] : kind === 'car' || kind === 'campervan' ? ['Pick-up', 'Drop-off']
+    : kind === 'parking' ? ['Drop-off', 'Pick-up'] : kind === 'luggage' ? ['Drop-off', 'Collect'] : ['Check-in', 'Check-out'];
 }
 
 /** The kinds an Idea can be: every category except time and notes. */

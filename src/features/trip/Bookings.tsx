@@ -1,10 +1,8 @@
 import { useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { Button, EventCard, ListGroup, ListItem, PageHeader, PageSection, SectionHeader, EmptyState } from '../../design/components';
+import { Button, EventCard, PageHeader, PageSection, SectionHeader, EmptyState } from '../../design/components';
 import { ActivityForm } from './ActivityForm';
 import { formatDay, today } from '../../lib/dates';
-import { hostOf, isPdf } from '../../lib/format';
-import { recordView } from '../../lib/recent';
 import { BOOKING_GROUPS, bookingGroupOf } from '../../lib/categories';
 import { byTime } from './Itinerary';
 import { eventCardProps } from './events';
@@ -16,7 +14,6 @@ import s from './trip.module.css';
 /**
  * One Bookings row opened (Figma "Trip — Flights"): that kind of event grouped by date, one Event card each (flights
  * as Journey cards), then "Add a flight" (Secondary). Forwarding booking emails comes later.
- * Documents lists every link and file attached to the trip's events.
  */
 export function Bookings(ctx: TripCtx) {
   const { group = '' } = useParams();
@@ -25,27 +22,7 @@ export function Bookings(ctx: TripCtx) {
   const reads = useReads(me.uid);
   const back = { to: `/trip/${trip.id}`, label: 'Overview' };
 
-  if (group === 'documents') {
-    const docs = activities.slice().sort((a, b) => a.date.localeCompare(b.date) || byTime(a, b)).flatMap((a) => a.links.map((l) => ({ a, l })));
-    return (
-      <>
-        <PageHeader title="Documents" size="small" back={back} />
-        <SectionHeader title={`${docs.length} ${docs.length === 1 ? 'file or link' : 'files and links'}`} meta="Attached to your events. Open an event to add more." />
-        {docs.length === 0 ? <EmptyState illustration="ticket" title="Nothing attached yet" message="Add tickets, confirmations and booking links to an event and they show here." /> : (
-          <ListGroup label="Documents">
-            {docs.map(({ a, l }, i) => (
-              <ListItem key={`${a.id}-${i}`} icon={isPdf(l.url) ? 'doc' : 'link'} title={l.label || hostOf(l.url)}
-                meta={`${a.title} · ${formatDay(a.date)}`} trailing={isPdf(l.url) ? 'PDF' : undefined} href={l.url}
-                onClick={() => recordView(trip.id, { url: l.url, kind: isPdf(l.url) ? 'PDF' : 'Link', label: l.label || hostOf(l.url), meta: a.title })}
-                label={`${l.label || hostOf(l.url)}, for ${a.title} (opens in a new tab)`} />
-            ))}
-          </ListGroup>
-        )}
-      </>
-    );
-  }
-
-  // Older addresses: 'car' is now under Getting around
+  // Older addresses: 'car' is now under Getting around; 'documents' is gone (files live on their events), so it opens Flights
   const g = BOOKING_GROUPS.find((x) => x.key === (group === 'car' ? 'transport' : group)) ?? BOOKING_GROUPS[0];
   const list = activities.filter((a) => bookingGroupOf(a.category) === g.key).sort((a, b) => a.date.localeCompare(b.date) || byTime(a, b));
   const days = [...new Set(list.map((a) => a.date))];

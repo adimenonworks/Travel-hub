@@ -28,7 +28,6 @@ export function Overview(ctx: TripCtx) {
   const base = `/trip/${trip.id}`;
   const next = nextEvent(activities);
   const [country, setCountry] = useState<string | null>(null);
-  const docs = activities.reduce((n, a) => n + a.links.length, 0);
   const recent = useRecentViews(trip.id);
   // Budget (per person): the prices of the events you book ahead, by group. Food, drink and free time are everyday spending.
   const priced = activities.flatMap((a) => { const g = bookingGroupOf(a.category); const p = isEveryday(a.category) ? null : priceOf(a, trip); return p && p.amount > 0 ? [{ price: p, group: g }] : []; });
@@ -71,7 +70,6 @@ export function Overview(ctx: TripCtx) {
             const n = activities.filter((a) => bookingGroupOf(a.category) === g.key).length;
             return <ListItem key={g.key} icon={g.icon} tone={TYPE_TONE[g.type]} title={g.title} meta={`${n} ${n === 1 ? g.one : g.many}`} to={`${base}/bookings/${g.key}`} />;
           })}
-          <ListItem icon="doc" title="Documents" meta={`${docs} ${docs === 1 ? 'file' : 'files'}`} to={`${base}/bookings/documents`} />
         </ListGroup>
       </PageSection>
 
