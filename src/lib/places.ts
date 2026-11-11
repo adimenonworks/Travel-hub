@@ -1,49 +1,68 @@
-import { eventKind, eventType } from './categories';
-import type { IconName } from '../design/components';
+import { EVENT_TYPES, TYPE_TONE, eventKind, eventType, kindInfo, type EventKind } from './categories';
+import type { CategoryTone, IconName } from '../design/components';
 import type { Activity, Category, LinkPreview, PlaceCategory, SavedPlace, Trip } from '../data/types';
 import { countryCodeOf } from './countries';
 import { today } from './dates';
 
-/** The fixed Collections categories, in the order the filter Chips list them. */
-export const PLACE_CATEGORIES: { value: PlaceCategory; label: string; one: string; icon: IconName }[] = [
-  { value: 'restaurant', label: 'Restaurants', one: 'Restaurant', icon: 'utensils' },
-  { value: 'cafe', label: 'Cafés', one: 'Café', icon: 'coffee' },
-  { value: 'bar', label: 'Bars', one: 'Bar', icon: 'cocktail' },
-  { value: 'shop', label: 'Shops', one: 'Shop', icon: 'shopping-bag' },
-  { value: 'stay', label: 'Stays', one: 'Stay', icon: 'bed' },
-  { value: 'sight', label: 'Sights & activities', one: 'Sight', icon: 'camera' },
+/**
+ * Saved places use the same types and categories as events (owner's decision, 11 Nov 2026): a Place's `category` is an
+ * event category from Food & drink, Stays or Activities (Restaurant, Airbnb or holiday home, Museum…), picked with the
+ * same type → chips picker, in the type's colour. Older saves stored six groups; `shop` and `stay` are read as Shopping
+ * and Hotel, and restaurant, cafe, bar and sight already are categories, so nothing in the database needs changing.
+ */
+export type PlaceType = 'food' | 'stays' | 'activities';
+export const PLACE_TYPES = EVENT_TYPES.filter((t): t is typeof t & { value: PlaceType } => t.value === 'food' || t.value === 'stays' || t.value === 'activities');
+const OLD: Record<string, EventKind> = { shop: 'shopping', stay: 'hotel' };
+
+/** A Place's category (an event category), reading older values. Anything that isn't a place category counts as a sight. */
+export function placeKind(c: PlaceCategory | string | undefined): EventKind {
+  const k = eventKind(OLD[c ?? ''] ?? c ?? 'sight');
+  const t = eventType(k);
+  return t === 'food' || t === 'stays' || t === 'activities' ? k : 'sight';
+}
+export const placeTypeOf = (c: PlaceCategory | string | undefined) => eventType(placeKind(c)) as PlaceType;
+
+/** A Place's category label, icon, type and colour ("Airbnb or holiday home", the house icon, Stays, violet). */
+export function placeCategory(c: PlaceCategory | string | undefined): { value: EventKind; one: string; label: string; icon: IconName; type: PlaceType; tone: CategoryTone } {
+  const k = kindInfo(placeKind(c));
+  return { value: k.value, one: k.label, label: k.label, icon: k.icon, type: k.type as PlaceType, tone: TYPE_TONE[k.type] };
+}
+export const placeTypeInfo = (t: PlaceType) => PLACE_TYPES.find((x) => x.value === t)!;
+
+const KEYWORDS: [EventKind, string[]][] = [
+  ['cafe', ['cafe', 'café', 'bakery', 'ice cream', 'coffee', 'tea']],
+  ['bar', ['bar', 'pub', 'biergarten', 'wine bar', 'cocktail']],
+  ['nightlife', ['nightclub', 'club']],
+  ['market', ['food court', 'market', 'street food']],
+  ['restaurant', ['restaurant', 'fast food', 'noodle', 'ramen', 'pizza', 'sushi']],
+  ['hostel', ['hostel', 'guest house']],
+  ['apartment', ['apartment']],
+  ['camping', ['camp site', 'camping', 'caravan']],
+  ['resort', ['resort']],
+  ['hotel', ['hotel', 'motel', 'chalet', 'inn']],
+  ['museum', ['museum', 'gallery']],
+  ['nature', ['park', 'beach', 'garden', 'lake']],
+  ['themepark', ['theme park', 'zoo', 'aquarium']],
+  ['spa', ['spa']],
+  ['shopping', ['shop', 'mall', 'store', 'boutique']],
 ];
-export const placeCategory = (c: PlaceCategory) => PLACE_CATEGORIES.find((x) => x.value === c) ?? PLACE_CATEGORIES[5];
 
-const RESTAURANT = ['restaurant', 'fast food', 'food court', 'noodle', 'ramen'];
-const CAFE = ['cafe', 'bakery', 'ice cream', 'coffee', 'tea'];
-const BAR = ['bar', 'pub', 'biergarten', 'wine bar', 'nightclub', 'cocktail'];
-const STAY = ['hotel', 'hostel', 'guest house', 'apartment', 'motel', 'chalet', 'camp site', 'resort'];
-
-/** The category Rove detects from the map data when saving ("Fast food" → Restaurants, a shop tag → Shops). */
-export function detectCategory(p: LinkPreview['place']): PlaceCategory {
+/** The category Rove detects from the map data when saving ("Fast food" → Restaurant, "Hostel" → Hostel). */
+export function detectCategory(p: LinkPreview['place']): EventKind {
   if (!p) return 'sight';
-  if (p.category) return p.category;
+  if (p.category) return placeKind(p.category);
   const k = (p.kind ?? '').toLowerCase();
-  if (RESTAURANT.some((x) => k.includes(x))) return 'restaurant';
-  if (CAFE.some((x) => k.includes(x))) return 'cafe';
-  if (BAR.some((x) => k.includes(x))) return 'bar';
-  if (STAY.some((x) => k.includes(x))) return 'stay';
+  for (const [kind, words] of KEYWORDS) if (words.some((w) => k.includes(w))) return kind;
   if (p.type === 'food') return 'restaurant';
-  if (p.type === 'stay') return 'stay';
+  if (p.type === 'stay') return 'hotel';
   return 'sight';
 }
 
-/** The event type an idea or event about this Place gets (cafés and bars keep their own icon). */
-export const eventCategoryOf = (c: PlaceCategory): Category =>
-  c === 'restaurant' ? 'restaurant' : c === 'cafe' ? 'cafe' : c === 'bar' ? 'bar' : c === 'stay' ? 'hotel' : c === 'shop' ? 'shopping' : 'sight';
+/** The event category an idea or event about this Place gets: the Place's own. */
+export const eventCategoryOf = (c: PlaceCategory | string | undefined): Category => placeKind(c);
 
-/** The Place category for an event that gets starred without a Place yet. */
-export function placeCategoryOfEvent(c: Category): PlaceCategory {
-  const k = eventKind(c), t = eventType(c);
-  return k === 'cafe' ? 'cafe' : k === 'bar' || k === 'tasting' || k === 'nightlife' ? 'bar' : t === 'food' ? 'restaurant'
-    : t === 'stays' ? 'stay' : k === 'shopping' || k === 'market' ? 'shop' : 'sight';
-}
+/** The Place category for an event that gets starred without a Place yet: its own, when it's a place category. */
+export const placeCategoryOfEvent = (c: Category): EventKind => placeKind(c);
 
 /** "Tokyo" for a saved Place, or "Other places" when no city was found. */
 export const cityOf = (p: SavedPlace) => p.city || 'Other places';

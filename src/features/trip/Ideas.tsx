@@ -3,13 +3,13 @@ import { useSearchParams } from 'react-router-dom';
 import { Button, EmptyState, IdeaRow, LinkButton, ListGroup, ListItem, PageSection, SectionHeader, SegmentedControl, Select, Sheet, TextArea, TextField, useToast } from '../../design/components';
 import { store } from '../../data';
 import { personName, useMe, usePlaces, usePlacesById } from '../../data/hooks';
-import type { Category, Idea, LinkItem, PlaceCategory, SavedPlace } from '../../data/types';
+import type { Category, Idea, LinkItem, SavedPlace } from '../../data/types';
 import { countryName } from '../../lib/countries';
-import { cityOf, eventCategoryOf, groupBy, placeCategory, sortPlaces, tripCountryCodes } from '../../lib/places';
+import { PLACE_TYPES, cityOf, eventCategoryOf, groupBy, placeCategory, placeTypeOf, sortPlaces, tripCountryCodes } from '../../lib/places';
 import { PlaceMarks, PlaceRow } from '../saves/Collections';
 import { usePlaceMarks } from '../saves/placeMarks';
 import { haptic, confirmAction } from '../../lib/native';
-import { EVENT_TYPES, categoryInfo, eventKind, isEveryday } from '../../lib/categories';
+import { EVENT_TYPES, categoryInfo, categoryTone, eventKind, isEveryday } from '../../lib/categories';
 import { priceOf, priceText } from '../../lib/currency';
 import { recordView } from '../../lib/recent';
 import { hostOf, isPdf } from '../../lib/format';
@@ -88,6 +88,7 @@ export function Ideas(ctx: TripCtx) {
                 const meta = [kind, priceOf(i, trip) ? priceText(priceOf(i, trip)!) : '', i.createdBy === me.uid ? 'you' : personName(ctx.profiles, i.createdBy).split(' ')[0]].filter(Boolean).join(' · ');
                 return (
                   <IdeaRow key={i.id} title={place?.name ?? i.title} meta={meta} icon={place ? placeCategory(place.category).icon : i.links.length ? 'link' : cat.icon}
+                    tone={place ? placeCategory(place.category).tone : i.links.length ? undefined : categoryTone(i.category)}
                     tag={i.id === top ? { icon: 'star', label: 'Most votes' } : undefined}
                     vote={{ count: ups(i), voted: !!i.votes?.[me.uid], onClick: () => vote(i) }}
                     onClick={() => { setViewing(i); if (place) recordView(trip.id, { url: `/trip/${trip.id}/ideas?idea=${i.id}`, label: place.name, kind: 'Place' }); }} />
@@ -144,10 +145,10 @@ function AddIdeaSheet({ open, ctx, onClose, onNew }: { open: boolean; ctx: TripC
       ) : groupBy(sortPlaces(fits, visited), cityOf).map(([city, list]) => (
         <section key={city} className={s.addSection} aria-label={city}>
           <h3 className="t-heading-3">{city}</h3>
-          {groupBy(list, (p) => p.category).map(([cat, items]) => (
-            <ListGroup key={cat} label={`${city}, ${placeCategory(cat as PlaceCategory).label}`}>
+          {groupBy(list.slice().sort((a, b) => PLACE_TYPES.findIndex((t) => t.value === placeTypeOf(a.category)) - PLACE_TYPES.findIndex((t) => t.value === placeTypeOf(b.category))), (p) => placeTypeOf(p.category)).map(([type, items]) => (
+            <ListGroup key={type} label={`${city}, ${PLACE_TYPES.find((t) => t.value === type)!.label}`}>
               {items.map((p) => added.has(p.id)
-                ? <ListItem key={p.id} icon={placeCategory(p.category).icon} title={p.name} meta={placeCategory(p.category).one} trailing="Added" />
+                ? <ListItem key={p.id} icon={placeCategory(p.category).icon} tone={placeCategory(p.category).tone} title={p.name} meta={placeCategory(p.category).one} trailing="Added" />
                 : <PlaceRow key={p.id} place={p} visited={visited.has(p.id)} starred={starred(p)} onClick={() => add(p)} />)}
             </ListGroup>
           ))}

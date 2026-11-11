@@ -6,12 +6,14 @@ import { searchCities } from '../../lib/geocode';
 import { useCountries, placeCounts } from './Collections';
 import { store } from '../../data';
 import { useActivitiesFor, useMyTrips, usePlaces } from '../../data/hooks';
-import type { LinkPreview, PlaceCategory } from '../../data/types';
+import type { LinkPreview } from '../../data/types';
+import type { EventKind } from '../../lib/categories';
 import { countryName } from '../../lib/countries';
 import { today } from '../../lib/dates';
 import { findUrl, readLink } from '../../lib/links';
 import { haptic, readClipboard } from '../../lib/native';
-import { PLACE_CATEGORIES, detectCategory, eventCategoryOf, placeCategory, tripCoversCity } from '../../lib/places';
+import { detectCategory, eventCategoryOf, placeCategory, tripCoversCity } from '../../lib/places';
+import { PlaceKindPicker } from './PlaceKindPicker';
 import s from './saves.module.css';
 
 export type SaveRequest = { mode: 'link'; url?: string };
@@ -32,7 +34,7 @@ export function SaveSheet({ request, onClose }: { request: SaveRequest | null; o
   const [name, setName] = useState('');
   const [preview, setPreview] = useState<LinkPreview | null>(null);
   const [reading, setReading] = useState(false);
-  const [category, setCategory] = useState<PlaceCategory>('sight');
+  const [category, setCategory] = useState<EventKind>('sight');
   const [alsoTrip, setAlsoTrip] = useState(false);
   const [note, setNote] = useState('');
   // Where it goes: Rove's pick from the link, or the person's choice in "Where should it go?"
@@ -179,17 +181,7 @@ export function SaveSheet({ request, onClose }: { request: SaveRequest | null; o
             </span>
             <Button variant="ghost" size="regular" onClick={() => { setStep('where'); setNewCity(null); }}>{code ? 'Change' : 'Choose'}</Button>
           </div>
-          {(
-            <div className={s.field}>
-              <h3 className={s.label} id="save-category">Category</h3>
-              <div className={s.chipsWrap} role="group" aria-labelledby="save-category">
-                {PLACE_CATEGORIES.map((c) => (
-                  <Chip key={c.value} active={category === c.value} icon={c.icon} onClick={() => { haptic('selection'); setCategory(c.value); }}
-                    label={`${c.label}${category === c.value ? ', selected' : ''}`}>{c.label}</Chip>
-                ))}
-              </div>
-            </div>
-          )}
+          <PlaceKindPicker id="save-category" value={category} onChange={setCategory} />
           {kind === 'place' && trip && <Switch checked={alsoTrip} onChange={setAlsoTrip} label={`Also add to ${trip.name} ideas`} hint="So everyone on the trip can vote on it" />}
           <TextArea label="Note (optional)" placeholder="Why did you save this?" value={note} onChange={(e) => setNote(e.target.value)} rows={2} />
         </>

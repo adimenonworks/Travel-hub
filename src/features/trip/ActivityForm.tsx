@@ -75,7 +75,7 @@ export function suggestFreeTime(activities: Activity[], day: string, except?: st
 }
 
 /**
- * Add an event by hand, or edit one. Step 1: the 7 types as Option cards with what each covers (Flights, Getting
+ * Add an event by hand, or edit one. Step 1: the 6 types as Option cards with what each covers (Getting
  * around, Stays, Food & drink, Activities, Free time, Notes & reminders). Step 2, in the same Sheet: a Chip row of the
  * type's categories (the most common pre-selected; Flights has only one), a line saying what the chosen one covers,
  * then the fields for its behaviour (journey, span, at a place, open, note). Saved events get their category, type and
@@ -253,18 +253,18 @@ export function ActivityForm({ open, trip, date, activity, draft, onClose, onCre
       onClose={onClose} onSubmit={kind ? submit : undefined} submitLabel={activity ? 'Save' : `Add to ${formatDay(f.date)}`} submitDisabled={!valid || busy}
       secondary={activity && kind ? <Button variant="destructive" size="large" onClick={remove}>Delete</Button> : undefined}>
       {!f.type ? (
-        // Step 1: the 7 types, each with what it covers
+        // Step 1: the 6 types, each with what it covers, in its colour
         <div className={s.typeList} role="group" aria-label="Type">
           {EVENT_TYPES.map((t) => <OptionCard key={t.value} icon={t.icon} label={t.label} description={t.hint} tone={TYPE_TONE[t.value]} onClick={() => pickType(t.value)} />)}
         </div>
       ) : (
         <>
-          {/* Step 2: the type's categories (Flights has one, so no chips), and what the chosen one covers */}
+          {/* Step 2: the type's categories, the chosen one in the type's colour, and what it covers */}
           {typeInfo && typeInfo.kinds.length > 1 && (
             <div className={s.kindPicker}>
               <div className={s.kindChips} role="group" aria-label="Category">
                 {typeInfo.kinds.map((x) => (
-                  <Chip key={x.value} icon={x.icon} active={kind === x.value} label={`${x.label}${kind === x.value ? ', selected' : ''}`}
+                  <Chip key={x.value} icon={x.icon} tone={TYPE_TONE[typeInfo.value]} active={kind === x.value} label={`${x.label}${kind === x.value ? ', selected' : ''}`}
                     onClick={() => { haptic('selection'); pickKind(x.value); }}>{x.label}</Chip>
                 ))}
               </div>

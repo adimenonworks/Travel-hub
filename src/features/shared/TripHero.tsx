@@ -9,7 +9,7 @@ import type { Trip } from '../../data/types';
 import { daysBetween, formatDay, formatTime, today, tripPhase } from '../../lib/dates';
 import { eventKind } from '../../lib/categories';
 import { countryName, tripCountries } from '../../lib/countries';
-import { categoryInfo } from '../../lib/categories';
+import { categoryInfo, categoryTone } from '../../lib/categories';
 import { heroCountdown, nextEvent, tripDatesLabel } from '../../lib/trips';
 import { TripCover } from './TripCover';
 
@@ -38,7 +38,7 @@ export function TripHero({ trip, cover = true, size = 'regular' }: { trip: Trip;
   const t = today();
   const when = (d: string, time: string) => `${d === t ? 'Today' : formatDay(d)}${time ? `, ${formatTime(time)}` : ''}`;
   const next = upNext
-    ? { icon: categoryInfo(upNext.category).icon, title: upNext.title, meta: [when(upNext.date, upNext.startTime), upNext.locationText || upNext.location?.name?.split(',')[0]].filter(Boolean).join(' · '), to: `${base}/plan/${upNext.id}` }
+    ? { icon: categoryInfo(upNext.category).icon, tone: categoryTone(upNext.category), title: upNext.title, meta: [when(upNext.date, upNext.startTime), upNext.locationText || upNext.location?.name?.split(',')[0]].filter(Boolean).join(' · '), to: `${base}/plan/${upNext.id}` }
     : phase === 'past'
       ? { icon: 'photo' as const, title: 'Add your photos', meta: 'Share an album with everyone who went', to: `${base}/photos` }
       : { icon: 'plus' as const, title: 'Plan the first day', meta: 'Add events to the itinerary', to: `${base}/itinerary` };
@@ -51,7 +51,7 @@ export function TripHero({ trip, cover = true, size = 'regular' }: { trip: Trip;
   const live = useFlightStatus(flight);
   const tag = flight ? flightTag(flight, live) : undefined;
   const headsUp = flight && tag
-    ? { icon: 'plane' as const, title: tag.label === 'Check-in open' ? 'Check-in open' : `Flight ${tag.label.toLowerCase()}`, meta: [flight.title, flight.ref].filter(Boolean).join(' · '), to: `${base}/plan/${flight.id}` }
+    ? { icon: 'plane' as const, tone: 'travel' as const, title: tag.label === 'Check-in open' ? 'Check-in open' : `Flight ${tag.label.toLowerCase()}`, meta: [flight.title, flight.ref].filter(Boolean).join(' · '), to: `${base}/plan/${flight.id}` }
     : phase === 'upcoming' && daysBetween(t, trip.startDate) <= 14 && abroad.length > 0
       ? { icon: 'doc' as const, title: 'Check the entry requirements', meta: abroad.map(countryName).join(', '), to: base }
       : undefined;

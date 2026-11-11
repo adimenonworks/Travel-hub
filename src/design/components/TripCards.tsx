@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { Icon, type IconName } from './Icon';
 import { AvatarStack, Badge } from './Misc';
 import { PageHeader } from './Bars';
-import { ListItem } from './Rows';
+import { ListItem, type CategoryTone } from './Rows';
 import s from './TripCards.module.css';
 
 type Person = { id: string; name: string; photo?: string | null };
@@ -27,9 +27,9 @@ export function HeroCard({ size = 'regular', cover, photo, countdown, title, met
   people?: Person[];
   to?: string;
   /** Figma "Show next up": one List item, e.g. the next event */
-  next?: { icon: IconName; title: string; meta?: string; to?: string };
+  next?: { icon: IconName; title: string; meta?: string; to?: string; tone?: CategoryTone };
   /** Figma "Show heads-up": one time-sensitive row (check-in open, a flight change…) */
-  headsUp?: { icon: IconName; title: string; meta?: string; to?: string };
+  headsUp?: { icon: IconName; title: string; meta?: string; to?: string; tone?: CategoryTone };
 }) {
   return (
     <section className={[s.hero, size === 'compact' && s.heroCompact].filter(Boolean).join(' ')} aria-label={title}>
@@ -53,8 +53,8 @@ export function HeroCard({ size = 'regular', cover, photo, countdown, title, met
         {!cover && countdown && <div><Badge tone="neutral" icon={countdown.icon ?? 'calendar'}>{countdown.label}</Badge></div>}
         {size === 'regular' && (next || headsUp) && (
           <div className={s.rows}>
-            {next && <ListItem icon={next.icon} title={next.title} meta={next.meta} to={next.to} round />}
-            {headsUp && <ListItem icon={headsUp.icon} title={headsUp.title} meta={headsUp.meta} to={headsUp.to} round />}
+            {next && <ListItem icon={next.icon} tone={next.tone} title={next.title} meta={next.meta} to={next.to} round />}
+            {headsUp && <ListItem icon={headsUp.icon} tone={headsUp.tone} title={headsUp.title} meta={headsUp.meta} to={headsUp.to} round />}
           </div>
         )}
       </div>

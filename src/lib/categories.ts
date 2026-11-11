@@ -14,8 +14,8 @@ import type { Category } from '../data/types';
  */
 export type Behaviour = 'journey' | 'span' | 'place' | 'open' | 'note';
 
-/** The 7 types. */
-export type EventType = 'flights' | 'transport' | 'stays' | 'food' | 'activities' | 'free' | 'notes';
+/** The 6 types (Flights folded into Getting around on 11 Nov 2026: one colour, one option). */
+export type EventType = 'transport' | 'stays' | 'food' | 'activities' | 'free' | 'notes';
 
 /** The stored category ids (Activity.category), plus the older values read through LEGACY. */
 export type EventKind =
@@ -40,8 +40,7 @@ const k = (value: EventKind, label: string, icon: IconName, type: EventType, beh
 
 /** Every category, by type, the most common first (it's pre-selected in the picker). */
 export const EVENT_KINDS: KindInfo[] = [
-  k('flight', 'Flight', 'plane', 'flights', 'journey', 'A flight with its number and times. Add a connection for each leg.'),
-
+  k('flight', 'Flight', 'plane', 'transport', 'journey', 'A flight with its number and times. Add a connection for each leg.'),
   k('train', 'Train', 'train', 'transport', 'journey', 'Trains, from city hops to high-speed and sleepers.'),
   k('bus', 'Bus or coach', 'bus-alt', 'transport', 'journey', 'Long-distance buses and coaches between towns.'),
   k('ferry', 'Ferry', 'ship', 'transport', 'journey', 'Ferries and boat crossings.'),
@@ -91,10 +90,9 @@ export const EVENT_KINDS: KindInfo[] = [
   k('errand', 'Errand', 'list-check', 'notes', 'place', 'A small task: luggage storage, a SIM card, laundry.', false),
 ];
 
-/** The 7 types, in the picker's order, with the subtext shown on their Option cards. */
+/** The 6 types, in the picker's order, with the subtext shown on their Option cards. */
 export const EVENT_TYPES: { value: EventType; label: string; icon: IconName; hint: string; kinds: KindInfo[] }[] = ([
-  ['flights', 'Flights', 'plane', 'Flights, including connections and layovers'],
-  ['transport', 'Getting around', 'train', 'Trains, buses, ferries, taxis, transfers and car hire'],
+  ['transport', 'Getting around', 'plane', 'Flights, trains, buses, ferries, taxis, transfers and car hire'],
   ['stays', 'Stays', 'bed', 'Hotels, apartments, hostels, camping and cruises'],
   ['food', 'Food & drink', 'utensils', 'Restaurants, cafés, bars and markets'],
   ['activities', 'Activities', 'ticket', 'Sights, tours, walks, hikes, shows and experiences'],
@@ -119,10 +117,11 @@ export const behaviourOf = (c: Category | string): Behaviour => kindInfo(c).beha
 
 /**
  * The colour of each type (owner's choice, 11 Nov 2026: "Option D"): it fills the icon tile on Event cards and in the
- * type picker. Travel is sky, Stays violet, Food & drink yellow, Activities pink; Free time and Notes stay neutral.
+ * type picker, and everywhere else an event or place shows. Travel (Getting around, flights included) is sky, Stays
+ * violet, Food & drink yellow, Activities pink, Notes & reminders emerald; Free time stays neutral.
  */
 export const TYPE_TONE: Record<EventType, CategoryTone> = {
-  flights: 'travel', transport: 'travel', stays: 'stays', food: 'food', activities: 'activities', free: 'neutral', notes: 'neutral',
+  transport: 'travel', stays: 'stays', food: 'food', activities: 'activities', free: 'neutral', notes: 'notes',
 };
 
 /** The colour of any stored category's type. */
@@ -152,9 +151,12 @@ export function categoryInfo(c: Category | string): { value: EventType; label: s
  * `key` is the address of its list (`/trip/:id/bookings/:key`).
  */
 export const BOOKING_GROUPS: { key: string; title: string; icon: IconName; type: EventType; one: string; many: string; add: EventKind }[] = [
-  { key: 'flights', title: 'Flights', icon: 'plane', type: 'flights', one: 'flight', many: 'flights', add: 'flight' },
+  { key: 'flights', title: 'Flights', icon: 'plane', type: 'transport', one: 'flight', many: 'flights', add: 'flight' },
   { key: 'stays', title: 'Stays', icon: 'bed', type: 'stays', one: 'stay', many: 'stays', add: 'hotel' },
   { key: 'transport', title: 'Getting around', icon: 'train', type: 'transport', one: 'booking', many: 'bookings', add: 'train' },
   { key: 'activities', title: 'Activities', icon: 'ticket', type: 'activities', one: 'activity', many: 'activities', add: 'sight' },
   { key: 'food', title: 'Food & drink', icon: 'utensils', type: 'food', one: 'reservation', many: 'reservations', add: 'restaurant' },
 ];
+
+/** Which Bookings row an event belongs to: flights have their own row; the rest of Getting around is "transport". */
+export const bookingGroupOf = (c: Category | string): string => eventKind(c) === 'flight' ? 'flights' : eventType(c);

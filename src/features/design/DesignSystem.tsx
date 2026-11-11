@@ -294,18 +294,31 @@ export function DesignSystem() {
           <EventCard icon="notebook" layout="note" title="Bag drop closes 40 min before" place="Sam has the passports" />
         </Section>
 
-        <Section title="Event types" footer="Type sets the icon tile's colour (--category-<type>-surface / -icon): Travel (flights and getting around) sky, Stays violet, Food & drink yellow, Activities pink; Free time and Notes stay Neutral. The Next state ignores it. Option cards in the Add to itinerary picker use the same tiles, 16px above the text.">
+        <Section title="Event types" footer="Type sets the icon tile's colour (--category-<type>-surface / -icon): Getting around (flights included) sky, Stays violet, Food & drink yellow, Activities pink, Notes emerald; Free time stays Neutral. On the deep-green Next card the tile takes the bright step. List items, Idea rows and active Chips use the same colours; the price sits subtle at the top right. Option cards in the Add to itinerary picker use the same tiles, 16px above the text.">
           <EventCard icon="plane" tone="travel" title="Transfer to the hotel" time="09:30 – 10:10" place="Porto Airport" to="/design" />
           <EventCard icon="hotel" tone="stays" title="Check-in · Torel Palace" time="15:00" place="Ribeira" to="/design" />
           <EventCard icon="coffee" tone="food" title="Coffee at Combi" time="11:00 – 11:45" place="Baixa" to="/design" />
           <EventCard icon="bank" tone="activities" title="Serralves Museum" time="12:30 – 14:30" place="Lordelo do Ouro" to="/design" />
           <EventCard icon="hourglass" title="Free time" time="16:00 – 18:00" place="Wander the riverside" placeIcon={null} to="/design" />
+          <EventCard icon="notebook" tone="notes" layout="note" title="Bag drop closes 40 min before" place="Sam has the passports" placeIcon={null} />
+          <EventCard icon="hotel" tone="stays" title="Check-in at the Torel Palace Porto, a long hotel name" time="15:00" place="Ribeira" amount="€320" to="/design" />
+          <EventCard icon="utensils" tone="food" state="next" title="Time Out Market" time="13:30 – 15:00" place="Cais do Sodré" amount="€25" to="/design" />
+          <ListGroup label="Places and ideas by type">
+            <ListItem icon="house-chimney" tone="stays" title="Casa do Príncipe" meta="Airbnb or holiday home · Lisbon" />
+            <ListItem icon="glass-cheers" tone="food" title="Quinta da Pacheca" meta="Tasting · Douro" />
+            <IdeaRow icon="bank" tone="activities" title="Gulbenkian Museum" meta="Museum or gallery · Lisbon · Sam" vote={{ count: 2, voted: false, onClick: () => {} }} />
+          </ListGroup>
+          <div className={s.chipRow}>
+            <Chip icon="plane" tone="travel" active>Flight</Chip><Chip icon="hotel" tone="stays" active>Hotel</Chip><Chip icon="coffee" tone="food" active>Café</Chip>
+            <Chip icon="camera" tone="activities" active>Sight</Chip><Chip icon="notebook" tone="notes" active>Note</Chip><Chip icon="train" tone="travel">Train</Chip>
+          </div>
           <div className={s.optionGrid}>
-            <OptionCard icon="plane" tone="travel" label="Flights" description="Flights, including connections and layovers" onClick={() => {}} />
+            <OptionCard icon="plane" tone="travel" label="Getting around" description="Flights, trains, buses, ferries, taxis, transfers and car hire" onClick={() => {}} />
             <OptionCard icon="bed" tone="stays" label="Stays" description="Hotels, apartments, hostels, camping and cruises" onClick={() => {}} />
             <OptionCard icon="utensils" tone="food" label="Food & drink" description="Restaurants, cafés, bars and markets" onClick={() => {}} />
             <OptionCard icon="ticket" tone="activities" label="Activities" description="Sights, tours, walks, hikes, shows and experiences" onClick={() => {}} />
             <OptionCard icon="hourglass" tone="neutral" label="Free time" description="Time to rest, wander or keep open" onClick={() => {}} />
+            <OptionCard icon="notebook" tone="notes" label="Notes & reminders" description="A note, or a small task like luggage storage or picking up a SIM" onClick={() => {}} />
           </div>
         </Section>
 

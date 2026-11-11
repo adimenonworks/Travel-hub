@@ -16,22 +16,24 @@ function Pressable({ to, href, onClick, label, className, children, role }: Pres
 }
 
 /** The square (8px corners) or round thumb that leads a row: an icon on the light grey surface, or a flag/avatar. */
-function Thumb({ icon, media, round }: { icon?: IconName; media?: ReactNode; round?: boolean }) {
-  return <span className={[s.thumb, round && s.thumbRound].filter(Boolean).join(' ')} aria-hidden={media ? undefined : true}>{media ?? (icon && <Icon name={icon} size={24} />)}</span>;
+function Thumb({ icon, media, round, tone }: { icon?: IconName; media?: ReactNode; round?: boolean; tone?: CategoryTone }) {
+  return <span className={[s.thumb, round && s.thumbRound, !media && tone && tone !== 'neutral' && s[`tone-${tone}`]].filter(Boolean).join(' ')} aria-hidden={media ? undefined : true}>{media ?? (icon && <Icon name={icon} size={24} />)}</span>;
 }
 
 /**
  * Figma "List item" (Size Default / Compact): a 48px thumb (Compact: 32), the title (Heading 3; Compact: Body),
  * a meta line (Body small) and optional trailing text. Used inside a List group.
  */
-export function ListItem({ title, meta, trailing, action, icon, media, size = 'default', round, ...press }: Press & {
+export function ListItem({ title, meta, trailing, action, icon, media, size = 'default', round, tone, ...press }: Press & {
   title: ReactNode; meta?: ReactNode; trailing?: ReactNode; icon?: IconName; media?: ReactNode; size?: 'default' | 'compact'; round?: boolean;
+  /** Figma "Type": the icon tile in an event type's colour (a place or an event). */
+  tone?: CategoryTone;
   /** Figma "Show action": a small Ghost Icon button at the end, e.g. Copy for a booking reference. Not inside a pressable row. */
   action?: ReactNode;
 }) {
   return (
     <Pressable {...press} role="listitem" className={[s.item, size === 'compact' && s.compact].filter(Boolean).join(' ')}>
-      {(icon || media) && <Thumb icon={icon} media={media} round={round} />}
+      {(icon || media) && <Thumb icon={icon} media={media} round={round} tone={tone} />}
       <span className={s.itemText}>
         <span className={s.itemTitle}>{title}</span>
         {meta && <span className={s.itemMeta}>{meta}</span>}
@@ -81,7 +83,7 @@ export type EventState = 'default' | 'next' | 'done';
  * Next has the brand border; Done fades the content. The whole card opens the event.
  */
 /** Figma "Type" on the Event card and Option card: the colour of the icon tile (an event's type; see categoryTone()). */
-export type CategoryTone = 'neutral' | 'travel' | 'stays' | 'food' | 'activities';
+export type CategoryTone = 'neutral' | 'travel' | 'stays' | 'food' | 'activities' | 'notes';
 
 export function EventCard({ title, time, timeIcon = 'clock', place, placeIcon = 'pin', amount, icon, layout = 'standard', state = 'default', tone = 'neutral', journey, extras, status, favourite, to, onClick }: {
   title: string; time?: string; place?: string; amount?: string; icon: IconName;
@@ -92,7 +94,7 @@ export function EventCard({ title, time, timeIcon = 'clock', place, placeIcon = 
   /** Figma "Favourite": a filled star after the title (the event's Place is starred). */
   favourite?: boolean;
   layout?: 'standard' | 'journey' | 'note'; state?: EventState;
-  /** Figma "Type": the icon tile's colour. The Next state ignores it (it stays deep green). */
+  /** Figma "Type": the icon tile's colour (on the deep-green Next card, the bright on-dark step). */
   tone?: CategoryTone;
   journey?: { fromTime: string; fromPlace?: string; duration?: string; toTime: string; toPlace?: string; mode?: IconName };
   /** Figma "Show extras": Tag 1, Tag 2 */
@@ -104,8 +106,8 @@ export function EventCard({ title, time, timeIcon = 'clock', place, placeIcon = 
   const cls = [s.event, s[`event-${layout}`], s[`event-${state}`], state === 'next' && 'surface-dark'].filter(Boolean).join(' ');
   const stateText = state === 'next' ? ', up next' : state === 'done' ? ', done' : '';
   return (
-    <Pressable to={to} onClick={onClick} className={cls} label={`${title}${favourite ? ', favourite' : ''}${time ? `, ${time}` : ''}${place ? `, ${place}` : ''}${amount ? `, ${amount}` : ''}${stateText}`}>
-      <span className={[s.eventIcon, state !== 'next' && s[`tone-${tone}`]].filter(Boolean).join(' ')} aria-hidden="true"><Icon name={icon} size={24} /></span>
+    <Pressable to={to} onClick={onClick} className={cls} label={`${title}${favourite ? ', favourite' : ''}${time ? `, ${time}` : ''}${place ? `, ${place}` : ''}${amount ? `, ${amount} per person` : ''}${stateText}`}>
+      <span className={[s.eventIcon, s[`tone-${tone}`]].filter(Boolean).join(' ')} aria-hidden="true"><Icon name={icon} size={24} /></span>
       <span className={s.eventBody} aria-hidden="true">
         <span className={s.eventHeader}>
           <span className={s.eventText}>
@@ -156,15 +158,17 @@ export function VoteButton({ count, voted, onClick, label }: { count: number; vo
 }
 
 /** Figma "Idea row": thumb, title (Heading 3), meta, an optional tag under it, and the Vote button. */
-export function IdeaRow({ title, meta, icon, tag, vote, onClick }: {
+export function IdeaRow({ title, meta, icon, tone, tag, vote, onClick }: {
   title: string; meta?: ReactNode; icon: IconName; tag?: { icon?: IconName; label: string };
+  /** Figma "Type": the icon tile's colour (the idea's category type). */
+  tone?: CategoryTone;
   vote: { count: number; voted: boolean; onClick: () => void };
   onClick?: () => void;
 }) {
   return (
     <div role="listitem" className={s.ideaRow}>
       <Pressable onClick={onClick} className={s.ideaMain} label={onClick ? `${title}: open` : undefined}>
-        <Thumb icon={icon} />
+        <Thumb icon={icon} tone={tone} />
         <span className={s.itemText}>
           <span className={s.itemTitle}>{title}</span>
           {meta && <span className={s.itemMeta}>{meta}</span>}
@@ -256,7 +260,7 @@ export function OptionCard({ icon, label, description, selected, tone, onClick }
  */
 export function BudgetCard({ label, amount, caption, ratio, rows, over }: {
   label: string; amount: string; caption: string; ratio: number; over?: boolean;
-  rows: { icon: IconName; label: string; amount: string }[];
+  rows: { icon: IconName; label: string; amount: string; tone?: CategoryTone }[];
 }) {
   return (
     <div className={s.budget}>
@@ -271,7 +275,7 @@ export function BudgetCard({ label, amount, caption, ratio, rows, over }: {
       {rows.length > 0 && (
         <ul className={s.budgetRows} aria-label="Planned by category">
           {rows.map((r) => (
-            <li key={r.label} className={s.budgetRow}><Icon name={r.icon} size={16} /><span className={s.budgetRowLabel}>{r.label}</span><span className={s.budgetRowAmount}>{r.amount}</span></li>
+            <li key={r.label} className={s.budgetRow}><span className={r.tone ? s[`ink-${r.tone}`] : undefined}><Icon name={r.icon} size={16} /></span><span className={s.budgetRowLabel}>{r.label}</span><span className={s.budgetRowAmount}>{r.amount}</span></li>
           ))}
         </ul>
       )}

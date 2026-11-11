@@ -1,4 +1,7 @@
+import { useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import { stepTab, useSwipeTabs } from '../../app/useSwipeTabs';
+import { SlideSwap } from '../shared/SlideSwap';
 import { Button, Card, Icon, Illustration, PageHeader, PageSkeleton, SegmentedControl, Tile } from '../../design/components';
 import { useMyTrips } from '../../data/hooks';
 import type { SavedPlace } from '../../data/types';
@@ -10,6 +13,7 @@ import s from './Home.module.css';
 import ss from '../saves/saves.module.css';
 
 type Segment = 'upcoming' | 'saved' | 'past';
+const SEGMENTS: Segment[] = ['upcoming', 'saved', 'past'];
 
 
 /** A country you've saved in, as a Figma "Tile" (Default tone: grey, flag-led, "24 saves · 3 cities"); opens its collection. */
@@ -29,7 +33,7 @@ const remembered = (): Segment | null => {
 /**
  * Trips tab: the library. Upcoming · Saved · Past (Upcoming first; the segment you picked is remembered on this device).
  * Upcoming: a compact Hero Card per trip, soonest first, under "Plan a new trip". Saved: your Collections, one country
- * Tile each. Past: compact Hero Cards, most recent first.
+ * Tile each. Past: compact Hero Cards, most recent first. Swiping the list sideways changes segment, like a trip's tabs.
  */
 export function Trips() {
   const trips = useMyTrips();
@@ -46,15 +50,18 @@ export function Trips() {
   const countries = useCountries() ?? [];
   const upcoming = dated.filter((t) => tripPhase(t.startDate, t.endDate) !== 'past');
   const past = dated.filter((t) => tripPhase(t.startDate, t.endDate) === 'past').reverse();
+  const box = useRef<HTMLDivElement>(null);
+  useSwipeTabs(box, (dir) => { const n = stepTab(SEGMENTS, segment, dir); if (n) pick(n); });
 
   return (
     <Content>
       <PageHeader title="Trips" fit />
       {trips === null ? <PageSkeleton bare /> : (
-        <div className={s.segments}>
+        <div className={s.segments} ref={box}>
           <SegmentedControl label="Show trips" block value={segment} onChange={pick}
             options={[{ value: 'upcoming', label: 'Upcoming' }, { value: 'saved', label: 'Saved' }, { value: 'past', label: 'Past' }]} />
-          {segment === 'upcoming' && (upcoming.length === 0 ? (
+          <SlideSwap value={segment} id={segment} rank={SEGMENTS.indexOf(segment)}>{(seg) => <>
+          {seg === 'upcoming' && (upcoming.length === 0 ? (
             <Card tone="accent" title="No trips planned yet" body="Pick where, when and who. Your saves come with you."
               actions={<Button block iconEnd="chevron-right" onClick={() => newTrip()}>Plan a trip</Button>} />
           ) : (
@@ -66,7 +73,7 @@ export function Trips() {
               </div>
             </>
           ))}
-          {segment === 'saved' && (countries.length === 0 ? (
+          {seg === 'saved' && (countries.length === 0 ? (
             <Card media={<Illustration name="map" size={120} />} title="Looks a little empty" body="Save things to organise your future trip"
               actions={<Button block onClick={() => openSave({ mode: 'link' })}>Save a place</Button>} />
           ) : (
@@ -75,11 +82,12 @@ export function Trips() {
               <Tile tone="add" icon="plus" title="New place to go" onClick={() => openSave({ mode: 'link' })} />
             </div>
           ))}
-          {segment === 'past' && (past.length === 0 ? (
+          {seg === 'past' && (past.length === 0 ? (
             <p className="t-body t-secondary">Trips you’ve taken will show up here</p>
           ) : (
             <div className={s.list}>{past.map((t) => <TripHero key={t.id} trip={t} size="compact" />)}</div>
           ))}
+          </>}</SlideSwap>
         </div>
       )}
     </Content>
