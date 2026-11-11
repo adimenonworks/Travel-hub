@@ -1,6 +1,4 @@
-import { useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { hasStep, stepTab, useSwipeTabs } from '../../app/useSwipeTabs';
 import { SlideSwap } from '../shared/SlideSwap';
 import { Button, Card, Icon, Illustration, PageHeader, PageSkeleton, SegmentControl, Tile } from '../../design/components';
 import { useMyTrips } from '../../data/hooks';
@@ -50,14 +48,12 @@ export function Trips() {
   const countries = useCountries() ?? [];
   const upcoming = dated.filter((t) => tripPhase(t.startDate, t.endDate) !== 'past');
   const past = dated.filter((t) => tripPhase(t.startDate, t.endDate) === 'past').reverse();
-  const box = useRef<HTMLDivElement>(null);
-  useSwipeTabs(box, (dir) => { const n = stepTab(SEGMENTS, segment, dir); if (n) pick(n); }, (dir) => hasStep(SEGMENTS, segment, dir));
 
   return (
     <Content>
       <PageHeader title="Trips" fit />
       {trips === null ? <PageSkeleton bare /> : (
-        <div className={s.segments} ref={box}>
+        <div className={s.segments}>
           <SegmentControl label="Show trips" block value={segment} onChange={pick}
             options={[{ value: 'upcoming', label: 'Upcoming' }, { value: 'saved', label: 'Collections' }, { value: 'past', label: 'Past' }]} />
           <SlideSwap value={segment} id={segment} rank={SEGMENTS.indexOf(segment)}>{(seg) => <>
