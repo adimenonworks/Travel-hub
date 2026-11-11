@@ -21,7 +21,7 @@ export type EventType = 'flights' | 'transport' | 'stays' | 'food' | 'activities
 export type EventKind =
   | 'flight'
   | 'train' | 'bus' | 'ferry' | 'taxi' | 'transfer' | 'metro' | 'driver' | 'bike' | 'car' | 'campervan'
-  | 'hotel' | 'apartment' | 'hostel' | 'camping' | 'cruise' | 'friends'
+  | 'hotel' | 'apartment' | 'airbnb' | 'resort' | 'hostel' | 'camping' | 'cruise' | 'friends'
   | 'restaurant' | 'cafe' | 'bar' | 'market' | 'tasting'
   | 'sight' | 'museum' | 'tour' | 'hike' | 'nature' | 'show' | 'sports' | 'festival' | 'themepark' | 'spa' | 'class' | 'adventure' | 'nightlife' | 'shopping' | 'meetup'
   | 'free' | 'rest'
@@ -43,22 +43,24 @@ export const EVENT_KINDS: KindInfo[] = [
   k('flight', 'Flight', 'plane', 'flights', 'journey', 'A flight with its number and times. Add a connection for each leg.'),
 
   k('train', 'Train', 'train', 'transport', 'journey', 'Trains, from city hops to high-speed and sleepers.'),
-  k('bus', 'Bus or coach', 'school-bus', 'transport', 'journey', 'Long-distance buses and coaches between towns.'),
+  k('bus', 'Bus or coach', 'bus-alt', 'transport', 'journey', 'Long-distance buses and coaches between towns.'),
   k('ferry', 'Ferry', 'ship', 'transport', 'journey', 'Ferries and boat crossings.'),
   k('taxi', 'Taxi or rideshare', 'taxi', 'transport', 'place', 'A taxi, Uber or Bolt from where you’re picked up.', false),
-  k('transfer', 'Airport transfer', 'luggage', 'transport', 'journey', 'A booked ride to or from the airport.'),
+  k('transfer', 'Airport transfer', 'shuttle-van', 'transport', 'journey', 'A booked ride to or from the airport.'),
   k('metro', 'Metro or tram', 'train-side', 'transport', 'place', 'A local metro, tram or city train ride.', false),
-  k('driver', 'Private driver', 'car', 'transport', 'journey', 'A driver booked to take you somewhere.'),
+  k('driver', 'Private driver', 'car-side', 'transport', 'journey', 'A driver booked to take you somewhere.'),
   k('bike', 'Bike or scooter hire', 'bike', 'transport', 'place', 'Bikes or scooters to get around for a while.'),
   k('car', 'Car rental', 'key', 'transport', 'span', 'A hire car: shown at pick-up and drop-off.'),
-  k('campervan', 'Campervan', 'truck', 'transport', 'span', 'A campervan or motorhome: shown at pick-up and drop-off.'),
+  k('campervan', 'Campervan', 'rv', 'transport', 'span', 'A campervan or motorhome: shown at pick-up and drop-off.'),
 
-  k('hotel', 'Hotel', 'building', 'stays', 'span', 'Hotels, resorts and B&Bs: shown at check-in and check-out.'),
-  k('apartment', 'Apartment', 'building', 'stays', 'span', 'Apartments and holiday rentals like Airbnb.'),
-  k('hostel', 'Hostel', 'bed', 'stays', 'span', 'Hostels and guesthouses.'),
+  k('hotel', 'Hotel', 'hotel', 'stays', 'span', 'Hotels and B&Bs: shown at check-in and check-out.'),
+  k('apartment', 'Apartment', 'apartment', 'stays', 'span', 'Serviced apartments and flats.'),
+  k('airbnb', 'Airbnb or holiday home', 'house-chimney', 'stays', 'span', 'An Airbnb, Vrbo or holiday home: shown at check-in and check-out.'),
+  k('resort', 'Resort', 'swimmer', 'stays', 'span', 'Resorts and all-inclusives.'),
+  k('hostel', 'Hostel', 'backpack', 'stays', 'span', 'Hostels and guesthouses.'),
   k('camping', 'Camping', 'camping', 'stays', 'span', 'Campsites, glamping and huts.'),
-  k('cruise', 'Cruise', 'ship', 'stays', 'span', 'A cruise from embarking to disembarking. Add port calls as activities.'),
-  k('friends', 'Staying with friends', 'home-location', 'stays', 'span', 'A friend’s or family’s place.', false),
+  k('cruise', 'Cruise', 'ship-side', 'stays', 'span', 'A cruise from embarking to disembarking. Add port calls as activities.'),
+  k('friends', 'Staying with friends', 'users', 'stays', 'span', 'A friend’s or family’s place.', false),
 
   k('restaurant', 'Restaurant', 'utensils', 'food', 'place', 'Lunch or dinner somewhere, booked or not.'),
   k('cafe', 'Café', 'coffee', 'food', 'place', 'Coffee, breakfast or a bakery stop.', false),
@@ -67,17 +69,17 @@ export const EVENT_KINDS: KindInfo[] = [
   k('tasting', 'Tasting', 'glass-cheers', 'food', 'place', 'Wineries, breweries, distilleries and tastings.'),
 
   k('sight', 'Sight or landmark', 'camera', 'activities', 'place', 'Landmarks, viewpoints, churches and monuments.'),
-  k('museum', 'Museum or gallery', 'picture', 'activities', 'place', 'Museums, galleries and exhibitions.'),
-  k('tour', 'Tour', 'navigation', 'activities', 'place', 'Guided tours, day trips and boat trips.'),
-  k('hike', 'Walk or hike', 'mountains', 'activities', 'place', 'Walks, trails and hikes.', false),
-  k('nature', 'Beach or nature', 'sun', 'activities', 'place', 'Beaches, parks, lakes and gardens.', false),
+  k('museum', 'Museum or gallery', 'bank', 'activities', 'place', 'Museums, galleries and exhibitions.'),
+  k('tour', 'Tour', 'flag', 'activities', 'place', 'Guided tours, day trips and boat trips.'),
+  k('hike', 'Walk or hike', 'hiking', 'activities', 'place', 'Walks, trails and hikes.', false),
+  k('nature', 'Beach or nature', 'umbrella-beach', 'activities', 'place', 'Beaches, parks, lakes and gardens.', false),
   k('show', 'Show or gig', 'music', 'activities', 'place', 'Concerts, theatre, comedy and gigs.'),
   k('sports', 'Sports event', 'trophy', 'activities', 'place', 'A match, race or game to watch.'),
   k('festival', 'Festival', 'mask', 'activities', 'place', 'Festivals, carnivals and celebrations.'),
   k('themepark', 'Theme park', 'ferris-wheel', 'activities', 'place', 'Theme parks, water parks and zoos.'),
   k('spa', 'Spa or wellness', 'spa', 'activities', 'place', 'Spas, baths, massages and yoga.'),
-  k('class', 'Class or workshop', 'e-learning', 'activities', 'place', 'Cooking classes, lessons and workshops.'),
-  k('adventure', 'Adventure', 'surfing', 'activities', 'place', 'Diving, surfing, skiing and other thrills.'),
+  k('class', 'Class or workshop', 'graduation-cap', 'activities', 'place', 'Cooking classes, lessons and workshops.'),
+  k('adventure', 'Adventure', 'rocket', 'activities', 'place', 'Diving, surfing, skiing and other thrills.'),
   k('nightlife', 'Nightlife', 'disco-ball', 'activities', 'place', 'Clubs and late nights out.'),
   k('shopping', 'Shopping', 'shopping-bag', 'activities', 'place', 'Shops, malls and markets that aren’t food.', false),
   k('meetup', 'Meet-up or event', 'comment-user', 'activities', 'place', 'Meeting people, or an event you’re going to.', false),
