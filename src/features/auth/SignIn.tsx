@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Notification, Button, Card, Icon, TextField } from '../../design/components';
+import { Notification, Button, Card, Logo, TextField } from '../../design/components';
 import { store } from '../../data';
 import { describeAuthError, isInAppBrowser } from '../../lib/authErrors';
 import s from './SignIn.module.css';
@@ -29,7 +29,7 @@ export function SignIn({ message }: { message?: string }) {
   return (
     <div className={s.page}>
       <div className={s.hero}>
-        <span className={s.mark}><Icon name="plane" size={40} /></span>
+        <span className={s.mark}><Logo size={88} /></span>
         <h1 className="t-display">Plan trips… together</h1>
         <p className="t-body t-secondary">Whether you’re going solo or with people, plan your trips, know where’s next and keep your travels saved.</p>
       </div>

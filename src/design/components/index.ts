@@ -17,3 +17,4 @@ export { FlowScreen, CelebrationScreen, Calendar } from './Flow';
 export { ContextMenu, type ContextMenuItem } from './ContextMenu';
 export { Accordion } from './Accordion';
 export { LocationCard } from './LocationCard';
+export { Logo } from './Logo';
