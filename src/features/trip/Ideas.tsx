@@ -1,5 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
-import { hasStep, stepTab, useSwipeTabs } from '../../app/useSwipeTabs';
+import { useEffect, useState } from 'react';
 import { SlideSwap } from '../shared/SlideSwap';
 import { useSearchParams } from 'react-router-dom';
 import { Button, EmptyState, IdeaRow, LinkButton, ListGroup, ListItem, PageSection, SectionHeader, SegmentControl, Select, Sheet, TextArea, TextField, useToast } from '../../design/components';
@@ -55,8 +54,6 @@ export function Ideas(ctx: TripCtx) {
   const topOf = (shown: Idea[]) => shown[0] && ups(shown[0]) > 0 && (shown.length === 1 || ups(shown[0]) > ups(shown[1])) ? shown[0].id : null;
   // Swipe the list sideways to move between To decide · Planned · Passed (the list slides like the trip's days)
   const FILTERS: Filter[] = ['open', 'approved', 'rejected'];
-  const swipeBox = useRef<HTMLDivElement>(null);
-  useSwipeTabs(swipeBox, (dir) => { const n = stepTab(FILTERS, filter, dir); if (n) setFilter(n); }, (dir) => hasStep(FILTERS, filter, dir));
   const vote = async (i: Idea) => {
     const mine = !!i.votes?.[me.uid];
     haptic('light');
@@ -77,7 +74,7 @@ export function Ideas(ctx: TripCtx) {
         { value: 'approved', label: `Planned · ${count('approved')}` },
         { value: 'rejected', label: `Passed · ${count('rejected')}` },
       ]} />
-      <div ref={swipeBox} className={s.swipeArea}>
+      <div className={s.swipeArea}>
       <SlideSwap value={filter} id={filter} rank={FILTERS.indexOf(filter)}>{(filter) => { const shown = shownFor(filter); const top = topOf(shown); return (<div className={s.ideaList}>
       {shown.length === 0 ? (
         <EmptyState illustration="ideas" title={filter === 'open' ? 'No ideas to decide on' : 'Nothing here yet'}
