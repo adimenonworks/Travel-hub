@@ -13,6 +13,8 @@ type Kind = 'push' | 'back' | 'tab' | 'none';
 let pending: Kind | null = null;
 /** Say how the next screen change should look (call just before navigating). */
 export const nextTransition = (k: Kind) => { pending = k; };
+/** How the screen change now happening will look, without using up the request (ScreenStack reads it while rendering). */
+export const peekTransition = (navType: string): Kind => pending ?? (navType === 'PUSH' ? 'push' : 'none');
 
 /** Back, the app way: step back through history when there is somewhere to go back to, else go to the parent screen. */
 export function goBack(navigate: NavigateFunction, parent: string) {

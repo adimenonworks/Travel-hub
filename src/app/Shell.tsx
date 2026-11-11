@@ -2,7 +2,7 @@ import { createContext, useContext, useEffect, useState, type ReactNode } from '
 import { useLocation, useNavigate } from 'react-router-dom';
 import { BottomNav, Notification, ToastProvider, type NavTab } from '../design/components';
 import { store } from '../data';
-import { screenKey, useScreenTransition } from './navigation';
+import { ScreenStack } from './ScreenStack';
 import { SwipeBack } from './SwipeBack';
 import { ChatAlerts } from './ChatAlerts';
 import { NewTrip } from '../features/trip/NewTrip';
@@ -35,7 +35,6 @@ export function Shell({ children }: { children: ReactNode }) {
   const { pathname } = useLocation();
   const tabs = TABS;
   const showNav = !pathname.startsWith('/join/') && pathname !== '/design';
-  const transition = useScreenTransition();
 
   return (
     <NewTripContext.Provider value={newTrip}>
@@ -50,7 +49,7 @@ export function Shell({ children }: { children: ReactNode }) {
                 <Notification state="warning">Demo mode: data is saved only in this browser. Connect Firebase to share trips with friends (see README).</Notification>
               </div>
             )}
-            <div key={screenKey(pathname)} className={transition === 'none' ? undefined : s[transition]}>{children}</div>
+            <ScreenStack>{children}</ScreenStack>
           </main>
         </SwipeBack>
         {showNav && <BottomNav tabs={tabs} />}

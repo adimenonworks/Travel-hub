@@ -8,14 +8,32 @@
 
 .main { min-width: 0; padding-top: env(safe-area-inset-top); overflow-x: clip; /* a screen sliding in never makes the page scroll sideways */ }
 /* Room for the Bottom Nav (its height, the 8px gap and the home indicator) under every page */
-.push { animation: pushIn var(--motion-screen); }
-.back { animation: backIn var(--motion-screen); }
+/* Screen changes (ScreenStack.tsx): both screens move together, like iOS. Transform and opacity only. */
+.screen { position: relative; z-index: 1; }
+.leaving { position: fixed; left: 0; right: 0; z-index: 0; pointer-events: none; }
+/* Open: the new screen slides in from the right with a soft edge shadow, over the old one drifting left and dimming */
+.in-push { z-index: 2; min-height: 100dvh; background: var(--on-light-surface-primary); box-shadow: var(--shadow-overlay); animation: pushIn var(--motion-screen); will-change: transform; }
+.out-push { animation: driftLeft var(--motion-screen) forwards; will-change: transform; }
+.out-push::after { content: ''; position: absolute; inset: -100vh 0; background: var(--overlay-scrim); opacity: 0; animation: dimIn var(--motion-screen) forwards; }
+/* Back: the mirror. The current screen slides off to the right on top; the previous one comes in from the left */
+.in-back { animation: driftIn var(--motion-screen); will-change: transform; }
+.in-back::after { content: ''; position: absolute; inset: 0; background: var(--overlay-scrim); opacity: 0; pointer-events: none; animation: dimOut var(--motion-screen); }
+.out-back { z-index: 3; background: var(--on-light-surface-primary); box-shadow: var(--shadow-overlay); animation: pushOut var(--motion-screen) forwards; will-change: transform; }
+/* Bottom Nav: the old tab fades out over the new one, so there's never a blank frame */
+.out-tab { z-index: 3; background: var(--on-light-surface-primary); animation: fadeOut 200ms var(--ease-standard) forwards; will-change: opacity; }
+/* Held on the first frame until the new screen has drawn (ScreenStack), then it runs */
+.paused, .paused::after { animation-play-state: paused !important; }
 @keyframes pushIn { from { transform: translateX(100%); } }
-@keyframes backIn { from { transform: translateX(-30%); opacity: 0.6; } }
-/* Switching tabs: a quick cross-fade with a slight rise, like iOS tab bars */
-.tab { animation: tabIn var(--duration-base) var(--ease-fluid); }
-@keyframes tabIn { from { opacity: 0; transform: translateY(6px); } }
-@media (prefers-reduced-motion: reduce) { .push, .back, .tab { animation: none; } }
+@keyframes pushOut { to { transform: translateX(100%); } }
+@keyframes driftLeft { to { transform: translateX(-30%); } }
+@keyframes driftIn { from { transform: translateX(-30%); } }
+@keyframes dimIn { to { opacity: 0.4; } }
+@keyframes dimOut { from { opacity: 0.4; } }
+@keyframes fadeOut { to { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) {
+  .in-push, .in-back, .out-push, .in-back::after, .out-push::after { animation: none; box-shadow: none; }
+  .out-push, .out-back, .out-tab { z-index: 3; background: var(--on-light-surface-primary); animation: fadeOut 150ms var(--ease-standard) forwards; }
+}
 /* Every page already ends with 96px (space/default/1000), which clears the floating Bottom Nav (64 + 16).
    Add the safe area (home indicator), and whatever the bar grows by at larger text sizes. */
 .withNav { padding-bottom: calc(env(safe-area-inset-bottom) + max(0px, var(--size-tab-bar) - 60px)); }

@@ -31,7 +31,7 @@
 /* The name's link covers the whole card; the chips, avatars and the row sit above it */
 .nameLink::after { content: ''; position: absolute; inset: 0; z-index: 1; }
 .hero:has(.nameLink) { position: relative; cursor: pointer; transition: transform var(--motion-release); }
-.hero:has(.nameLink):active { transform: scale(0.99); transition: transform var(--motion-press); }
+.hero:has(.nameLink):active { transform: scale(0.98); transition: transform var(--motion-press); }
 .chips, .rows { position: relative; z-index: 2; }
 .meta { font: var(--type-body); color: var(--on-light-text-secondary); }
 .chips { margin: 0; padding: 0; list-style: none; display: flex; flex-wrap: wrap; gap: var(--space-default-300); }
