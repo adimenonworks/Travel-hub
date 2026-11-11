@@ -176,6 +176,14 @@
 .optionSelected { border-color: var(--on-light-border-focus); box-shadow: inset 0 0 0 1px var(--on-light-border-focus); }
 .optionLabel { font: var(--type-heading-3); letter-spacing: -0.02em; color: var(--on-light-text-primary); }
 .optionDescription { font: var(--type-body-small); color: var(--on-light-text-secondary); text-align: left; }
+.optionTiled { gap: var(--space-default-500); }
+.optionTile { flex: none; display: grid; place-items: center; width: 40px; height: 40px; border-radius: var(--radius-1000); background: var(--on-light-surface-secondary); color: var(--on-light-icon-primary); }
+
+/* Figma "Type" (Event card, Option card): the icon tile's colour by event type. Neutral keeps the tile it sits in. */
+.tone-travel { background: var(--category-travel-surface); color: var(--category-travel-icon); }
+.tone-stays { background: var(--category-stays-surface); color: var(--category-stays-icon); }
+.tone-food { background: var(--category-food-surface); color: var(--category-food-icon); }
+.tone-activities { background: var(--category-activities-surface); color: var(--category-activities-icon); }
 
 /* Search field: pill, 16 / 20, gap 8 */
 .search { display: flex; align-items: center; gap: var(--space-default-300); min-height: 58px; padding: var(--space-default-500) var(--space-default-600); border-radius: var(--radius-1000); background: var(--on-light-surface-primary); border: 1px solid var(--on-light-border-subtle); color: var(--on-light-icon-primary); }

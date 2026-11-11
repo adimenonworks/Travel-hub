@@ -294,6 +294,21 @@ export function DesignSystem() {
           <EventCard icon="notebook" layout="note" title="Bag drop closes 40 min before" place="Sam has the passports" />
         </Section>
 
+        <Section title="Event types" footer="Type sets the icon tile's colour (--category-<type>-surface / -icon): Travel (flights and getting around) sky, Stays violet, Food & drink yellow, Activities pink; Free time and Notes stay Neutral. The Next state ignores it. Option cards in the Add to itinerary picker use the same tiles, 16px above the text.">
+          <EventCard icon="plane" tone="travel" title="Transfer to the hotel" time="09:30 – 10:10" place="Porto Airport" to="/design" />
+          <EventCard icon="hotel" tone="stays" title="Check-in · Torel Palace" time="15:00" place="Ribeira" to="/design" />
+          <EventCard icon="coffee" tone="food" title="Coffee at Combi" time="11:00 – 11:45" place="Baixa" to="/design" />
+          <EventCard icon="bank" tone="activities" title="Serralves Museum" time="12:30 – 14:30" place="Lordelo do Ouro" to="/design" />
+          <EventCard icon="hourglass" title="Free time" time="16:00 – 18:00" place="Wander the riverside" placeIcon={null} to="/design" />
+          <div className={s.optionGrid}>
+            <OptionCard icon="plane" tone="travel" label="Flights" description="Flights, including connections and layovers" onClick={() => {}} />
+            <OptionCard icon="bed" tone="stays" label="Stays" description="Hotels, apartments, hostels, camping and cruises" onClick={() => {}} />
+            <OptionCard icon="utensils" tone="food" label="Food & drink" description="Restaurants, cafés, bars and markets" onClick={() => {}} />
+            <OptionCard icon="ticket" tone="activities" label="Activities" description="Sights, tours, walks, hikes, shows and experiences" onClick={() => {}} />
+            <OptionCard icon="hourglass" tone="neutral" label="Free time" description="Time to rest, wander or keep open" onClick={() => {}} />
+          </div>
+        </Section>
+
         <Section title="Rows, groups and tiles" footer="Section header, List group of List items (Default / Compact), Idea rows with Vote buttons, Tiles, Map card, Stat strip, Profile Card.">
           <SectionHeader title="Saved for later" meta="4 places · 61 saves" action={<LinkButton to="/design" variant="ghost" size="regular" iconEnd="chevron-right">See all</LinkButton>} />
           <ListGroup>

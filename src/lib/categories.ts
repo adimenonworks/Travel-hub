@@ -1,4 +1,4 @@
-import type { IconName } from '../design/components';
+import type { CategoryTone, IconName } from '../design/components';
 import type { Category } from '../data/types';
 
 /**
@@ -116,6 +116,17 @@ export const eventType = (c: Category | string): EventType => kindInfo(c).type;
 
 /** How any stored category behaves: its card layout and fields. */
 export const behaviourOf = (c: Category | string): Behaviour => kindInfo(c).behaviour;
+
+/**
+ * The colour of each type (owner's choice, 11 Nov 2026: "Option D"): it fills the icon tile on Event cards and in the
+ * type picker. Travel is sky, Stays violet, Food & drink yellow, Activities pink; Free time and Notes stay neutral.
+ */
+export const TYPE_TONE: Record<EventType, CategoryTone> = {
+  flights: 'travel', transport: 'travel', stays: 'stays', food: 'food', activities: 'activities', free: 'neutral', notes: 'neutral',
+};
+
+/** The colour of any stored category's type. */
+export const categoryTone = (c: Category | string): CategoryTone => TYPE_TONE[eventType(c)];
 
 /** Everyday spending (no price per person, not added to the budget): food & drink, free time and notes. */
 export const isEveryday = (c: Category | string) => { const t = eventType(c); return t === 'food' || t === 'free' || t === 'notes'; };

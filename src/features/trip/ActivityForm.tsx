@@ -5,7 +5,7 @@ import { useMe, useSub } from '../../data/hooks';
 import type { Activity, Category, LinkItem, Place, Trip } from '../../data/types';
 import { addDays, dayWord, formatDay, formatTime, tripDays } from '../../lib/dates';
 import { geocodePlace } from '../../lib/geocode';
-import { EVENT_TYPES, behaviourOf, eventKind, isEveryday, kindInfo, spanWords, type EventKind, type EventType } from '../../lib/categories';
+import { EVENT_TYPES, TYPE_TONE, behaviourOf, eventKind, isEveryday, kindInfo, spanWords, type EventKind, type EventType } from '../../lib/categories';
 import { haptic, confirmAction } from '../../lib/native';
 import { LinkEditor, cleanLinks } from '../shared/Links';
 import { zoneAt, zoneOfDay } from '../../lib/timezone';
@@ -255,7 +255,7 @@ export function ActivityForm({ open, trip, date, activity, draft, onClose, onCre
       {!f.type ? (
         // Step 1: the 7 types, each with what it covers
         <div className={s.typeList} role="group" aria-label="Type">
-          {EVENT_TYPES.map((t) => <OptionCard key={t.value} icon={t.icon} label={t.label} description={t.hint} onClick={() => pickType(t.value)} />)}
+          {EVENT_TYPES.map((t) => <OptionCard key={t.value} icon={t.icon} label={t.label} description={t.hint} tone={TYPE_TONE[t.value]} onClick={() => pickType(t.value)} />)}
         </div>
       ) : (
         <>
