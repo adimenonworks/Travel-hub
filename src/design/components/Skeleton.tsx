@@ -13,10 +13,12 @@ export function Skeleton({ shape = 'text', width, height }: { shape?: 'text' | '
 /**
  * A page loading: a title, a big card and a few lines, used instead of a spinner.
  * `bare` is for inside a page that already shows its own header: just the content shapes, full width.
+ * `fullscreen` is for the one drawn before the app frame exists (while Rove checks who's signed in): it keeps clear of
+ * the status bar and Dynamic Island itself.
  */
-export function PageSkeleton({ label = 'Loading', bare }: { label?: string; bare?: boolean }) {
+export function PageSkeleton({ label = 'Loading', bare, fullscreen }: { label?: string; bare?: boolean; fullscreen?: boolean }) {
   return (
-    <div className={[s.page, bare && s.bare].filter(Boolean).join(' ')} role="status" aria-label={label}>
+    <div className={[s.page, bare && s.bare, fullscreen && s.fullscreen].filter(Boolean).join(' ')} role="status" aria-label={label}>
       {!bare && <Skeleton width="55%" height="calc(48rem / 17)" />}
       <Skeleton shape="block" height={bare ? 231 : 340} />
       <Skeleton width="40%" height="calc(20rem / 17)" />
