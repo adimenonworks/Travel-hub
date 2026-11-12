@@ -21,7 +21,7 @@ const DesignSystem = lazy(() => import('../features/design/DesignSystem').then((
 function Routed() {
   const { user, loading } = useAuth();
   const { pathname, search } = useLocation();
-  if (loading) return <PageSkeleton />;
+  if (loading) return <PageSkeleton fullscreen />;
   if (pathname === '/design' && !user) return <DesignSystem />;
   const joining = pathname.startsWith('/join/');
   // Collection invite links end in ?to=collection, so the message is right before anyone has signed in
