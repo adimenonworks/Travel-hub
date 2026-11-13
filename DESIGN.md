@@ -588,7 +588,7 @@ Decisions recorded (13 Nov 2026):
 ### Component names
 
 Controls: Button · Icon button · Switch · Chip · Text field · Segment control (`.Segment`) · `.Vote button` · Step progress · Option card · Calendar (`.Calendar day`)
-Navigation: Page header · Trip header · Section header · Tab bar (`.Tab`) · Bottom nav (`.Nav item`) · Context menu (`.Context menu item`) · Sheet · Flow screen
+Navigation: Page header · Section header · Tab bar (`.Tab`) · Bottom nav (`.Nav item`) · Context menu (`.Context menu item`) · Sheet · Flow screen
 Content & lists: List item · List group · Idea row · Accordion · Tag · `.Category icon` · Stat · Stat strip
 Cards: Card · Empty state · Tile · Hero card · Budget card · Map card
 Trip: Event card · Day card · Now line · Travel connector · Journey details card · Span card · Layover block

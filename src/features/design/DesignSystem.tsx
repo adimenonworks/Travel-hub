@@ -4,7 +4,7 @@ import {
   LinkButton, PageHeader, PageSection, SegmentControl, Select, Sheet, Tabs, TextArea, TextField, NowLine, Illustration,
   type IllustrationName, COVER_ILLUSTRATIONS, ICON_NAMES, useToast, BottomNav, Skeleton, Logo,
   ListItem, ListGroup, SectionHeader, EventCard, TravelConnector, IdeaRow, Tile, StatStrip, ProfileCard,
-  OptionCard, BudgetCard, Switch, StepProgress, TripHeader, DayCard, CountryModal,
+  OptionCard, BudgetCard, Switch, StepProgress, DayCard, CountryModal,
   CategoryIcon, ContextMenu, Accordion, SpanCard, MapCard,
 } from '../../design/components';
 import { flagUrl } from '../../lib/countries';
@@ -273,12 +273,12 @@ export function DesignSystem() {
           </div>
         </Section>
 
-        <Section title="Trip components" footer="Hero card (phase-aware countdown, an optional heads-up row; no next-up row since 11 Nov 2026: Home shows the Next card on its own), Trip header, Day card, NowLine.">
+        <Section title="Trip components" footer="Hero card (phase-aware countdown, an optional heads-up row; no next-up row since 11 Nov 2026: Home shows the Next card on its own), Page header with Show meta (the old Trip header), Day card, Now line.">
           <HeroCard cover={<Illustration name={COVER_ILLUSTRATIONS[1]} />} countdown={{ label: 'In 9 days' }} title="Portugal & Spain" meta="Nov 2 – 11 · 10 days"
             people={[{ id: 'a', name: 'Alex Menon' }, { id: 'j', name: 'Jo Ma' }, { id: 's', name: 'Sam Lee' }, { id: 'p', name: 'Priya Shah' }]} to="/design" />
           <HeroCard countdown={{ label: 'Day 3 of 15' }} title="Japan" meta="Mar 20 – Apr 3 · 15 days" people={[{ id: 'a', name: 'Alex Menon' }, { id: 'j', name: 'Jo Ma' }, { id: 's', name: 'Sam Lee' }, { id: 'p', name: 'Priya Shah' }]} />
           <HeroCard cover={<Illustration name={COVER_ILLUSTRATIONS[2]} />} countdown={{ label: 'In 40 days' }} title="Japan" meta="Dec 17 – 31 · 15 days" to="/design" />
-          <TripHeader title="Portugal & Spain" back={{ to: '/design', label: 'Trips' }} action={{ icon: 'pencil', label: 'Edit trip', onClick: () => {} }}
+          <PageHeader size="small" title="Portugal & Spain" back={{ to: '/design', label: 'Trips' }} action={{ icon: 'pencil', label: 'Edit trip', onClick: () => {} }}
             meta="2 – 11 Nov · 10 days" />
           <div className={s.row}>
             <DayCard day={3} weekday="Tue" label="Today, Tuesday 3 November" selected onClick={() => {}} />

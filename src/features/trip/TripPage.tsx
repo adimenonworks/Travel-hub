@@ -2,7 +2,7 @@ import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { Navigate, Route, Routes, useLocation, useMatch, useNavigate, useParams, type Location } from 'react-router-dom';
 import { savedScroll } from '../../app/navigation';
 import { SlideSwap } from '../shared/SlideSwap';
-import { EmptyState, LinkButton, PageSkeleton, Tabs, TripHeader, type TabItem } from '../../design/components';
+import { EmptyState, LinkButton, PageSkeleton, Tabs, PageHeader, type TabItem } from '../../design/components';
 import { useMe, useProfiles, useRole, useSub, useTrip } from '../../data/hooks';
 import { useStarMigration } from '../saves/starEvent';
 import type { Activity, Album, Comment, Idea, Profile, Trip } from '../../data/types';
@@ -90,8 +90,8 @@ function TripLoaded({ trip }: { trip: Trip }) {
   return (
     <>
       <Content>
-        {/* Figma "Trip header": back to Trips, the name (Title small) with Edit, then the dates only */}
-        <TripHeader
+        {/* Figma "Page header" (Size Small, Show meta): back to Trips, the name with Edit, then the dates only */}
+        <PageHeader size="small"
           title={trip.name}
           back={{ to: '/trips', label: 'Trips' }}
           action={canManage ? { icon: 'pencil', label: 'Edit trip', onClick: () => setEditing(true) } : undefined}

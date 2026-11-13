@@ -13,17 +13,19 @@ import s from './Bars.module.css';
  * Figma "Page header": an optional ghost back button, then the title row: the title (Type=Title Large: Display 48;
  * Title small: Heading 1, both in the brand text colour) with an optional Label subtitle, and one optional secondary icon button.
  */
-export function PageHeader({ title, subtitle, back, action, fit, size = 'large', icon, tone }: {
+export function PageHeader({ title, subtitle, meta, back, action, fit, size = 'large', icon, tone }: {
   title: ReactNode;
   subtitle?: ReactNode;
+  /** Figma "Show meta": a Body line under the title row (a trip's dates: "2 – 11 Nov · 10 days"). This is the old Trip header, merged in on 13 Nov 2026. */
+  meta?: ReactNode;
   back?: { to: string; label: string };
-  /** The one optional button, e.g. edit the trip */
+  /** Figma "Show trailing": the one optional button, e.g. edit the trip */
   action?: { icon: IconName; label: string; onClick: () => void };
   /** Keep the title on one line: if it doesn't fit, it steps down to the Heading 1 size */
   fit?: boolean;
-  /** Figma "Type": large = Title Large (tabs), small = Title small (a trip's pages) */
+  /** Figma "Size": Large (tabs: Display) or Small (pushed pages and a trip's pages: Heading 1) */
   size?: 'large' | 'small';
-  /** Figma "Show icon" (Size Small): the event's category icon tile, in its type's colour, before the title */
+  /** Figma "Show leading icon" (Size Small): the event's category icon tile, in its type's colour, before the title */
   icon?: IconName; tone?: CategoryTone;
 }) {
   const navigate = useNavigate();
@@ -54,6 +56,7 @@ export function PageHeader({ title, subtitle, back, action, fit, size = 'large',
           </div>
         )}
       </div>
+      {meta && <div className={s.meta}>{meta}</div>}
     </header>
   );
 }

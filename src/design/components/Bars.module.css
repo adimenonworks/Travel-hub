@@ -12,6 +12,7 @@
 .fit { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding-block: 0.12em; margin-block: -0.12em; } /* room for descenders (g, p, y) that the 1.0 line height would clip */
 .fitSmaller { font-size: var(--size-heading-1); } /* same display font, Heading 1 size, when the line still does not fit */
 .subtitle { color: var(--on-light-text-secondary); font: var(--type-label); } /* Label */
+.meta { font: var(--type-body); color: var(--on-light-text-secondary); } /* Show meta: a trip's dates, 12 under the title row */
 .leadIcon { flex: none; align-self: flex-start; } /* the category tile, top-aligned with the title */
 .actions { flex: none; display: flex; align-items: center; gap: var(--space-default-400); }
 /* Large: Body subtitle; Regular button and 72 avatar (gap 24) */
