@@ -35,8 +35,6 @@
 .chips { margin: 0; padding: 0; list-style: none; display: flex; flex-wrap: wrap; gap: var(--space-default-300); }
 .rows { border-top: 1px solid var(--on-light-divider-default); display: flex; flex-direction: column; }
 
-/* Figma "Trip header": Page header, then meta and chips, gap 12 */
-.tripHeader { display: flex; flex-direction: column; gap: var(--space-default-400); }
 
 /* Figma "Day card": 24 corners, the date (Display tiny) over the weekday. Unselected: ghost with a border, 64 wide.
    Selected: brand (selected primary) and wider (88), so it pushes the cards beside it aside; picking another day

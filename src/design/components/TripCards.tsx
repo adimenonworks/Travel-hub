@@ -2,7 +2,6 @@ import { type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import { Icon, type IconName } from './Icon';
 import { AvatarStack, Tag } from './Misc';
-import { PageHeader } from './Bars';
 import { ListItem, type CategoryTone } from './Rows';
 import s from './TripCards.module.css';
 
@@ -55,20 +54,6 @@ export function HeroCard({ cover, photo, countdown, title, meta, people, to, hea
         )}
       </div>
     </section>
-  );
-}
-
-/** Figma "Trip header": the Page header (Title small) with back and edit, then the dates only ("2 – 11 Nov · 10 days"). */
-export function TripHeader({ title, meta, back, action }: {
-  title: string; meta: ReactNode;
-  back?: { to: string; label: string };
-  action?: { icon: IconName; label: string; onClick: () => void };
-}) {
-  return (
-    <div className={s.tripHeader}>
-      <PageHeader title={title} size="small" back={back} action={action} />
-      <div className={s.meta}>{meta}</div>
-    </div>
   );
 }
 
