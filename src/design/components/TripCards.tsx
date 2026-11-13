@@ -84,13 +84,65 @@ export function NowLine({ time }: { time: string }) {
 
 type JourneyEnd = { city: string; time: string; date: string; terminal?: string };
 /**
- * Figma "Journey details card" (421:3200): the top of a flight's or train's detail page. Tags for the number and the
+ * Figma "Journey card" (613:681): one card for anything with two ends, at the top of its event page.
+ * - Layout Journey: a stack of `.Leg` (`JourneyLeg`) cards with a `.Stop` (`JourneyStop`) between legs, 8px apart.
+ *   A direct journey is one leg; layovers are worked out from the legs, never stored.
+ * - Layout Span: the two ends side by side (Check-in / Check-out, Pick-up / Drop-off, Embark / Disembark, Drop-off /
+ *   Collect): a Body small label, the date (Heading 3), the time and, for a car, the place; an optional footer says how
+ *   long (2 nights). Grey card, 24 corners, a divider between the two ends.
+ * Merged from Journey details card, Layover block and Span card on 13 Nov 2026 (structure only: nothing looks different).
+ */
+export function JourneyCard(props:
+  | { layout?: 'journey'; children: ReactNode; label?: string }
+  | { layout: 'span'; start: SpanEnd; end: SpanEnd; footer?: string }) {
+  if (props.layout === 'span') {
+    const { start, end, footer } = props;
+    const col = (e: SpanEnd) => (
+      <div className={s.spanEnd}>
+        <span className={s.spanLabel}>{e.label}</span>
+        <span className={s.spanDate}>{e.date}</span>
+        {e.time && <span className={s.spanTime}>{e.time}</span>}
+        {e.place && <span className={s.spanLabel}>{e.place}</span>}
+      </div>
+    );
+    return (
+      <div className={s.span}>
+        <div className={s.spanEnds}>{col(start)}<span className={s.spanDivider} aria-hidden="true" />{col(end)}</div>
+        {footer && <p className={s.spanLabel}>{footer}</p>}
+      </div>
+    );
+  }
+  return <div className={s.journeyCard} aria-label={props.label}>{props.children}</div>;
+}
+type SpanEnd = { label: string; date: string; time?: string; place?: string };
+
+/**
+ * Figma "Layover block" → `.Stop` in Journey card: between the legs of one journey. Where and how long (worked out from
+ * the gap between legs, never stored), an optional Warning tag ("Tight connection", "Overnight in Dubai") and action.
+ */
+export function JourneyStop({ title, meta, warning, action }: { title: string; meta?: string; warning?: string; action?: ReactNode }) {
+  return (
+    <div className={s.layover}>
+      <div className={s.layoverRow}>
+        <Icon name="clock" size={24} />
+        <div className={s.layoverText}>
+          <span className="t-heading-4">{title}</span>
+          {meta && <span className="t-body-small t-secondary">{meta}</span>}
+        </div>
+      </div>
+      {(warning || action) && <div className={s.layoverActions}>{warning && <Tag tone="warning" icon="info">{warning}</Tag>}{action}</div>}
+    </div>
+  );
+}
+
+/**
+ * Figma `.Leg` in Journey card (was "Journey details card"): one leg of a flight or train. Tags for the number and the
  * status ("Check-in open" Warning, then "On time" Success, "Delayed" Warning or "Cancelled" Danger); the two cities with
  * big times and dates, the duration between; then (Show airport details) terminal, gate and boarding on the left,
  * terminal and belt on the right; a footer ("Operated by TAP Air Portugal · updated 2 min ago").
  * Trains, buses and ferries show stations or ports, the operator, coach and seat, and no live status.
  */
-export function JourneyDetails({ mode = 'plane', number, status, duration, from, to, gate, boarding, belt, footer, airportDetails = true }: {
+export function JourneyLeg({ mode = 'plane', number, status, duration, from, to, gate, boarding, belt, footer, airportDetails = true }: {
   /** The journey's icon: Plane, Train, Bus, Ferry or Taxi */ mode?: IconName; number?: string;
   status?: { label: string; tone: 'success' | 'warning' | 'danger' };
   duration?: string; from: JourneyEnd; to: JourneyEnd;

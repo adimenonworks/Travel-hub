@@ -1,5 +1,5 @@
 import { useState, type CSSProperties } from 'react';
-import { Avatar, AvatarStack, Tag, Chip, Banner, Button, Card, FieldRow, HeroCard, Icon, IconButton, LinkButton, PageHeader, PageSection, SegmentControl, Select, Sheet, Tabs, TextArea, TextField, NowLine, Illustration, type IllustrationName, COVER_ILLUSTRATIONS, ICON_NAMES, useToast, BottomNav, Skeleton, Logo, ListItem, ListGroup, SectionHeader, EventCard, TravelConnector, IdeaRow, Tile, StatStrip, ProfileCard, OptionCard, BudgetCard, Switch, StepProgress, DayCard, CountryModal, CategoryIcon, ContextMenu, Accordion, SpanCard, MapCard } from '../../design/components';
+import { Avatar, AvatarStack, Tag, Chip, Banner, Button, Card, FieldRow, HeroCard, Icon, IconButton, LinkButton, PageHeader, PageSection, SegmentControl, Select, Sheet, Tabs, TextArea, TextField, NowLine, Illustration, type IllustrationName, COVER_ILLUSTRATIONS, ICON_NAMES, useToast, BottomNav, Skeleton, Logo, ListItem, ListGroup, SectionHeader, EventCard, TravelConnector, IdeaRow, Tile, StatStrip, ProfileCard, OptionCard, BudgetCard, Switch, StepProgress, DayCard, CountryModal, CategoryIcon, ContextMenu, Accordion, JourneyCard, JourneyLeg, JourneyStop, MapCard } from '../../design/components';
 import { flagUrl } from '../../lib/countries';
 import { EVENT_TYPES, TYPE_TONE } from '../../lib/categories';
 import type { ReactNode } from 'react';
@@ -347,9 +347,16 @@ export function DesignSystem() {
           <MapCard title="24 places · 3 cities" meta="6 of 24 visited · Saved by you and Sam" trailing={<AvatarStack people={[{ id: "a", name: "Alex Menon" }, { id: "s", name: "Sam Lee" }]} />} />
         </Section>
 
-        <Section title="Span card" footer="Figma Span card: the two ends of a stay, car, cruise, parking or luggage, at the top of its event page. A car shows its places; the footer says how long.">
-          <SpanCard start={{ label: 'Check-in', date: 'Thu 12 Nov', time: '15:00' }} end={{ label: 'Check-out', date: 'Sat 14 Nov', time: '11:00' }} footer="2 nights" />
-          <SpanCard start={{ label: 'Pick-up', date: 'Fri 13 Nov', time: '10:00', place: 'Porto Campanhã' }} end={{ label: 'Drop-off', date: 'Mon 16 Nov', time: '18:00', place: 'Barcelona Sants' }} footer="4 days" />
+        <Section title="Journey card" footer="Figma Journey card: one card for anything with two ends, at the top of its event page. Layout Journey stacks .Leg cards with a .Stop (a layover) between them; Layout Span shows the two ends of a stay, car, cruise, parking or luggage side by side (a car shows its places; the footer says how long).">
+          <JourneyCard>
+            <JourneyLeg number="EK 405" status={{ label: 'On time', tone: 'success' }} duration="13h 25m"
+              from={{ city: 'Melbourne', time: '21:45', date: 'Wed 11 Nov', terminal: 'MEL · Terminal 2' }} to={{ city: 'Dubai', time: '05:10 +1', date: 'Thu 12 Nov', terminal: 'DXB · Terminal 3' }}
+              gate="" belt="" footer="Operated by Emirates · updated 2 min ago" />
+            <JourneyStop title="2h 35m in Dubai" meta="Change at DXB" warning="Tight connection" action={<Button tone="ghost" size="regular" icon="plus">Add a stay</Button>} />
+            <JourneyLeg number="EK 191" duration="7h 55m" from={{ city: 'Dubai', time: '07:45', date: 'Thu 12 Nov', terminal: 'DXB · Terminal 3' }} to={{ city: 'Lisbon', time: '12:40', date: 'Thu 12 Nov', terminal: 'LIS · Terminal 1' }} footer="Operated by Emirates" />
+          </JourneyCard>
+          <JourneyCard layout="span" start={{ label: 'Check-in', date: 'Thu 12 Nov', time: '15:00' }} end={{ label: 'Check-out', date: 'Sat 14 Nov', time: '11:00' }} footer="2 nights" />
+          <JourneyCard layout="span" start={{ label: 'Pick-up', date: 'Fri 13 Nov', time: '10:00', place: 'Porto Campanhã' }} end={{ label: 'Drop-off', date: 'Mon 16 Nov', time: '18:00', place: 'Barcelona Sants' }} footer="4 days" />
         </Section>
 
         <Section title="Accordion" footer="Figma Accordion: a grey card that folds a group away (a day of events in Save to Rove → Add to an event). Starts collapsed; the chevron turns over when open.">

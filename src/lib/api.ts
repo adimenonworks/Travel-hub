@@ -80,7 +80,7 @@ export function useFlightStatus(a: Activity | undefined) {
 }
 
 /**
- * The status Tag on the Journey details card: "Check-in open" (Warning) in the usual check-in window (24 hours to
+ * The status Tag on the Journey card's `.Leg`: "Check-in open" (Warning) in the usual check-in window (24 hours to
  * 1 hour before departure), then "On time" (Success), "Delayed" (Warning) or "Cancelled" (Danger). Rove never says
  * whether you've checked in. Without live data it only shows the check-in window.
  */
