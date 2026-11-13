@@ -1,5 +1,5 @@
 import { useState, type CSSProperties } from 'react';
-import { Avatar, AvatarStack, Tag, Chip, Banner, Button, Card, FieldRow, HeroCard, Icon, IconButton, LinkButton, PageHeader, PageSection, SegmentControl, Select, Sheet, Tabs, TextArea, TextField, NowLine, Illustration, type IllustrationName, COVER_ILLUSTRATIONS, ICON_NAMES, useToast, BottomNav, Skeleton, Logo, ListItem, ListGroup, SectionHeader, EventCard, TravelConnector, IdeaRow, Tile, StatStrip, ProfileCard, OptionCard, BudgetCard, StepProgress, DayCard, CountryModal, CategoryIcon, ContextMenu, Accordion, JourneyCard, JourneyLeg, JourneyStop, MapCard } from '../../design/components';
+import { Avatar, AvatarStack, Tag, Chip, Banner, Button, Card, FieldRow, HeroCard, Icon, IconButton, LinkButton, PageHeader, PageSection, SegmentControl, Select, Sheet, Tabs, TextArea, TextField, NowLine, Illustration, type IllustrationName, COVER_ILLUSTRATIONS, ICON_NAMES, useToast, BottomNav, Skeleton, Logo, ListItem, ListGroup, SectionHeader, EventCard, TravelConnector, IdeaRow, Tile, StatStrip, ProfileCard, OptionCard, BudgetCard, StepProgress, DayCard, CountryModal, CategoryIcon, ContextMenu, Accordion, Calendar, JourneyCard, JourneyLeg, JourneyStop, MapCard } from '../../design/components';
 import { flagUrl } from '../../lib/countries';
 import { EVENT_TYPES, TYPE_TONE } from '../../lib/categories';
 import type { ReactNode } from 'react';
@@ -61,6 +61,7 @@ const icons = ICON_NAMES;
 /** Living reference for tokens and components, at /#/design. */
 export function DesignSystem() {
   const [seg, setSeg] = useState<'a' | 'b' | 'c'>('a');
+  const [range, setRange] = useState<[string, string]>(['2026-11-14', '2026-11-21']);
   const [sheet, setSheet] = useState(false);
   const [menu, setMenu] = useState(false);
   const [country, setCountry] = useState<string | null>(null);
@@ -397,13 +398,14 @@ export function DesignSystem() {
           <ProfileCard name="Alex Menon" email="alex.menon@gmail.com · Google" onClick={() => {}} />
         </Section>
 
-        <Section title="Flow" footer="Text field with a leading icon (the old Search field), Option cards and Step progress (used on the New trip screens, which are screens, not components).">
+        <Section title="Flow" footer="Text field with a leading icon (the old Search field), Option cards, Step progress and the Calendar (.Calendar day: Default, Range, Start, End, Empty; tap two days for a range), used on the New trip screens, which are screens, not components.">
           <TextField icon="pin" type="search" aria-label="Search a country or city" placeholder="Search a country or city" />
           <div className={s.tiles}>
             <OptionCard icon="person" label="Just me" selected={opt === 'me'} onClick={() => setOpt('me')} />
             <OptionCard icon="people" label="With others" selected={opt === 'others'} onClick={() => setOpt('others')} />
           </div>
           <div className={s.flowSample}><StepProgress step={2} /></div>
+          <Calendar start={range[0]} end={range[1]} onChange={(a, b) => setRange([a, b])} />
         </Section>
 
         <Section title="Inputs">

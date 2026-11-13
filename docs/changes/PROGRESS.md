@@ -4,7 +4,7 @@ Read this first when starting a session. If it disagrees with the code or Figma,
 
 ## Prompt being worked on
 
-`docs/changes/rove-change-component-library.md` (component library cleanup). The other two prompts wait until it's finished.
+`docs/changes/rove-change-component-library.md` (component library cleanup) is **finished** (13 Nov 2026; caveats in the Check everything results below). Next: one of the other two prompts, `rove-change-people-and-sharing.md` or `rove-change-polish-and-library.md`, whichever the owner picks.
 
 ## Owner's decisions for this prompt (13 Nov 2026)
 
@@ -60,19 +60,18 @@ Read this first when starting a session. If it disagrees with the code or Figma,
 
 - A3 merges are all done. The Figma glossary block on Foundations (`597:724`: texts `597:730`, `597:733`, `597:736`, `597:742`) now matches `DESIGN.md`.
 - **Variant order done (13 Nov 2026):** every set is smallest size first, then state (Default · Pressed · Disabled · Selected · Focus · Filled · Next · Done), grouped by tone or type where a set has one. Changed: 328 icon and flag sets (Small then Large, Default then Filled; they're auto-layout, so the layer order is the visual order), Icon button `382:4034` (per tone: Small, Regular), Chip `291:6401` (per type: Default, Selected), Toast `173:1790` (Neutral Regular, Neutral Large, Danger Regular; 611 wide) and Page header `160:1684` (Small above Large; set 416 tall). The first variant is a set's default, so icons and flags now default to Small and Page header to Small. Sets reordered in A3 were left as they are.
-- **A4 (delete what's unused), part one done:** Switch (Figma `409:3230`, 2 variants, no instances; code `Switch`, only on `/#/design`) deleted from both; the Controls row closed up. The orphan "Destination header" comment in `Rows.tsx` removed (the component was already gone).
-- **A4 is stopped for the owner** (the prompt says report before deleting anything used in one place but not the other). Components with **no instance on Screens or inside another component, but used in the app**: Toast, Skeleton, Calendar, `.Calendar day` (Figma's Calendar doesn't nest it), Banner, Budget card, Context menu + `.Context menu item`, Accordion, Card, Logo, Journey card (+ `.Leg`, `.Stop`, used only inside it). Recommended: **keep all of them** (they're real, used components; the Screens page just shows eight core screens, and sheets/flows aren't drawn). Nothing is used in Figma but not in the app.
-- Also found: the Page header's back and edit buttons are instances of two old standalone components outside the Components section, "Button/Ghost/Small/Default" (`59:600`, 9 instances) and "Button/Secondary/Small/Default" (`5:26`, 7 instances; Secondary no longer exists), not the Button set. Recommended: swap them to Button (Tone Ghost) and Icon button (Tone Secondary) in Page header, checking it looks the same.
+- **A4 done (13 Nov 2026).** Switch deleted (part one). The owner kept every component that the app uses but no Figma screen draws (Toast, Skeleton, Calendar, `.Calendar day`, Banner, Budget card, Context menu + `.Context menu item`, Accordion, Card, Logo, Journey card + `.Leg`, `.Stop`): the Screens page shows eight core screens, and sheets and flows aren't drawn. Nothing is used in Figma but not in the app.
+- **Page header buttons (owner's yes, 13 Nov 2026):** the back button is now Button (Tone Ghost, Size Regular, chevron-left Small, label "Go back") and the edit button Icon button (Tone Secondary, Size Regular, pencil) in both Page header variants (`291:5536`, `160:1686`; `291:5541`, `160:1692`). It now matches the app exactly: the back button is 32px tall with a 16px icon box (was 40 / 24) and the edit button a 40px circle (was 48 × 40). The swap reset the Screens copies' back labels; they were set back (Trips on the three trip screens, Itinerary on Event, Collections on Saved · Country). Code: `PageHeader` passes `tone="secondary"` and the old `brand` Icon button alias is gone. The old standalone "Button/Ghost/Small/Default" (`59:600`) and "Button/Secondary/Small/Default" (`5:26`) are no longer on any page (the API reports no parent); their last three copies are on the Archive pages, so they were left alone.
 - Hero card copies: on Screens, Home's `500:569` showed the default dates under "Day 4 of 11"; now "Nov 7 – 17 · 11 days" like the same trip on Trips and Overview. "Home · during a trip" `545:2257` ("Day 3 of 10", "2 – 11 Nov · 10 days") is consistent and left as it is. The five copies on Planning still show the defaults (Planning isn't a source of truth).
 - Fixed as its own PR (pull request 114): the Segment control split words at 320px (even at the default text size: "Upcoming" and "Collections"; at 375px "Collections"). Words now never split; labels shrink to fit when a word is wider than its segment.
 
 ## Still to do
 
-The owner's answers on A4 and the Page header buttons, then variant order on Foundations, then the Check everything list and the Check everything list. At the end of A3: update the "Component names" block of the glossary on Foundations (`597:724`) to match `DESIGN.md`, and order the variants in the sets not yet touched.
+Nothing in this prompt. Left as caveats (see Check everything): Message has no matching code component, inner layer names weren't all checked, and a Back label / true Trailing slot on Page header weren't built.
 
 ## Figma changes so far
 
-See A1 and A2 above. **Variant count before the cleanup: 274** (Components section, not counting icons and flags); after A2: 270; after Tile, Tag, Hover and Flow screen: 240; after Map card, Hero card, Search field, Illustration, Page header and Card: 237 (Card gained two for Layout); after Journey card and event type in `.Category icon`: 202 (Event card 42 → 7, List item 12 → 2, Option card 14 → 4, Idea row 6 → 1, `.Category icon` 6 → 30, Journey card 2); after A4's Switch: **200** in 49 components.
+See A1 and A2 above. **Variant count before the cleanup: 274** (Components section, not counting icons and flags); after A2: 270; after Tile, Tag, Hover and Flow screen: 240; after Map card, Hero card, Search field, Illustration, Page header and Card: 237 (Card gained two for Layout); after Journey card and event type in `.Category icon`: 202 (Event card 42 → 7, List item 12 → 2, Option card 14 → 4, Idea row 6 → 1, `.Category icon` 6 → 30, Journey card 2); after A4's Switch: **200** in 49 components (final; icons and flags not counted). Flags renamed to sentence case ("Isle of Man", "Trinidad and Tobago": 10 sets).
 
 ## How to check screens
 
@@ -82,11 +81,16 @@ Build in demo mode (`npx vite build --mode demo --outDir <dir>`; a normal build 
 
 - Consider a neutral selected Chip with only the icon coloured, so Chip can drop `Type` (the last component multiplied by event type).
 
-## Added to the Check everything list
+## Check everything results (13 Nov 2026)
 
-- [ ] Every merge so far also checked at 375 × 812 (iPhone mini / X width), not just 393 × 852.
+- ✅ No overlapping sets (checked by script); grouped grid by kind; icons and flags in alphabetical grids; strays and duplicate sections cleaned (A1).
+- ⚠️ Sentence case everywhere: every component, property and value name in the Components section passes (checked by script; 10 flags fixed today). Inner layer names inside components weren't all checked. Nested-only parts start with "." ✅; glossary on Foundations and in `DESIGN.md` ✅.
+- ✅ Every A3 merge done in Figma and code (Number card and Profile card kept, with reasons). Variant count 274 → 200 (49 components). Unused components deleted after reporting (Switch); the rest kept by the owner.
+- ✅ Backup icons are on the Backup artifacts page (`318:11532`, 996 layers, unchanged).
+- ⚠️ Every screen looks the same: demo mode, 393 × 852 and 375 × 812, light and dark, Main before the cleanup (`de0eb2c`) against now. Pixel-identical: Trip · Overview, Itinerary, two event pages (stay, restaurant), You. Different only where approved: Home and Trips (one 5:2 Hero card cover, owner's choice C), Saved · Country (progress bar removed, "0 of 3 visited" in the meta line), Ideas (segments now one line, 21px shorter: owner's request today). Earlier merges also changed New trip's search field (11px shorter, approved) and small rows' icons (1.3px larger, a fix).
+- ⚠️ `/#/design` and `DESIGN.md` match the library, except **Message**: Figma has a Message component, but in code the chat bubble lives inside `features/shared/Comments.tsx`, not `design/components`, so `/#/design` doesn't show it. Calendar was missing from `/#/design` and was added today.
+- Checked at 375 × 812 as well as 393 × 852 (the item added to this list).
 
 ## Questions waiting for the owner
 
-1. A4: keep the components that are used in the app but never placed on a Figma screen (list under In progress)? Recommended: keep all.
-2. Swap the Page header's two old standalone buttons for the Button and Icon button sets? Recommended: yes.
+None. The owner answered both on 13 Nov 2026 (keep all; swap the Page header buttons).

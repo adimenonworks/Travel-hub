@@ -50,8 +50,8 @@ export function LinkButton({ to, href, tone, size, block, icon, iconEnd, label, 
   return <Link to={to!} className={c} aria-label={label} onClick={onClick}>{body}</Link>;
 }
 
-/** Figma Icon button tones. ('brand', the old emerald Page header action, now draws as Secondary: the grey circle.) */
-export type IconButtonTone = 'secondary' | 'ghost' | 'on-brand' | 'primary' | 'brand';
+/** Figma Icon button tones */
+export type IconButtonTone = 'secondary' | 'ghost' | 'on-brand' | 'primary';
 
 /**
  * Figma "Icon button" (Tone Secondary / Ghost / On brand / Primary): a 40px circle with a 24px icon, inside a 44px tap area.
@@ -65,7 +65,7 @@ export function IconButton({ icon, label, tone, state, small, className, type = 
   /** @deprecated Figma has one size (40px); ignored */ size?: ButtonSize;
   /** Show the filled icon (e.g. a starred event) */ state?: 'default' | 'filled';
 }) {
-  const t = (tone === 'brand' ? 'secondary' : tone) ?? 'ghost';
+  const t = tone ?? 'ghost';
   delete (rest as { size?: unknown }).size;
   return (
     <button type={type} className={[s.iconButton, small && s.iconSmall, s[`icon-${t}`], className].filter(Boolean).join(' ')} aria-label={label} title={label} {...rest}>
