@@ -48,7 +48,7 @@ export function PageHeader({ title, subtitle, meta, back, action, fit, size = 'l
     if (fit || !el) return;
     const ctx = document.createElement('canvas').getContext('2d');
     if (!ctx) return;
-    let width = -1;
+    let seen = '';
     const shrink = () => {
       el.style.removeProperty('font-size');
       const room = el.clientWidth;
@@ -60,7 +60,11 @@ export function PageHeader({ title, subtitle, meta, back, action, fit, size = 'l
       if (widest > room) el.style.fontSize = `${Math.floor(parseFloat(cs.fontSize) * (room / widest) * 10) / 10}px`;
     };
     shrink();
-    const ro = new ResizeObserver(() => { if (el.clientWidth !== width) { width = el.clientWidth; shrink(); } });
+    // Measure again when the width or the text size changes (not when the shrink itself changes the height)
+    const ro = new ResizeObserver(() => {
+      const key = `${el.clientWidth}|${getComputedStyle(document.documentElement).fontSize}`;
+      if (key !== seen) { seen = key; shrink(); }
+    });
     ro.observe(el);
     document.fonts?.ready.then(shrink).catch(() => {});
     return () => ro.disconnect();
