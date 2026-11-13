@@ -552,7 +552,7 @@ The same text sits on the Figma Foundations page ("Glossary", beside the Compone
 ### Naming rules
 
 - **Sentence case everywhere:** components, frames, properties and values ("Hero card", "Page header", `Show heads-up`).
-- **A "." in front** means a part that is only ever used inside another component, never placed on a screen by itself: `.Tab`, `.Segment`, `.Nav item`, `.Calendar day`, `.Vote button`, `.Category icon`, `.Context menu item`. (Message has no "." because it is placed on the Event screen by itself.)
+- **A "." in front** means a part that is only ever used inside another component, never placed on a screen by itself: `.Tab`, `.Segment`, `.Nav item`, `.Calendar day`, `.Vote button`, `.Category icon`, `.Context menu item`, `.Leg`, `.Stop`. (Message has no "." because it is placed on the Event screen by itself.)
 - In code the same names are written as one word: "Hero card" is `HeroCard`, `.Category icon` is `CategoryIcon`, `Show heads-up` is `headsUp`.
 
 ### Property names (exactly these, nothing else)
@@ -560,17 +560,18 @@ The same text sits on the Figma Foundations page ("Glossary", beside the Compone
 | Property | Means | Values |
 | --- | --- | --- |
 | `Type` | Event type (sets the colour). Only on `.Category icon` (nested in Event card, List item, Idea row, Option card, Page header) and Chip | Neutral · Travel · Stays · Food & drink · Activities · Notes |
-| `Tone` | Colour role, not event type | Default · Accent · Neutral · Success · Warning · Danger. Buttons use their own roles: Primary · Destructive · Inverse · Neutral · Tertiary · Ghost; Icon button: Secondary · Ghost · On brand · Primary |
+| `Tone` | Colour role, not event type | Default · Accent · Neutral · Success · Warning · Danger. Buttons use their own roles: Primary · Destructive · Inverse · Neutral · Tertiary · Ghost; Icon button: Secondary · Ghost · On brand · Primary; `.Category icon`, by the surface it sits on: Secondary · Primary · On dark |
 | `Size` | Size | Small · Regular · Large |
 | `State` | Interaction or status | Default · Pressed · Disabled · Selected · Focus · Filled · Next · Done · Suggested; plus a component's own statuses (Accordion: Collapsed · Expanded; `.Calendar day`: Range · Start · End · Empty; Step progress: Step 1–4) |
-| `Layout` | Structural variant | Per component (Event card: Standard · Journey · Note; Text field: Input · Text area · Dropdown; Avatar: Initials · More; Message: Theirs · Mine; Skeleton: Text · Block · Circle) |
+| `Layout` | Structural variant | Per component (Event card: Standard · Journey · Note; Card: Start · Centre; Option card: Plain · Category; Journey card: Journey · Span; Text field: Input · Text area · Dropdown; Avatar: Initials · More; Message: Theirs · Mine; Skeleton: Text · Block · Circle) |
 | `Show <thing>` | Something is visible or not | On / off |
 
 Decisions recorded (13 Nov 2026):
 
-- Chip's `Category` became `Type`.
+- Chip's `Category` became `Type`. Chip is the only component besides `.Category icon` that has `Type` (a selected category chip is filled with the colour).
+- Event type lives only in `.Category icon`; Event card, List item, Idea row, Option card and Page header nest it.
 - Avatar's `Kind` became `Layout` (Initials · More), not `Type`: `Type` only ever means the event type.
-- A selected, checked or voted control is `State` = Selected (Switch, `.Vote button`, `.Nav item`, `.Tab`, `.Segment`, Day card, Option card, Chip).
+- A selected, checked or voted control is `State` = Selected (`.Vote button`, `.Nav item`, `.Tab`, `.Segment`, Day card, Option card, Chip).
 - Button's `Variant` became `Tone`.
 - Illustration keeps `Name` for which drawing it is (the one exception, owner 13 Nov 2026): `Type` only ever means the event type, and the drawings don't differ in structure, so `Layout` would mislead. Cover scene merged into Illustration as `Size` Cover.
 
@@ -587,7 +588,7 @@ Decisions recorded (13 Nov 2026):
 
 ### Component names
 
-Controls: Button · Icon button · Switch · Chip · Text field · Segment control (`.Segment`) · `.Vote button` · Step progress · Option card · Calendar (`.Calendar day`)
+Controls: Button · Icon button · Chip · Text field · Segment control (`.Segment`) · `.Vote button` · Step progress · Option card · Calendar (`.Calendar day`)
 Navigation: Page header · Section header · Tab bar (`.Tab`) · Bottom nav (`.Nav item`) · Context menu (`.Context menu item`) · Sheet
 Content & lists: List item · List group · Idea row · Accordion · Tag · `.Category icon` · Stat · Stat strip
 Cards: Card (empty states too: Layout Centre) · Tile · Hero card · Budget card · Map card
