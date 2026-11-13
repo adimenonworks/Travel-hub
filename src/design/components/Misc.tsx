@@ -39,10 +39,10 @@ export function AvatarStack({ people, max = 3, size = 'regular' }: { people: { i
 }
 
 /**
- * Figma "Tag" Tone: Neutral, Tint, Category, Success, Warning, Danger. Neutral is the default and what the app uses;
- * Success / Warning / Danger only for a real status. Tint stays in the component but isn't used anywhere.
+ * Figma "Tag" Tone: Neutral, Category, Success, Warning, Danger. Neutral is the default and what the app uses;
+ * Success / Warning / Danger only for a real status. (Tint was removed on 13 Nov 2026: brand-tinted tags are banned.)
  */
-export type TagTone = 'neutral' | 'tint' | 'success' | 'warning' | 'danger' | 'category';
+export type TagTone = 'neutral' | 'success' | 'warning' | 'danger' | 'category';
 
 /** Figma "Tag": a pill with an optional 16px icon and a Label small label. */
 export function Tag({ tone = 'neutral', icon, iconState, flag, children }: {

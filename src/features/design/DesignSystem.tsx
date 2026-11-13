@@ -262,14 +262,14 @@ export function DesignSystem() {
           </div>
         </Section>
 
-        <Section title="Chips and tags" footer="Chip (country pills: tap opens the Country sheet; Default / Selected) and Tag (Neutral, Tint, Category, Success, Warning, Danger).">
+        <Section title="Chips and tags" footer="Chip (country pills: tap opens the Country sheet; Default / Selected) and Tag (Neutral, Category, Success, Warning, Danger).">
           <div className={s.row}>
             <Chip flag={flagUrl('pt')} onClick={() => setCountry('pt')} label="About Portugal">Portugal</Chip>
             <Chip selected flag={flagUrl('es')}>Spain</Chip>
             <Chip icon="people">4 going</Chip>
           </div>
           <div className={s.row}>
-            <Tag icon="calendar">In 9 days</Tag><Tag tone="tint" icon="check">Tint (unused)</Tag><Tag tone="category" icon="camera">Category</Tag><Tag tone="success" icon="check">Success</Tag><Tag tone="warning">Warning</Tag><Tag tone="danger">Danger</Tag>
+            <Tag icon="calendar">In 9 days</Tag><Tag tone="category" icon="camera">Category</Tag><Tag tone="success" icon="check">Success</Tag><Tag tone="warning">Warning</Tag><Tag tone="danger">Danger</Tag>
           </div>
         </Section>
 

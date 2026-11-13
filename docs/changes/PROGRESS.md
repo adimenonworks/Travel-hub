@@ -38,6 +38,7 @@ Read this first when starting a session. If it disagrees with the code or Figma,
 
 - **A3, merge and remove** (one pull request per change):
   - **Tile:** Orange, Green, Yellow and Pink removed (Figma set `331:3015` is now `Add` False / True; four archived copies on the Archive page were detached so they keep their look). Code: `Tile add` replaces `tone`.
+  - **Tag:** Tint removed (Figma `6:36`: Neutral, Category, Success, Warning, Danger; two archived copies detached). Code: `TagTone` has no `tint`.
 <!-- next A3 item goes above this line -->
 
 ## In progress
