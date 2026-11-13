@@ -11,6 +11,10 @@
   max-width: 100%;
 }
 .block { display: grid; width: 100%; }
+/* A word never splits: when the longest word doesn't fit its segment, the control gets .tight (8px sides) and --fit,
+   the shrink that makes it fit (set by SegmentControl.tsx, measured on the device) */
+.word { white-space: nowrap; }
+.tight .option { padding-inline: var(--space-default-300); }
 .option {
   min-height: 34px;
   /* Side padding gives way as text grows (16px at the default size, 8px from about 23px text), so words keep to one line */
@@ -19,9 +23,9 @@
   border-radius: var(--radius-1000);
   background: transparent;
   /* Label, growing up to 1.4× like the titles (then it stops, so "Member" fits half a phone at accessibility sizes) */
-  font: var(--weight-medium) min(calc(14rem / 17), 20px)/1.5 var(--font-family);
+  font: var(--weight-medium) calc(min(calc(14rem / 17), 20px) * var(--fit, 1))/1.5 var(--font-family);
   color: var(--interactive-selected-ghost-text);
-  overflow-wrap: break-word; text-align: center;
+  text-align: center;
   position: relative; z-index: 1;
   transition: background var(--motion-fast), color var(--motion-fluid), transform var(--motion-release);
 }
