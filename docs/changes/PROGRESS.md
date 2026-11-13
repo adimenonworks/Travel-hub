@@ -39,6 +39,7 @@ Read this first when starting a session. If it disagrees with the code or Figma,
 - **A3, merge and remove** (one pull request per change):
   - **Tile:** Orange, Green, Yellow and Pink removed (Figma set `331:3015` is now `Add` False / True; four archived copies on the Archive page were detached so they keep their look). Code: `Tile add` replaces `tone`.
   - **Tag:** Tint removed (Figma `6:36`: Neutral, Category, Success, Warning, Danger; two archived copies detached). Code: `TagTone` has no `tint`.
+  - **Hover dropped (Figma only):** Button `5:122` 48 → 36 (Default / Pressed / Disabled), `.Tab` `6:60` and `.Segment` `6:96` 4 → 3, Text field `7:89` 15 → 9 (Default / Focus / Filled; Typing merged into Focus). Sets re-gridded by tone, size, then state. Code keeps its `@media (hover: hover)` CSS for the website. Noticed, not changed: several components' `:hover` rules (tabs, chips, rows, tiles, day cards) are not inside `@media (hover: hover)`, so on iPhone they can stick after a tap; and Text field's Text area variants are drawn the same height as Input in Figma.
 <!-- next A3 item goes above this line -->
 
 ## In progress
