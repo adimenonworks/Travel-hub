@@ -17,19 +17,26 @@ Read this first when starting a session. If it disagrees with the code or Figma,
 
 ## Items done
 
-- Standing rule ("Challenge the owner's requests") added to `CLAUDE.md`; "How the work is saved" replaces "Working across two accounts" in all three prompts.
+- **Standing rule** ("Challenge the owner's requests") in `CLAUDE.md`; "How the work is saved" replaces "Working across two accounts" in all three prompts. Pull request 99.
+- **A1, tidy the canvas** (Figma only; the app is unchanged):
+  - Components section `88:7142`: every set in rows by kind, each under a heading (text nodes `593:756`–`593:763`, named "Group · <kind>"): Controls · Navigation · Content & lists · Cards · Trip · People · Feedback · Media. 96px between sets, 120px between kinds, no overlaps (checked by script).
+  - Icons section `109:10358` (now under Media): 92 icons A to Z in an 8-column grid, then 236 flags A to Z in a 14-column grid. A new icon or flag goes in its alphabetical place.
+  - Deleted the stray instance "Sheet · edit (example)" (`558:899`).
+  - New page **Backup artifacts** (`593:755`): the "Backup icons" section (`318:11532`, unchanged) and the three loose image rectangles (`442:3559`, `442:3560`, `442:3561`; archived, not deleted).
+  - Section "Primtives" is now "Primitives" (`35:1719`); the second "Typography" (`35:2217`, it holds spacing and radii) is now "Spacing & radius".
+  - Not done in A1: reordering the variants inside each set by size then state. The sets that A2 and A3 rename or rebuild get ordered then; check the rest at the end of A3.
 
 ## In progress
 
-- A1 (tidy the canvas): not started.
+- A2 (naming and glossary): not started.
 
 ## Still to do
 
-A1, A2, A3 (14 changes, one pull request each), A4, then the Check everything list.
+A2, A3 (14 changes, one pull request each), A4, then the Check everything list.
 
 ## Figma changes so far
 
-None.
+See A1 above.
 
 ## Questions waiting for the owner
 
