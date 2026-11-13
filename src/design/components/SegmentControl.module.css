@@ -2,7 +2,7 @@
   position: relative;
   display: inline-grid;
   grid-auto-flow: column;
-  grid-auto-columns: minmax(0, 1fr); /* equal widths, like iOS: the pill only ever slides; big text wraps between words */
+  grid-auto-columns: minmax(0, 1fr); /* equal widths, like iOS: the pill only ever slides; labels stay on one line */
   padding: var(--space-default-200);
   gap: var(--space-default-200);
   background: transparent;
@@ -11,13 +11,17 @@
   max-width: 100%;
 }
 .block { display: grid; width: 100%; }
-/* A word never splits: when the longest word doesn't fit its segment, the control gets .tight (8px sides) and --fit,
-   the shrink that makes it fit (set by SegmentControl.tsx, measured on the device) */
-.word { white-space: nowrap; }
+/* A label never wraps: when one doesn't fit its segment, the control gets .tight (8px sides) and --fit, the shrink
+   that makes it fit; past 80% it also gets .noCount, which hides the counts from view (set by SegmentControl.tsx,
+   measured on the device) */
+.text { white-space: nowrap; }
 .tight .option { padding-inline: var(--space-default-300); }
+.noCount .count { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; } /* still read out */
+.option { padding-inline: var(--space-default-300); }
 .option {
   min-height: 34px;
-  /* Side padding gives way as text grows (16px at the default size, 8px from about 23px text), so words keep to one line */
+  /* Side padding gives way as text grows (16px at the default size, 8px from about 23px text), so labels keep to one line */
+  white-space: nowrap; overflow: hidden;
   padding: var(--space-default-400) clamp(var(--space-default-300), calc(54px - 2rem), var(--space-default-500));
   border: 0;
   border-radius: var(--radius-1000);
