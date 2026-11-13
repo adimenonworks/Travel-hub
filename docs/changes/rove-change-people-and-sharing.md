@@ -40,20 +40,20 @@
 
 Every time I ask for a change, first check whether it's a good idea, and whether there's a better, more meaningful, more on-brand, more standard or more native (iOS) way to do it. If there is, say so and propose it **before** building, with the reason. My ideas are a starting point and we work them out together. **Rules I set explicitly are absolute**, and this is one of them.
 
-## Working across two accounts (read first)
+## How the work is saved (read first)
 
-This work is shared between two Claude Code accounts. Either one may stop partway through when it runs out of usage, and the other picks up from the repo alone. So:
+One Claude Code account does this work now (owner, 13 Nov 2026), so the old two-account branch rule is gone. A session may still stop partway, and a new one picks up from Main alone. So:
 
-1. **Work on one branch per prompt,** named `changes/<prompt-name>` (e.g. `changes/component-library`). If it already exists, check it out and continue on it. Don't start a new one.
-2. **Push after every commit.** Unpushed work is lost when the account switches.
-3. **Keep `docs/changes/PROGRESS.md` up to date.** Rewrite it after every commit, and push it in the same commit. It should hold:
-   - the prompt being worked on, and its branch;
-   - the items done, with their commit hashes;
+1. **Work on the session's own branch** (the one Claude Code gives it). There is no `changes/<prompt-name>` branch.
+2. **Open and merge a pull request after each finished item** (for the component library prompt: the standing rule, A1, A2, each A3 merge, A4), following `CLAUDE.md`: build and checks pass, nothing needs the owner's attention, then merge without asking. Stop and ask first at any design gate.
+3. **Commit `docs/changes/PROGRESS.md` with each merge,** so a new session can continue from Main. It should hold:
+   - the prompt being worked on;
+   - the items done, with their pull requests;
    - the item in progress, and exactly what's left in it;
    - Figma changes made so far (node ids), and anything half-done in Figma;
    - questions waiting for me, and any design gate you're stopped at.
 4. **When starting, read `PROGRESS.md` first** and continue from it. Don't redo finished items. If it disagrees with the code or Figma, trust the code and Figma, and update it.
-5. **Open the pull request** only when the whole prompt and its Check everything list are done. Then mark the prompt finished in `PROGRESS.md`.
+5. **When the whole prompt and its Check everything list are done,** mark the prompt finished in `PROGRESS.md`.
 
 ---
 
