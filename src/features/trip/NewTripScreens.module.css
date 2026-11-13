@@ -54,24 +54,3 @@
   .step { animation: flood var(--duration-base) var(--ease-standard); }
   .badge { animation: flood var(--duration-base) var(--ease-standard); }
 }
-
-/* Figma "Calendar": white, 24 corners, 16 padding; days are 40px (Calendar day) */
-.calendar { display: flex; flex-direction: column; gap: var(--space-default-200); padding: var(--space-default-500); border-radius: var(--radius-600); background: var(--on-light-surface-primary); color: var(--on-light-text-primary); }
-.month { display: flex; align-items: center; justify-content: space-between; }
-.monthName { font: var(--type-heading-3); letter-spacing: -0.02em; }
-.grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); row-gap: var(--space-default-0); }
-.weekday { text-align: center; font: var(--type-body-small); color: var(--on-light-text-secondary); padding-bottom: var(--space-default-200); }
-.cell { position: relative; min-height: 40px; display: grid; place-items: center; }
-.day { border: 0; background: none; padding: 0; font: var(--type-body); color: var(--on-light-text-primary); cursor: pointer; font-variant-numeric: tabular-nums; }
-.day > span { position: relative; z-index: 1; display: grid; place-items: center; width: 36px; height: 36px; border-radius: var(--radius-1000); transition: transform var(--motion-release); }
-.day:active > span { transform: scale(0.94); transition: transform var(--motion-press); }
-.day:disabled { color: var(--interactive-button-ghost-disabled-foreground); cursor: default; }
-.day-range { background: var(--on-light-surface-brand); color: var(--on-light-text-brand); }
-/* Picking dates: the range sweeps in from the start, one day every 20ms (Figma motion spec) */
-.day-range, .day-end { animation: sweep var(--duration-fast) var(--ease-standard) both; animation-delay: calc(var(--i, 0) * 20ms); }
-@keyframes sweep { from { clip-path: inset(0 100% 0 0); } }
-/* Start / End: the selected-primary pair (Figma uses text/brand + on-dark text, which is under 4.5:1 in dark mode) */
-.day-start, .day-end, .day-single { color: var(--interactive-selected-primary-text); }
-.day-start > span, .day-end > span, .day-single > span { background: var(--interactive-selected-primary-background); }
-.day-start { background: linear-gradient(90deg, transparent 50%, var(--on-light-surface-brand) 50%); }
-.day-end { background: linear-gradient(90deg, var(--on-light-surface-brand) 50%, transparent 50%); }

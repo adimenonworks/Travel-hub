@@ -40,11 +40,12 @@ Read this first when starting a session. If it disagrees with the code or Figma,
   - **Tile:** Orange, Green, Yellow and Pink removed (Figma set `331:3015` is now `Add` False / True; four archived copies on the Archive page were detached so they keep their look). Code: `Tile add` replaces `tone`.
   - **Tag:** Tint removed (Figma `6:36`: Neutral, Category, Success, Warning, Danger; two archived copies detached). Code: `TagTone` has no `tint`.
   - **Hover dropped (Figma only):** Button `5:122` 48 → 36 (Default / Pressed / Disabled), `.Tab` `6:60` and `.Segment` `6:96` 4 → 3, Text field `7:89` 15 → 9 (Default / Focus / Filled; Typing merged into Focus). Sets re-gridded by tone, size, then state. Code keeps its `@media (hover: hover)` CSS for the website. Noticed, not changed: several components' `:hover` rules (tabs, chips, rows, tiles, day cards) are not inside `@media (hover: hover)`, so on iPhone they can stick after a tap; and Text field's Text area variants are drawn the same height as Input in Figma.
+  - **Flow screen deleted:** Figma set `354:3391` removed (5 variants). Its five variants are now plain frames on the Screens page: `600:1054`, `600:1108`, `600:1162`, `600:1216` (New trip · step 1–4) and `600:1301` (New trip · celebration); their content areas are empty, as the component's slot was. Seven copies in "Onboarding — exploration" on the Planning page were detached (same look, no longer linked). Code: `FlowScreen` and `CelebrationScreen` moved to `src/features/trip/NewTripScreens.tsx`; `Calendar` is now `src/design/components/Calendar.tsx`.
 <!-- next A3 item goes above this line -->
 
 ## In progress
 
-- A3: Tag Tint next, then the rest of the table. Design gates (Hero card height, Map card, Number card) are shown to the owner before merging.
+- A3: next in the table are Card + Empty state, Search field → Text field, Cover scene → Illustration, Profile card, Page header + Trip header, Journey card, event type in .Category icon; then the three design gates (Map card, Number card, Hero card), which are shown to the owner before merging.
 
 ## Still to do
 

@@ -395,7 +395,7 @@ export function DesignSystem() {
           <ProfileCard name="Alex Menon" email="alex.menon@gmail.com · Google" onClick={() => {}} />
         </Section>
 
-        <Section title="Flow" footer="Search field, Option cards and Step progress (shown on the bright emerald Flow screen).">
+        <Section title="Flow" footer="Search field, Option cards and Step progress (used on the New trip screens, which are screens, not components).">
           <SearchField label="Search a country or city" placeholder="Search a country or city" />
           <div className={s.tiles}>
             <OptionCard icon="person" label="Just me" selected={opt === 'me'} onClick={() => setOpt('me')} />

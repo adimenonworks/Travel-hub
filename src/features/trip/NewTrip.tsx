@@ -1,5 +1,6 @@
 import { Fragment, useEffect, useState } from 'react';
-import { Button, Calendar, CelebrationScreen, Chip, FlowScreen, Icon, Illustration, ListGroup, ListItem, OptionCard, SearchField, useToast } from '../../design/components';
+import { Button, Calendar, Chip, Icon, Illustration, ListGroup, ListItem, OptionCard, SearchField, useToast } from '../../design/components';
+import { CelebrationScreen, FlowScreen } from './NewTripScreens';
 import { useCountries, placeCounts } from '../saves/Collections';
 import { store } from '../../data';
 import type { Place, Trip } from '../../data/types';
