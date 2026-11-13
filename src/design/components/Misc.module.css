@@ -24,7 +24,6 @@
   white-space: nowrap;
 }
 .badge-neutral { background: var(--tag-neutral-background); color: var(--tag-neutral-text); }
-.badge-tint { background: var(--tag-brand-bold-background); color: var(--tag-brand-bold-text); }
 .badge-category { background: var(--tag-brand-subtle-background); color: var(--tag-brand-subtle-text); }
 .badge-success { background: var(--tag-success-background); color: var(--tag-success-text); }
 .badge-warning { background: var(--tag-warning-background); color: var(--tag-warning-text); }
