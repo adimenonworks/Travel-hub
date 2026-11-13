@@ -212,7 +212,7 @@ export function SaveSheet({ request, onClose }: { request: SaveRequest | null; o
   const eventRow = (a: Activity, extra?: string) => {
     const k = kindInfo(a.category);
     const meta = [longDay(a.date), a.startTime ? formatTime(a.startTime) : null, extra ?? k.label].filter(Boolean).join(' · ');
-    return <ListItem key={a.id} icon={k.icon} tone={categoryTone(a.category)} title={a.title} meta={meta}
+    return <ListItem key={a.id} icon={k.icon} type={categoryTone(a.category)} title={a.title} meta={meta}
       trailing={a.id === picked2?.id ? 'Selected' : undefined} onClick={() => { haptic('selection'); setEventId(a.id); }} />;
   };
   const tripSide = trip && (
@@ -226,9 +226,9 @@ export function SaveSheet({ request, onClose }: { request: SaveRequest | null; o
         </section>
       )}
       <div className={s.field} role="group" aria-label="How to add it">
-        <OptionCard icon={cat.icon} tone={cat.tone} label="New event" description={`${cat.label} · ${name.trim() || place?.name || preview?.title}, filled in from the link`} selected={action === 'new'} onClick={() => { haptic('selection'); setAction('new'); }} />
-        {events.length > 0 && <OptionCard icon="link" tone="neutral" label="Add to an event" description="Attach the link to something already planned" selected={action === 'add'} onClick={() => { haptic('selection'); setAction('add'); }} />}
-        <OptionCard icon="lightbulb" tone="notes" label="Add to ideas" description="So everyone on the trip can vote on it" selected={action === 'idea'} onClick={() => { haptic('selection'); setAction('idea'); }} />
+        <OptionCard icon={cat.icon} type={cat.tone} label="New event" description={`${cat.label} · ${name.trim() || place?.name || preview?.title}, filled in from the link`} selected={action === 'new'} onClick={() => { haptic('selection'); setAction('new'); }} />
+        {events.length > 0 && <OptionCard icon="link" type="neutral" label="Add to an event" description="Attach the link to something already planned" selected={action === 'add'} onClick={() => { haptic('selection'); setAction('add'); }} />}
+        <OptionCard icon="lightbulb" type="notes" label="Add to ideas" description="So everyone on the trip can vote on it" selected={action === 'idea'} onClick={() => { haptic('selection'); setAction('idea'); }} />
       </div>
       {action === 'new' && (
         <>

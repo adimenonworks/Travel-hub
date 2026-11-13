@@ -49,7 +49,7 @@ export function HeroCard({ cover, photo, countdown, title, meta, people, to, hea
         {!cover && countdown && <div><Tag tone="neutral" icon={countdown.icon ?? 'calendar'}>{countdown.label}</Tag></div>}
         {headsUp && (
           <div className={s.rows}>
-            {headsUp && <ListItem icon={headsUp.icon} tone={headsUp.tone} title={headsUp.title} meta={headsUp.meta} to={headsUp.to} round />}
+            {headsUp && <ListItem icon={headsUp.icon} type={headsUp.tone} title={headsUp.title} meta={headsUp.meta} to={headsUp.to} round />}
           </div>
         )}
       </div>

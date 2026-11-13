@@ -276,7 +276,7 @@ export function NewTrip({ open, onClose, onOpenTrip }: { open: boolean; onClose:
                           return (
                             <Fragment key={catKey}>
                               {c && (
-                                <ListItem size="small" icon={c.icon} tone={TYPE_TONE[c.value]} title={c.label} meta={m ? `${m} of ${places.length} chosen` : `${places.length} saved`}
+                                <ListItem size="small" icon={c.icon} type={TYPE_TONE[c.value]} title={c.label} meta={m ? `${m} of ${places.length} chosen` : `${places.length} saved`}
                                   trailing={<Icon name="chevron-down" size={16} className={catOpen ? s.flipped : undefined} />}
                                   onClick={() => { haptic('selection'); setOpenCat(catOpen ? null : catKey); }}
                                   label={`${c.label} in ${g}, ${places.length} saved, ${m} chosen. ${catOpen ? 'Hide' : 'Show'} places`} />
@@ -290,7 +290,7 @@ export function NewTrip({ open, onClose, onOpenTrip }: { open: boolean; onClose:
                                   {places.map((p) => {
                                     const on = picked.includes(p.id);
                                     return (
-                                      <ListItem key={p.id} size="small" icon={on ? 'check' : placeCategory(p.category).icon} tone={on ? undefined : placeCategory(p.category).tone} title={p.name}
+                                      <ListItem key={p.id} size="small" icon={on ? 'check' : placeCategory(p.category).icon} type={on ? undefined : placeCategory(p.category).tone} title={p.name}
                                         trailing={on ? 'Chosen' : undefined}
                                         onClick={() => { haptic('light'); toggle([p.id], !on); }} label={`${p.name}, ${on ? 'chosen' : 'not chosen'}`} />
                                     );

@@ -296,44 +296,47 @@ export function DesignSystem() {
           {EVENT_TYPES.map((t) => (
             <ListGroup key={t.value} label={t.label}>
               <h3 className="t-heading-3">{t.label}</h3>
-              {t.kinds.map((k) => <ListItem key={k.value} size="small" icon={k.icon} tone={TYPE_TONE[t.value]} title={k.label} meta={k.behaviour === 'span' ? 'Shown twice: start and end' : undefined} />)}
+              {t.kinds.map((k) => <ListItem key={k.value} size="small" icon={k.icon} type={TYPE_TONE[t.value]} title={k.label} meta={k.behaviour === 'span' ? 'Shown twice: start and end' : undefined} />)}
             </ListGroup>
           ))}
         </Section>
 
         <Section title="Event types" footer="Type sets the icon tile's colour (--category-<type>-surface / -icon): Getting around (flights included) sky, Stays violet, Food & drink yellow, Activities pink, Notes emerald; Free time stays Neutral. On the deep-green Next card the tile takes the bright step. List items, Idea rows and active Chips use the same colours; the price sits subtle at the top right. Option cards in the Add to itinerary picker use the same tiles, 16px above the text.">
-          <EventCard icon="plane" tone="travel" title="Transfer to the hotel" time="09:30 – 10:10" place="Porto Airport" to="/design" />
-          <EventCard icon="hotel" tone="stays" title="Check-in · Torel Palace" time="15:00" place="Ribeira" to="/design" />
-          <EventCard icon="coffee" tone="food" title="Coffee at Combi" time="11:00 – 11:45" place="Baixa" to="/design" />
-          <EventCard icon="bank" tone="activities" title="Serralves Museum" time="12:30 – 14:30" place="Lordelo do Ouro" to="/design" />
+          <EventCard icon="plane" type="travel" title="Transfer to the hotel" time="09:30 – 10:10" place="Porto Airport" to="/design" />
+          <EventCard icon="hotel" type="stays" title="Check-in · Torel Palace" time="15:00" place="Ribeira" to="/design" />
+          <EventCard icon="coffee" type="food" title="Coffee at Combi" time="11:00 – 11:45" place="Baixa" to="/design" />
+          <EventCard icon="bank" type="activities" title="Serralves Museum" time="12:30 – 14:30" place="Lordelo do Ouro" to="/design" />
           <EventCard icon="hourglass" title="Free time" time="16:00 – 18:00" place="Wander the riverside" placeIcon={null} to="/design" />
-          <EventCard icon="notebook" tone="notes" layout="note" title="Bag drop closes 40 min before" place="Sam has the passports" placeIcon={null} />
-          <EventCard icon="hotel" tone="stays" title="Check-in at the Torel Palace Porto, a long hotel name" time="15:00" place="Ribeira" amount="€320" to="/design" />
-          <EventCard icon="utensils" tone="food" state="next" title="Time Out Market" time="13:30 – 15:00" place="Cais do Sodré" amount="€25" to="/design" />
+          <EventCard icon="notebook" type="notes" layout="note" title="Bag drop closes 40 min before" place="Sam has the passports" placeIcon={null} />
+          <EventCard icon="hotel" type="stays" title="Check-in at the Torel Palace Porto, a long hotel name" time="15:00" place="Ribeira" amount="€320" to="/design" />
+          <EventCard icon="utensils" type="food" state="next" title="Time Out Market" time="13:30 – 15:00" place="Cais do Sodré" amount="€25" to="/design" />
           <ListGroup label="Places and ideas by type">
-            <ListItem icon="house-chimney" tone="stays" title="Casa do Príncipe" meta="Airbnb or holiday home · Lisbon" />
-            <ListItem icon="glass-cheers" tone="food" title="Quinta da Pacheca" meta="Tasting · Douro" />
-            <IdeaRow icon="bank" tone="activities" title="Gulbenkian Museum" meta="Museum or gallery · Lisbon · Sam" vote={{ count: 2, selected: false, onClick: () => {} }} />
+            <ListItem icon="house-chimney" type="stays" title="Casa do Príncipe" meta="Airbnb or holiday home · Lisbon" />
+            <ListItem icon="glass-cheers" type="food" title="Quinta da Pacheca" meta="Tasting · Douro" />
+            <IdeaRow icon="bank" type="activities" title="Gulbenkian Museum" meta="Museum or gallery · Lisbon · Sam" vote={{ count: 2, selected: false, onClick: () => {} }} />
           </ListGroup>
           <div className={s.chipRow}>
             <Chip icon="plane" type="travel" selected>Flight</Chip><Chip icon="hotel" type="stays" selected>Hotel</Chip><Chip icon="coffee" type="food" selected>Café</Chip>
             <Chip icon="camera" type="activities" selected>Sight</Chip><Chip icon="notebook" type="notes" selected>Note</Chip><Chip icon="train" type="travel">Train</Chip>
           </div>
           <div className={s.optionGrid}>
-            <OptionCard icon="plane" tone="travel" label="Getting around" description="Flights, trains, buses, ferries, taxis, transfers and car hire" onClick={() => {}} />
-            <OptionCard icon="bed" tone="stays" label="Stays" description="Hotels, apartments, hostels, camping and cruises" onClick={() => {}} />
-            <OptionCard icon="utensils" tone="food" label="Food & drink" description="Restaurants, cafés, bars and markets" onClick={() => {}} />
-            <OptionCard icon="ticket" tone="activities" label="Activities" description="Sights, tours, walks, hikes, shows and experiences" onClick={() => {}} />
-            <OptionCard icon="hourglass" tone="neutral" label="Free time" description="Time to rest, wander or keep open" onClick={() => {}} />
-            <OptionCard icon="notebook" tone="notes" label="Notes & reminders" description="A note, or a small task like luggage storage or picking up a SIM" onClick={() => {}} />
+            <OptionCard icon="plane" type="travel" label="Getting around" description="Flights, trains, buses, ferries, taxis, transfers and car hire" onClick={() => {}} />
+            <OptionCard icon="bed" type="stays" label="Stays" description="Hotels, apartments, hostels, camping and cruises" onClick={() => {}} />
+            <OptionCard icon="utensils" type="food" label="Food & drink" description="Restaurants, cafés, bars and markets" onClick={() => {}} />
+            <OptionCard icon="ticket" type="activities" label="Activities" description="Sights, tours, walks, hikes, shows and experiences" onClick={() => {}} />
+            <OptionCard icon="hourglass" type="neutral" label="Free time" description="Time to rest, wander or keep open" onClick={() => {}} />
+            <OptionCard icon="notebook" type="notes" label="Notes & reminders" description="A note, or a small task like luggage storage or picking up a SIM" onClick={() => {}} />
           </div>
         </Section>
 
-        <Section title="Event page header and Context menu" footer="Page header Title small with Show icon (the Category icon: a 40px round tile in the type's colour) and Show subtitle (the time). Context menu: what a long press on your own comment opens (Edit, Delete in red); tap the bubble to see it.">
-          <div className={s.chipRow}>
-            {(['neutral', 'travel', 'stays', 'food', 'activities', 'notes'] as const).map((t) => <CategoryIcon key={t} icon={t === 'food' ? 'grape' : 'plane'} type={t} />)}
-          </div>
-          <PageHeader size="small" icon="grape" tone="food" title="Quinta da Pacheca" subtitle="Thu 12 Nov, 15:00 – 17:00" back={{ to: '/design', label: 'Itinerary' }} action={{ icon: 'pencil', label: 'Example edit button', onClick: () => {} }} />
+        <Section title="Category icon, event page header and Context menu" footer=".Category icon is the one place an event type's colour lives (Event card, List item, Idea row, Option card and the Page header nest it): Size Small 32 / Regular 40 / Large 48; Tone Secondary (grey Neutral tile, on white), Primary (white, on a grey card), On dark (on the Next card). Page header Title small with Show leading icon and Show subtitle (the time). Context menu: what a long press on your own comment opens (Edit, Delete in red); tap the bubble to see it.">
+          {/* Figma `.Category icon`: Type × Size × Tone, the rows as on Foundations */}
+          {([['regular', 'secondary'], ['regular', 'primary'], ['regular', 'on-dark'], ['large', 'primary'], ['small', 'primary']] as const).map(([size, tone]) => (
+            <div key={size + tone} className={[s.chipRow, tone === 'on-dark' && 'surface-dark'].filter(Boolean).join(' ')} style={tone === 'primary' ? { background: 'var(--on-light-surface-secondary)', borderRadius: 'var(--radius-600)', padding: 'var(--space-default-300)' } : tone === 'on-dark' ? { background: 'var(--on-dark-surface-brand)', borderRadius: 'var(--radius-600)', padding: 'var(--space-default-300)' } : undefined}>
+              {(['neutral', 'travel', 'stays', 'food', 'activities', 'notes'] as const).map((t) => <CategoryIcon key={t} icon={t === 'food' ? 'grape' : 'plane'} type={t} size={size} tone={tone} />)}
+            </div>
+          ))}
+          <PageHeader size="small" icon="grape" type="food" title="Quinta da Pacheca" subtitle="Thu 12 Nov, 15:00 – 17:00" back={{ to: '/design', label: 'Itinerary' }} action={{ icon: 'pencil', label: 'Example edit button', onClick: () => {} }} />
           <div>
             {menu ? (
               <ContextMenu label="Message actions" onClose={() => setMenu(false)} items={[{ label: 'Edit', icon: 'pencil', onClick: () => {} }, { label: 'Delete', icon: 'trash', tone: 'danger', onClick: () => {} }]}>
@@ -361,11 +364,11 @@ export function DesignSystem() {
 
         <Section title="Accordion" footer="Figma Accordion: a grey card that folds a group away (a day of events in Save to Rove → Add to an event). Starts collapsed; the chevron turns over when open.">
           <Accordion title="Fri 13 Nov" meta="2 events">
-            <ListItem icon="utensils" tone="food" title="Dinner at Ramiro" meta="19:30 · Restaurant" onClick={() => {}} />
-            <ListItem icon="bank" tone="activities" title="Tile museum" meta="14:00 · Museum or gallery" onClick={() => {}} />
+            <ListItem icon="utensils" type="food" title="Dinner at Ramiro" meta="19:30 · Restaurant" onClick={() => {}} />
+            <ListItem icon="bank" type="activities" title="Tile museum" meta="14:00 · Museum or gallery" onClick={() => {}} />
           </Accordion>
           <Accordion title="Sat 14 Nov" meta="1 event" defaultOpen>
-            <ListItem icon="train" tone="travel" title="Train to Porto" meta="09:10 · Train" onClick={() => {}} />
+            <ListItem icon="train" type="travel" title="Train to Porto" meta="09:10 · Train" onClick={() => {}} />
           </Accordion>
         </Section>
 

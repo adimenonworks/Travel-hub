@@ -93,7 +93,7 @@ export function Ideas(ctx: TripCtx) {
                 const meta = [kind, priceOf(i, trip) ? priceText(priceOf(i, trip)!) : '', i.createdBy === me.uid ? 'you' : personName(ctx.profiles, i.createdBy).split(' ')[0]].filter(Boolean).join(' · ');
                 return (
                   <IdeaRow key={i.id} title={place?.name ?? i.title} meta={meta} icon={place ? placeCategory(place.category).icon : i.links.length ? 'link' : cat.icon}
-                    tone={place ? placeCategory(place.category).tone : i.links.length ? undefined : categoryTone(i.category)}
+                    type={place ? placeCategory(place.category).tone : i.links.length ? undefined : categoryTone(i.category)}
                     tag={i.id === top ? { icon: 'star', label: 'Most votes' } : undefined}
                     vote={{ count: ups(i), selected: !!i.votes?.[me.uid], onClick: () => vote(i) }}
                     onClick={() => { setViewing(i); if (place) recordView(trip.id, { url: `/trip/${trip.id}/ideas?idea=${i.id}`, label: place.name, kind: 'Place' }); }} />
@@ -155,7 +155,7 @@ function AddIdeaSheet({ open, ctx, onClose, onNew }: { open: boolean; ctx: TripC
           {groupBy(list.slice().sort((a, b) => PLACE_TYPES.findIndex((t) => t.value === placeTypeOf(a.category)) - PLACE_TYPES.findIndex((t) => t.value === placeTypeOf(b.category))), (p) => placeTypeOf(p.category)).map(([type, items]) => (
             <ListGroup key={type} label={`${city}, ${PLACE_TYPES.find((t) => t.value === type)!.label}`}>
               {items.map((p) => added.has(p.id)
-                ? <ListItem key={p.id} icon={placeCategory(p.category).icon} tone={placeCategory(p.category).tone} title={p.name} meta={placeCategory(p.category).one} trailing="Added" />
+                ? <ListItem key={p.id} icon={placeCategory(p.category).icon} type={placeCategory(p.category).tone} title={p.name} meta={placeCategory(p.category).one} trailing="Added" />
                 : <PlaceRow key={p.id} place={p} visited={visited.has(p.id)} starred={starred(p)} onClick={() => add(p)} />)}
             </ListGroup>
           ))}

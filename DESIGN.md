@@ -559,7 +559,7 @@ The same text sits on the Figma Foundations page ("Glossary", beside the Compone
 
 | Property | Means | Values |
 | --- | --- | --- |
-| `Type` | Event type (sets the colour) | Neutral · Travel · Stays · Food & drink · Activities · Notes |
+| `Type` | Event type (sets the colour). Only on `.Category icon` (nested in Event card, List item, Idea row, Option card, Page header) and Chip | Neutral · Travel · Stays · Food & drink · Activities · Notes |
 | `Tone` | Colour role, not event type | Default · Accent · Neutral · Success · Warning · Danger. Buttons use their own roles: Primary · Destructive · Inverse · Neutral · Tertiary · Ghost; Icon button: Secondary · Ghost · On brand · Primary |
 | `Size` | Size | Small · Regular · Large |
 | `State` | Interaction or status | Default · Pressed · Disabled · Selected · Focus · Filled · Next · Done · Suggested; plus a component's own statuses (Accordion: Collapsed · Expanded; `.Calendar day`: Range · Start · End · Empty; Step progress: Step 1–4) |
