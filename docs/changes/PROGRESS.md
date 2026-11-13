@@ -49,19 +49,18 @@ Read this first when starting a session. If it disagrees with the code or Figma,
   - **Trip header → Page header:** Figma Page header `160:1684` gained Show meta + Meta (a Body line under the title row); Show icon is now Show leading icon and Show button is Show trailing. The three trip screens use Page header Small instances (`609:1117`, `609:1209`, `609:1235`); eleven Trip header copies on Planning were detached; Trip header `347:2803` deleted. Code: `PageHeader meta`; `TripHeader` is gone. Not done: a separate Back label property and a true Trailing slot (the back label is still the nested Button's label; trailing is the one Icon button, shown or hidden).
   - **Card + Empty state → Card:** Empty state `491:520` deleted (it had no instances). Card `7:96` is Tone Default / Accent × Layout Start / Centre (4 variants), with Show media, Show body, Show actions, Show second button. **Conflict found and fixed:** Figma's Card was drawn centred while the code's Card is left-aligned; Layout=Start is now left-aligned in Figma, and Centre is the empty state. Code: `EmptyState` is gone; its 13 uses are `<Card layout="centre" media={<Illustration … size={120} />} …>`.
   - **Profile card: kept (decided).** It is its own grey card with 16px padding, a Large avatar, a Heading 2 name and a chevron. A List item only matches it by gaining a Size Large built to exactly that spec and used in exactly one place, and it would also have to stop sitting inside a List group. That is the same component under another name, so nothing is saved.
+  - **Journey card** (owner's answer A, 13 Nov 2026: structure only, no screen changes; the redesign is B4 of the polish prompt): Figma set `613:681` "Journey card", Layout Journey (`613:576`: a stack 8 apart (`space/default/300`) of `.Leg`, `.Stop`, `.Leg`, with Show stop) / Span (`553:762`, the old Span card, unchanged). Journey details card `421:3200` is now `.Leg`, Layover block `515:508` is now `.Stop` (none had instances). Code: `JourneyCard` (`layout="journey"` with `JourneyLeg` / `JourneyStop` children, or `layout="span"`); `JourneyDetails`, `LayoverBlock` and `SpanCard` are gone; `/#/design` shows both layouts. Flight, stay and car pages are pixel-identical to Main.
 <!-- next A3 item goes above this line -->
 
 ## In progress
 
-- **Stopped for two answers from the owner (13 Nov 2026), asked in chat.** Both remaining A3 merges would change how screens look if done literally:
-  1. **Journey card** (Journey details card + Span card + Layover block). Today a flight page is separate leg cards with a layover block between them, and a stay shows the Span card (label, date in Heading 3, time, place, two columns with a divider). Literally merging puts legs and stops inside one card and gives stays the journey's big-time layout. Recommended: **merge the structure only** now (one Figma "Journey card" whose slot stacks `.Leg` and `.Stop`, plus a Span layout that keeps today's look; code `JourneyCard`), so no screen changes, and leave any redesign to prompt B4, which needs this component.
-  2. **Event type only in `.Category icon`.** Event card, List item, Idea row and Option card already show the type as a coloured icon tile, so nesting a `.Category icon` (it needs Size Small 32 / Regular 40 / Large 48 to fit them) changes nothing visible and takes Event card from 42 variants to 9. **Chip is different:** a selected category Chip is filled with the type's colour; there is no tile to swap. Recommended: Chip keeps `Type` as the one exception (12 variants).
-- Hero card caveat still stands: seven Hero card copies (two on Screens: `545:2257`, `500:569`; five on Planning) show the default name and dates after their properties were re-created.
-- Seen while checking, not changed: at 320px with the largest text, the Trips Segment control splits "Upcoming" and "Collections" across two lines (CLAUDE.md says a word never splits).
+- **Event type only in `.Category icon`** (owner's answer, 13 Nov 2026: yes; **Chip keeps `Type`** as the one exception).
+- Hero card copies: on Screens, Home's `500:569` showed the default dates under "Day 4 of 11"; now "Nov 7 – 17 · 11 days" like the same trip on Trips and Overview. "Home · during a trip" `545:2257` ("Day 3 of 10", "2 – 11 Nov · 10 days") is consistent and left as it is. The five copies on Planning still show the defaults (Planning isn't a source of truth).
+- Fixed as its own PR (pull request 114): the Segment control split words at 320px (even at the default text size: "Upcoming" and "Collections"; at 375px "Collections"). Words now never split; labels shrink to fit when a word is wider than its segment.
 
 ## Still to do
 
-Journey card and event type in `.Category icon` (waiting on the owner), then A4 and the Check everything list. At the end of A3: update the "Component names" block of the glossary on Foundations (`597:724`) to match `DESIGN.md`, and order the variants in the sets not yet touched.
+Event type in `.Category icon`, then A4 and the Check everything list. At the end of A3: update the "Component names" block of the glossary on Foundations (`597:724`) to match `DESIGN.md`, and order the variants in the sets not yet touched.
 
 ## Figma changes so far
 
@@ -70,6 +69,14 @@ See A1 and A2 above. **Variant count before the cleanup: 274** (Components secti
 ## How to check screens
 
 Build in demo mode (`npx vite build --mode demo --outDir <dir>`; a normal build shows only the join-only website), seed `localStorage` `triphub-demo-db` and `sessionStorage` `triphub-demo-user` with a sample trip, fix the clock, block the network, and screenshot each route with Playwright; compare against the same from Main pixel by pixel.
+
+## Notes for the polish prompt
+
+- Consider a neutral selected Chip with only the icon coloured, so Chip can drop `Type` (the last component multiplied by event type).
+
+## Added to the Check everything list
+
+- [ ] Every merge so far also checked at 375 × 812 (iPhone mini / X width), not just 393 × 852.
 
 ## Questions waiting for the owner
 

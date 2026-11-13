@@ -1,7 +1,7 @@
 import { Fragment, useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { nextTransition } from '../../app/navigation';
-import { Button, IconButton, JourneyDetails, LayoverBlock, LinkButton, ListGroup, ListItem, MapCard, PageHeader, PageSection, Sheet, SpanCard, TextField, useToast, Card, Illustration } from '../../design/components';
+import { Button, IconButton, JourneyCard, JourneyLeg, JourneyStop, LinkButton, ListGroup, ListItem, MapCard, PageHeader, PageSection, Sheet, TextField, useToast, Card, Illustration } from '../../design/components';
 import type { Activity } from '../../data/types';
 import { daysBetween } from '../../lib/dates';
 import { store } from '../../data';
@@ -147,18 +147,18 @@ export function ActivityPage(ctx: TripCtx) {
 
       {/* Figma "Journey detail" for flights and trains; every other type shows its Event card. No price anywhere. */}
       {journey ? (
-        <div className={s.legs}>
+        <JourneyCard>
           {legs.map((leg, i) => {
             const own = leg.id === a.id ? live : null;
             return (
               <Fragment key={leg.id}>
                 {i > 0 && stops[i - 1] && (
-                  <LayoverBlock title={`${durationLabel(stops[i - 1].ms) || 'Layover'} in ${stops[i - 1].at}`}
+                  <JourneyStop title={`${durationLabel(stops[i - 1].ms) || 'Layover'} in ${stops[i - 1].at}`}
                     meta={stops[i - 1].code ? `Change at ${stops[i - 1].code}` : undefined}
                     warning={stops[i - 1].overnight ? `Overnight in ${stops[i - 1].at}` : stops[i - 1].tight ? 'Tight connection' : undefined}
                     action={stops[i - 1].overnight ? <Button tone="ghost" size="regular" icon="plus" onClick={() => setStayAt(stops[i - 1])}>Add a stay</Button> : undefined} />
                 )}
-                <JourneyDetails mode={kindInfo(leg.category).icon} number={leg.ref || undefined} status={leg.id === a.id ? tag : undefined}
+                <JourneyLeg mode={kindInfo(leg.category).icon} number={leg.ref || undefined} status={leg.id === a.id ? tag : undefined}
                   from={{ city: city(leg.fromText), time: own?.departure?.revised ? own.departure.revised.slice(11, 16) : leg.startTime ? formatTime(leg.startTime) : '—', date: formatDay(leg.date),
                     terminal: [own?.departure?.airport || code(leg.fromText), own?.departure?.terminal && `Terminal ${own.departure.terminal}`].filter(Boolean).join(' · ') || undefined }}
                   to={{ city: city(leg.toText), time: own?.arrival?.revised ? own.arrival.revised.slice(11, 16) : leg.endTime ? `${formatTime(leg.endTime)}${leg.endDate && leg.endDate > leg.date ? ` +${daysBetween(leg.date, leg.endDate)}` : ''}` : '—', date: formatDay(leg.endDate || leg.date),
@@ -169,11 +169,11 @@ export function ActivityPage(ctx: TripCtx) {
               </Fragment>
             );
           })}
-        </div>
+        </JourneyCard>
       ) : null}
 
       {spans && a.endDate && (
-        <SpanCard footer={length}
+        <JourneyCard layout="span" footer={length}
           start={{ label: startWord, ...at(a.date, a.startTime), place: vehicle ? a.fromText?.split(',')[0] : undefined }}
           end={{ label: endWord, ...at(a.endDate, a.endTime), place: vehicle ? (a.toText || a.fromText)?.split(',')[0] : undefined }} />
       )}

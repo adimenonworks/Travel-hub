@@ -123,8 +123,6 @@
 /* The categories sit inside the chosen type: a grey inset panel (inner radius = the sheet's 24 − 0, a card in the sheet) */
 .kindPanel { padding: var(--space-default-500); border-radius: var(--radius-600); background: var(--on-light-surface-secondary); }
 .pickerLabel { margin: 0; font: var(--type-body-small); color: var(--on-light-text-secondary); }
-.legs { display: flex; flex-direction: column; gap: var(--space-default-300); }
-.legs > button:last-child { align-self: flex-start; } /* Add a connection hugs its label */
 /* Event form: Location with Paste beside it (both 48px tall, bottoms lined up), the hint under both */
 .locationField { display: flex; flex-direction: column; gap: var(--space-default-200); }
 .locationRow { display: flex; align-items: flex-end; gap: var(--space-default-300); }
