@@ -53,17 +53,19 @@ Read this first when starting a session. If it disagrees with the code or Figma,
 
 ## In progress
 
-- Owner's answers (13 Nov 2026): Map card OK; Hero card cover **5:2 everywhere** (option C); Search field → Text field OK; Illustration keeps `Name` (`Type` is only ever the event type).
-- Hero card: **Figma is done** (see below), code next. Then Search field → Text field, Cover scene → Illustration, Card + Empty state, Page header + Trip header, Journey card, event type only in `.Category icon` (show the owner the Chip before building: a selected Chip takes the whole type colour today), Profile card → List item (only if it matches).
-- Hero card in Figma: the set is now one component `347:2733` "Hero card" (cover and photo 342 × 137, no `Size`; properties Trip name, Meta, Show cover, Show photo, Photo credit, Show people, Show heads-up, Show countdown). Taking the variant out of its set wiped its property definitions, so they were re-created and re-linked; the three list cards on Screens (`501:682`, `501:700`, `545:2224`) had their name and dates restored and people turned off. **Caveat:** the other seven cards (two on Screens: `545:2257`, `500:569`; five on Planning) now show the default name and dates, which they most likely had already.
+- **Stopped for two answers from the owner (13 Nov 2026), asked in chat.** Both remaining A3 merges would change how screens look if done literally:
+  1. **Journey card** (Journey details card + Span card + Layover block). Today a flight page is separate leg cards with a layover block between them, and a stay shows the Span card (label, date in Heading 3, time, place, two columns with a divider). Literally merging puts legs and stops inside one card and gives stays the journey's big-time layout. Recommended: **merge the structure only** now (one Figma "Journey card" whose slot stacks `.Leg` and `.Stop`, plus a Span layout that keeps today's look; code `JourneyCard`), so no screen changes, and leave any redesign to prompt B4, which needs this component.
+  2. **Event type only in `.Category icon`.** Event card, List item, Idea row and Option card already show the type as a coloured icon tile, so nesting a `.Category icon` (it needs Size Small 32 / Regular 40 / Large 48 to fit them) changes nothing visible and takes Event card from 42 variants to 9. **Chip is different:** a selected category Chip is filled with the type's colour; there is no tile to swap. Recommended: Chip keeps `Type` as the one exception (12 variants).
+- Hero card caveat still stands: seven Hero card copies (two on Screens: `545:2257`, `500:569`; five on Planning) show the default name and dates after their properties were re-created.
+- Seen while checking, not changed: at 320px with the largest text, the Trips Segment control splits "Upcoming" and "Collections" across two lines (CLAUDE.md says a word never splits).
 
 ## Still to do
 
-The rest of A3 (see In progress), A4, then the Check everything list.
+Journey card and event type in `.Category icon` (waiting on the owner), then A4 and the Check everything list. At the end of A3: update the "Component names" block of the glossary on Foundations (`597:724`) to match `DESIGN.md`, and order the variants in the sets not yet touched.
 
 ## Figma changes so far
 
-See A1 and A2 above. **Variant count before the cleanup: 274** (Components section, not counting icons and flags); after A2: 270; after Tile, Tag, Hover and Flow screen: 240.
+See A1 and A2 above. **Variant count before the cleanup: 274** (Components section, not counting icons and flags); after A2: 270; after Tile, Tag, Hover and Flow screen: 240; after Map card, Hero card, Search field, Illustration, Page header and Card: 237 (Card gained two for Layout).
 
 ## How to check screens
 
