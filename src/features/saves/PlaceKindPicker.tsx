@@ -22,7 +22,7 @@ export function PlaceKindPicker({ value, onChange, id = 'place-kind' }: { value:
             {t.kinds.map((k) => {
               const on = k.value === value;
               return (
-                <Chip key={k.value} icon={k.icon} tone={TYPE_TONE[t.value]} active={on} label={`${k.label}${on ? ', selected' : ''}`}
+                <Chip key={k.value} icon={k.icon} type={TYPE_TONE[t.value]} selected={on} label={`${k.label}${on ? ', selected' : ''}`}
                   onClick={() => { if (on) return; haptic('selection'); onChange(k.value); }}>{k.label}</Chip>
               );
             })}

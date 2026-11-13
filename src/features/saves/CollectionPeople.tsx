@@ -56,26 +56,26 @@ export function CollectionPeople({ open, onClose, code, share, profiles }: {
         await navigator.clipboard.writeText(url);
         toast({ icon: 'copy', label: 'Invite link copied' });
       }
-    } catch { toast({ tone: 'error', label: "Couldn't make the link. Check your connection" }); }
+    } catch { toast({ tone: 'danger', label: "Couldn't make the link. Check your connection" }); }
     finally { setBusy(false); }
   };
 
   const saveRole = async () => {
     if (!share || !person) return;
     try { await store.setShareRole(share, person, role); toast({ icon: 'check', label: 'Role updated' }); setPerson(null); }
-    catch { toast({ tone: 'error', label: "Couldn't save. Check your connection" }); }
+    catch { toast({ tone: 'danger', label: "Couldn't save. Check your connection" }); }
   };
   const remove = async () => {
     if (!share || !person) return;
     const name = personName(profiles, person);
     if (!confirmAction(`Remove ${name} from your ${country} collection?`)) return;
     try { await store.setShareRole(share, person, null); toast({ icon: 'trash', label: `${name} removed` }); setPerson(null); }
-    catch { toast({ tone: 'error', label: "Couldn't remove. Check your connection" }); }
+    catch { toast({ tone: 'danger', label: "Couldn't remove. Check your connection" }); }
   };
   const leave = async () => {
     if (!share || !confirmAction(`Leave ${ownerName}'s ${country} collection? Places you added stay yours.`)) return;
     try { await store.setShareRole(share, me.uid, null); toast({ icon: 'signout', label: 'You left the collection' }); onClose(); navigate('/trips'); }
-    catch { toast({ tone: 'error', label: "Couldn't leave. Check your connection" }); }
+    catch { toast({ tone: 'danger', label: "Couldn't leave. Check your connection" }); }
   };
 
   const people: { id: string; role: CollectionRole | 'owner' }[] = [
@@ -87,14 +87,14 @@ export function CollectionPeople({ open, onClose, code, share, profiles }: {
     <>
       <Sheet open={open && !person} title="People" subtitle={owner ? `Who sees your ${country} collection` : `${ownerName}'s ${country} collection`} onClose={onClose}
         onSubmit={owner ? invite : undefined} submitLabel="Share invite link" submitDisabled={busy}
-        secondary={!owner ? <Button variant="destructive" size="large" icon="signout" onClick={leave}>Leave</Button> : undefined}>
+        secondary={!owner ? <Button tone="destructive" size="large" icon="signout" onClick={leave}>Leave</Button> : undefined}>
         <div className={s.sections}>
           <ListGroup label="People in this collection">
             {people.map(({ id, role: r }) => {
               const name = id === me.uid ? (me.name || 'You') : personName(profiles, id);
               const editable = owner && r !== 'owner';
               return (
-                <ListItem key={id} media={<Avatar name={name} photo={id === me.uid ? me.photo : profiles[id]?.photo} size={40} />} round
+                <ListItem key={id} media={<Avatar name={name} photo={id === me.uid ? me.photo : profiles[id]?.photo} size="large" />} round
                   title={name} meta={`${roleName(r)}${id === me.uid ? ' · you' : ''}`}
                   onClick={editable ? () => { haptic('selection'); setRole(r as CollectionRole); setPerson(id); } : undefined}
                   label={editable ? `${name}, ${roleName(r)}: change role` : undefined} />
@@ -112,7 +112,7 @@ export function CollectionPeople({ open, onClose, code, share, profiles }: {
       </Sheet>
       <Sheet open={open && !!person} mode="edit" title={person ? personName(profiles, person) : ''} subtitle={`What they can do in your ${country} collection`}
         onClose={() => setPerson(null)} onSubmit={saveRole} submitLabel="Save"
-        secondary={<Button variant="destructive" size="large" onClick={remove}>Remove</Button>}>
+        secondary={<Button tone="destructive" size="large" onClick={remove}>Remove</Button>}>
         <SegmentControl label="Role" block value={role} onChange={setRole} options={[{ value: 'viewer', label: 'Can view' }, { value: 'member', label: 'Can edit' }]} />
         <p className="t-body-small t-secondary">{COLLECTION_ROLE_HELP[role]}</p>
       </Sheet>

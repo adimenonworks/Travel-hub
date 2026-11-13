@@ -23,7 +23,7 @@
 /* The tab's content */
 .tabPanel { display: flex; flex-direction: column; gap: var(--space-stack); }
 
-/* Day strip (Figma "Day Card" in a sideways-scrolling row) */
+/* Day strip (Figma "Day card" in a sideways-scrolling row) */
 .days {
   display: flex; align-items: stretch; gap: var(--space-default-300); overflow-x: auto; scroll-snap-type: x proximity; scrollbar-width: none;
   /* Room above and below for the selected card's growth and focus rings (the strip scrolls, so it would clip them),

@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { BottomNav, Notification, ToastProvider, type NavTab } from '../design/components';
+import { BottomNav, Banner, ToastProvider, type NavTab } from '../design/components';
 import { store } from '../data';
 import { ScreenStack } from './ScreenStack';
 import { SwipeBack } from './SwipeBack';
@@ -18,14 +18,14 @@ export const useNewTrip = () => useContext(NewTripContext);
 const SaveContext = createContext<(r: SaveRequest) => void>(() => {});
 export const useSave = () => useContext(SaveContext);
 
-/** Bottom Nav (Figma): Home, Trips (your trips, and each trip's pages) and You. */
+/** Bottom nav (Figma): Home, Trips (your trips, and each trip's pages) and You. */
 const TABS: NavTab[] = [
   { to: '/', label: 'Home', icon: 'home', active: (p) => p === '/' },
   { to: '/trips', label: 'Trips', icon: 'plane', active: (p) => p === '/trips' || p.startsWith('/trip/') },
   { to: '/profile', label: 'You', icon: 'person', active: (p) => p.startsWith('/profile') },
 ];
 
-/** App frame: the page and the Bottom Nav. The New trip flow lives here so any page can open it. */
+/** App frame: the page and the Bottom nav. The New trip flow lives here so any page can open it. */
 export function Shell({ children }: { children: ReactNode }) {
   const navigate = useNavigate();
   const [creating, setCreating] = useState(false);
@@ -50,7 +50,7 @@ export function Shell({ children }: { children: ReactNode }) {
           <main id="main" className={[s.main, showNav && s.withNav].filter(Boolean).join(' ')}>
             {store.mode === 'demo' && (
               <div className={s.demo}>
-                <Notification state="warning">Demo mode: data is saved only in this browser. Connect Firebase to share trips with friends (see README).</Notification>
+                <Banner tone="warning">Demo mode: data is saved only in this browser. Connect Firebase to share trips with friends (see README).</Banner>
               </div>
             )}
             <ScreenStack>{children}</ScreenStack>

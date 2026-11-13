@@ -13,7 +13,7 @@ const DURATION: Record<Kind, number> = { push: 420, back: 420, tab: 220 };
 /**
  * Screen changes the iPhone way: both screens move together. Opening something slides the new screen in from the
  * right over the old one, which drifts 30% left and dims; Back is the mirror (the current screen slides off to the
- * right, the previous one comes in from the left and brightens); the Bottom Nav cross-fades, the old tab fading out
+ * right, the previous one comes in from the left and brightens); the Bottom nav cross-fades, the old tab fading out
  * over the new one, so there's never a blank frame.
  *
  * The change is noticed while rendering, so the leaving screen never leaves the React tree: it keeps its key and

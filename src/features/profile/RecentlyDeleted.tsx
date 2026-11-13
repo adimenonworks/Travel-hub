@@ -64,7 +64,7 @@ export function RecentlyDeleted() {
   const meta = (x: { deletedAt?: number; deletedBy?: string }, before?: string) =>
     [before, `Deleted ${when(x.deletedAt!)}${by(x.deletedBy)}`, `${daysLeft(x.deletedAt!)} day${daysLeft(x.deletedAt!) === 1 ? '' : 's'} left`].filter(Boolean).join(' · ');
   const planner = (t: Trip) => !!t.roles[me.uid] && t.roles[me.uid] !== 'viewer';
-  const fail = () => toast({ tone: 'error', label: "Couldn't restore it. Check your connection" });
+  const fail = () => toast({ tone: 'danger', label: "Couldn't restore it. Check your connection" });
 
   const restoreTrip = async (t: Trip) => {
     try { await store.setDeleted({ kind: 'trip', id: t.id }, false); haptic('success'); toast({ icon: 'check', label: `${t.name} is back in Trips` }); } catch { fail(); }
@@ -95,7 +95,7 @@ export function RecentlyDeleted() {
   const restorePlace = async (id: string, name: string) => {
     try { await store.setDeleted({ kind: 'place', id }, false); haptic('success'); toast({ icon: 'check', label: `${name} is back in Collections` }); } catch { fail(); }
   };
-  const restore = (label: string, run: () => void) => <Button variant="neutral" size="regular" onClick={run} aria-label={`Restore ${label}`}>Restore</Button>;
+  const restore = (label: string, run: () => void) => <Button tone="neutral" size="regular" onClick={run} aria-label={`Restore ${label}`}>Restore</Button>;
 
   const empty = binnedTrips.length + events.length + binnedPlaces.length === 0;
   return (

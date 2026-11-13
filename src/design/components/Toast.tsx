@@ -5,13 +5,13 @@ import s from './Toast.module.css';
 
 /** `action`: one short text button, e.g. Undo after a save (the toast then stays 5 seconds).
  *  `size: 'large'` (Figma Size=Large): Body text, more padding, a 24px icon; stays 6 seconds. For messages from people. */
-type ToastMessage = { id: number; icon?: IconName; label: string; tone?: 'neutral' | 'error'; size?: 'regular' | 'large'; action?: { label: string; onClick: () => void } };
+type ToastMessage = { id: number; icon?: IconName; label: string; tone?: 'neutral' | 'danger'; size?: 'regular' | 'large'; action?: { label: string; onClick: () => void } };
 
 const ToastContext = createContext<(t: Omit<ToastMessage, 'id'>) => void>(() => {});
 
 /**
  * Show a short message at the top of the screen, e.g. `toast({ icon: 'copy', label: 'Address copied' })`,
- * or `toast({ tone: 'error', label: "Couldn't save. Check your connection" })` when something fails.
+ * or `toast({ tone: 'danger', label: "Couldn't save. Check your connection" })` when something fails.
  */
 export const useToast = () => useContext(ToastContext);
 
@@ -34,7 +34,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
     clear();
     setLeaving(false);
     setMsg({ ...t, id: Date.now() });
-    if (t.tone === 'error') haptic('error'); // Figma Haptics map: Error when a save fails
+    if (t.tone === 'danger') haptic('error'); // Figma Haptics map: Error when a save fails
     const ms = t.size === 'large' ? LARGE_MS : t.action ? SHOW_MS + 2000 : SHOW_MS;
     timers.current.push(
       window.setTimeout(() => setLeaving(true), ms),
@@ -48,8 +48,8 @@ export function ToastProvider({ children }: { children: ReactNode }) {
       {children}
       <div className={s.region} role="status" aria-live="polite">
         {msg && (
-          <div key={msg.id} className={[s.toast, msg.size === 'large' ? s.large : s.small, msg.tone === 'error' && s.error, leaving && s.leaving].filter(Boolean).join(' ')}>
-            {(msg.icon || msg.tone === 'error') && <Icon name={msg.icon ?? 'info'} size={msg.size === 'large' ? 24 : 16} className={s.icon} />}
+          <div key={msg.id} className={[s.toast, msg.size === 'large' ? s.large : s.small, msg.tone === 'danger' && s.error, leaving && s.leaving].filter(Boolean).join(' ')}>
+            {(msg.icon || msg.tone === 'danger') && <Icon name={msg.icon ?? 'info'} size={msg.size === 'large' ? 24 : 16} className={s.icon} />}
             <span>{msg.label}</span>
             {msg.action && (
               <button type="button" className={s.action} onClick={() => { msg.action!.onClick(); clear(); setLeaving(true); timers.current.push(window.setTimeout(() => setMsg(null), LEAVE_MS)); }}>

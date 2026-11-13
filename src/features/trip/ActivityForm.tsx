@@ -124,7 +124,7 @@ export function ActivityForm({ open, trip, date, activity, draft, onClose, onCre
         set({ [key]: '' } as Partial<Form>);
         toast({ label: 'Couldn’t find a place in that link. Type the name or address' });
       }
-    } catch { toast({ tone: 'error', label: 'Couldn’t read that link' }); }
+    } catch { toast({ tone: 'danger', label: 'Couldn’t read that link' }); }
     finally { setReading(null); }
   };
   const pasteLocation = async (key: PlaceKey = 'locationText') => {
@@ -238,7 +238,7 @@ export function ActivityForm({ open, trip, date, activity, draft, onClose, onCre
       toast({ icon: 'check', label: activity ? 'Changes saved' : behaviour === 'span' ? `${info.label} added: ${startWord.toLowerCase()} and ${endWord.toLowerCase()}` : 'Event added' });
       onClose();
     } catch {
-      toast({ tone: 'error', label: "Couldn't save. Check your connection" });
+      toast({ tone: 'danger', label: "Couldn't save. Check your connection" });
     } finally {
       setBusy(false);
     }
@@ -253,7 +253,7 @@ export function ActivityForm({ open, trip, date, activity, draft, onClose, onCre
       onClose();
       onDeleted?.(activity);
     } catch {
-      toast({ tone: 'error', label: "Couldn't delete. Check your connection" });
+      toast({ tone: 'danger', label: "Couldn't delete. Check your connection" });
     }
   };
 
@@ -277,7 +277,7 @@ export function ActivityForm({ open, trip, date, activity, draft, onClose, onCre
       <div className={s.locationRow}>
         <TextField label={lbl} placeholder={placeholder} value={f[key]} inputMode="text"
           onChange={(e) => { const v = e.target.value; set({ [key]: v } as Partial<Form>); setLinkPlaces((m) => ({ ...m, [key]: undefined })); const url = findUrl(v); if (url && url === v.trim()) fromLink(url, key); }} />
-        <Button variant="neutral" size="large" icon="copy" onClick={() => pasteLocation(key)} disabled={reading === key} aria-label={`Paste into ${lbl}`}>Paste</Button>
+        <Button tone="neutral" size="large" icon="copy" onClick={() => pasteLocation(key)} disabled={reading === key} aria-label={`Paste into ${lbl}`}>Paste</Button>
       </div>
       <p className="t-body-small t-secondary" aria-live="polite">{reading === key ? 'Reading the link…' : hint}</p>
     </div>
@@ -308,7 +308,7 @@ export function ActivityForm({ open, trip, date, activity, draft, onClose, onCre
     <Sheet open={open} mode={activity ? 'edit' : 'default'} title={sheetTitle}
       subtitle={!f.type ? 'What are you adding?' : undefined}
       onClose={onClose} onSubmit={kind ? submit : undefined} submitLabel={activity ? 'Save' : `Add to ${formatDay(f.date)}`} submitDisabled={!valid || busy}
-      secondary={activity && kind && (canManage || activity.createdBy === me.uid) ? <Button variant="destructive" size="large" onClick={remove}>Delete</Button> : undefined}>
+      secondary={activity && kind && (canManage || activity.createdBy === me.uid) ? <Button tone="destructive" size="large" onClick={remove}>Delete</Button> : undefined}>
       {!f.type ? (
         // Step 1: the 6 types, each with what it covers, in its colour
         <div className={s.typeList} role="group" aria-label="Type">
@@ -319,12 +319,12 @@ export function ActivityForm({ open, trip, date, activity, draft, onClose, onCre
           {/* The type it is, with Change type: a mistake is one tap to fix (the six types as chips, in their colours) */}
           {typeInfo && (
             <div className={s.typeRow}>
-              <CategoryIcon icon={info?.icon ?? typeInfo.icon} tone={TYPE_TONE[typeInfo.value]} />
+              <CategoryIcon icon={info?.icon ?? typeInfo.icon} type={TYPE_TONE[typeInfo.value]} />
               <div className={s.typeRowText}>
                 <span className="t-heading-4">{typeInfo.label}</span>
                 {info && <span className="t-body-small t-secondary">{info.label}</span>}
               </div>
-              <Button variant="ghost" size="regular" aria-expanded={changingType} onClick={() => { haptic('selection'); setChangingType((v) => !v); }}>{changingType ? 'Done' : 'Change type'}</Button>
+              <Button tone="ghost" size="regular" aria-expanded={changingType} onClick={() => { haptic('selection'); setChangingType((v) => !v); }}>{changingType ? 'Done' : 'Change type'}</Button>
             </div>
           )}
           {changingType && (
@@ -332,7 +332,7 @@ export function ActivityForm({ open, trip, date, activity, draft, onClose, onCre
               <h3 className={s.pickerLabel} id="event-type">Type</h3>
               <div className={s.kindChips} role="radiogroup" aria-labelledby="event-type">
                 {EVENT_TYPES.map((x) => (
-                  <Chip key={x.value} icon={x.icon} tone={TYPE_TONE[x.value]} active={f.type === x.value} label={`${x.label}${f.type === x.value ? ', selected' : ''}`}
+                  <Chip key={x.value} icon={x.icon} type={TYPE_TONE[x.value]} selected={f.type === x.value} label={`${x.label}${f.type === x.value ? ', selected' : ''}`}
                     onClick={() => { if (f.type !== x.value) pickType(x.value); }}>{x.label}</Chip>
                 ))}
               </div>
@@ -345,7 +345,7 @@ export function ActivityForm({ open, trip, date, activity, draft, onClose, onCre
               <h3 className={s.pickerLabel} id="event-category">{`${typeInfo.label} categories`}</h3>
               <div className={s.kindChips} role="group" aria-labelledby="event-category">
                 {typeInfo.kinds.map((x) => (
-                  <Chip key={x.value} icon={x.icon} tone={TYPE_TONE[typeInfo.value]} active={kind === x.value} label={`${x.label}${kind === x.value ? ', selected' : ''}`}
+                  <Chip key={x.value} icon={x.icon} type={TYPE_TONE[typeInfo.value]} selected={kind === x.value} label={`${x.label}${kind === x.value ? ', selected' : ''}`}
                     onClick={() => { haptic('selection'); pickKind(x.value); }}>{x.label}</Chip>
                 ))}
               </div>
@@ -376,7 +376,7 @@ export function ActivityForm({ open, trip, date, activity, draft, onClose, onCre
                 {!['taxi', 'driver', 'transfer'].includes(kind) && text('Seat (optional)', 'seats', kind === 'flight' ? '23A' : 'Coach 4, seat 32')}
               </FieldRow>
               {activity && onAddConnection && (
-                <div><Button variant="ghost" size="regular" icon="plus" onClick={() => { onClose(); onAddConnection(); }}>Add a connection</Button></div>
+                <div><Button tone="ghost" size="regular" icon="plus" onClick={() => { onClose(); onAddConnection(); }}>Add a connection</Button></div>
               )}
             </>
           )}

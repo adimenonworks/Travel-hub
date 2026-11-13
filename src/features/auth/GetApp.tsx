@@ -41,7 +41,7 @@ export function GetApp() {
       <Card className={s.card}>
         <Button size="large" block onClick={open}>Open in Rove</Button>
         {APP_STORE_URL
-          ? <LinkButton href={APP_STORE_URL} variant="neutral" size="large" block>Get Rove on the App Store</LinkButton>
+          ? <LinkButton href={APP_STORE_URL} tone="neutral" size="large" block>Get Rove on the App Store</LinkButton>
           : <p className="t-body-small t-secondary">Don’t have Rove yet? It’s coming to the App Store soon. Ask whoever invited you how to get it.</p>}
       </Card>
     </div>

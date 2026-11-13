@@ -60,7 +60,7 @@ export function Ideas(ctx: TripCtx) {
     const mine = !!i.votes?.[me.uid];
     haptic('light');
     try { await store.setVote(trip.id, i.id, me.uid, mine ? 0 : 1); }
-    catch { toast({ tone: 'error', label: "Couldn't save your vote. Check your connection" }); }
+    catch { toast({ tone: 'danger', label: "Couldn't save your vote. Check your connection" }); }
   };
   const live = viewing ? ideas.find((i) => i.id === viewing.id) ?? null : null;
   // Ideas that point at a saved Place show the Place (its name, kind and city); it's never copied into the idea.
@@ -95,7 +95,7 @@ export function Ideas(ctx: TripCtx) {
                   <IdeaRow key={i.id} title={place?.name ?? i.title} meta={meta} icon={place ? placeCategory(place.category).icon : i.links.length ? 'link' : cat.icon}
                     tone={place ? placeCategory(place.category).tone : i.links.length ? undefined : categoryTone(i.category)}
                     tag={i.id === top ? { icon: 'star', label: 'Most votes' } : undefined}
-                    vote={{ count: ups(i), voted: !!i.votes?.[me.uid], onClick: () => vote(i) }}
+                    vote={{ count: ups(i), selected: !!i.votes?.[me.uid], onClick: () => vote(i) }}
                     onClick={() => { setViewing(i); if (place) recordView(trip.id, { url: `/trip/${trip.id}/ideas?idea=${i.id}`, label: place.name, kind: 'Place' }); }} />
                 );
               })}
@@ -142,11 +142,11 @@ function AddIdeaSheet({ open, ctx, onClose, onNew }: { open: boolean; ctx: TripC
       await store.addSub(ctx.trip.id, 'ideas', { title: p.name, category: eventCategoryOf(p.category), notes: '', links: [], votes: {}, status: 'open', placeId: p.id });
       haptic('light');
       toast({ icon: 'check', label: `${p.name} added to ideas` });
-    } catch { toast({ tone: 'error', label: "Couldn't save. Check your connection" }); }
+    } catch { toast({ tone: 'danger', label: "Couldn't save. Check your connection" }); }
   };
   return (
     <Sheet open={open} title="Add an idea" subtitle={fits.length ? 'From your saved places, or something new' : undefined} onClose={onClose}>
-      <Button variant="neutral" icon="plus" block onClick={onNew}>New idea</Button>
+      <Button tone="neutral" icon="plus" block onClick={onNew}>New idea</Button>
       {fits.length === 0 ? (
         <p className="t-body-small t-secondary">Places you save in {[...codes].map(countryName).join(' or ') || 'this trip’s countries'} show up here, ready to add.</p>
       ) : groupBy(sortPlaces(fits, visited), cityOf).map(([city, list]) => (
@@ -176,13 +176,13 @@ function IdeaSheet({ idea, place, ctx, onClose, onEdit, onSchedule }: { idea: Id
     haptic('light');
     const on = !starred(place);
     try { await store.starPlace(place.id, me.uid, on); toast({ icon: 'star', label: on ? 'Added to favourites' : 'Removed from favourites' }); }
-    catch { toast({ tone: 'error', label: "Couldn't save. Check your connection" }); }
+    catch { toast({ tone: 'danger', label: "Couldn't save. Check your connection" }); }
   };
   const cat = categoryInfo(idea.category);
   const canEdit = ctx.canManage || idea.createdBy === me.uid;
   const setStatus = async (status: Idea['status'], label: string) => {
     try { await store.updateSub(ctx.trip.id, 'ideas', idea.id, { status }); toast({ icon: 'check', label }); onClose(); }
-    catch { toast({ tone: 'error', label: "Couldn't save. Check your connection" }); }
+    catch { toast({ tone: 'danger', label: "Couldn't save. Check your connection" }); }
   };
   return (
     <Sheet open title={place?.name ?? idea.title} subtitle={[place ? [place.kind || placeCategory(place.category).one, place.city].filter(Boolean).join(' · ') : cat.label, `added by ${idea.createdBy === me.uid ? 'you' : personName(ctx.profiles, idea.createdBy)}`].filter(Boolean).join(' · ')} onClose={onClose}>
@@ -193,18 +193,18 @@ function IdeaSheet({ idea, place, ctx, onClose, onEdit, onSchedule }: { idea: Id
       <LinkChips links={idea.links} onOpen={(l) => recordView(ctx.trip.id, { url: l.url, kind: isPdf(l.url) ? 'PDF' : 'Link', label: l.label || hostOf(l.url), meta: idea.title })} />
       {place && (
         <div className={s.ideaButtons}>
-          {place.url && <LinkButton href={place.url} variant="neutral" icon={isMapsLink(place.url) ? 'map' : 'arrow-up-right'} label={`Open ${place.name}`}>{isMapsLink(place.url) ? 'Open in Maps' : 'Open link'}</LinkButton>}
-          <Button variant="neutral" icon="star" onClick={star}>{starred(place) ? 'Favourite' : 'Add to favourites'}</Button>
+          {place.url && <LinkButton href={place.url} tone="neutral" icon={isMapsLink(place.url) ? 'map' : 'arrow-up-right'} label={`Open ${place.name}`}>{isMapsLink(place.url) ? 'Open in Maps' : 'Open link'}</LinkButton>}
+          <Button tone="neutral" icon="star" onClick={star}>{starred(place) ? 'Favourite' : 'Add to favourites'}</Button>
         </div>
       )}
       {ctx.canManage && idea.status === 'open' && (
         <div className={s.ideaButtons}>
-          <Button variant="neutral" onClick={() => setStatus('rejected', 'Idea passed')}>Pass</Button>
+          <Button tone="neutral" onClick={() => setStatus('rejected', 'Idea passed')}>Pass</Button>
           <Button icon="calendar" onClick={onSchedule}>Add to a day</Button>
         </div>
       )}
-      {ctx.canManage && idea.status === 'rejected' && <Button variant="neutral" block onClick={() => setStatus('open', 'Idea back to decide')}>Back to “To decide”</Button>}
-      {canEdit && <Button variant="ghost" icon="pencil" onClick={onEdit}>Edit idea</Button>}
+      {ctx.canManage && idea.status === 'rejected' && <Button tone="neutral" block onClick={() => setStatus('open', 'Idea back to decide')}>Back to “To decide”</Button>}
+      {canEdit && <Button tone="ghost" icon="pencil" onClick={onEdit}>Edit idea</Button>}
     </Sheet>
   );
 }
@@ -227,17 +227,17 @@ function IdeaForm({ open, tripId, currency, idea, onClose }: { open: boolean; tr
       else await store.addSub(tripId, 'ideas', { ...data, votes: {}, status: 'open' });
       toast({ icon: 'check', label: idea ? 'Idea saved' : 'Idea added' });
       onClose();
-    } catch { toast({ tone: 'error', label: "Couldn't save. Check your connection" }); }
+    } catch { toast({ tone: 'danger', label: "Couldn't save. Check your connection" }); }
   };
   const remove = async () => {
     if (!idea || !confirmAction(`Delete "${idea.title}"?`)) return;
     try { await store.deleteSub(tripId, 'ideas', idea.id); toast({ icon: 'trash', label: 'Idea deleted' }); onClose(); }
-    catch { toast({ tone: 'error', label: "Couldn't delete. Check your connection" }); }
+    catch { toast({ tone: 'danger', label: "Couldn't delete. Check your connection" }); }
   };
 
   return (
     <Sheet open={open} mode={idea ? 'edit' : 'default'} title={idea ? 'Edit idea' : 'New idea'} onClose={onClose} onSubmit={submit} submitLabel={idea ? 'Save' : 'Add'} submitDisabled={!f.title.trim()}
-      secondary={idea ? <Button variant="destructive" size="large" onClick={remove}>Delete</Button> : undefined}>
+      secondary={idea ? <Button tone="destructive" size="large" onClick={remove}>Delete</Button> : undefined}>
       <TextField label="Idea" placeholder="Dinner at Taberna da Rua das Flores" value={f.title} onChange={(e) => set({ title: e.target.value })} />
       <Select label="Type" value={eventKind(f.category)} onChange={(e) => set({ category: e.target.value as Category })}>
         {EVENT_TYPES.filter((t) => t.value !== 'free' && t.value !== 'notes').map((t) => (

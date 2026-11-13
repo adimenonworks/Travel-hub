@@ -1,7 +1,7 @@
 import { hasStep, stepTab, useSwipeTabs } from '../../app/useSwipeTabs';
 import { Fragment, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { Button, ContextMenu, DayCard, EmptyState, EventCard, SectionHeader, Timeline, TravelConnector, useToast, type ContextMenuItem, type EventState } from '../../design/components';
+import { Button, ContextMenu, DayCard, EmptyState, EventCard, SectionHeader, NowLine, TravelConnector, useToast, type ContextMenuItem, type EventState } from '../../design/components';
 import { useMe, usePlacesById } from '../../data/hooks';
 import type { Activity } from '../../data/types';
 import { dayWord, formatDay, formatTime, parseDay, today, tripDays } from '../../lib/dates';
@@ -61,7 +61,7 @@ export function Itinerary(ctx: TripCtx) {
       await store.setDeleted({ kind: 'event', tripId: trip.id, id: a.id }, true);
       toast({ icon: 'trash', label: 'Event deleted', action: { label: 'Undo', onClick: () => { store.setDeleted({ kind: 'event', tripId: trip.id, id: a.id }, false).catch(() => {}); } } });
     }
-    catch { toast({ tone: 'error', label: "Couldn't delete. Check your connection" }); }
+    catch { toast({ tone: 'danger', label: "Couldn't delete. Check your connection" }); }
   };
 
   // What's on each day (a Stay counts on its check-in and check-out days).
@@ -76,7 +76,7 @@ export function Itinerary(ctx: TripCtx) {
   const me = useMe();
   const reads = useReads(me.uid);
   const places = usePlacesById(activities.flatMap((x) => (x.placeId ? [x.placeId] : [])));
-  const nowLine = <Timeline time={formatTime(now)} />;
+  const nowLine = <NowLine time={formatTime(now)} />;
   const startsIn = (e: DayEntry) => {
     const at = entryTime(e);
     if (!at || at <= now) return 'Now';
@@ -110,7 +110,7 @@ export function Itinerary(ctx: TripCtx) {
         <div ref={planBox}>
         <SlideSwap value={day} id={day} rank={days.indexOf(day)}>{(d) => {
           const list: DayEntry[] = byDay[d] ?? [];
-          // On today's plan, the "now" line (Figma Timeline) sits before the next plan. The page doesn't scroll to it.
+          // On today's plan, the "now" line (Figma Now line) sits before the next plan. The page doesn't scroll to it.
           const showNow = d === localToday && list.length > 1;
           const nextIndex = d === localToday ? list.findIndex((e) => entryEnd(e) > now) : -1;
           // The price per person, subtle at the top right, on bookings (not everyday spending); a stay shows it at check-in only.
@@ -124,7 +124,7 @@ export function Itinerary(ctx: TripCtx) {
           const dateLine = list.some((e) => legsOf(e.a, activities).some(crossesDateLine));
           return list.length === 0 ? (
             <EmptyState illustration="calendar" title="Nothing planned yet" message="Add something to do, or schedule an idea from the Ideas board."
-              action={ctx.canContribute ? <Button variant="neutral" icon="plus" onClick={() => setAdding(true)}>Add event</Button> : undefined} />
+              action={ctx.canContribute ? <Button tone="neutral" icon="plus" onClick={() => setAdding(true)}>Add event</Button> : undefined} />
           ) : (
             <div className={s.eventList}>
               {arrivals.map(({ a, last }) => <TravelConnector key={`arr-${a.id}`} icon={categoryInfo(a.category).icon} label={`Arrives ${formatTime(last.endTime)} from ${(a.fromText ?? '').split(',')[0].replace(/\s*\([^)]*\)/, '')}`} />)}
@@ -152,7 +152,7 @@ export function Itinerary(ctx: TripCtx) {
                       return ctx.canManage ? (
                         <HoldMenu label={`${a.title} actions`} items={[
                           { label: 'Edit', icon: 'pencil', onClick: () => setEditing(a) },
-                          { label: 'Delete', icon: 'trash', destructive: true, onClick: () => remove(a) },
+                          { label: 'Delete', icon: 'trash', tone: 'danger', onClick: () => remove(a) },
                         ]}>{card}</HoldMenu>
                       ) : card;
                     })()}

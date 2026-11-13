@@ -19,7 +19,7 @@ import ss from '../saves/saves.module.css';
 /**
  * Home (Figma "Home — v2"): what's happening now. The greeting, two quick actions side by side (Save a place, Plan a
  * trip), then your trips: while one is on, "Happening now" (Next up: the next event as the deep-green Next card, as on
- * the trip's Overview, then the trip's card), and "Upcoming trips" (the soonest as a full Hero Card, the rest compact).
+ * the trip's Overview, then the trip's card), and "Upcoming trips" (the soonest as a full Hero card, the rest compact).
  * Then "Collections" (your saves by country as Tiles) and "Recently saved". With no trip or no saves, an accent Card
  * with an illustration takes their place.
  */
@@ -62,7 +62,7 @@ export function Home() {
       <PageHeader title={`Hi, ${name.split(' ')[0]}`} fit />
       <nav className={s.quickActions} aria-label="Quick actions">
         <Button size="regular" icon="plus" onClick={() => openSave({ mode: 'link' })}>Save a place</Button>
-        <Button size="regular" variant="neutral" icon="calendar" onClick={() => newTrip()}>Plan a trip</Button>
+        <Button size="regular" tone="neutral" icon="calendar" onClick={() => newTrip()}>Plan a trip</Button>
       </nav>
       {trips === null ? <PageSkeleton bare /> : happening || upcoming.length > 0 ? (
         <>
@@ -89,7 +89,7 @@ export function Home() {
           actions={<Button block onClick={() => openSave({ mode: 'link' })}>Save a place</Button>} />
       ) : (
         <PageSection title="Collections" meta={`${countries.length} place${countries.length === 1 ? '' : 's'} · ${places.length} save${places.length === 1 ? '' : 's'}`}
-          action={<LinkButton to="/trips?show=saved" variant="ghost" size="regular" iconEnd="chevron-right">See all</LinkButton>}>
+          action={<LinkButton to="/trips?show=saved" tone="ghost" size="regular" iconEnd="chevron-right">See all</LinkButton>}>
           <div className={ss.tileRow}>
             {countries.map((c) => <CountryTile key={c.code} country={c} />)}
           </div>
@@ -98,7 +98,7 @@ export function Home() {
 
       {recent.length > 0 && (
         <PageSection title="Recently saved"
-          action={<LinkButton to="/trips?show=saved" variant="ghost" size="regular" iconEnd="chevron-right">See all</LinkButton>}>
+          action={<LinkButton to="/trips?show=saved" tone="ghost" size="regular" iconEnd="chevron-right">See all</LinkButton>}>
           <ListGroup label="Recently saved">
             {recent.map((p) => (
               <PlaceRow key={p.id} place={p} visited={visited.has(p.id)} starred={starred(p)} onClick={() => setOpen(p.id)} trailing={timeAgo(p.createdAt)}

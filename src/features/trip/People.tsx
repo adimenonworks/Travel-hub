@@ -38,7 +38,7 @@ export function People({ trip, profiles, canManage, isOwner }: TripCtx) {
   };
   const share = async (url: string) => {
     if (await shareLink({ title: `Join ${trip.name}`, text: `Join our trip "${trip.name}" on Rove`, url })) return;
-    try { await navigator.clipboard.writeText(url); toast({ icon: 'copy', label: 'Invite link copied' }); } catch { toast({ tone: 'error', label: "Couldn't share the link. Try again" }); }
+    try { await navigator.clipboard.writeText(url); toast({ icon: 'copy', label: 'Invite link copied' }); } catch { toast({ tone: 'danger', label: "Couldn't share the link. Try again" }); }
   };
   const invite = async () => {
     const url = await makeLink();
@@ -55,7 +55,7 @@ export function People({ trip, profiles, canManage, isOwner }: TripCtx) {
     const was = trip.roles[person] === 'viewer' ? 'viewer' : 'planner';
     if (was === role) { setPerson(null); return; }
     try { await store.setRole(trip, person, role === 'viewer' ? 'viewer' : 'editor'); toast({ icon: 'check', label: 'Role updated' }); setPerson(null); }
-    catch { toast({ tone: 'error', label: "Couldn't save. Check your connection" }); }
+    catch { toast({ tone: 'danger', label: "Couldn't save. Check your connection" }); }
   };
 
   const removePerson = async () => {
@@ -63,7 +63,7 @@ export function People({ trip, profiles, canManage, isOwner }: TripCtx) {
     const name = personName(profiles, person);
     if (!confirmAction(`Remove ${name} from this trip?`)) return;
     try { await store.removeMember(trip, person); toast({ icon: 'trash', label: `${name} removed` }); setPerson(null); }
-    catch { toast({ tone: 'error', label: "Couldn't remove. Check your connection" }); }
+    catch { toast({ tone: 'danger', label: "Couldn't remove. Check your connection" }); }
   };
 
   return (
@@ -76,7 +76,7 @@ export function People({ trip, profiles, canManage, isOwner }: TripCtx) {
           // Any Planner changes anyone's role, except their own and the trip creator's (the trip always keeps them)
           const editable = canManage && id !== me.uid && id !== trip.ownerId;
           return (
-            <ListItem key={id} media={<Avatar name={name} photo={profiles[id]?.photo} size={40} />} round
+            <ListItem key={id} media={<Avatar name={name} photo={profiles[id]?.photo} size="large" />} round
               title={name} meta={`${roleName(id)}${id === me.uid ? ' · you' : ''}`}
               onClick={editable ? () => open(id) : undefined} label={editable ? `${name}, ${roleName(id)}: change role` : undefined} />
           );
@@ -92,7 +92,7 @@ export function People({ trip, profiles, canManage, isOwner }: TripCtx) {
 
       {/* Deleting the trip lives in Edit trip (its creator only); here anyone can leave, while someone else is on it */}
       {members.length > 1 && (
-        <Button variant="destructive" icon="signout" onClick={async () => {
+        <Button tone="destructive" icon="signout" onClick={async () => {
           if (!confirmAction(isOwner ? `Leave "${trip.name}"? It stays with everyone else.` : `Leave "${trip.name}"?`)) return;
           await store.leaveTrip(trip.id, me.uid);
           navigate('/');
@@ -100,7 +100,7 @@ export function People({ trip, profiles, canManage, isOwner }: TripCtx) {
       )}
 
       <Sheet open={!!person} mode="edit" title={person ? personName(profiles, person) : ''} subtitle="What they can do on this trip" onClose={() => setPerson(null)} onSubmit={saveRole} submitLabel="Save"
-        secondary={person ? <Button variant="destructive" size="large" onClick={removePerson}>Remove</Button> : undefined}>
+        secondary={person ? <Button tone="destructive" size="large" onClick={removePerson}>Remove</Button> : undefined}>
         <SegmentControl label="Role" block value={role} onChange={setRoleDraft} options={[{ value: 'viewer', label: 'Viewer' }, { value: 'planner', label: 'Planner' }]} />
         <p className="t-body-small t-secondary">{ROLE_HELP[role]}</p>
       </Sheet>

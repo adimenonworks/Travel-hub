@@ -131,7 +131,7 @@ export function Sheet({ open, title, subtitle, onClose, onSubmit, submitLabel = 
           <div className={s.body}>
             {shown.current.children}
             {edit
-              ? <div className={s.footer}><Button variant="neutral" size="large" onClick={onClose}>Discard changes</Button>{secondary}</div>
+              ? <div className={s.footer}><Button tone="neutral" size="large" onClick={onClose}>Discard changes</Button>{secondary}</div>
               : (onSubmit || secondary) && <div className={s.footer}>{secondary}{onSubmit && <Button type="submit" block disabled={submitDisabled}>{submitLabel}</Button>}</div>}
           </div>
         </form>

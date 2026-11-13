@@ -172,7 +172,7 @@
   --on-mid-status-warning-subtle: var(--color-orange-100);
   --on-mid-status-error: var(--color-red-800);
   --on-mid-status-error-subtle: var(--color-red-100);
-  /* On dark: the deep brand surface (Hero Card panel) */
+  /* On dark: the deep brand surface (Hero card panel) */
   --on-dark-surface-primary: var(--color-neutral-900);
   --on-dark-surface-secondary: var(--color-emerald-600);
   --on-dark-surface-brand: var(--color-emerald-800);
@@ -265,11 +265,11 @@
   --shadow-raised: 0 0 40px rgba(14, 15, 12, 0.05), 0 2px 6px rgba(14, 15, 12, 0.04);
   --shadow-overlay: 0 24px 64px rgba(14, 15, 12, 0.24), 0 4px 12px rgba(14, 15, 12, 0.1);
   --blur-overlay: 20px;
-  /* Elevation/Floating bar: the Raised shadow plus the background blur (the Bottom Nav) */
+  /* Elevation/Floating bar: the Raised shadow plus the background blur (the Bottom nav) */
   --elevation-floating-bar: var(--shadow-raised);
 
   /* Sizing and motion (code only) */
-  --size-tap: 44px; --size-control: 48px; --size-control-sm: 32px; /* Button Regular (Wise's small button) */ --size-tab-bar: calc(60rem / 17); /* Bottom Nav height, growing with text size */ --size-content-max: 480px; /* phone width: on a computer the test site shows a centred phone column */
+  --size-tap: 44px; --size-control: 48px; --size-control-sm: 32px; /* Button Regular (Wise's small button) */ --size-tab-bar: calc(60rem / 17); /* Bottom nav height, growing with text size */ --size-content-max: 480px; /* phone width: on a computer the test site shows a centred phone column */
   --motion-fast: var(--duration-fast) var(--ease-standard);
   --motion-base: var(--duration-base) var(--ease-standard);
   --motion-sheet: var(--duration-sheet) var(--ease-spring);
@@ -449,7 +449,7 @@
     --on-mid-status-warning-subtle: var(--color-orange-900);
     --on-mid-status-error: var(--color-red-300);
     --on-mid-status-error-subtle: var(--color-red-900);
-    /* On dark: the deep brand surface (Hero Card panel) */
+    /* On dark: the deep brand surface (Hero card panel) */
     --on-dark-surface-primary: var(--color-neutral-900);
     --on-dark-surface-secondary: var(--color-emerald-600);
     --on-dark-surface-brand: var(--color-emerald-800);
@@ -683,7 +683,7 @@
   --on-mid-status-warning-subtle: var(--color-orange-900);
   --on-mid-status-error: var(--color-red-300);
   --on-mid-status-error-subtle: var(--color-red-900);
-  /* On dark: the deep brand surface (Hero Card panel) */
+  /* On dark: the deep brand surface (Hero card panel) */
   --on-dark-surface-primary: var(--color-neutral-900);
   --on-dark-surface-secondary: var(--color-emerald-600);
   --on-dark-surface-brand: var(--color-emerald-800);

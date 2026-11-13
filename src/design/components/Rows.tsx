@@ -2,7 +2,7 @@ import type { ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import { Icon, type IconName } from './Icon';
 import { Avatar, AvatarStack } from './Misc';
-import { Badge } from './Misc';
+import { Tag } from './Misc';
 import s from './Rows.module.css';
 
 type Press = { to?: string; href?: string; onClick?: () => void; label?: string };
@@ -21,18 +21,18 @@ function Thumb({ icon, media, round, tone }: { icon?: IconName; media?: ReactNod
 }
 
 /**
- * Figma "List item" (Size Default / Compact): a 48px thumb (Compact: 32), the title (Heading 3; Compact: Body),
+ * Figma "List item" (Size Regular / Small): a 48px thumb (Small: 32), the title (Heading 3; Small: Body),
  * a meta line (Body small) and optional trailing text. Used inside a List group.
  */
-export function ListItem({ title, meta, trailing, action, icon, media, size = 'default', round, tone, ...press }: Press & {
-  title: ReactNode; meta?: ReactNode; trailing?: ReactNode; icon?: IconName; media?: ReactNode; size?: 'default' | 'compact'; round?: boolean;
+export function ListItem({ title, meta, trailing, action, icon, media, size = 'regular', round, tone, ...press }: Press & {
+  title: ReactNode; meta?: ReactNode; trailing?: ReactNode; icon?: IconName; media?: ReactNode; size?: 'regular' | 'small'; round?: boolean;
   /** Figma "Type": the icon tile in an event type's colour (a place or an event). */
   tone?: CategoryTone;
   /** Figma "Show action": a small Ghost Icon button at the end, e.g. Copy for a booking reference. Not inside a pressable row. */
   action?: ReactNode;
 }) {
   return (
-    <Pressable {...press} role="listitem" className={[s.item, size === 'compact' && s.compact].filter(Boolean).join(' ')}>
+    <Pressable {...press} role="listitem" className={[s.item, size === 'small' && s.compact].filter(Boolean).join(' ')}>
       {(icon || media) && <Thumb icon={icon} media={media} round={round} tone={tone} />}
       <span className={s.itemText}>
         <span className={s.itemTitle}>{title}</span>
@@ -86,8 +86,8 @@ export type EventState = 'default' | 'next' | 'done';
 export type CategoryTone = 'neutral' | 'travel' | 'stays' | 'food' | 'activities' | 'notes';
 
 /** Figma "Category icon": a 40px round tile with an event type's icon, in its colour (Neutral: the grey tile), e.g. in an event page's header. */
-export function CategoryIcon({ icon, tone = 'neutral' }: { icon: IconName; tone?: CategoryTone }) {
-  return <span className={`${s.optionTile} ${s[`tone-${tone}`] ?? ''}`} aria-hidden="true"><Icon name={icon} size={24} /></span>;
+export function CategoryIcon({ icon, type = 'neutral' }: { icon: IconName; type?: CategoryTone }) {
+  return <span className={`${s.optionTile} ${s[`tone-${type}`] ?? ''}`} aria-hidden="true"><Icon name={icon} size={24} /></span>;
 }
 
 export function EventCard({ title, time, timeIcon = 'clock', place, placeIcon = 'pin', amount, icon, layout = 'standard', state = 'default', tone = 'neutral', journey, extras, status, favourite, to, onClick }: {
@@ -140,7 +140,7 @@ export function EventCard({ title, time, timeIcon = 'clock', place, placeIcon = 
           </span>
         )}
         {extras && extras.length > 0 && (
-          <span className={s.eventExtras}>{extras.map((e) => <Badge key={e.label} tone="neutral" icon={e.icon}>{e.label}</Badge>)}</span>
+          <span className={s.eventExtras}>{extras.map((e) => <Tag key={e.label} tone="neutral" icon={e.icon}>{e.label}</Tag>)}</span>
         )}
       </span>
     </Pressable>
@@ -153,10 +153,10 @@ export function TravelConnector({ label, icon = 'pin' }: { label: string; icon?:
 }
 
 /** Figma "Vote button" (Voted No / Yes): thumbs up with the count. */
-export function VoteButton({ count, voted, onClick, label }: { count: number; voted: boolean; onClick: () => void; label: string }) {
+export function VoteButton({ count, selected, onClick, label }: { count: number; selected: boolean; onClick: () => void; label: string }) {
   return (
-    <button type="button" className={[s.vote, voted && s.voted].filter(Boolean).join(' ')} aria-pressed={voted} aria-label={label} onClick={onClick}>
-      <Icon name="thumbs-up" size={16} state={voted ? 'filled' : 'default'} style={voted ? { color: 'currentColor' } : undefined} />
+    <button type="button" className={[s.vote, selected && s.voted].filter(Boolean).join(' ')} aria-pressed={selected} aria-label={label} onClick={onClick}>
+      <Icon name="thumbs-up" size={16} state={selected ? 'filled' : 'default'} style={selected ? { color: 'currentColor' } : undefined} />
       <span className="t-num">{count}</span>
     </button>
   );
@@ -167,7 +167,7 @@ export function IdeaRow({ title, meta, icon, tone, tag, vote, onClick }: {
   title: string; meta?: ReactNode; icon: IconName; tag?: { icon?: IconName; label: string };
   /** Figma "Type": the icon tile's colour (the idea's category type). */
   tone?: CategoryTone;
-  vote: { count: number; voted: boolean; onClick: () => void };
+  vote: { count: number; selected: boolean; onClick: () => void };
   onClick?: () => void;
 }) {
   return (
@@ -177,11 +177,11 @@ export function IdeaRow({ title, meta, icon, tone, tag, vote, onClick }: {
         <span className={s.itemText}>
           <span className={s.itemTitle}>{title}</span>
           {meta && <span className={s.itemMeta}>{meta}</span>}
-          {tag && <span className={s.ideaTag}><Badge tone="neutral" icon={tag.icon}>{tag.label}</Badge></span>}
+          {tag && <span className={s.ideaTag}><Tag tone="neutral" icon={tag.icon}>{tag.label}</Tag></span>}
         </span>
       </Pressable>
-      <VoteButton count={vote.count} voted={vote.voted} onClick={vote.onClick}
-        label={`${vote.voted ? 'Remove your vote for' : 'Vote for'} ${title}, ${vote.count} ${vote.count === 1 ? 'vote' : 'votes'}`} />
+      <VoteButton count={vote.count} selected={vote.selected} onClick={vote.onClick}
+        label={`${vote.selected ? 'Remove your vote for' : 'Vote for'} ${title}, ${vote.count} ${vote.count === 1 ? 'vote' : 'votes'}`} />
     </div>
   );
 }
@@ -219,11 +219,11 @@ export function StatStrip({ stats }: { stats: { value: ReactNode; label: string 
   );
 }
 
-/** Figma "Profile Card": 40px avatar, name (Heading 2), email (Body small), chevron. */
+/** Figma "Profile card": 40px avatar, name (Heading 2), email (Body small), chevron. */
 export function ProfileCard({ name, email, photo, avatar, ...press }: Press & { name: string; email?: ReactNode; photo?: string | null; avatar?: ReactNode }) {
   return (
     <Pressable {...press} className={s.profile}>
-      {avatar ?? <Avatar name={name} photo={photo} size={40} />}
+      {avatar ?? <Avatar name={name} photo={photo} size="large" />}
       <span className={s.itemText}>
         <span className={s.profileName}>{name}</span>
         {email && <span className={s.itemMeta}>{email}</span>}
@@ -313,7 +313,7 @@ export function LayoverBlock({ title, meta, warning, action }: { title: string; 
           {meta && <span className="t-body-small t-secondary">{meta}</span>}
         </div>
       </div>
-      {(warning || action) && <div className={s.layoverActions}>{warning && <Badge tone="warning" icon="info">{warning}</Badge>}{action}</div>}
+      {(warning || action) && <div className={s.layoverActions}>{warning && <Tag tone="warning" icon="info">{warning}</Tag>}{action}</div>}
     </div>
   );
 }

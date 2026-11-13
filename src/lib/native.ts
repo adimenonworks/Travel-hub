@@ -64,7 +64,7 @@ export type Haptic = 'selection' | 'light' | 'medium' | 'success' | 'warning' | 
 /**
  * The Figma "Haptics map": Selection for the day strip, tabs, chips, calendar days and picking a destination;
  * light/medium impact for votes and Option cards; success / warning / error for outcomes (saved, trip created, failed).
- * Never for list taps, page changes or the Bottom Nav. Does nothing in a browser.
+ * Never for list taps, page changes or the Bottom nav. Does nothing in a browser.
  */
 export function haptic(kind: Haptic) {
   if (!isNativeApp) return;
