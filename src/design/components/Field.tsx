@@ -14,7 +14,7 @@ function Wrapper({ id, label, hint, children }: Wrap & { id: string; children: R
   );
 }
 
-/** Figma "Text field" (Type Input). `icon`: the optional leading icon (e.g. Pin or Search in a search field). */
+/** Figma "Text field" (Layout Input). `icon`: Figma "Show leading icon" + "Leading icon" (the Pin on New trip's search; Search field merged into this on 13 Nov 2026). */
 export function TextField({ label, hint, id, icon, ...rest }: Wrap & InputHTMLAttributes<HTMLInputElement> & { icon?: IconName }) {
   const auto = useId();
   const fid = id ?? auto;

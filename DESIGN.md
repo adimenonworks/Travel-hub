@@ -572,7 +572,7 @@ Decisions recorded (13 Nov 2026):
 - Avatar's `Kind` became `Layout` (Initials · More), not `Type`: `Type` only ever means the event type.
 - A selected, checked or voted control is `State` = Selected (Switch, `.Vote button`, `.Nav item`, `.Tab`, `.Segment`, Day card, Option card, Chip).
 - Button's `Variant` became `Tone`.
-- Illustration and Cover scene still call their picture `Name`; that is settled when they merge (change prompt A3).
+- Illustration keeps `Name` for which drawing it is (the one exception, owner 13 Nov 2026): `Type` only ever means the event type, and the drawings don't differ in structure, so `Layout` would mislead. Cover scene merged into Illustration as `Size` Cover.
 
 ### Event types
 
@@ -587,14 +587,14 @@ Decisions recorded (13 Nov 2026):
 
 ### Component names
 
-Controls: Button · Icon button · Switch · Chip · Text field · Search field · Segment control (`.Segment`) · `.Vote button` · Step progress · Option card · Calendar (`.Calendar day`)
+Controls: Button · Icon button · Switch · Chip · Text field · Segment control (`.Segment`) · `.Vote button` · Step progress · Option card · Calendar (`.Calendar day`)
 Navigation: Page header · Trip header · Section header · Tab bar (`.Tab`) · Bottom nav (`.Nav item`) · Context menu (`.Context menu item`) · Sheet · Flow screen
 Content & lists: List item · List group · Idea row · Accordion · Tag · `.Category icon` · Stat · Stat strip
 Cards: Card · Empty state · Tile · Hero card · Budget card · Map card
 Trip: Event card · Day card · Now line · Travel connector · Journey details card · Span card · Layover block
 People: Avatar · Avatar stack · Profile card · Message
 Feedback: Toast · Banner · Skeleton
-Media: Logo · Illustration · Cover scene · Icons · Flags
+Media: Logo · Illustration (Size Spot / Cover) · Icons · Flags
 
 Renamed on 13 Nov 2026: Notification → **Banner** (the in-page message; "Notification" now belongs only to the Notification centre), Tags → **Tag**, Timeline → **Now line** (the current-time marker).
 
