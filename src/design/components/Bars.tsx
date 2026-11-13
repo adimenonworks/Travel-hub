@@ -41,6 +41,34 @@ export function PageHeader({ title, subtitle, meta, back, action, fit, size = 'l
     ro.observe(el.parentElement!);
     return () => ro.disconnect();
   }, [fit, title, size]);
+  // Words never split (owner, 13 Nov 2026): if the longest word is wider than the line (a long place name at 320px
+  // with the largest text), the whole title shrinks until that word fits, like iOS's "shrink to fit".
+  useLayoutEffect(() => {
+    const el = titleRef.current;
+    if (fit || !el) return;
+    const ctx = document.createElement('canvas').getContext('2d');
+    if (!ctx) return;
+    let seen = '';
+    const shrink = () => {
+      el.style.removeProperty('font-size');
+      const room = el.clientWidth;
+      if (!room) return;
+      const cs = getComputedStyle(el);
+      ctx.font = `${cs.fontStyle} ${cs.fontWeight} ${cs.fontSize} ${cs.fontFamily}`;
+      const words = (el.textContent ?? '').split(/\s+/).filter(Boolean);
+      const widest = Math.max(0, ...words.map((w) => ctx.measureText(w).width));
+      if (widest > room) el.style.fontSize = `${Math.floor(parseFloat(cs.fontSize) * (room / widest) * 10) / 10}px`;
+    };
+    shrink();
+    // Measure again when the width or the text size changes (not when the shrink itself changes the height)
+    const ro = new ResizeObserver(() => {
+      const key = `${el.clientWidth}|${getComputedStyle(document.documentElement).fontSize}`;
+      if (key !== seen) { seen = key; shrink(); }
+    });
+    ro.observe(el);
+    document.fonts?.ready.then(shrink).catch(() => {});
+    return () => ro.disconnect();
+  }, [fit, title, size]);
   return (
     <header className={s.header}>
       {back && <div className={s.back}><LinkButton to={back.to} tone="ghost" size="regular" icon="chevron-left" onClick={(e) => { e.preventDefault(); goBack(navigate, back.to); }}>{back.label}</LinkButton></div>}
