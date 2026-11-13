@@ -141,7 +141,7 @@ export function ActivityPage(ctx: TripCtx) {
     <>
       {/* The category icon in its type's colour beside the title, the time under it; the place is in the Location card */}
       <PageHeader title={journey ? `${city(legs[0].fromText)} to ${city(lastLeg.toText)}` : a.title} size="small" back={backTo}
-        icon={kindInfo(a.category).icon} tone={categoryTone(a.category)}
+        icon={kindInfo(a.category).icon} type={categoryTone(a.category)}
         subtitle={journey ? formatDay(a.date) : spans ? (a.endDate && a.endDate !== a.date ? `${formatDay(a.date)} – ${formatDay(a.endDate)}` : formatDay(a.date)) : eventCardProps(a, ctx, true).time}
         action={ctx.canContribute ? { icon: 'pencil', label: 'Edit event', onClick: () => setEditing(true) } : undefined} />
 

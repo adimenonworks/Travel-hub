@@ -34,7 +34,7 @@ export function PlaceMarks({ visited, starred }: { visited: boolean; starred: bo
 export function PlaceRow({ place, visited, starred, onClick, meta, trailing }: { place: SavedPlace; visited: boolean; starred: boolean; onClick: () => void; meta?: ReactNode; trailing?: ReactNode }) {
   const c = placeCategory(place.category);
   return (
-    <ListItem icon={c.icon} tone={c.tone} media={place.image ? <img src={place.image} alt="" /> : undefined} title={place.name}
+    <ListItem icon={c.icon} type={c.tone} media={place.image ? <img src={place.image} alt="" /> : undefined} title={place.name}
       meta={meta ?? [place.kind || c.one, place.source ? `from ${place.source}` : null].filter(Boolean).join(' · ')}
       trailing={trailing ?? <PlaceMarks visited={visited} starred={starred} />} onClick={onClick}
       label={`${place.name}${visited ? ', visited' : ''}${starred ? ', favourite' : ''}`} />
@@ -287,7 +287,7 @@ export function CountryCollection() {
             <PageSection title="Links & notes" action={seeAll('links', extras.length)}>
               <ListGroup label="Links and notes">
                 {(expanded.includes('links') ? extras : extras.slice(0, SHOW)).map((p) => (
-                  <ListItem key={p.id} icon={kindOf(p) === 'note' ? 'notebook' : 'link'} tone={kindOf(p) === 'note' ? 'notes' : undefined} title={p.name} onClick={() => setOpen(p.id)}
+                  <ListItem key={p.id} icon={kindOf(p) === 'note' ? 'notebook' : 'link'} type={kindOf(p) === 'note' ? 'notes' : undefined} title={p.name} onClick={() => setOpen(p.id)}
                     meta={[kindOf(p) === 'note' ? 'Note' : p.kind || 'Link', p.notes && kindOf(p) === 'note' ? p.notes.split('\n')[0] : p.url ? hostOf(p.url) : null].filter(Boolean).join(' · ')} />
                 ))}
               </ListGroup>

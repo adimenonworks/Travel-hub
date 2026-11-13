@@ -312,7 +312,7 @@ export function ActivityForm({ open, trip, date, activity, draft, onClose, onCre
       {!f.type ? (
         // Step 1: the 6 types, each with what it covers, in its colour
         <div className={s.typeList} role="group" aria-label="Type">
-          {EVENT_TYPES.map((t) => <OptionCard key={t.value} icon={t.icon} label={t.label} description={t.hint} tone={TYPE_TONE[t.value]} onClick={() => pickType(t.value)} />)}
+          {EVENT_TYPES.map((t) => <OptionCard key={t.value} icon={t.icon} label={t.label} description={t.hint} type={TYPE_TONE[t.value]} onClick={() => pickType(t.value)} />)}
         </div>
       ) : (
         <>

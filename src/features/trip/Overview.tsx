@@ -68,7 +68,7 @@ export function Overview(ctx: TripCtx) {
         <ListGroup label="Bookings">
           {BOOKING_GROUPS.map((g) => {
             const n = activities.filter((a) => bookingGroupOf(a.category) === g.key).length;
-            return <ListItem key={g.key} icon={g.icon} tone={TYPE_TONE[g.type]} title={g.title} meta={`${n} ${n === 1 ? g.one : g.many}`} to={`${base}/bookings/${g.key}`} />;
+            return <ListItem key={g.key} icon={g.icon} type={TYPE_TONE[g.type]} title={g.title} meta={`${n} ${n === 1 ? g.one : g.many}`} to={`${base}/bookings/${g.key}`} />;
           })}
         </ListGroup>
       </PageSection>
@@ -82,7 +82,7 @@ export function Overview(ctx: TripCtx) {
               // A booking you opened shows in its event type's icon and colour
               const ev = activities.find((a) => v.url.endsWith(`/plan/${a.id}`));
               return isInApp(v)
-                ? <ListItem key={v.url} size="small" icon={ev ? categoryInfo(ev.category).icon : KIND_ICON[kind]} tone={ev ? categoryTone(ev.category) : undefined} title={v.label} trailing={trailing} to={v.url} />
+                ? <ListItem key={v.url} size="small" icon={ev ? categoryInfo(ev.category).icon : KIND_ICON[kind]} type={ev ? categoryTone(ev.category) : undefined} title={v.label} trailing={trailing} to={v.url} />
                 : <ListItem key={v.url} size="small" icon={KIND_ICON[kind]} title={v.label} trailing={trailing} href={v.url} label={`${v.label} (opens in a new tab)`}
                     onClick={() => recordView(trip.id, { url: v.url, label: v.label, meta: v.meta, kind })} />;
             })}

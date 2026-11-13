@@ -118,7 +118,7 @@ export function RecentlyDeleted() {
               <ListGroup label="Deleted events">
                 {events.map(({ a, t }) => {
                   const k = kindInfo(a.category);
-                  return <ListItem key={a.id} icon={k.icon} tone={categoryTone(a.category)} title={a.title}
+                  return <ListItem key={a.id} icon={k.icon} type={categoryTone(a.category)} title={a.title}
                     meta={meta(a, `${t.name}${t.deletedAt ? ' (deleted)' : ''} · ${formatDay(a.date, { day: 'numeric', month: 'short' })}`)}
                     action={planner(t) ? restore(a.title, () => restoreEvent(a, t)) : undefined} />;
                 })}
@@ -128,7 +128,7 @@ export function RecentlyDeleted() {
           {binnedPlaces.length > 0 && (
             <PageSection title="Places">
               <ListGroup label="Deleted places">
-                {binnedPlaces.map((p) => { const c = placeCategory(p.category); return <ListItem key={p.id} icon={c.icon} tone={c.tone} title={p.name} meta={meta(p, [p.city, p.country].filter(Boolean).join(', '))} action={restore(p.name, () => restorePlace(p.id, p.name))} />; })}
+                {binnedPlaces.map((p) => { const c = placeCategory(p.category); return <ListItem key={p.id} icon={c.icon} type={c.tone} title={p.name} meta={meta(p, [p.city, p.country].filter(Boolean).join(', '))} action={restore(p.name, () => restorePlace(p.id, p.name))} />; })}
               </ListGroup>
             </PageSection>
           )}

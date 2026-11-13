@@ -55,11 +55,9 @@
 .event:hover { box-shadow: inset 0 0 0 100vmax var(--interactive-unselected-ghost-background-hover); }
 /* Next: the deep green card (the surface-dark class re-points the on-light tokens inside it) */
 .event-next { background: var(--on-dark-surface-brand); }
-.event-next .eventIcon { background: var(--on-dark-surface-sunken); }
 .event-done .eventIcon, .event-done .eventBody { opacity: 0.48; }
 /* Note: white with a subtle border */
 .event-note { background: var(--on-light-surface-primary); border-color: var(--on-light-border-subtle); }
-.eventIcon { flex: none; display: grid; place-items: center; width: 40px; height: 40px; border-radius: var(--radius-1000); background: var(--on-light-surface-primary); color: var(--on-light-icon-primary); }
 .eventBody { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: var(--space-default-400); }
 .eventHeader { display: flex; gap: var(--space-default-500); align-items: flex-start; }
 .eventText { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: var(--space-default-200); }
@@ -169,7 +167,13 @@
 .optionLabel { font: var(--type-heading-3); letter-spacing: -0.02em; color: var(--on-light-text-primary); }
 .optionDescription { font: var(--type-body-small); color: var(--on-light-text-secondary); text-align: left; }
 .optionTiled { gap: var(--space-default-500); }
-.optionTile { flex: none; display: grid; place-items: center; width: 40px; height: 40px; border-radius: var(--radius-1000); background: var(--on-light-surface-secondary); color: var(--on-light-icon-primary); }
+/* Figma `.Category icon`: Size Regular 40 (Small 32, Large 48); Tone Secondary (the grey Neutral tile, on white),
+   Primary (white, on a grey card), On dark (on the Next card); the type colours follow (tone-*) */
+.catIcon { flex: none; display: grid; place-items: center; width: 40px; height: 40px; border-radius: var(--radius-1000); background: var(--on-light-surface-secondary); color: var(--on-light-icon-primary); }
+.catIcon-small { width: 32px; height: 32px; }
+.catIcon-large { width: 48px; height: 48px; }
+.catIcon-primary { background: var(--on-light-surface-primary); }
+.catIcon-on-dark { background: var(--on-dark-surface-sunken); }
 
 /* Figma "Type" (Event card, Option card): the icon tile's colour by event type. Neutral keeps the tile it sits in. */
 .tone-travel { background: var(--category-travel-surface); color: var(--category-travel-icon); }
@@ -178,11 +182,11 @@
 .tone-activities { background: var(--category-activities-surface); color: var(--category-activities-icon); }
 .tone-notes { background: var(--category-notes-surface); color: var(--category-notes-icon); }
 /* On the deep-green Next card: the bright step with a near-black icon (about 6:1 against the green). */
-.event-next .tone-travel { background: var(--category-travel-surface-on-dark); color: var(--category-travel-icon-on-dark); }
-.event-next .tone-stays { background: var(--category-stays-surface-on-dark); color: var(--category-stays-icon-on-dark); }
-.event-next .tone-food { background: var(--category-food-surface-on-dark); color: var(--category-food-icon-on-dark); }
-.event-next .tone-activities { background: var(--category-activities-surface-on-dark); color: var(--category-activities-icon-on-dark); }
-.event-next .tone-notes { background: var(--category-notes-surface-on-dark); color: var(--category-notes-icon-on-dark); }
+.catIcon-on-dark.tone-travel { background: var(--category-travel-surface-on-dark); color: var(--category-travel-icon-on-dark); }
+.catIcon-on-dark.tone-stays { background: var(--category-stays-surface-on-dark); color: var(--category-stays-icon-on-dark); }
+.catIcon-on-dark.tone-food { background: var(--category-food-surface-on-dark); color: var(--category-food-icon-on-dark); }
+.catIcon-on-dark.tone-activities { background: var(--category-activities-surface-on-dark); color: var(--category-activities-icon-on-dark); }
+.catIcon-on-dark.tone-notes { background: var(--category-notes-surface-on-dark); color: var(--category-notes-icon-on-dark); }
 /* Budget card rows: the group's icon in its type colour (600 on white, 300 in dark mode). */
 .ink-travel { display: inline-flex; color: var(--category-travel-surface); }
 .ink-stays { display: inline-flex; color: var(--category-stays-surface); }
