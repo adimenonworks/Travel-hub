@@ -82,8 +82,8 @@ export function Overview(ctx: TripCtx) {
               // A booking you opened shows in its event type's icon and colour
               const ev = activities.find((a) => v.url.endsWith(`/plan/${a.id}`));
               return isInApp(v)
-                ? <ListItem key={v.url} size="compact" icon={ev ? categoryInfo(ev.category).icon : KIND_ICON[kind]} tone={ev ? categoryTone(ev.category) : undefined} title={v.label} trailing={trailing} to={v.url} />
-                : <ListItem key={v.url} size="compact" icon={KIND_ICON[kind]} title={v.label} trailing={trailing} href={v.url} label={`${v.label} (opens in a new tab)`}
+                ? <ListItem key={v.url} size="small" icon={ev ? categoryInfo(ev.category).icon : KIND_ICON[kind]} tone={ev ? categoryTone(ev.category) : undefined} title={v.label} trailing={trailing} to={v.url} />
+                : <ListItem key={v.url} size="small" icon={KIND_ICON[kind]} title={v.label} trailing={trailing} href={v.url} label={`${v.label} (opens in a new tab)`}
                     onClick={() => recordView(trip.id, { url: v.url, label: v.label, meta: v.meta, kind })} />;
             })}
           </ListGroup>

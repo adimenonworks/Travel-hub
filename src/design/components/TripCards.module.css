@@ -1,4 +1,4 @@
-/* Figma "Hero Card": the grey container, no border, 24 corners, cover 2:1 on top, then 16 / 16 / 4 padding with gap 12 */
+/* Figma "Hero card": the grey container, no border, 24 corners, cover 2:1 on top, then 16 / 16 / 4 padding with gap 12 */
 .hero {
   display: flex; flex-direction: column; overflow: hidden; /* the cover is a deliberate viewport */
   border-radius: var(--radius-600);
@@ -37,10 +37,10 @@
 .chips { margin: 0; padding: 0; list-style: none; display: flex; flex-wrap: wrap; gap: var(--space-default-300); }
 .rows { border-top: 1px solid var(--on-light-divider-default); display: flex; flex-direction: column; }
 
-/* Figma "Trip header": Page Header, then meta and chips, gap 12 */
+/* Figma "Trip header": Page header, then meta and chips, gap 12 */
 .tripHeader { display: flex; flex-direction: column; gap: var(--space-default-400); }
 
-/* Figma "Day Card": 24 corners, the date (Display tiny) over the weekday. Unselected: ghost with a border, 64 wide.
+/* Figma "Day card": 24 corners, the date (Display tiny) over the weekday. Unselected: ghost with a border, 64 wide.
    Selected: brand (selected primary) and wider (88), so it pushes the cards beside it aside; picking another day
    widens that one as this one narrows, a smooth, gentle push (400ms, no bounce). */
 .day {

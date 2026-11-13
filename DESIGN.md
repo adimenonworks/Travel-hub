@@ -542,3 +542,69 @@ The brand uses surface contrast (`{colors.canvas-soft}` background vs `{colors.c
 - Don't render CTAs as sharp rectangles. The 24 px pill geometry is non-negotiable.
 - Don't pair the green CTA with a green background. The brand always sits Wise green on neutral surfaces (sage / white / ink).
 - Don't replace Wise Sans with a generic geometric sans for hero typography — the proprietary face IS the brand's voice.
+
+---
+
+## Rove glossary (names used in Figma and code)
+
+The same text sits on the Figma Foundations page ("Glossary", beside the Components section). Change one, change the other.
+
+### Naming rules
+
+- **Sentence case everywhere:** components, frames, properties and values ("Hero card", "Page header", `Show heads-up`).
+- **A "." in front** means a part that is only ever used inside another component, never placed on a screen by itself: `.Tab`, `.Segment`, `.Nav item`, `.Calendar day`, `.Vote button`, `.Category icon`, `.Context menu item`. (Message has no "." because it is placed on the Event screen by itself.)
+- In code the same names are written as one word: "Hero card" is `HeroCard`, `.Category icon` is `CategoryIcon`, `Show heads-up` is `headsUp`.
+
+### Property names (exactly these, nothing else)
+
+| Property | Means | Values |
+| --- | --- | --- |
+| `Type` | Event type (sets the colour) | Neutral · Travel · Stays · Food & drink · Activities · Notes |
+| `Tone` | Colour role, not event type | Default · Accent · Neutral · Success · Warning · Danger. Buttons use their own roles: Primary · Destructive · Inverse · Neutral · Tertiary · Ghost; Icon button: Secondary · Ghost · On brand · Primary |
+| `Size` | Size | Small · Regular · Large |
+| `State` | Interaction or status | Default · Pressed · Disabled · Selected · Focus · Filled · Next · Done · Suggested; plus a component's own statuses (Accordion: Collapsed · Expanded; `.Calendar day`: Range · Start · End · Empty; Step progress: Step 1–4) |
+| `Layout` | Structural variant | Per component (Event card: Standard · Journey · Note; Text field: Input · Text area · Dropdown; Avatar: Initials · More; Message: Theirs · Mine; Skeleton: Text · Block · Circle) |
+| `Show <thing>` | Something is visible or not | On / off |
+
+Decisions recorded (13 Nov 2026):
+
+- Chip's `Category` became `Type`.
+- Avatar's `Kind` became `Layout` (Initials · More), not `Type`: `Type` only ever means the event type.
+- A selected, checked or voted control is `State` = Selected (Switch, `.Vote button`, `.Nav item`, `.Tab`, `.Segment`, Day card, Option card, Chip).
+- Button's `Variant` became `Tone`.
+- Illustration and Cover scene still call their picture `Name`; that is settled when they merge (change prompt A3).
+
+### Event types
+
+| Type | Colour | What it covers |
+| --- | --- | --- |
+| Travel | sky | Getting around, flights included |
+| Stays | violet | Hotels, apartments, cruises and other places to sleep |
+| Food & drink | yellow | Restaurants, cafés, bars, tastings |
+| Activities | pink | Sights, tours, shows, shopping |
+| Notes | emerald | Notes & reminders |
+| Neutral | grey | Free time, and anything without a type |
+
+### Component names
+
+Controls: Button · Icon button · Switch · Chip · Text field · Search field · Segment control (`.Segment`) · `.Vote button` · Step progress · Option card · Calendar (`.Calendar day`)
+Navigation: Page header · Trip header · Section header · Tab bar (`.Tab`) · Bottom nav (`.Nav item`) · Context menu (`.Context menu item`) · Sheet · Flow screen
+Content & lists: List item · List group · Idea row · Accordion · Tag · `.Category icon` · Stat · Stat strip
+Cards: Card · Empty state · Tile · Hero card · Budget card · Location card · Collection header
+Trip: Event card · Day card · Now line · Travel connector · Journey details card · Span card · Layover block
+People: Avatar · Avatar stack · Profile card · Message
+Feedback: Toast · Banner · Skeleton
+Media: Logo · Illustration · Cover scene · Icons · Flags
+
+Renamed on 13 Nov 2026: Notification → **Banner** (the in-page message; "Notification" now belongs only to the Notification centre), Tags → **Tag**, Timeline → **Now line** (the current-time marker).
+
+### Product words
+
+- **Trip:** a plan with dates and people: an itinerary, ideas, photos.
+- **Event:** one thing on a trip's itinerary (a flight, a stay, a dinner, a note).
+- **Idea:** something a trip might do, voted on, not yet on a day.
+- **Place:** somewhere you saved. Ideas and events point at it.
+- **Collection:** your saved places for one country. It can be shared.
+- **Traveller:** someone going on the trip, who plans it (today's "Planner"; the name changes with the "people, sharing and money" prompt).
+- **Follower:** someone who watches a trip without going or changing it (today's "Viewer").
+- **Guest:** someone added to a single event without joining the trip (not built yet).

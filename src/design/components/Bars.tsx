@@ -7,10 +7,10 @@ import { CategoryIcon, type CategoryTone } from './Rows';
 import { haptic } from '../../lib/native';
 import s from './Bars.module.css';
 
-/** Kept for older callers; the Figma Page Header no longer shows your profile picture (the You tab does). */
+/** Kept for older callers; the Figma Page header no longer shows your profile picture (the You tab does). */
 
 /**
- * Figma "Page Header": an optional ghost back button, then the title row: the title (Type=Title Large: Display 48;
+ * Figma "Page header": an optional ghost back button, then the title row: the title (Type=Title Large: Display 48;
  * Title small: Heading 1, both in the brand text colour) with an optional Label subtitle, and one optional secondary icon button.
  */
 export function PageHeader({ title, subtitle, back, action, fit, size = 'large', icon, tone }: {
@@ -41,9 +41,9 @@ export function PageHeader({ title, subtitle, back, action, fit, size = 'large',
   }, [fit, title, size]);
   return (
     <header className={s.header}>
-      {back && <div className={s.back}><LinkButton to={back.to} variant="ghost" size="regular" icon="chevron-left" onClick={(e) => { e.preventDefault(); goBack(navigate, back.to); }}>{back.label}</LinkButton></div>}
+      {back && <div className={s.back}><LinkButton to={back.to} tone="ghost" size="regular" icon="chevron-left" onClick={(e) => { e.preventDefault(); goBack(navigate, back.to); }}>{back.label}</LinkButton></div>}
       <div className={[s.titleRow, size === 'small' && s.titleRowSmall].filter(Boolean).join(' ')}>
-        {icon && <span className={s.leadIcon}><CategoryIcon icon={icon} tone={tone} /></span>}
+        {icon && <span className={s.leadIcon}><CategoryIcon icon={icon} type={tone} /></span>}
         <div className={s.titleText}>
           <h1 ref={titleRef} className={[s.title, size === 'small' && s.titleSmall, fit && s.fit, fit && smaller && s.fitSmaller].filter(Boolean).join(' ')}>{title}</h1>
           {subtitle && <div className={s.subtitle}>{subtitle}</div>}

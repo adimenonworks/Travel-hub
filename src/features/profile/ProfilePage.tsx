@@ -25,7 +25,7 @@ const currencyName = (code: string) => { try { const n = new Intl.DisplayNames(u
 type Open = 'profile' | 'home' | 'maps' | 'appearance' | 'currency' | 'delete' | null;
 
 /**
- * You tab (Figma "You tab — Profile"): the Profile Card, "Your travels" (a Stat strip of countries, cities and days
+ * You tab (Figma "You tab — Profile"): the Profile card, "Your travels" (a Stat strip of countries, cities and days
  * away on the bright brand surface, and the map of places you've been), "Favourite places" (Places you starred; See all
  * opens Favourites), Settings, and Sign out.
  * Each setting opens a Sheet.
@@ -60,7 +60,7 @@ export function ProfilePage() {
 
   const save = async (data: Parameters<typeof store.saveProfile>[1], label: string) => {
     try { await store.saveProfile(me.uid, data); toast({ icon: 'check', label }); }
-    catch { toast({ tone: 'error', label: "Couldn't save. Check your connection" }); }
+    catch { toast({ tone: 'danger', label: "Couldn't save. Check your connection" }); }
   };
   const name = profile?.name || me.name;
   const home = useHomeCurrency();
@@ -85,7 +85,7 @@ export function ProfilePage() {
       </PageSection>
 
       <PageSection title="Favourite places" meta="Starred from your trips"
-        action={favourites.length > 0 ? <LinkButton to="/profile/favourites" variant="ghost" size="regular" iconEnd="chevron-right">See more</LinkButton> : undefined}>
+        action={favourites.length > 0 ? <LinkButton to="/profile/favourites" tone="ghost" size="regular" iconEnd="chevron-right">See more</LinkButton> : undefined}>
         {favourites.length === 0
           ? <ListGroup><ListItem icon="star" title="No favourites yet" meta="Star a saved place, or an idea or event on a trip, and it shows here." /></ListGroup>
           : (
@@ -110,8 +110,8 @@ export function ProfilePage() {
       </PageSection>
 
       <div className={s.account}>
-        <Button variant="neutral" block iconEnd="signout" onClick={() => store.signOut()}>Sign out</Button>
-        <Button variant="destructive" block iconEnd="trash" onClick={() => setOpen('delete')}>Delete account</Button>
+        <Button tone="neutral" block iconEnd="signout" onClick={() => store.signOut()}>Sign out</Button>
+        <Button tone="destructive" block iconEnd="trash" onClick={() => setOpen('delete')}>Delete account</Button>
       </div>
       <p className={['t-body-small t-secondary', s.version].join(' ')}>
         {version}{version && ' · '}<Link to="/privacy" className={s.privacy}>Privacy policy</Link>
@@ -126,7 +126,7 @@ export function ProfilePage() {
       <Sheet open={open === 'home'} title="Home city" subtitle="It appears on your map with a home pin" onClose={() => setOpen(null)}>
         <CityPicker key={profile?.home?.name ?? 'none'} label="Home city" placeholder="Melbourne" value={profile?.home ?? null}
           onChange={(p) => p && save({ home: p, homeCity: p.name }, 'Home city saved')} />
-        {profile?.home && <Button variant="destructive" icon="trash" onClick={() => save({ home: null, homeCity: '' }, 'Home city removed')}>Remove home city</Button>}
+        {profile?.home && <Button tone="destructive" icon="trash" onClick={() => save({ home: null, homeCity: '' }, 'Home city removed')}>Remove home city</Button>}
       </Sheet>
 
       <Sheet open={open === 'currency'} title="Currency" subtitle="Idea prices show in their own currency, with a conversion to this one." onClose={() => setOpen(null)}>
@@ -148,7 +148,7 @@ export function ProfilePage() {
   );
 }
 
-/** Your picture (tap it to change it), name and email, then your nickname: the Profile Card's sheet. */
+/** Your picture (tap it to change it), name and email, then your nickname: the Profile card's sheet. */
 function ProfileEditor({ uid, name, photo, email }: { uid: string; name: string; photo: string | null; email?: string | null }) {
   const input = useRef<HTMLInputElement>(null);
   const [draft, setDraft] = useState(name);
@@ -177,7 +177,7 @@ function ProfileEditor({ uid, name, photo, email }: { uid: string; name: string;
     const next = draft.trim();
     if (!next || next === name) return;
     try { await store.saveProfile(uid, { name: next }); setSaved(true); toast({ icon: 'check', label: 'Nickname saved' }); }
-    catch { toast({ tone: 'error', label: "Couldn't save your nickname. Check your connection" }); }
+    catch { toast({ tone: 'danger', label: "Couldn't save your nickname. Check your connection" }); }
   };
 
   const trimmed = draft.trim();
@@ -187,7 +187,7 @@ function ProfileEditor({ uid, name, photo, email }: { uid: string; name: string;
         {/* Tap your picture to add or change it */}
         <button type="button" className={s.avatarButton} onClick={() => input.current?.click()} disabled={busy}
           aria-label={busy ? 'Preparing photo…' : photo ? 'Change your photo' : 'Add a photo'}>
-          <Avatar name={name} photo={photo} seed={uid} size={40} />
+          <Avatar name={name} photo={photo} seed={uid} size="large" />
         </button>
         <div className={s.whoText}>
           <h2 className="t-heading-2">{name}</h2>
@@ -228,14 +228,14 @@ function DeleteAccount({ open, uid, onClose }: { open: boolean; uid: string; onC
       const code = (e as { code?: string }).code ?? '';
       setBusy(false);
       if (code.includes('cancel') || code.includes('canceled')) return;
-      toast({ tone: 'error', label: code === 'app/wrong-account' ? 'That was a different Google account. Nothing was deleted' : "Couldn't delete your account. Try again" });
+      toast({ tone: 'danger', label: code === 'app/wrong-account' ? 'That was a different Google account. Nothing was deleted' : "Couldn't delete your account. Try again" });
     }
   };
   return (
     <Sheet open={open} title="Delete your account?" subtitle="This can't be undone." onClose={busy ? () => {} : onClose}
       secondary={<>
-        <Button variant="neutral" block onClick={onClose} disabled={busy}>Keep account</Button>
-        <Button variant="destructive" block loading={busy} disabled={busy} onClick={go}>Delete</Button>
+        <Button tone="neutral" block onClick={onClose} disabled={busy}>Keep account</Button>
+        <Button tone="destructive" block loading={busy} disabled={busy} onClick={go}>Delete</Button>
       </>}>
       <ListGroup label="What deleting does">
         <ListItem icon="plane" title="Trips you made" meta="Go to another person on the trip. Trips with only you are deleted." />

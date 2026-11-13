@@ -69,7 +69,7 @@ export function PlaceSheet({ place, onClose, role = 'owner', cities = [] }: {
   const moveTo = async (city: string) => {
     if (!city.trim() || city.trim() === place.city) return;
     try { await store.updatePlace(place.id, { city: city.trim() }); haptic('success'); toast({ icon: 'check', label: `Moved to ${city.trim()}` }); setNewCity(null); }
-    catch { toast({ tone: 'error', label: "Couldn't move it. Check your connection" }); }
+    catch { toast({ tone: 'danger', label: "Couldn't move it. Check your connection" }); }
   };
   const cityChips = [...new Set([place.city, ...cities].filter(Boolean))].sort((a, b) => a.localeCompare(b));
   const isStar = starred(place);
@@ -79,7 +79,7 @@ export function PlaceSheet({ place, onClose, role = 'owner', cities = [] }: {
   const star = async () => {
     haptic('light');
     try { await store.starPlace(place.id, me, !isStar); toast({ icon: 'star', label: isStar ? 'Removed from favourites' : 'Added to favourites' }); }
-    catch { toast({ tone: 'error', label: "Couldn't save. Check your connection" }); }
+    catch { toast({ tone: 'danger', label: "Couldn't save. Check your connection" }); }
   };
   const addToTrip = async () => {
     if (!target) return;
@@ -88,7 +88,7 @@ export function PlaceSheet({ place, onClose, role = 'owner', cities = [] }: {
       haptic('success');
       toast({ icon: 'check', label: `Added to ${target.name} ideas` });
       onClose();
-    } catch { toast({ tone: 'error', label: "Couldn't save. Check your connection" }); }
+    } catch { toast({ tone: 'danger', label: "Couldn't save. Check your connection" }); }
   };
   const remove = async () => {
     if (!confirmAction(`Delete "${place.name}" from your collection? It stays in Recently deleted for 30 days.`)) return;
@@ -97,7 +97,7 @@ export function PlaceSheet({ place, onClose, role = 'owner', cities = [] }: {
       toast({ icon: 'trash', label: 'Place deleted', action: { label: 'Undo', onClick: () => { store.setDeleted({ kind: 'place', id: place.id }, false).catch(() => {}); } } });
       onClose();
     }
-    catch { toast({ tone: 'error', label: "Couldn't delete. Check your connection" }); }
+    catch { toast({ tone: 'danger', label: "Couldn't delete. Check your connection" }); }
   };
   const cat = placeCategory(place.category);
   const savedOn = new Date(place.createdAt).toLocaleDateString(undefined, { day: 'numeric', month: 'short', ...(new Date(place.createdAt).getFullYear() !== new Date().getFullYear() ? { year: 'numeric' } : {}) });
@@ -107,24 +107,24 @@ export function PlaceSheet({ place, onClose, role = 'owner', cities = [] }: {
   return (
     <Sheet open title={place.name}
       onSubmit={target && !viewer ? addToTrip : undefined} submitLabel={target ? `Add to ${target.name} ideas` : 'Add to ideas'}
-      secondary={mine ? <Button variant="destructive" size="large" onClick={remove}>Delete</Button> : undefined}
+      secondary={mine ? <Button tone="destructive" size="large" onClick={remove}>Delete</Button> : undefined}
       subtitle={where || undefined} onClose={onClose}>
       <div className={s.sections}>
         {/* Key info: the category (Edit to change it), Favourite, and when and where it was saved */}
         <section className={s.field} aria-label="About this place">
           <div className={s.placeKey}>
-            <CategoryIcon icon={cat.icon} tone={cat.tone} />
+            <CategoryIcon icon={cat.icon} type={cat.tone} />
             <div className={s.placeKeyText}>
               <span className="t-heading-4">{cat.one}</span>
               <span className="t-body-small t-secondary">{[`Saved ${savedOn}`, place.source ? `from ${place.source}` : null, visited.has(place.id) ? 'Visited ✓' : null].filter(Boolean).join(' · ')}</span>
             </div>
-            {canEdit && <Button variant="ghost" size="regular" aria-expanded={editing} onClick={() => { haptic('selection'); setEditing((x) => !x); }}>{editing ? 'Done' : 'Edit'}</Button>}
+            {canEdit && <Button tone="ghost" size="regular" aria-expanded={editing} onClick={() => { haptic('selection'); setEditing((x) => !x); }}>{editing ? 'Done' : 'Edit'}</Button>}
             <IconButton icon="star" tone="ghost" state={isStar ? 'filled' : 'default'} aria-pressed={isStar} label={isStar ? 'Remove from favourites' : 'Add to favourites'} onClick={star} />
           </div>
           {editing && canEdit && (
             <PlaceKindPicker id={`kind-${place.id}`} value={placeKind(place.category)} onChange={async (k) => {
               try { await store.updatePlace(place.id, { category: k }); toast({ icon: 'check', label: 'Category changed' }); }
-              catch { toast({ tone: 'error', label: "Couldn't save. Check your connection" }); }
+              catch { toast({ tone: 'danger', label: "Couldn't save. Check your connection" }); }
             }} />
           )}
           {/* Move it to another city in this collection, or a new one */}
@@ -132,14 +132,14 @@ export function PlaceSheet({ place, onClose, role = 'owner', cities = [] }: {
             <div className={s.field}>
               <h4 className="t-heading-4">City</h4>
               <ul className={s.chips} aria-label="City">
-                {cityChips.map((c) => <li key={c}><Chip active={c === place.city && newCity === null} onClick={() => { haptic('selection'); moveTo(c); }}>{c}</Chip></li>)}
-                <li><Chip icon="plus" active={newCity !== null} onClick={() => setNewCity((x) => (x === null ? '' : null))}>New city</Chip></li>
+                {cityChips.map((c) => <li key={c}><Chip selected={c === place.city && newCity === null} onClick={() => { haptic('selection'); moveTo(c); }}>{c}</Chip></li>)}
+                <li><Chip icon="plus" selected={newCity !== null} onClick={() => setNewCity((x) => (x === null ? '' : null))}>New city</Chip></li>
               </ul>
               {newCity !== null && (
                 <div className={s.field}>
                   <TextField label="New city" value={newCity} autoFocus enterKeyHint="done" onChange={(e) => setNewCity(e.target.value)}
                     onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); moveTo(newCity); } }} />
-                  <Button type="button" variant="neutral" disabled={!newCity.trim()} onClick={() => moveTo(newCity)}>{newCity.trim() ? `Move to ${newCity.trim()}` : 'Move'}</Button>
+                  <Button type="button" tone="neutral" disabled={!newCity.trim()} onClick={() => moveTo(newCity)}>{newCity.trim() ? `Move to ${newCity.trim()}` : 'Move'}</Button>
                 </div>
               )}
             </div>
@@ -153,7 +153,7 @@ export function PlaceSheet({ place, onClose, role = 'owner', cities = [] }: {
             <h3 className="t-heading-4" id={`where-${place.id}`}>Location</h3>
             <LocationCard title={place.name} subtitle={where || undefined}
               map={pos ? <MapView pins={[{ lat: pos.lat, lng: pos.lng, label: place.name }]} center={pos} zoom={15} height={160} /> : undefined}
-              buttons={<LinkButton href={maps ? place.url! : mapsUrl([place.name, where].filter(Boolean).join(', '), pos ? { name: place.name, lat: pos.lat, lng: pos.lng } : null)} variant="neutral" icon="map" label={`Open ${place.name} in Maps`}>Open in Maps</LinkButton>} />
+              buttons={<LinkButton href={maps ? place.url! : mapsUrl([place.name, where].filter(Boolean).join(', '), pos ? { name: place.name, lat: pos.lat, lng: pos.lng } : null)} tone="neutral" icon="map" label={`Open ${place.name} in Maps`}>Open in Maps</LinkButton>} />
           </section>
         )}
         {place.url && !maps && (
@@ -250,7 +250,7 @@ export function CountryCollection() {
     ...(places.some((p) => visited.has(p.id)) ? [{ value: 'visited' as Filter, label: 'Visited', n: places.filter((p) => visited.has(p.id)).length }] : []),
   ];
   const seeAll = (key: string, n: number) => n > SHOW && !expanded.includes(key)
-    ? <Button variant="ghost" size="regular" iconEnd="chevron-right" onClick={() => setExpanded((x) => [...x, key])}>{`See all ${n}`}</Button> : undefined;
+    ? <Button tone="ghost" size="regular" iconEnd="chevron-right" onClick={() => setExpanded((x) => [...x, key])}>{`See all ${n}`}</Button> : undefined;
   const row = (p: SavedPlace) => <PlaceRow key={p.id} place={p} visited={visited.has(p.id)} starred={starred(p)} onClick={() => setOpen(p.id)}
     meta={[p.kind || placeCategory(p.category).one, p.source ? `from ${p.source}` : null].filter(Boolean).join(' · ')} />;
 
@@ -272,7 +272,7 @@ export function CountryCollection() {
             visited={places.length ? { done: places.filter((p) => visited.has(p.id)).length, total: places.length } : undefined} />
           <ul className={s.chips} aria-label="Filter">
             {filters.map((f) => (
-              <li key={f.value}><Chip active={filter === f.value} onClick={() => { haptic('selection'); setFilter(f.value); }} label={`${f.label}, ${f.n}${filter === f.value ? ', selected' : ''}`}>{`${f.label} ${f.n}`}</Chip></li>
+              <li key={f.value}><Chip selected={filter === f.value} onClick={() => { haptic('selection'); setFilter(f.value); }} label={`${f.label}, ${f.n}${filter === f.value ? ', selected' : ''}`}>{`${f.label} ${f.n}`}</Chip></li>
             ))}
           </ul>
           {cities.length === 0 && extras.length === 0 && <p className="t-body t-secondary">Nothing matches this filter.</p>}

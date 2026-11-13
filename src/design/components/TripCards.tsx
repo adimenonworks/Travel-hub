@@ -1,7 +1,7 @@
 import { type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import { Icon, type IconName } from './Icon';
-import { AvatarStack, Badge } from './Misc';
+import { AvatarStack, Tag } from './Misc';
 import { PageHeader } from './Bars';
 import { ListItem, type CategoryTone } from './Rows';
 import s from './TripCards.module.css';
@@ -10,14 +10,14 @@ type Person = { id: string; name: string; photo?: string | null };
 
 
 /**
- * Figma "Hero Card": the trip's cover (an illustration, or a photo with its credit) with a countdown Tag ("In 9 days"),
+ * Figma "Hero card": the trip's cover (an illustration, or a photo with its credit) with a countdown Tag ("In 9 days"),
  * then the name (Heading 2), dates, who's going and, under a divider, a heads-up row for one time-sensitive thing
  * (no next-up row: Home shows the next event on its own, 11 Nov 2026). Phase-aware: the caller passes the countdown and the rows.
  */
 export function HeroCard({ size = 'regular', cover, photo, countdown, title, meta, people, to, headsUp }: {
   /** Figma "Size": Regular, or Compact (a shorter cover, the name, dates and countdown; no people, no next up) for lists */
   size?: 'regular' | 'compact';
-  /** Figma "Show cover": a photo or Cover Scene; leave out for the panel alone */
+  /** Figma "Show cover": a photo or Cover scene; leave out for the panel alone */
   cover?: ReactNode;
   /** Figma "Show photo": a photo over the cover, with "Photo by <name> on Unsplash" (both names linked) */
   photo?: { url: string; credit: ReactNode };
@@ -37,7 +37,7 @@ export function HeroCard({ size = 'regular', cover, photo, countdown, title, met
           {photo && <img className={s.photo} src={photo.url} alt="" />}
           {photo && <span className={s.scrim} aria-hidden="true" />}
           {photo && <span className={s.credit}>{photo.credit}</span>}
-          {countdown && <span className={s.countdown}><Badge tone="neutral" icon={countdown.icon ?? 'calendar'}>{countdown.label}</Badge></span>}
+          {countdown && <span className={s.countdown}><Tag tone="neutral" icon={countdown.icon ?? 'calendar'}>{countdown.label}</Tag></span>}
         </div>
       )}
       <div className={s.body}>
@@ -48,7 +48,7 @@ export function HeroCard({ size = 'regular', cover, photo, countdown, title, met
           </div>
           {size === 'regular' && people && people.length > 0 && <AvatarStack people={people} />}
         </div>
-        {!cover && countdown && <div><Badge tone="neutral" icon={countdown.icon ?? 'calendar'}>{countdown.label}</Badge></div>}
+        {!cover && countdown && <div><Tag tone="neutral" icon={countdown.icon ?? 'calendar'}>{countdown.label}</Tag></div>}
         {size === 'regular' && headsUp && (
           <div className={s.rows}>
             {headsUp && <ListItem icon={headsUp.icon} tone={headsUp.tone} title={headsUp.title} meta={headsUp.meta} to={headsUp.to} round />}
@@ -59,7 +59,7 @@ export function HeroCard({ size = 'regular', cover, photo, countdown, title, met
   );
 }
 
-/** Figma "Trip header": the Page Header (Title small) with back and edit, then the dates only ("2 – 11 Nov · 10 days"). */
+/** Figma "Trip header": the Page header (Title small) with back and edit, then the dates only ("2 – 11 Nov · 10 days"). */
 export function TripHeader({ title, meta, back, action }: {
   title: string; meta: ReactNode;
   back?: { to: string; label: string };
@@ -74,7 +74,7 @@ export function TripHeader({ title, meta, back, action }: {
 }
 
 /**
- * Figma "Day Card" (Selected No / Yes): a large date number with the weekday below. The selected card is brand
+ * Figma "Day card" (Selected No / Yes): a large date number with the weekday below. The selected card is brand
  * coloured and a little larger; it grows with a spring while its neighbours ease aside (transform only, in CSS).
  */
 export function DayCard({ day, weekday, label, selected, onClick, dataDay }: {
@@ -88,8 +88,8 @@ export function DayCard({ day, weekday, label, selected, onClick, dataDay }: {
   );
 }
 
-/** Figma "Timeline": the "now" marker in today's plan: a deep emerald pill with a clock and the time, then a dashed line. */
-export function Timeline({ time }: { time: string }) {
+/** Figma "Now line" (called Timeline until 13 Nov 2026): the "now" marker in today's plan: a deep emerald pill with a clock and the time, then a dashed line. */
+export function NowLine({ time }: { time: string }) {
   return (
     <div className={s.timeline} role="note" aria-label={`Now, ${time}`}>
       <span className={s.timelineTab} aria-hidden="true"><Icon name="time" size={16} />{time}</span>
@@ -117,8 +117,8 @@ export function JourneyDetails({ mode = 'plane', number, status, duration, from,
     <section className={s.journey} aria-label={`${from.city} to ${to.city}`}>
       {(number || status) && (
         <div className={s.journeyTags}>
-          {number ? <Badge icon={mode}>{number}</Badge> : <span />}
-          {status && <Badge tone={status.tone}>{status.label}</Badge>}
+          {number ? <Tag icon={mode}>{number}</Tag> : <span />}
+          {status && <Tag tone={status.tone}>{status.label}</Tag>}
         </div>
       )}
       <div className={s.journeyTimes}>
@@ -127,7 +127,7 @@ export function JourneyDetails({ mode = 'plane', number, status, duration, from,
           <span className={s.journeyTime}>{from.time}</span>
           <span className={s.journeyDate}>{from.date}</span>
         </div>
-        {duration && <Badge icon={mode}>{duration}</Badge>}
+        {duration && <Tag icon={mode}>{duration}</Tag>}
         <div className={[s.journeyEnd, s.journeyEndTo].join(' ')}>
           <span className={s.journeyCity}>{to.city}</span>
           <span className={s.journeyTime}>{to.time}</span>

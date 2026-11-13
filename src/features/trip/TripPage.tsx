@@ -40,7 +40,7 @@ export function TripPage() {
     return (
       <Content>
         <EmptyState illustration="compass" title="Trip not found" message="It may have been deleted, or you're not a member yet. Ask the organizer for an invite link."
-          action={<LinkButton to="/trips" variant="neutral">Back to trips</LinkButton>} />
+          action={<LinkButton to="/trips" tone="neutral">Back to trips</LinkButton>} />
       </Content>
     );
   return <TripLoaded trip={trip} />;
@@ -67,7 +67,7 @@ function TripLoaded({ trip }: { trip: Trip }) {
 
   const base = `/trip/${trip.id}`;
   const section = pathname.slice(base.length + 1).split('/')[0];
-  // Figma "Tab Bar": Overview, Itinerary, Ideas, Photos, People (labels only; it scrolls sideways on narrow phones).
+  // Figma "Tab bar": Overview, Itinerary, Ideas, Photos, People (labels only; it scrolls sideways on narrow phones).
   const tabs: TabItem[] = [
     { to: base, label: 'Overview', active: section === '' },
     { to: `${base}/itinerary`, label: 'Itinerary', active: section === 'itinerary' },
@@ -122,7 +122,7 @@ function TripLoaded({ trip }: { trip: Trip }) {
 const TAB_ORDER = ['', 'itinerary', 'ideas', 'photos', 'people'];
 
 /**
- * The trip's Tab Bar, sticky under the status bar. Only once it's actually stuck does it fill the status-bar strip
+ * The trip's Tab bar, sticky under the status bar. Only once it's actually stuck does it fill the status-bar strip
  * above it (so nothing shows behind the clock); before that the strip would cover the bottom of the trip header.
  */
 function StickyTabs({ children }: { children: React.ReactNode }) {
@@ -142,9 +142,9 @@ function StickyTabs({ children }: { children: React.ReactNode }) {
 }
 
 /**
- * The trip's tabs as nested views under one header and Tab Bar that never unmount (SlideSwap slides the panel in
+ * The trip's tabs as nested views under one header and Tab bar that never unmount (SlideSwap slides the panel in
  * the direction of travel). Each tab comes back at its own scroll position; a tab not seen yet opens at its top,
- * with the Tab Bar in view.
+ * with the Tab bar in view.
  */
 function TabPanels({ location, section, children }: { location: Location; section: string; children: (loc: Location) => React.ReactNode }) {
   const box = useRef<HTMLDivElement>(null);
@@ -152,7 +152,7 @@ function TabPanels({ location, section, children }: { location: Location; sectio
   useLayoutEffect(() => {
     if (shown.current === location.pathname) return;
     shown.current = location.pathname;
-    // A new tab opens at its top, just under the stuck Tab Bar (bar = the sticky element right above the panels).
+    // A new tab opens at its top, just under the stuck Tab bar (bar = the sticky element right above the panels).
     const el = box.current, bar = el?.previousElementSibling;
     let top = 0;
     if (el && bar && el.parentElement) {

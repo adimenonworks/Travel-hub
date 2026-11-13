@@ -87,7 +87,7 @@ export function NewTrip({ open, onClose, onOpenTrip }: { open: boolean; onClose:
       setCreated({ id, name: city, start, brought: bring.length });
     } catch {
       haptic('error');
-      toast({ tone: 'error', label: "Couldn't create the trip. Check your connection" });
+      toast({ tone: 'danger', label: "Couldn't create the trip. Check your connection" });
     } finally {
       setBusy(false);
     }
@@ -113,7 +113,7 @@ export function NewTrip({ open, onClose, onOpenTrip }: { open: boolean; onClose:
           company === 'others' ? 'Share the invite link so everyone can plan with you.' : 'Add your plans, ideas and bookings as they come.'].join(' ')}
         number={until} numberLabel={until === 1 ? 'day to go' : 'days to go'}
         primary={<Button size="large" iconEnd="chevron-right" onClick={() => { onClose(); onOpenTrip(created.id); }}>Open my trip</Button>}
-        secondary={<Button size="large" variant="ghost" className={s.onDarkGhost} onClick={() => invite(created.id, created.name)}>Share with friends</Button>} />
+        secondary={<Button size="large" tone="ghost" className={s.onDarkGhost} onClick={() => invite(created.id, created.name)}>Share with friends</Button>} />
     );
   }
 
@@ -182,7 +182,7 @@ export function NewTrip({ open, onClose, onOpenTrip }: { open: boolean; onClose:
         </Button>}>
         <div className={s.flowChips} role="group" aria-label="How sure are you?">
           {(['exact', 'month'] as const).map((m) => (
-            <Chip key={m} active={dateMode === m} onClick={() => { haptic('selection'); setDateMode(m); setStart(''); setEnd(''); }}
+            <Chip key={m} selected={dateMode === m} onClick={() => { haptic('selection'); setDateMode(m); setStart(''); setEnd(''); }}
               label={`${m === 'exact' ? 'Exact dates' : 'Roughly'}${dateMode === m ? ', selected' : ''}`}>{m === 'exact' ? 'Exact dates' : 'Roughly'}</Chip>
           ))}
         </div>
@@ -220,7 +220,7 @@ export function NewTrip({ open, onClose, onOpenTrip }: { open: boolean; onClose:
       <FlowScreen step={4} of={steps} stepKey={3} title="Who’s coming?" subtitle="Everyone you add can see and edit the plan." onClose={onClose}
         footer={<>
           <Button size="large" iconEnd="chevron-right" loading={busy && steps !== 5} disabled={busy} onClick={create3}>{steps === 5 ? 'Continue' : createLabel}</Button>
-          <Button variant="ghost" className={s.flowSkip} disabled={busy} onClick={() => { setCompany('me'); create3(); }}>Skip for now</Button>
+          <Button tone="ghost" className={s.flowSkip} disabled={busy} onClick={() => { setCompany('me'); create3(); }}>Skip for now</Button>
         </>}>
         <div className={s.optionGrid}>
           <OptionCard icon="person" label="Just me" selected={company === 'me'} onClick={() => { haptic('light'); setCompany('me'); }} />
@@ -244,7 +244,7 @@ export function NewTrip({ open, onClose, onOpenTrip }: { open: boolean; onClose:
         <Button size="large" iconEnd="chevron-right" loading={busy} disabled={busy} onClick={() => create()}>
           {picked.length ? `${createLabel} · ${picked.length} save${picked.length === 1 ? '' : 's'}` : createLabel}
         </Button>
-        <Button variant="ghost" className={s.flowSkip} disabled={busy} onClick={() => create(false)}>Skip for now</Button>
+        <Button tone="ghost" className={s.flowSkip} disabled={busy} onClick={() => create(false)}>Skip for now</Button>
         <p className={s.flowFootnote}>You can bring saves in any time from your trip's Ideas.</p>
       </>}>
       {byCountry.map((c) => (
@@ -265,7 +265,7 @@ export function NewTrip({ open, onClose, onOpenTrip }: { open: boolean; onClose:
                     label={`${g}, ${list.length} saved, ${n} chosen. ${open ? 'Hide' : 'Show'} places`} />
                   {open && (
                     <div className={s.flowDropdown}>
-                      <ListItem size="compact" icon={n === list.length ? 'check' : 'plus'} title={`All of ${g === 'Links & notes' ? 'these' : g}`}
+                      <ListItem size="small" icon={n === list.length ? 'check' : 'plus'} title={`All of ${g === 'Links & notes' ? 'these' : g}`}
                         onClick={() => { haptic('light'); toggle(ids, n !== list.length); }} label={`All of ${g}, ${n === list.length ? 'chosen' : 'not chosen'}`} />
                       {/* City → type → places: each type opens to its places (links and notes have none) */}
                       {(g === 'Links & notes' ? [{ c: null, places: list }] : PLACE_TYPES.map((c) => ({ c, places: list.filter((p) => placeTypeOf(p.category) === c.value) })).filter((x) => x.places.length > 0))
@@ -275,7 +275,7 @@ export function NewTrip({ open, onClose, onOpenTrip }: { open: boolean; onClose:
                           return (
                             <Fragment key={catKey}>
                               {c && (
-                                <ListItem size="compact" icon={c.icon} tone={TYPE_TONE[c.value]} title={c.label} meta={m ? `${m} of ${places.length} chosen` : `${places.length} saved`}
+                                <ListItem size="small" icon={c.icon} tone={TYPE_TONE[c.value]} title={c.label} meta={m ? `${m} of ${places.length} chosen` : `${places.length} saved`}
                                   trailing={<Icon name="chevron-down" size={16} className={catOpen ? s.flipped : undefined} />}
                                   onClick={() => { haptic('selection'); setOpenCat(catOpen ? null : catKey); }}
                                   label={`${c.label} in ${g}, ${places.length} saved, ${m} chosen. ${catOpen ? 'Hide' : 'Show'} places`} />
@@ -283,13 +283,13 @@ export function NewTrip({ open, onClose, onOpenTrip }: { open: boolean; onClose:
                               {catOpen && (
                                 <div className={c ? s.flowDropdown : undefined}>
                                   {c && places.length > 1 && (
-                                    <ListItem size="compact" icon={m === places.length ? 'check' : 'plus'} title={`All ${c.label.toLowerCase()}`}
+                                    <ListItem size="small" icon={m === places.length ? 'check' : 'plus'} title={`All ${c.label.toLowerCase()}`}
                                       onClick={() => { haptic('light'); toggle(catIds, m !== places.length); }} label={`All ${c.label} in ${g}, ${m === places.length ? 'chosen' : 'not chosen'}`} />
                                   )}
                                   {places.map((p) => {
                                     const on = picked.includes(p.id);
                                     return (
-                                      <ListItem key={p.id} size="compact" icon={on ? 'check' : placeCategory(p.category).icon} tone={on ? undefined : placeCategory(p.category).tone} title={p.name}
+                                      <ListItem key={p.id} size="small" icon={on ? 'check' : placeCategory(p.category).icon} tone={on ? undefined : placeCategory(p.category).tone} title={p.name}
                                         trailing={on ? 'Chosen' : undefined}
                                         onClick={() => { haptic('light'); toggle([p.id], !on); }} label={`${p.name}, ${on ? 'chosen' : 'not chosen'}`} />
                                     );

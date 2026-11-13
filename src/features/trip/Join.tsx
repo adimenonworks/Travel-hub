@@ -40,7 +40,7 @@ export function Join() {
       <Content>
         <Card>
           <EmptyState illustration="ticket" title={expired ? 'This invite has expired' : 'Invite not found'} message={invite?.kind === 'collection' ? 'Ask whoever shared it for a new link.' : 'Ask the trip organizer for a new link.'}
-            action={<LinkButton to="/" variant="neutral">{joinOnly() ? 'Get Rove' : 'Go to my trips'}</LinkButton>} />
+            action={<LinkButton to="/" tone="neutral">{joinOnly() ? 'Get Rove' : 'Go to my trips'}</LinkButton>} />
         </Card>
       </Content>
     );

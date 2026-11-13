@@ -31,8 +31,8 @@ const remembered = (): Segment | null => {
 
 /**
  * Trips tab: the library. Upcoming · Saved · Past (Upcoming first; the segment you picked is remembered on this device).
- * Upcoming: a compact Hero Card per trip, soonest first, under "Plan a new trip". Saved: your Collections, one country
- * Tile each. Past: compact Hero Cards, most recent first (an illustrated empty card until there's one). Segments are tap only.
+ * Upcoming: a compact Hero card per trip, soonest first, under "Plan a new trip". Saved: your Collections, one country
+ * Tile each. Past: compact Hero cards, most recent first (an illustrated empty card until there's one). Segments are tap only.
  */
 export function Trips() {
   const trips = useMyTrips();

@@ -73,7 +73,7 @@ export function ActivityPage(ctx: TripCtx) {
     return (
       <>
         <PageHeader title="Event not found" back={{ to: itinerary, label: 'Itinerary' }} />
-        <EmptyState illustration="calendar" title="This event was deleted" message="It may have been removed from the itinerary." action={<LinkButton to={itinerary} variant="neutral">Back to itinerary</LinkButton>} />
+        <EmptyState illustration="calendar" title="This event was deleted" message="It may have been removed from the itinerary." action={<LinkButton to={itinerary} tone="neutral">Back to itinerary</LinkButton>} />
       </>
     );
 
@@ -89,7 +89,7 @@ export function ActivityPage(ctx: TripCtx) {
     const doc = a.links[i];
     if (!confirmAction(`Remove "${doc.label || hostOf(doc.url)}"?`)) return;
     try { await store.updateSub(trip.id, 'activities', a.id, { links: a.links.filter((_, j) => j !== i) }); toast({ icon: 'trash', label: 'Removed' }); }
-    catch { toast({ tone: 'error', label: "Couldn't delete. Check your connection" }); }
+    catch { toast({ tone: 'danger', label: "Couldn't delete. Check your connection" }); }
   };
   // Starring the event stars its Place (made in your Collections first if the event doesn't have one).
   const star = async () => {
@@ -98,7 +98,7 @@ export function ActivityPage(ctx: TripCtx) {
       if (place) await store.starPlace(place.id, me.uid, !starred);
       else await placeForEvent(trip.id, a, [me.uid]);
       toast({ icon: 'star', label: starred ? 'Removed from favourites' : 'Added to favourites' });
-    } catch { toast({ tone: 'error', label: "Couldn't save. Check your connection" }); }
+    } catch { toast({ tone: 'danger', label: "Couldn't save. Check your connection" }); }
   };
   const goingNames = a.attendeeIds.map((id) => (id === me.uid ? 'you' : personName(profiles, id).split(' ')[0]));
 
@@ -156,7 +156,7 @@ export function ActivityPage(ctx: TripCtx) {
                   <LayoverBlock title={`${durationLabel(stops[i - 1].ms) || 'Layover'} in ${stops[i - 1].at}`}
                     meta={stops[i - 1].code ? `Change at ${stops[i - 1].code}` : undefined}
                     warning={stops[i - 1].overnight ? `Overnight in ${stops[i - 1].at}` : stops[i - 1].tight ? 'Tight connection' : undefined}
-                    action={stops[i - 1].overnight ? <Button variant="ghost" size="regular" icon="plus" onClick={() => setStayAt(stops[i - 1])}>Add a stay</Button> : undefined} />
+                    action={stops[i - 1].overnight ? <Button tone="ghost" size="regular" icon="plus" onClick={() => setStayAt(stops[i - 1])}>Add a stay</Button> : undefined} />
                 )}
                 <JourneyDetails mode={kindInfo(leg.category).icon} number={leg.ref || undefined} status={leg.id === a.id ? tag : undefined}
                   from={{ city: city(leg.fromText), time: own?.departure?.revised ? own.departure.revised.slice(11, 16) : leg.startTime ? formatTime(leg.startTime) : '—', date: formatDay(leg.date),
@@ -181,7 +181,7 @@ export function ActivityPage(ctx: TripCtx) {
       {/* Route: where a journey (not a flight) or a car's rental starts and ends, each opening in the maps app, and directions */}
       {/* (a car shows a Route only when it's dropped off somewhere else: its pick-up is already the Location card) */}
       {routeFrom && (!vehicle || routeTo) && (
-        <PageSection title="Route" action={routeTo ? <LinkButton href={directionsUrl({ q: routeFrom, p: a.location }, { q: routeTo, p: a.to })} variant="ghost" size="regular" icon="map" label={`Directions from ${routeFrom} to ${routeTo}`}>Directions</LinkButton> : undefined}>
+        <PageSection title="Route" action={routeTo ? <LinkButton href={directionsUrl({ q: routeFrom, p: a.location }, { q: routeTo, p: a.to })} tone="ghost" size="regular" icon="map" label={`Directions from ${routeFrom} to ${routeTo}`}>Directions</LinkButton> : undefined}>
           <ListGroup label="Route">
             <ListItem icon="pin" title={routeFrom.split(',')[0]} meta={[vehicle ? startWord : 'From', routeFrom.split(',').slice(1).join(',').trim()].filter(Boolean).join(' · ')}
               href={mapsUrl(routeFrom, a.location, app)} label={`${routeFrom} in ${mapsAppLabel(app)}`} trailing={mapsAppLabel(app)} />
@@ -199,8 +199,8 @@ export function ActivityPage(ctx: TripCtx) {
             action={behaviour !== 'open' && behaviour !== 'note' ? <IconButton icon="star" state={starred ? 'filled' : 'default'} aria-pressed={starred}
               label={starred ? `Remove ${where.split(',')[0]} from favourites` : `Add ${where.split(',')[0]} to favourites`} onClick={star} /> : undefined}
             buttons={<>
-              <LinkButton href={mapsUrl(where, a.location, app)} variant="neutral" icon="map" label={`Directions to ${where} in ${mapsAppLabel(app)}`}>{mapsAppLabel(app)}</LinkButton>
-              <LinkButton href={uberUrl(where, a.location)} variant="neutral" icon="car" label={`Get an Uber to ${where}`}>Uber</LinkButton>
+              <LinkButton href={mapsUrl(where, a.location, app)} tone="neutral" icon="map" label={`Directions to ${where} in ${mapsAppLabel(app)}`}>{mapsAppLabel(app)}</LinkButton>
+              <LinkButton href={uberUrl(where, a.location)} tone="neutral" icon="car" label={`Get an Uber to ${where}`}>Uber</LinkButton>
             </>} />
         </PageSection>
       )}
@@ -227,7 +227,7 @@ export function ActivityPage(ctx: TripCtx) {
         </PageSection>
       )}
 
-      <PageSection title="Files & links" action={ctx.canContribute ? <Button variant="ghost" size="regular" iconEnd="chevron-right" onClick={() => setAddingDoc(true)}>Add</Button> : undefined}>
+      <PageSection title="Files & links" action={ctx.canContribute ? <Button tone="ghost" size="regular" iconEnd="chevron-right" onClick={() => setAddingDoc(true)}>Add</Button> : undefined}>
         {a.links.length > 0 || a.manageUrl ? (
           <ListGroup label="Files and links">
             {a.links.map((l, i) => {
@@ -237,7 +237,7 @@ export function ActivityPage(ctx: TripCtx) {
                   <ListItem icon={isPdf(l.url) ? 'doc' : 'link'} title={name} meta={`${isPdf(l.url) ? 'PDF' : hostOf(l.url)}${l.emailUrl ? ' · from email' : ''}`}
                     trailing={isPdf(l.url) ? 'PDF' : undefined} href={l.url} label={`${name} (opens in a new tab)`}
                     onClick={() => recordView(trip.id, { url: l.url, kind: isPdf(l.url) ? 'PDF' : 'Link', label: name, meta: a.title })} />
-                  {l.emailUrl && <LinkButton href={l.emailUrl} size="regular" variant="ghost" icon="mail" label={`Open the email for ${name}`} />}
+                  {l.emailUrl && <LinkButton href={l.emailUrl} size="regular" tone="ghost" icon="mail" label={`Open the email for ${name}`} />}
                   {ctx.canContribute && <IconButton icon="trash" label={`Remove ${name}`} onClick={() => removeDoc(i)} />}
                 </div>
               );
@@ -261,7 +261,7 @@ export function ActivityPage(ctx: TripCtx) {
       <DocumentForm open={addingDoc} onClose={() => setAddingDoc(false)}
         onAdd={async (d) => {
           try { await store.updateSub(trip.id, 'activities', a.id, { links: [...a.links, d] }); toast({ icon: 'check', label: 'Added' }); }
-          catch { toast({ tone: 'error', label: "Couldn't save. Check your connection" }); }
+          catch { toast({ tone: 'danger', label: "Couldn't save. Check your connection" }); }
         }} />
     </>
   );

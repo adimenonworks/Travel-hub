@@ -1,7 +1,7 @@
 import { useState, type CSSProperties } from 'react';
 import {
-  Avatar, AvatarStack, Badge, Chip, Notification, Button, Card, EmptyState, FieldRow, HeroCard, Icon, IconButton,
-  LinkButton, PageHeader, PageSection, SegmentControl, Select, Sheet, Tabs, TextArea, TextField, Timeline, Illustration,
+  Avatar, AvatarStack, Tag, Chip, Banner, Button, Card, EmptyState, FieldRow, HeroCard, Icon, IconButton,
+  LinkButton, PageHeader, PageSection, SegmentControl, Select, Sheet, Tabs, TextArea, TextField, NowLine, Illustration,
   type IllustrationName, COVER_ILLUSTRATIONS, ICON_NAMES, useToast, BottomNav, Skeleton, Logo,
   ListItem, ListGroup, SectionHeader, EventCard, TravelConnector, IdeaRow, Tile, StatStrip, ProfileCard,
   OptionCard, BudgetCard, Switch, SearchField, StepProgress, TripHeader, DayCard, CountryModal,
@@ -22,8 +22,8 @@ function Section({ title, footer, children }: { title: string; footer?: ReactNod
 const SET_TOKENS = ["surface-primary", "surface-secondary", "surface-brand", "surface-sunken", "text-primary", "text-secondary", "text-brand-yellow", "text-brand-orange", "text-brand-green", "text-brand-pink", "link-default", "link-hover", "link-pressed", "icon-primary", "icon-secondary", "icon-brand", "border-subtle", "border-bold", "border-focus", "border-brand", "divider-default", "illustration-primary", "illustration-secondary", "illustration-accent", "illustration-accent-bold", "illustration-accent-subtle", "illustration-warm", "illustration-warm-bold", "illustration-border", "status-success", "status-success-subtle", "status-warning", "status-warning-subtle", "status-error", "status-error-subtle"];
 const surfaceSets: { name: string; title: string; note: string }[] = [
   { name: 'on-light', title: 'On light', note: 'White and light grey: the canvas, cards and sheets.' },
-  { name: 'on-mid', title: 'On mid', note: 'Bright emerald: the Hero Card frame and accent cards.' },
-  { name: 'on-dark', title: 'On dark', note: 'Deep emerald: the Hero Card panel.' },
+  { name: 'on-mid', title: 'On mid', note: 'Bright emerald: the Hero card frame and accent cards.' },
+  { name: 'on-dark', title: 'On dark', note: 'Deep emerald: the Hero card panel.' },
 ];
 // On accent: one set shared by every accent surface (they share one tone), so only the surface changes.
 const ACCENTS = ['yellow', 'orange', 'green', 'pink'];
@@ -204,7 +204,7 @@ export function DesignSystem() {
           </Card>
         </Section>
 
-        <Section title="Bottom Nav and Skeleton" footer="Figma Bottom Nav (Nav Item ×3: Home, Trip, You), floating on the frosted bar; hidden while typing. Figma Skeleton (Text, Block, Circle) replaces spinners while a page loads.">
+        <Section title="Bottom nav and Skeleton" footer="Figma Bottom nav (.Nav item ×3: Home, Trip, You), floating on the frosted bar; hidden while typing. Figma Skeleton (Text, Block, Circle) replaces spinners while a page loads.">
           <Card>
             <BottomNav inline tabs={[
               { to: '/design', label: 'Home', icon: 'home', active: () => true },
@@ -214,31 +214,31 @@ export function DesignSystem() {
           </Card>
           <Card>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-default-400)' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-default-400)' }}><Skeleton shape="circle" /><Skeleton width="60%" /></div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-default-400)' }}><Skeleton layout="circle" /><Skeleton width="60%" /></div>
               <Skeleton width="85%" />
-              <Skeleton shape="block" />
+              <Skeleton layout="block" />
             </div>
           </Card>
         </Section>
 
-        <Section title="Buttons" footer="Figma Button: Variant × Size (Regular 48px, Small 40px with a 44px tap area). Icons can lead or trail.">
+        <Section title="Buttons" footer="Figma Button: Tone × Size (Regular 48px, Small 40px with a 44px tap area). Icons can lead or trail.">
           <Card className={s.row}>
             <Button>Primary</Button>
-            <Button variant="neutral">Secondary</Button>
-            <Button variant="ghost">Ghost</Button>
-            <Button variant="destructive">Destructive</Button>
+            <Button tone="neutral">Secondary</Button>
+            <Button tone="ghost">Ghost</Button>
+            <Button tone="destructive">Destructive</Button>
             <Button icon="plus">Leading icon</Button>
-            <Button variant="neutral" iconEnd="arrow-up-right">Trailing icon</Button>
+            <Button tone="neutral" iconEnd="arrow-up-right">Trailing icon</Button>
             <Button size="regular" icon="plus">Small</Button>
             <Button disabled>Disabled</Button>
-            <LinkButton to="/" variant="neutral">Link button</LinkButton>
+            <LinkButton to="/" tone="neutral">Link button</LinkButton>
             <IconButton icon="x" label="Close (Ghost)" />
             <IconButton icon="pencil" label="Edit (Secondary)" tone="secondary" />
             <IconButton icon="send" label="Send (Primary)" tone="primary" />
             <IconButton icon="send" label="Send (Primary, disabled)" tone="primary" disabled />
             <Select compact aria-label="Compact select (matches a small button)"><option>Organizer</option><option>Member</option></Select>
           </Card>
-          <Card tone="accent" className={s.row}><Button variant="inverse">Inverse</Button><IconButton icon="x" label="Close (On brand)" tone="on-brand" /></Card>
+          <Card tone="accent" className={s.row}><Button tone="inverse">Inverse</Button><IconButton icon="x" label="Close (On brand)" tone="on-brand" /></Card>
         </Section>
 
         <Section title="Navigation" footer="Tabs switch between sections of a page (each trip uses them). The current tab is darker and underlined in emerald (--interactive-selected-ghost-border).">
@@ -254,26 +254,26 @@ export function DesignSystem() {
         <Section title="Cards">
           <div className={s.cards}>
             <Card><div className="t-heading-3">Default card</div><p className="t-body-small t-secondary">White on the pale canvas, no shadow.</p></Card>
-            <Card tone="accent"><div className="t-heading-3">Brand card</div><p className="t-body-small t-secondary">For the one thing that matters most on a page.</p><div><Button variant="inverse" icon="plus">Inverse button</Button></div></Card>
-            <Card tone="accent" media={<Icon name="globe" size={56}  />} action={<Button variant="inverse">Action</Button>}>
+            <Card tone="accent"><div className="t-heading-3">Brand card</div><p className="t-body-small t-secondary">For the one thing that matters most on a page.</p><div><Button tone="inverse" icon="plus">Inverse button</Button></div></Card>
+            <Card tone="accent" media={<Icon name="globe" size={56}  />} action={<Button tone="inverse">Action</Button>}>
               <div className="t-heading-3">Card with media and action</div><p className="t-body-small">The media sits on the left, the action on the right (below on phones).</p>
             </Card>
             <Card media={<Illustration name="memories" />}><div className="t-heading-4">Card with an illustration</div><p className="t-body-small t-secondary">Illustrations are for empty states and invitations.</p></Card>
           </div>
         </Section>
 
-        <Section title="Chips and tags" footer="Chip (country pills: tap opens the Country sheet; Active / Inactive) and Tags (Neutral, Tint, Category, Success, Warning, Danger).">
+        <Section title="Chips and tags" footer="Chip (country pills: tap opens the Country sheet; Default / Selected) and Tag (Neutral, Tint, Category, Success, Warning, Danger).">
           <div className={s.row}>
             <Chip flag={flagUrl('pt')} onClick={() => setCountry('pt')} label="About Portugal">Portugal</Chip>
-            <Chip active flag={flagUrl('es')}>Spain</Chip>
+            <Chip selected flag={flagUrl('es')}>Spain</Chip>
             <Chip icon="people">4 going</Chip>
           </div>
           <div className={s.row}>
-            <Badge icon="calendar">In 9 days</Badge><Badge tone="tint" icon="check">Tint (unused)</Badge><Badge tone="category" icon="camera">Category</Badge><Badge tone="success" icon="check">Success</Badge><Badge tone="warning">Warning</Badge><Badge tone="danger">Danger</Badge>
+            <Tag icon="calendar">In 9 days</Tag><Tag tone="tint" icon="check">Tint (unused)</Tag><Tag tone="category" icon="camera">Category</Tag><Tag tone="success" icon="check">Success</Tag><Tag tone="warning">Warning</Tag><Tag tone="danger">Danger</Tag>
           </div>
         </Section>
 
-        <Section title="Trip components" footer="Hero Card (phase-aware countdown, an optional heads-up row; no next-up row since 11 Nov 2026: Home shows the Next card on its own; Size Compact for lists), Trip header, Day Card, Timeline.">
+        <Section title="Trip components" footer="Hero card (phase-aware countdown, an optional heads-up row; no next-up row since 11 Nov 2026: Home shows the Next card on its own; Size Compact for lists), Trip header, Day card, NowLine.">
           <HeroCard cover={<Illustration name={COVER_ILLUSTRATIONS[1]} />} countdown={{ label: 'In 9 days' }} title="Portugal & Spain" meta="Nov 2 – 11 · 10 days"
             people={[{ id: 'a', name: 'Alex Menon' }, { id: 'j', name: 'Jo Ma' }, { id: 's', name: 'Sam Lee' }, { id: 'p', name: 'Priya Shah' }]} to="/design" />
           <HeroCard countdown={{ label: 'Day 3 of 15' }} title="Japan" meta="Mar 20 – Apr 3 · 15 days" people={[{ id: 'a', name: 'Alex Menon' }, { id: 'j', name: 'Jo Ma' }, { id: 's', name: 'Sam Lee' }, { id: 'p', name: 'Priya Shah' }]} />
@@ -285,7 +285,7 @@ export function DesignSystem() {
             <DayCard day={4} weekday="Wed" label="Tomorrow, Wednesday 4 November" selected={false} onClick={() => {}} />
             <DayCard day={5} weekday="Thu" label="Day 4, Thursday 5 November" selected={false} onClick={() => {}} />
           </div>
-          <Timeline time="12:30" />
+          <NowLine time="12:30" />
         </Section>
 
         <Section title="Event cards" footer="Event card: Layout Standard / Journey / Note × State Default / Next / Done, joined by Travel connectors.">
@@ -303,7 +303,7 @@ export function DesignSystem() {
           {EVENT_TYPES.map((t) => (
             <ListGroup key={t.value} label={t.label}>
               <h3 className="t-heading-3">{t.label}</h3>
-              {t.kinds.map((k) => <ListItem key={k.value} size="compact" icon={k.icon} tone={TYPE_TONE[t.value]} title={k.label} meta={k.behaviour === 'span' ? 'Shown twice: start and end' : undefined} />)}
+              {t.kinds.map((k) => <ListItem key={k.value} size="small" icon={k.icon} tone={TYPE_TONE[t.value]} title={k.label} meta={k.behaviour === 'span' ? 'Shown twice: start and end' : undefined} />)}
             </ListGroup>
           ))}
         </Section>
@@ -320,11 +320,11 @@ export function DesignSystem() {
           <ListGroup label="Places and ideas by type">
             <ListItem icon="house-chimney" tone="stays" title="Casa do Príncipe" meta="Airbnb or holiday home · Lisbon" />
             <ListItem icon="glass-cheers" tone="food" title="Quinta da Pacheca" meta="Tasting · Douro" />
-            <IdeaRow icon="bank" tone="activities" title="Gulbenkian Museum" meta="Museum or gallery · Lisbon · Sam" vote={{ count: 2, voted: false, onClick: () => {} }} />
+            <IdeaRow icon="bank" tone="activities" title="Gulbenkian Museum" meta="Museum or gallery · Lisbon · Sam" vote={{ count: 2, selected: false, onClick: () => {} }} />
           </ListGroup>
           <div className={s.chipRow}>
-            <Chip icon="plane" tone="travel" active>Flight</Chip><Chip icon="hotel" tone="stays" active>Hotel</Chip><Chip icon="coffee" tone="food" active>Café</Chip>
-            <Chip icon="camera" tone="activities" active>Sight</Chip><Chip icon="notebook" tone="notes" active>Note</Chip><Chip icon="train" tone="travel">Train</Chip>
+            <Chip icon="plane" type="travel" selected>Flight</Chip><Chip icon="hotel" type="stays" selected>Hotel</Chip><Chip icon="coffee" type="food" selected>Café</Chip>
+            <Chip icon="camera" type="activities" selected>Sight</Chip><Chip icon="notebook" type="notes" selected>Note</Chip><Chip icon="train" type="travel">Train</Chip>
           </div>
           <div className={s.optionGrid}>
             <OptionCard icon="plane" tone="travel" label="Getting around" description="Flights, trains, buses, ferries, taxis, transfers and car hire" onClick={() => {}} />
@@ -336,17 +336,17 @@ export function DesignSystem() {
           </div>
         </Section>
 
-        <Section title="Event page header and Context menu" footer="Page Header Title small with Show icon (the Category icon: a 40px round tile in the type's colour) and Show subtitle (the time). Context menu: what a long press on your own comment opens (Edit, Delete in red); tap the bubble to see it.">
+        <Section title="Event page header and Context menu" footer="Page header Title small with Show icon (the Category icon: a 40px round tile in the type's colour) and Show subtitle (the time). Context menu: what a long press on your own comment opens (Edit, Delete in red); tap the bubble to see it.">
           <div className={s.chipRow}>
-            {(['neutral', 'travel', 'stays', 'food', 'activities', 'notes'] as const).map((t) => <CategoryIcon key={t} icon={t === 'food' ? 'grape' : 'plane'} tone={t} />)}
+            {(['neutral', 'travel', 'stays', 'food', 'activities', 'notes'] as const).map((t) => <CategoryIcon key={t} icon={t === 'food' ? 'grape' : 'plane'} type={t} />)}
           </div>
           <PageHeader size="small" icon="grape" tone="food" title="Quinta da Pacheca" subtitle="Thu 12 Nov, 15:00 – 17:00" back={{ to: '/design', label: 'Itinerary' }} action={{ icon: 'pencil', label: 'Example edit button', onClick: () => {} }} />
           <div>
             {menu ? (
-              <ContextMenu label="Message actions" onClose={() => setMenu(false)} items={[{ label: 'Edit', icon: 'pencil', onClick: () => {} }, { label: 'Delete', icon: 'trash', destructive: true, onClick: () => {} }]}>
-                <Button variant="neutral">Perfect, see you there</Button>
+              <ContextMenu label="Message actions" onClose={() => setMenu(false)} items={[{ label: 'Edit', icon: 'pencil', onClick: () => {} }, { label: 'Delete', icon: 'trash', tone: 'danger', onClick: () => {} }]}>
+                <Button tone="neutral">Perfect, see you there</Button>
               </ContextMenu>
-            ) : <Button variant="neutral" onClick={() => setMenu(true)}>Perfect, see you there</Button>}
+            ) : <Button tone="neutral" onClick={() => setMenu(true)}>Perfect, see you there</Button>}
           </div>
         </Section>
 
@@ -369,20 +369,20 @@ export function DesignSystem() {
           </Accordion>
         </Section>
 
-        <Section title="Rows, groups and tiles" footer="Section header, List group of List items (Default / Compact), Idea rows with Vote buttons, Tiles, Map card, Stat strip, Profile Card.">
-          <SectionHeader title="Collections" meta="4 places · 61 saves" action={<LinkButton to="/design" variant="ghost" size="regular" iconEnd="chevron-right">See all</LinkButton>} />
+        <Section title="Rows, groups and tiles" footer="Section header, List group of List items (Regular / Small), Idea rows with Vote buttons, Tiles, Map card, Stat strip, Profile card.">
+          <SectionHeader title="Collections" meta="4 places · 61 saves" action={<LinkButton to="/design" tone="ghost" size="regular" iconEnd="chevron-right">See all</LinkButton>} />
           <ListGroup>
             <ListItem icon="utensils" title="Ichiran Shibuya" meta="Ramen · Tokyo · from TikTok" trailing="2h" onClick={() => {}} />
             <ListItem icon="link" title="10 things to do in Cusco" meta="Article · Peru · cntraveler.com" trailing="Yesterday" />
-            <ListItem size="compact" icon="doc" title="TAP e-ticket" trailing="PDF · 2h ago" />
+            <ListItem size="small" icon="doc" title="TAP e-ticket" trailing="PDF · 2h ago" />
             <BudgetCard label="Left to spend" amount="A$1,800" caption="of A$5,000 per person · A$3,200 planned" ratio={0.64}
               rows={[{ icon: 'plane', label: 'Flights', amount: 'A$1,900' }, { icon: 'bed', label: 'Stays', amount: 'A$900' }, { icon: 'key', label: 'Car rental', amount: 'A$180' }]} />
             <OptionCard icon="wallet" label="Yes" description="Add costs to your bookings to see what the trip adds up to" onClick={() => {}} />
             <ListItem icon="ticket" title="TP-7XK2LQ" meta="Booking reference" action={<IconButton small icon="copy" label="Copy booking reference" onClick={() => {}} />} />
           </ListGroup>
           <ListGroup>
-            <IdeaRow icon="star" title="Fado night in Alfama" meta="Show · Clube de Fado · €30 · Sam" tag={{ icon: 'star', label: 'Most votes' }} vote={{ count: 4, voted: true, onClick: () => {} }} />
-            <IdeaRow icon="utensils" title="Pastéis de Belém" meta="Bakery · Belém · Priya" vote={{ count: 2, voted: false, onClick: () => {} }} />
+            <IdeaRow icon="star" title="Fado night in Alfama" meta="Show · Clube de Fado · €30 · Sam" tag={{ icon: 'star', label: 'Most votes' }} vote={{ count: 4, selected: true, onClick: () => {} }} />
+            <IdeaRow icon="utensils" title="Pastéis de Belém" meta="Bakery · Belém · Priya" vote={{ count: 2, selected: false, onClick: () => {} }} />
           </ListGroup>
           <div className={s.tiles}>
             <Tile tone="orange" media={<img src={flagUrl('jp')} alt="" />} title="Japan" meta="24 saves · 3 cities" />
@@ -425,22 +425,22 @@ export function DesignSystem() {
         <Section title="Feedback & identity">
           <Card className={s.stack}>
             <div className={s.row}>
-              <Avatar name="Alex Kim" size={24} />
+              <Avatar name="Alex Kim" size="small" />
             </div>
             <div className={s.row}>
-              <Avatar name="Alex Kim" size={40} /><Avatar name="Jo" size={32} />
+              <Avatar name="Alex Kim" size="large" /><Avatar name="Jo" size="regular" />
               <AvatarStack people={['Ana', 'Ben', 'Cy', 'Dee', 'Eli', 'Fay'].map((n) => ({ id: n, name: n }))} />
             </div>
-            {(['brand', 'neutral', 'success', 'warning', 'error'] as const).map((st) => <Notification key={st} state={st}>Notification, state {st}.</Notification>)}
+            {(['accent', 'neutral', 'success', 'warning', 'danger'] as const).map((st) => <Banner key={st} tone={st}>Banner, state {st}.</Banner>)}
             <div className={s.row}>
-              <Button variant="neutral" icon="copy" onClick={() => toast({ icon: 'copy', label: 'Address copied' })}>Show a toast</Button>
-              <Button variant="neutral" onClick={() => toast({ tone: 'error', label: "Couldn't save. Check your connection" })}>Error toast</Button>
-              <Button variant="neutral" onClick={() => toast({ icon: 'check', label: 'Saved to Portugal', action: { label: 'Undo', onClick: () => {} } })}>Toast with Undo</Button>
-              <Button variant="neutral" onClick={() => toast({ size: 'large', icon: 'chat', label: 'Sam on Tram 28 to Alfama: Meet at the stop?', action: { label: 'Open', onClick: () => {} } })}>Large toast (message)</Button>
+              <Button tone="neutral" icon="copy" onClick={() => toast({ icon: 'copy', label: 'Address copied' })}>Show a toast</Button>
+              <Button tone="neutral" onClick={() => toast({ tone: 'danger', label: "Couldn't save. Check your connection" })}>Error toast</Button>
+              <Button tone="neutral" onClick={() => toast({ icon: 'check', label: 'Saved to Portugal', action: { label: 'Undo', onClick: () => {} } })}>Toast with Undo</Button>
+              <Button tone="neutral" onClick={() => toast({ size: 'large', icon: 'chat', label: 'Sam on Tram 28 to Alfama: Meet at the stop?', action: { label: 'Open', onClick: () => {} } })}>Large toast (message)</Button>
             </div>
             <Switch checked={on} onChange={setOn} label="Also add to Portugal & Spain ideas" hint="Your trip covers Lisbon" />
           </Card>
-          <Card><EmptyState illustration="ideas" title="Empty state" message="Explains what goes here and how to start." action={<Button variant="neutral" onClick={() => setSheet(true)}>Open a sheet</Button>} /></Card>
+          <Card><EmptyState illustration="ideas" title="Empty state" message="Explains what goes here and how to start." action={<Button tone="neutral" onClick={() => setSheet(true)}>Open a sheet</Button>} /></Card>
         </Section>
       </div>
       <Sheet open={sheet} title="Save to Rove" subtitle="A short task over the current screen" onClose={() => setSheet(false)} onSubmit={() => setSheet(false)} submitLabel="Save">

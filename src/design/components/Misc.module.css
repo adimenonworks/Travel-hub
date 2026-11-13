@@ -43,12 +43,12 @@
 .note-warning svg { color: var(--on-light-status-warning); }
 .note-success { background: var(--on-light-status-success-subtle); }
 .note-success svg { color: var(--on-light-status-success); }
-.note-error { background: var(--on-light-status-error-subtle); }
-.note-error svg { color: var(--on-light-status-error); }
+.note-danger { background: var(--on-light-status-error-subtle); }
+.note-danger svg { color: var(--on-light-status-error); }
 .note-neutral { background: var(--on-light-surface-primary); border: 1px solid var(--on-light-border-subtle); }
 .note-neutral svg { color: var(--on-light-icon-primary); }
-.note-brand { background: var(--on-light-surface-brand); color: var(--on-light-text-brand); }
-.note-brand svg { color: var(--on-light-icon-brand); }
+.note-accent { background: var(--on-light-surface-brand); color: var(--on-light-text-brand); }
+.note-accent svg { color: var(--on-light-icon-brand); }
 
 /* Chip (Figma "Chip", Type=Action): 12 radius, 6 / 12, gap 8, a 16px flag or icon, Label small.
    Active is the deep emerald selected look; Inactive is white with a subtle border. */

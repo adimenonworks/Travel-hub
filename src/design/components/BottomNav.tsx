@@ -8,8 +8,8 @@ import s from './BottomNav.module.css';
 export type NavTab = { to: string; label: string; icon: IconName; active: (path: string) => boolean };
 
 /**
- * Figma "Bottom Nav": the app's tab bar, a frosted pill (Elevation/Floating bar) floating 16px from the sides and bottom,
- * always on top while the page scrolls under it. Each tab is a Figma "Nav Item": the current one sits on a grey pill
+ * Figma "Bottom nav": the app's tab bar, a frosted pill (Elevation/Floating bar) floating 16px from the sides and bottom,
+ * always on top while the page scrolls under it. Each tab is a Figma ".Nav item": the current one sits on a grey pill
  * (which slides between tabs) with its filled icon. Tapping the current tab scrolls it back to the top, as on iPhone.
  * You can also press and drag along the bar, like iOS: the pill follows your finger, the tab under it lights up (a
  * selection tick as it crosses each one), and letting go opens the nearest tab. Once dragging it keeps hold wherever

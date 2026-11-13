@@ -24,7 +24,7 @@ export function coverQuery(trip: Pick<Trip, 'destination' | 'name'>) {
 }
 
 /**
- * A trip as the Figma "Hero Card", phase-aware on one layout: the countdown ("In 9 days", then "Day 3 of 10") and, when
+ * A trip as the Figma "Hero card", phase-aware on one layout: the countdown ("In 9 days", then "Day 3 of 10") and, when
  * something is time-sensitive, one heads-up row. The next event lives on Home's "Happening now", not on the card.
  * `size="compact"` is for lists (Trips tab): a shorter cover, the name, dates and countdown only.
  */

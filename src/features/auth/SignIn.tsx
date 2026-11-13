@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Notification, Button, Card, Logo, TextField } from '../../design/components';
+import { Banner, Button, Card, Logo, TextField } from '../../design/components';
 import { store } from '../../data';
 import { describeAuthError, isInAppBrowser } from '../../lib/authErrors';
 import s from './SignIn.module.css';
@@ -36,7 +36,7 @@ export function SignIn({ message }: { message?: string }) {
       <Card className={s.card}>
         {message && <p className="t-body-small">{message}</p>}
         {store.mode === 'firebase' && inApp && (
-          <Notification state="warning">You're in an app's built-in browser, where Google sign-in is blocked. Tap the menu (⋯ or ↗) and choose <b>Open in Safari</b> or <b>Open in Chrome</b>.</Notification>
+          <Banner tone="warning">You're in an app's built-in browser, where Google sign-in is blocked. Tap the menu (⋯ or ↗) and choose <b>Open in Safari</b> or <b>Open in Chrome</b>.</Banner>
         )}
         {store.mode === 'firebase' ? (
           <Button size="large" block onClick={go} disabled={busy}>Continue with Google</Button>

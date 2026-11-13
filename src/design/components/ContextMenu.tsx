@@ -2,7 +2,7 @@ import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 're
 import { Icon, type IconName } from './Icon';
 import s from './ContextMenu.module.css';
 
-export type ContextMenuItem = { label: string; icon: IconName; destructive?: boolean; onClick: () => void };
+export type ContextMenuItem = { label: string; icon: IconName; /** Figma Tone=Danger: the red item (Delete) */ tone?: 'default' | 'danger'; onClick: () => void };
 
 /**
  * Figma "Context menu": what a long press opens, like iOS. The pressed thing lifts above a soft dim (wrap it in
@@ -31,7 +31,7 @@ export function ContextMenu({ items, onClose, align = 'end', children, label }: 
         {children}
         <div ref={menu} role="menu" aria-label={label} className={[s.menu, align === 'start' ? s.start : s.end, above && s.above].filter(Boolean).join(' ')}>
           {items.map((it) => (
-            <button key={it.label} type="button" role="menuitem" autoFocus={it === items[0]} className={[s.item, it.destructive && s.destructive].filter(Boolean).join(' ')}
+            <button key={it.label} type="button" role="menuitem" autoFocus={it === items[0]} className={[s.item, it.tone === 'danger' && s.destructive].filter(Boolean).join(' ')}
               onClick={() => { onClose(); it.onClick(); }}>
               <span>{it.label}</span><Icon name={it.icon} size={16} />
             </button>

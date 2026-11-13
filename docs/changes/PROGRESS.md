@@ -26,17 +26,31 @@ Read this first when starting a session. If it disagrees with the code or Figma,
   - Section "Primtives" is now "Primitives" (`35:1719`); the second "Typography" (`35:2217`, it holds spacing and radii) is now "Spacing & radius".
   - Not done in A1: reordering the variants inside each set by size then state. The sets that A2 and A3 rename or rebuild get ordered then; check the rest at the end of A3.
 
+- **A2, naming and glossary** (Figma and code; screens pixel-identical to Main at 393 × 852 in demo mode):
+  - Renamed in Figma: Tab bar, Text field, Avatar stack, Cover scene, Day card, Page header, Bottom nav, Profile card, Hero card; **Tag** (was Tags), **Now line** (was Timeline), **Banner** (was Notification); "." parts: `.Nav item`, `.Calendar day`, `.Vote button`, `.Category icon`, `.Context menu item`.
+  - **Message keeps its name:** it is placed directly on the Event screen (3 times), so it isn't nested-only.
+  - Properties: Button `Variant` → `Tone`; Chip `Category` → `Type` (its one-value `Type=Action` removed), State Active/Inactive → Selected/Default; Avatar `Kind` → `Layout`, Size 24/32/40 → Small/Regular/Large; `Selected`/`Voted`/`Checked` → `State` Default/Selected (`.Tab`, `.Segment`, `.Nav item`, Day card, Option card, `.Vote button`, Switch); Text field `Type` → `Layout`; Page header `Type` → `Size` Small/Large; Skeleton `Shape` → `Layout`; Message `Sender` → `Layout`; Step progress `Step` → `State` Step 1–4; List item Size Default/Compact → Regular/Small; Banner `State` → `Tone` (Error → Danger, Brand → Accent); Toast and `.Context menu item` Error/Destructive → Danger.
+  - `.Tab` and `.Segment` lost their Selected + Hover and Selected + Pressed variants (4 variants, no instances) when Selected folded into State.
+  - Code: `Button tone`, `Tag` (was `Badge`), `Banner tone` (was `Notification state`), `NowLine`, `Chip selected` / `type`, `CategoryIcon type`, `Avatar size="small|regular|large"`, `ListItem size="regular|small"`, `Skeleton layout`, toast `tone: 'danger'`, context menu `tone: 'danger'`, `VoteButton selected`. `Switch` keeps `checked` (the web's own word for a switch).
+  - Glossary: `DESIGN.md` ("Rove glossary") and the Figma section "Glossary" (`597:724`, right of Components).
+  - Left for A3 (they are rebuilt there): Illustration / Cover scene `Name`; Tile `Tone`; Hero card `Size`; Flow screen `Step`; Option card `Type=Plain`; Tag `Tone=Category` and `Tint`; the `tone` prop on EventCard, ListItem, IdeaRow, OptionCard (A3 moves event type into `.Category icon`).
+  - Not done: inner layer names inside components weren't all checked for sentence case.
+
 ## In progress
 
-- A2 (naming and glossary): not started.
+- A3 (merge and remove): not started. Do one change per pull request, in the table's order; stop at the three design gates.
 
 ## Still to do
 
-A2, A3 (14 changes, one pull request each), A4, then the Check everything list.
+A3 (14 changes, one pull request each), A4, then the Check everything list.
 
 ## Figma changes so far
 
-See A1 above.
+See A1 and A2 above. **Variant count before the cleanup: 274** (Components section, not counting icons and flags); after A2: 270.
+
+## How to check screens
+
+Build in demo mode (`npx vite build --mode demo --outDir <dir>`; a normal build shows only the join-only website), seed `localStorage` `triphub-demo-db` and `sessionStorage` `triphub-demo-user` with a sample trip, fix the clock, block the network, and screenshot each route with Playwright; compare against the same from Main pixel by pixel.
 
 ## Questions waiting for the owner
 

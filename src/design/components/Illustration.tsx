@@ -4,7 +4,7 @@ import city from '../../assets/covers/city.jpg';
 import friends from '../../assets/illustrations/friends.webp';
 import s from './Illustration.module.css';
 
-/** The Figma "Cover Scene" images (Hills, Coast, City). */
+/** The Figma "Cover scene" images (Hills, Coast, City). */
 const covers = { 'cover-hills': hills, 'cover-coast': coast, 'cover-city': city };
 
 export type IllustrationName =
@@ -20,7 +20,7 @@ export const COVER_ILLUSTRATIONS = ['cover-hills', 'cover-coast', 'cover-city'] 
  * Drawn with semantic tokens (Illustration.module.css) so they follow light and dark mode.
  * Always decorative: hidden from screen readers; the text beside them carries the meaning.
  *
- * Spot illustrations (empty states, cards) draw in a 120×96 box. Covers ('cover-*') are the Figma Cover Scene
+ * Spot illustrations (empty states, cards) draw in a 120×96 box. Covers ('cover-*') are the Figma Cover scene
  * images and fill their container (cropped to fit).
  */
 /** `square` fits the drawing into a size × size box (e.g. 64×64 in a Card's media slot). */

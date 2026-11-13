@@ -77,7 +77,7 @@ export function SaveSheet({ request, onClose }: { request: SaveRequest | null; o
   };
   const read = async (raw: string) => {
     const url = findUrl(raw) ?? raw.trim();
-    if (!/^https?:\/\//.test(url)) { toast({ tone: 'error', label: 'That doesn’t look like a link' }); return; }
+    if (!/^https?:\/\//.test(url)) { toast({ tone: 'danger', label: 'That doesn’t look like a link' }); return; }
     setReading(true);
     try { show(await readLink(url)); } finally { setReading(false); }
   };
@@ -156,9 +156,9 @@ export function SaveSheet({ request, onClose }: { request: SaveRequest | null; o
         ...(preview.site ? { source: preview.site } : {}), ...(place?.kind ? { kind: place.kind } : {}),
         ...(note.trim() ? { notes: note.trim() } : {}), ...(intoShare ? { sharedIn: intoShare.id } : {}),
       });
-      saved.catch(() => toast({ tone: 'error', label: "Couldn't save. Check your connection" }));
+      saved.catch(() => toast({ tone: 'danger', label: "Couldn't save. Check your connection" }));
       const dropPlace = () => { if (!dupe) store.deletePlace(id).catch(() => {}); };
-      const fail = () => toast({ tone: 'error', label: "Couldn't add it. Check your connection" });
+      const fail = () => toast({ tone: 'danger', label: "Couldn't add it. Check your connection" });
       const link: LinkItem = { label: preview.site || 'Link', url: preview.url };
       if (mode === 'collections') {
         haptic('success');
@@ -192,7 +192,7 @@ export function SaveSheet({ request, onClose }: { request: SaveRequest | null; o
       onClose();
     } catch {
       haptic('error');
-      toast({ tone: 'error', label: "Couldn't save. Check your connection" });
+      toast({ tone: 'danger', label: "Couldn't save. Check your connection" });
     }
   };
 
@@ -221,7 +221,7 @@ export function SaveSheet({ request, onClose }: { request: SaveRequest | null; o
         <section className={s.field} aria-labelledby="save-trip">
           <h3 className="t-heading-4" id="save-trip">Which trip?</h3>
           <div className={s.chipsWrap} role="group" aria-labelledby="save-trip">
-            {tripChoices.map((t) => <Chip key={t.id} active={t.id === trip.id} onClick={() => { haptic('selection'); setTripId(t.id); setDay(''); setEventId(''); }}>{t.name}</Chip>)}
+            {tripChoices.map((t) => <Chip key={t.id} selected={t.id === trip.id} onClick={() => { haptic('selection'); setTripId(t.id); setDay(''); setEventId(''); }}>{t.name}</Chip>)}
           </div>
         </section>
       )}
@@ -235,7 +235,7 @@ export function SaveSheet({ request, onClose }: { request: SaveRequest | null; o
           <section className={s.field} aria-labelledby="save-day">
             <h3 className="t-heading-4" id="save-day">{stay ? 'Check-in' : 'Which day?'}</h3>
             <div className={s.chipsWrap} role="group" aria-labelledby="save-day">
-              {days.map((d) => <Chip key={d} active={d === theDay} label={`${longDay(d)}${d === theDay ? ', selected' : ''}`} onClick={() => { haptic('selection'); setDay(d); }}>{dayLabel(d)}</Chip>)}
+              {days.map((d) => <Chip key={d} selected={d === theDay} label={`${longDay(d)}${d === theDay ? ', selected' : ''}`} onClick={() => { haptic('selection'); setDay(d); }}>{dayLabel(d)}</Chip>)}
             </div>
             {!stay && <TextField label="Time (optional)" type="time" value={time} onChange={(e) => setTime(e.target.value)} />}
           </section>
@@ -243,7 +243,7 @@ export function SaveSheet({ request, onClose }: { request: SaveRequest | null; o
             <section className={s.field} aria-labelledby="save-out">
               <h3 className="t-heading-4" id="save-out">Check-out</h3>
               <div className={s.chipsWrap} role="group" aria-labelledby="save-out">
-                {[...days.filter((d) => d > theDay), addDays(days[days.length - 1] ?? theDay, 1)].map((d) => <Chip key={d} active={d === out} label={`${longDay(d)}${d === out ? ', selected' : ''}`} onClick={() => { haptic('selection'); setCheckout(d); }}>{dayLabel(d)}</Chip>)}
+                {[...days.filter((d) => d > theDay), addDays(days[days.length - 1] ?? theDay, 1)].map((d) => <Chip key={d} selected={d === out} label={`${longDay(d)}${d === out ? ', selected' : ''}`} onClick={() => { haptic('selection'); setCheckout(d); }}>{dayLabel(d)}</Chip>)}
               </div>
               <TextField label="Check-in time (optional)" type="time" value={time} onChange={(e) => setTime(e.target.value)} />
             </section>
@@ -281,23 +281,23 @@ export function SaveSheet({ request, onClose }: { request: SaveRequest | null; o
           <span className={s.previewTitle}>{code ? countryName(code) : 'Choose a country'}</span>
           <span className={s.previewMeta}>{code ? (chosen ? 'You chose' : 'Found in the link') : 'Rove couldn’t find a place in the link'}</span>
         </span>
-        <Button variant="ghost" size="regular" onClick={() => { setStep('where'); setWhereQuery(''); }}>{code ? 'Change' : 'Choose'}</Button>
+        <Button tone="ghost" size="regular" onClick={() => { setStep('where'); setWhereQuery(''); }}>{code ? 'Change' : 'Choose'}</Button>
       </div>
       {code && (
         <>
           <div className={s.chipsWrap} role="group" aria-label={`City in ${countryName(code)}`}>
             {cityChips.map((c) => (
-              <Chip key={c} active={city === c && newCity === null} onClick={() => { haptic('selection'); setChosen({ code, city: c }); setNewCity(null); }} label={`${c}${city === c ? ', selected' : ''}`}>{c}</Chip>
+              <Chip key={c} selected={city === c && newCity === null} onClick={() => { haptic('selection'); setChosen({ code, city: c }); setNewCity(null); }} label={`${c}${city === c ? ', selected' : ''}`}>{c}</Chip>
             ))}
-            <Chip icon="plus" active={newCity !== null} onClick={() => { haptic('selection'); setNewCity(''); }}>New city</Chip>
+            <Chip icon="plus" selected={newCity !== null} onClick={() => { haptic('selection'); setNewCity(''); }}>New city</Chip>
           </div>
           {/* A friend shared their collection for this country with you as a Member: save into yours or theirs */}
           {memberOf.some((x) => x.countryCode === code) && (
             <div className={s.chipsWrap} role="group" aria-label="Whose collection">
-              <Chip active={!memberOf.some((x) => x.id === into && x.countryCode === code)} onClick={() => { haptic('selection'); setInto(''); }}>Your collection</Chip>
+              <Chip selected={!memberOf.some((x) => x.id === into && x.countryCode === code)} onClick={() => { haptic('selection'); setInto(''); }}>Your collection</Chip>
               {memberOf.filter((x) => x.countryCode === code).map((x) => {
                 const label = `${personName(owners, x.ownerId).split(' ')[0]}'s collection`;
-                return <Chip key={x.id} icon="people" active={into === x.id} onClick={() => { haptic('selection'); setInto(x.id); }} label={`${label}${into === x.id ? ', selected' : ''}`}>{label}</Chip>;
+                return <Chip key={x.id} icon="people" selected={into === x.id} onClick={() => { haptic('selection'); setInto(x.id); }} label={`${label}${into === x.id ? ', selected' : ''}`}>{label}</Chip>;
               })}
             </div>
           )}
@@ -317,8 +317,8 @@ export function SaveSheet({ request, onClose }: { request: SaveRequest | null; o
       {/* Reading the link: only the skeleton (the preview's shape) */}
       {!preview && reading && (
         <div className={s.reading} role="status" aria-label="Reading the link">
-          <Skeleton shape="block" height={72} />
-          <Skeleton shape="block" height={72} />
+          <Skeleton layout="block" height={72} />
+          <Skeleton layout="block" height={72} />
           <Skeleton width="40%" />
         </div>
       )}
@@ -328,7 +328,7 @@ export function SaveSheet({ request, onClose }: { request: SaveRequest | null; o
           <TextField label="Link" placeholder="https://…" inputMode="url" autoComplete="off" value={link} onChange={(e) => setLink(e.target.value)}
             onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); if (link.trim()) read(link); } }} />
           <div className={s.buttonPair}>
-            <Button variant="neutral" size="large" icon="copy" onClick={paste}>Paste</Button>
+            <Button tone="neutral" size="large" icon="copy" onClick={paste}>Paste</Button>
             <Button size="large" disabled={!link.trim()} onClick={() => read(link)}>Continue</Button>
           </div>
         </>

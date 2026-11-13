@@ -161,7 +161,7 @@
 .statValue { margin: 0; font: var(--type-heading-1); letter-spacing: -0.01em; color: var(--on-dark-text-primary); font-variant-numeric: tabular-nums; }
 .statLabel { font: var(--type-body-small); color: var(--on-dark-text-secondary); }
 
-/* Profile Card */
+/* Profile card */
 .profile { display: flex; align-items: center; gap: var(--space-default-400); padding: var(--space-default-500); border-radius: var(--radius-600); background: var(--on-light-surface-secondary); }
 .profile.pressable:hover { box-shadow: inset 0 0 0 100vmax var(--interactive-unselected-ghost-background-hover); }
 .profileName { font: var(--type-heading-2); letter-spacing: -0.01em; color: var(--on-light-text-primary); overflow-wrap: anywhere; }

@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { haptic } from '../../lib/native';
-import { Avatar, ContextMenu, IconButton, Notification, useToast } from '../../design/components';
+import { Avatar, ContextMenu, IconButton, Banner, useToast } from '../../design/components';
 import { store } from '../../data';
 import { personName, useMe } from '../../data/hooks';
 import type { Comment, Profile } from '../../data/types';
@@ -60,11 +60,11 @@ export function Comments({ tripId, targetId, comments, profiles }: { tripId: str
     try {
       if (was) { if (t !== was.text) await store.updateSub(tripId, 'comments', was.id, { text: t, editedAt: Date.now() }); }
       else await store.addSub(tripId, 'comments', { targetId, text: t, authorId: me.uid });
-    } catch { setText(t); setEditing(was); toast({ tone: 'error', label: was ? "Couldn't save. Check your connection" : "Couldn't send. Check your connection" }); }
+    } catch { setText(t); setEditing(was); toast({ tone: 'danger', label: was ? "Couldn't save. Check your connection" : "Couldn't send. Check your connection" }); }
   };
   const remove = async (c: Comment) => {
     try { await store.deleteSub(tripId, 'comments', c.id); toast({ icon: 'trash', label: 'Comment deleted' }); }
-    catch { toast({ tone: 'error', label: "Couldn't delete. Check your connection" }); }
+    catch { toast({ tone: 'danger', label: "Couldn't delete. Check your connection" }); }
   };
   const edit = (c: Comment) => { setEditing(c); setText(c.text); requestAnimationFrame(() => input.current?.focus()); };
 
@@ -112,12 +112,12 @@ export function Comments({ tripId, targetId, comments, profiles }: { tripId: str
                   );
                   return (
                     <div key={c.id} className={s.messageRow}>
-                      {!mine && (lastOne ? <Avatar name={name} photo={profiles[c.authorId]?.photo} seed={c.authorId} size={32} /> : <span className={s.avatarSpace} aria-hidden="true" />)}
+                      {!mine && (lastOne ? <Avatar name={name} photo={profiles[c.authorId]?.photo} seed={c.authorId} size="regular" /> : <span className={s.avatarSpace} aria-hidden="true" />)}
                       {c.editedAt && mine && <span className={s.edited}>Edited</span>}
                       {menu === c.id
                         ? <ContextMenu label="Message" align="end" onClose={() => setMenu(null)} items={[
                             { label: 'Edit', icon: 'pencil', onClick: () => edit(c) },
-                            { label: 'Delete', icon: 'trash', destructive: true, onClick: () => remove(c) },
+                            { label: 'Delete', icon: 'trash', tone: 'danger', onClick: () => remove(c) },
                           ]}>{bubble}</ContextMenu>
                         : bubble}
                       {c.editedAt && !mine && <span className={s.edited}>Edited</span>}
@@ -136,10 +136,10 @@ export function Comments({ tripId, targetId, comments, profiles }: { tripId: str
             <button type="button" className={s.editingCancel} onPointerDown={(e) => e.preventDefault()} onClick={() => { setEditing(null); setText(''); }}>Cancel</button>
           </div>
         )}
-        {/* Over the limit: a Warning Notification above the box, and Send is disabled */}
+        {/* Over the limit: a Warning Banner above the box, and Send is disabled */}
         {over > 0 && (
           <div className={s.composerWarning} id="comment-limit">
-            <Notification state="warning">{`Messages can be up to ${MAX_MESSAGE} characters. Remove ${over} to send.`}</Notification>
+            <Banner tone="warning">{`Messages can be up to ${MAX_MESSAGE} characters. Remove ${over} to send.`}</Banner>
           </div>
         )}
         <input ref={input} aria-describedby={over > 0 ? 'comment-limit' : undefined} aria-invalid={over > 0 || undefined} className={s.commentInput} placeholder="Add a comment" aria-label={editing ? 'Edit your comment' : 'Add a comment'} value={text} enterKeyHint="send"
