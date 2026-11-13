@@ -4,7 +4,9 @@ Read this first when starting a session. If it disagrees with the code or Figma,
 
 ## Prompt being worked on
 
-`docs/changes/rove-change-component-library.md` (component library cleanup) is **finished** (13 Nov 2026; caveats in the Check everything results below). Next: one of the other two prompts, `rove-change-people-and-sharing.md` or `rove-change-polish-and-library.md`, whichever the owner picks.
+`docs/changes/rove-change-component-library.md` (component library cleanup) is **finished** (13 Nov 2026; caveats in the Check everything results below).
+
+**Next: `docs/changes/rove-change-library-v2.md`** (owner, 14 Nov 2026), written from the 14 Nov Figma and code audit: token restructure, Size names, naming rules, component fixes. Then the transparency setup, then `rove-change-people-and-sharing.md`, then `rove-change-polish-and-library.md`.
 
 ## Owner's decisions for this prompt (13 Nov 2026)
 
