@@ -6,3 +6,6 @@ dist
 tests/rules/node_modules
 firebase-debug.log
 *.tsbuildinfo
+
+# macOS folder files
+.DS_Store
