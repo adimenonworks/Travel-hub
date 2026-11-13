@@ -6,7 +6,15 @@ Read this first when starting a session. If it disagrees with the code or Figma,
 
 `docs/changes/rove-change-component-library.md` (component library cleanup) is **finished** (13 Nov 2026; caveats in the Check everything results below).
 
-**Next: `docs/changes/rove-change-library-v2.md`** (owner, 14 Nov 2026), written from the 14 Nov Figma and code audit: token restructure, Size names, naming rules, component fixes. Then the transparency setup, then `rove-change-people-and-sharing.md`, then `rove-change-polish-and-library.md`.
+**Now: `docs/changes/rove-change-library-v2.md`** (owner, 14 Nov 2026), written from the 14 Nov Figma and code audit: token restructure, Size names, naming rules, component fixes. Then the transparency setup, then `rove-change-people-and-sharing.md`, then `rove-change-polish-and-library.md`.
+
+### Library v2 status (14 Nov 2026)
+
+- **Stopped at design gate A1.** `docs/token-migration.md` is written (every Figma variable and code CSS variable, old → new, with use counts) and waiting for the owner's review. **Nothing in Figma or the code has been changed.**
+- Questions waiting for the owner: the 11 numbered decisions at the top of `docs/token-migration.md` (feature tokens and the Next card's Tag, focus rings on deep green, keeping `surface/brand`, not creating `surface/raised`, Chip's selected colour, the mine-bubble colour, the map pin and the New trip close button, the Event card star colour, the Motion values).
+- Next once approved: A2 (collections), then A3–A7, one PR each, in order.
+
+The component library prompt below is finished; its notes stay for reference.
 
 ## Owner's decisions for this prompt (13 Nov 2026)
 
