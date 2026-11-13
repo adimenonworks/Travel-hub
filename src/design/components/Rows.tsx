@@ -298,5 +298,4 @@ export function StepProgress({ step, of = 4 }: { step: number; of?: number }) {
   );
 }
 
-/** Figma "Destination header" (4 tones): flag, title and meta on an accent surface, and one Inverse button. */
 

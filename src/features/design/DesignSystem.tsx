@@ -1,5 +1,5 @@
 import { useState, type CSSProperties } from 'react';
-import { Avatar, AvatarStack, Tag, Chip, Banner, Button, Card, FieldRow, HeroCard, Icon, IconButton, LinkButton, PageHeader, PageSection, SegmentControl, Select, Sheet, Tabs, TextArea, TextField, NowLine, Illustration, type IllustrationName, COVER_ILLUSTRATIONS, ICON_NAMES, useToast, BottomNav, Skeleton, Logo, ListItem, ListGroup, SectionHeader, EventCard, TravelConnector, IdeaRow, Tile, StatStrip, ProfileCard, OptionCard, BudgetCard, Switch, StepProgress, DayCard, CountryModal, CategoryIcon, ContextMenu, Accordion, JourneyCard, JourneyLeg, JourneyStop, MapCard } from '../../design/components';
+import { Avatar, AvatarStack, Tag, Chip, Banner, Button, Card, FieldRow, HeroCard, Icon, IconButton, LinkButton, PageHeader, PageSection, SegmentControl, Select, Sheet, Tabs, TextArea, TextField, NowLine, Illustration, type IllustrationName, COVER_ILLUSTRATIONS, ICON_NAMES, useToast, BottomNav, Skeleton, Logo, ListItem, ListGroup, SectionHeader, EventCard, TravelConnector, IdeaRow, Tile, StatStrip, ProfileCard, OptionCard, BudgetCard, StepProgress, DayCard, CountryModal, CategoryIcon, ContextMenu, Accordion, JourneyCard, JourneyLeg, JourneyStop, MapCard } from '../../design/components';
 import { flagUrl } from '../../lib/countries';
 import { EVENT_TYPES, TYPE_TONE } from '../../lib/categories';
 import type { ReactNode } from 'react';
@@ -63,7 +63,6 @@ export function DesignSystem() {
   const [seg, setSeg] = useState<'a' | 'b' | 'c'>('a');
   const [sheet, setSheet] = useState(false);
   const [menu, setMenu] = useState(false);
-  const [on, setOn] = useState(false);
   const [country, setCountry] = useState<string | null>(null);
   const [opt, setOpt] = useState('others');
   const toast = useToast();
@@ -438,7 +437,6 @@ export function DesignSystem() {
               <Button tone="neutral" onClick={() => toast({ icon: 'check', label: 'Saved to Portugal', action: { label: 'Undo', onClick: () => {} } })}>Toast with Undo</Button>
               <Button tone="neutral" onClick={() => toast({ size: 'large', icon: 'chat', label: 'Sam on Tram 28 to Alfama: Meet at the stop?', action: { label: 'Open', onClick: () => {} } })}>Large toast (message)</Button>
             </div>
-            <Switch checked={on} onChange={setOn} label="Also add to Portugal & Spain ideas" hint="Your trip covers Lisbon" />
           </Card>
           <Card><Card layout="centre" media={<Illustration name="ideas" size={120} />} title="Empty state" body="Explains what goes here and how to start." action={<Button tone="neutral" onClick={() => setSheet(true)}>Open a sheet</Button>} /></Card>
         </Section>

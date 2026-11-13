@@ -57,17 +57,21 @@ Read this first when starting a session. If it disagrees with the code or Figma,
 
 ## In progress
 
-- A3 merges are all done. Left before A4: update the Figma glossary block on Foundations (`597:724`) to match `DESIGN.md`, and order the variants in the sets not yet touched.
+- A3 merges are all done. The Figma glossary block on Foundations (`597:724`: texts `597:730`, `597:733`, `597:736`, `597:742`) now matches `DESIGN.md`. **Not yet done:** ordering the variants in the sets A2/A3 didn't touch.
+- **A4 (delete what's unused), part one done:** Switch (Figma `409:3230`, 2 variants, no instances; code `Switch`, only on `/#/design`) deleted from both; the Controls row closed up. The orphan "Destination header" comment in `Rows.tsx` removed (the component was already gone).
+- **A4 is stopped for the owner** (the prompt says report before deleting anything used in one place but not the other). Components with **no instance on Screens or inside another component, but used in the app**: Toast, Skeleton, Calendar, `.Calendar day` (Figma's Calendar doesn't nest it), Banner, Budget card, Context menu + `.Context menu item`, Accordion, Card, Logo, Journey card (+ `.Leg`, `.Stop`, used only inside it). Recommended: **keep all of them** (they're real, used components; the Screens page just shows eight core screens, and sheets/flows aren't drawn). Nothing is used in Figma but not in the app.
+- Also found: the Page header's back and edit buttons are instances of two old standalone components outside the Components section, "Button/Ghost/Small/Default" (`59:600`, 9 instances) and "Button/Secondary/Small/Default" (`5:26`, 7 instances; Secondary no longer exists), not the Button set. Recommended: swap them to Button (Tone Ghost) and Icon button (Tone Secondary) in Page header, checking it looks the same.
+- Seen at 320px with the largest text, not changed: the event page title splits "Melbourne" mid-word (Page header title uses `overflow-wrap: anywhere`).
 - Hero card copies: on Screens, Home's `500:569` showed the default dates under "Day 4 of 11"; now "Nov 7 – 17 · 11 days" like the same trip on Trips and Overview. "Home · during a trip" `545:2257` ("Day 3 of 10", "2 – 11 Nov · 10 days") is consistent and left as it is. The five copies on Planning still show the defaults (Planning isn't a source of truth).
 - Fixed as its own PR (pull request 114): the Segment control split words at 320px (even at the default text size: "Upcoming" and "Collections"; at 375px "Collections"). Words now never split; labels shrink to fit when a word is wider than its segment.
 
 ## Still to do
 
-The glossary block and variant order on Foundations, then A4 and the Check everything list. At the end of A3: update the "Component names" block of the glossary on Foundations (`597:724`) to match `DESIGN.md`, and order the variants in the sets not yet touched.
+The owner's answers on A4 and the Page header buttons, then variant order on Foundations, then the Check everything list and the Check everything list. At the end of A3: update the "Component names" block of the glossary on Foundations (`597:724`) to match `DESIGN.md`, and order the variants in the sets not yet touched.
 
 ## Figma changes so far
 
-See A1 and A2 above. **Variant count before the cleanup: 274** (Components section, not counting icons and flags); after A2: 270; after Tile, Tag, Hover and Flow screen: 240; after Map card, Hero card, Search field, Illustration, Page header and Card: 237 (Card gained two for Layout).
+See A1 and A2 above. **Variant count before the cleanup: 274** (Components section, not counting icons and flags); after A2: 270; after Tile, Tag, Hover and Flow screen: 240; after Map card, Hero card, Search field, Illustration, Page header and Card: 237 (Card gained two for Layout); after Journey card and event type in `.Category icon`: 202 (Event card 42 → 7, List item 12 → 2, Option card 14 → 4, Idea row 6 → 1, `.Category icon` 6 → 30, Journey card 2); after A4's Switch: **200** in 49 components.
 
 ## How to check screens
 
@@ -83,4 +87,5 @@ Build in demo mode (`npx vite build --mode demo --outDir <dir>`; a normal build 
 
 ## Questions waiting for the owner
 
-None.
+1. A4: keep the components that are used in the app but never placed on a Figma screen (list under In progress)? Recommended: keep all.
+2. Swap the Page header's two old standalone buttons for the Button and Icon button sets? Recommended: yes.
