@@ -13,24 +13,23 @@ type Person = { id: string; name: string; photo?: string | null };
  * Figma "Hero card": the trip's cover (an illustration, or a photo with its credit) with a countdown Tag ("In 9 days"),
  * then the name (Heading 2), dates, who's going and, under a divider, a heads-up row for one time-sensitive thing
  * (no next-up row: Home shows the next event on its own, 11 Nov 2026). Phase-aware: the caller passes the countdown and the rows.
+ * One component since 13 Nov 2026 (no Size): one 5:2 cover everywhere; lists leave out the people and the heads-up row.
  */
-export function HeroCard({ size = 'regular', cover, photo, countdown, title, meta, people, to, headsUp }: {
-  /** Figma "Size": Regular, or Compact (a shorter cover, the name, dates and countdown; no people, no next up) for lists */
-  size?: 'regular' | 'compact';
+export function HeroCard({ cover, photo, countdown, title, meta, people, to, headsUp }: {
   /** Figma "Show cover": a photo or Cover scene; leave out for the panel alone */
   cover?: ReactNode;
   /** Figma "Show photo": a photo over the cover, with "Photo by <name> on Unsplash" (both names linked) */
   photo?: { url: string; credit: ReactNode };
   countdown?: { icon?: IconName; label: string };
   title: string; meta: ReactNode;
-  /** Figma "Show people" */
+  /** Figma "Show people" (lists leave it out) */
   people?: Person[];
   to?: string;
   /** Figma "Show heads-up": one time-sensitive row (check-in open, a flight change…) */
   headsUp?: { icon: IconName; title: string; meta?: string; to?: string; tone?: CategoryTone };
 }) {
   return (
-    <section className={[s.hero, size === 'compact' && s.heroCompact].filter(Boolean).join(' ')} aria-label={title}>
+    <section className={s.hero} aria-label={title}>
       {cover && (
         <div className={s.cover}>
           {cover}
@@ -46,10 +45,10 @@ export function HeroCard({ size = 'regular', cover, photo, countdown, title, met
             <h2 className={s.name}>{to ? <Link to={to} className={s.nameLink}>{title}</Link> : title}</h2>
             <div className={s.meta}>{meta}</div>
           </div>
-          {size === 'regular' && people && people.length > 0 && <AvatarStack people={people} />}
+          {people && people.length > 0 && <AvatarStack people={people} />}
         </div>
         {!cover && countdown && <div><Tag tone="neutral" icon={countdown.icon ?? 'calendar'}>{countdown.label}</Tag></div>}
-        {size === 'regular' && headsUp && (
+        {headsUp && (
           <div className={s.rows}>
             {headsUp && <ListItem icon={headsUp.icon} tone={headsUp.tone} title={headsUp.title} meta={headsUp.meta} to={headsUp.to} round />}
           </div>

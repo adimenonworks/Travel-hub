@@ -68,7 +68,7 @@ export function Trips() {
           ) : (
             <>
               <div className={s.list}>
-                {upcoming.map((t) => <TripHero key={t.id} trip={t} size="compact" />)}
+                {upcoming.map((t) => <TripHero key={t.id} trip={t} list />)}
                 {/* Figma Tile Tone=Add, like Saved's "New place to go" */}
                 <Tile add icon="plus" title="Plan a new trip" onClick={() => newTrip()} />
               </div>
@@ -90,7 +90,7 @@ export function Trips() {
           {seg === 'past' && (past.length === 0 ? (
             <EmptyState illustration="memories" title="No past trips yet" message="When a trip ends it moves here, with its plans and photos, so you can look back on it." />
           ) : (
-            <div className={s.list}>{past.map((t) => <TripHero key={t.id} trip={t} size="compact" />)}</div>
+            <div className={s.list}>{past.map((t) => <TripHero key={t.id} trip={t} list />)}</div>
           ))}
           </>}</SlideSwap>
         </div>

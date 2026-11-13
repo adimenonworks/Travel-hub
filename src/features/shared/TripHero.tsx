@@ -26,9 +26,10 @@ export function coverQuery(trip: Pick<Trip, 'destination' | 'name'>) {
 /**
  * A trip as the Figma "Hero card", phase-aware on one layout: the countdown ("In 9 days", then "Day 3 of 10") and, when
  * something is time-sensitive, one heads-up row. The next event lives on Home's "Happening now", not on the card.
- * `size="compact"` is for lists (Trips tab): a shorter cover, the name, dates and countdown only.
+ * `list` is for lists (Trips tab, the later trips on Home): the cover, name, dates and countdown only (the Hero card's
+ * Show people and Show heads-up off).
  */
-export function TripHero({ trip, cover = true, size = 'regular' }: { trip: Trip; cover?: boolean; size?: 'regular' | 'compact' }) {
+export function TripHero({ trip, cover = true, list }: { trip: Trip; cover?: boolean; list?: boolean }) {
   const profiles = useProfiles(trip.memberIds);
   const activities = useSub(trip.id, 'activities') ?? [];
   const phase = tripPhase(trip.startDate, trip.endDate);
@@ -60,16 +61,16 @@ export function TripHero({ trip, cover = true, size = 'regular' }: { trip: Trip;
     });
   }, [trip.id, trip.coverPhoto, trip.cover, canSet]); // eslint-disable-line react-hooks/exhaustive-deps
   const photo = !trip.coverPhoto && trip.cover ? {
-    url: size === 'compact' ? trip.cover.small : trip.cover.url,
+    url: list ? trip.cover.small : trip.cover.url,
     credit: <>Photo by <a href={photographerUrl(trip.cover)} target="_blank" rel="noreferrer">{trip.cover.name}</a> on <a href={unsplashUrl} target="_blank" rel="noreferrer">Unsplash</a></>,
   } : undefined;
   return (
-    <HeroCard to={base} size={size} photo={photo}
+    <HeroCard to={base} photo={photo}
       cover={cover ? <TripCover trip={trip} /> : undefined}
       countdown={heroCountdown(trip)}
       title={trip.name}
       meta={tripDatesLabel(trip)}
-      people={trip.memberIds.map((id) => ({ id, name: personName(profiles, id), photo: profiles[id]?.photo }))}
-      headsUp={headsUp} />
+      people={list ? undefined : trip.memberIds.map((id) => ({ id, name: personName(profiles, id), photo: profiles[id]?.photo }))}
+      headsUp={list ? undefined : headsUp} />
   );
 }
