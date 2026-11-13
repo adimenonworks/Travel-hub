@@ -385,12 +385,9 @@ export function DesignSystem() {
             <IdeaRow icon="utensils" title="Pastéis de Belém" meta="Bakery · Belém · Priya" vote={{ count: 2, selected: false, onClick: () => {} }} />
           </ListGroup>
           <div className={s.tiles}>
-            <Tile tone="orange" media={<img src={flagUrl('jp')} alt="" />} title="Japan" meta="24 saves · 3 cities" />
-            <Tile tone="green" media={<img src={flagUrl('pe')} alt="" />} title="Peru" meta="18 saves" />
-            <Tile tone="yellow" media={<img src={flagUrl('ca')} alt="" />} title="Canada" meta="12 saves" />
-            <Tile tone="pink" media={<img src={flagUrl('mx')} alt="" />} title="Mexico" meta="7 saves" />
+            <Tile media={<img src={flagUrl('jp')} alt="" />} title="Japan" meta="24 saves · 3 cities" />
             <Tile icon="plane" title="Flights" meta="3 flights" to="/design" />
-            <Tile tone="add" icon="plus" title="New place to go" />
+            <Tile add icon="plus" title="New place to go" />
           </div>
           <div className={s.quickRow}>
           </div>

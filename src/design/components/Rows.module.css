@@ -121,16 +121,6 @@
 .tileMeta { font: var(--type-body); color: var(--on-light-text-secondary); }
 /* Default tone (the one screens use): grey, Heading 3 name */
 .tile-default .tileTitle { font: var(--type-heading-3); letter-spacing: -0.02em; }
-.tile-orange { background: var(--on-accent-surface-orange); }
-.tile-green { background: var(--on-accent-surface-green); }
-.tile-yellow { background: var(--on-accent-surface-yellow); }
-.tile-pink { background: var(--on-accent-surface-pink); }
-:is(.tile-orange, .tile-green, .tile-yellow, .tile-pink) .tileIcon { background: var(--on-light-surface-primary); }
-:is(.tile-orange, .tile-green, .tile-yellow, .tile-pink) .tileMeta { color: var(--on-accent-text-secondary); }
-.tile-orange :is(.tileTitle, .tileTitleSmall) { color: var(--on-accent-text-brand-orange); }
-.tile-green :is(.tileTitle, .tileTitleSmall) { color: var(--on-accent-text-brand-green); }
-.tile-yellow :is(.tileTitle, .tileTitleSmall) { color: var(--on-accent-text-brand-yellow); }
-.tile-pink :is(.tileTitle, .tileTitleSmall) { color: var(--on-accent-text-brand-pink); }
 .tile-add { align-items: center; justify-content: center; text-align: center; background: transparent; border: 1.5px dashed var(--on-light-border-bold); }
 .tile-add .tileIcon { background: var(--on-light-surface-secondary); }
 .tile-add .tileText { align-items: center; }

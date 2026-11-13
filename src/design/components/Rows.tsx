@@ -186,14 +186,15 @@ export function IdeaRow({ title, meta, icon, tone, tag, vote, onClick }: {
   );
 }
 
-export type TileTone = 'default' | 'orange' | 'green' | 'yellow' | 'pink' | 'add';
-
-/** Figma "Tile": a 24px-corner square with a round icon or flag at the top and a title + meta at the bottom. */
-export function Tile({ title, meta, icon, media, tone = 'default', ...press }: Press & {
-  title: string; meta?: ReactNode; icon?: IconName; media?: ReactNode; tone?: TileTone;
+/**
+ * Figma "Tile": a 24px-corner square with a round icon or flag at the top and a title + meta at the bottom.
+ * `add` (Figma "Add"): the dashed "New place to go" tile that ends a grid.
+ */
+export function Tile({ title, meta, icon, media, add, ...press }: Press & {
+  title: string; meta?: ReactNode; icon?: IconName; media?: ReactNode; add?: boolean;
 }) {
   return (
-    <Pressable {...press} className={[s.tile, s[`tile-${tone}`]].join(' ')}>
+    <Pressable {...press} className={[s.tile, add ? s['tile-add'] : s['tile-default']].join(' ')}>
       <span className={s.tileIcon} aria-hidden="true">{media ?? (icon && <Icon name={icon} size={24} />)}</span>
       <span className={s.tileText}>
         <span className={s.tileTitle}>{title}</span>
