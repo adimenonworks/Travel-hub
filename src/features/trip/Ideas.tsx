@@ -72,9 +72,9 @@ export function Ideas(ctx: TripCtx) {
       <SectionHeader title="Ideas board"
         action={ctx.canContribute ? <Button size="regular" icon="lightbulb" onClick={() => setAdding(true)}>Add idea</Button> : undefined} />
       <SegmentControl label="Show ideas" block value={filter} onChange={setFilter} options={[
-        { value: 'open', label: `To decide · ${count('open')}` },
-        { value: 'approved', label: `Planned · ${count('approved')}` },
-        { value: 'rejected', label: `Passed · ${count('rejected')}` },
+        { value: 'open', label: 'To decide', count: count('open') },
+        { value: 'approved', label: 'Planned', count: count('approved') },
+        { value: 'rejected', label: 'Passed', count: count('rejected') },
       ]} />
       <div className={s.swipeArea}>
       <SlideSwap value={filter} id={filter} rank={FILTERS.indexOf(filter)}>{(filter) => { const shown = shownFor(filter); const top = topOf(shown); return (<div className={s.ideaList}>
