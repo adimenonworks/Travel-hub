@@ -20,8 +20,9 @@ export const COVER_ILLUSTRATIONS = ['cover-hills', 'cover-coast', 'cover-city'] 
  * Drawn with semantic tokens (Illustration.module.css) so they follow light and dark mode.
  * Always decorative: hidden from screen readers; the text beside them carries the meaning.
  *
- * Spot illustrations (empty states, cards) draw in a 120×96 box. Covers ('cover-*') are the Figma Cover scene
- * images and fill their container (cropped to fit).
+ * One Figma set, "Illustration" (Cover scene merged in on 13 Nov 2026), with Size Spot / Cover and Name:
+ * Size=Spot (empty states, cards) draws in a 120×96 box; Size=Cover is the 'cover-*' names (Hills, Coast, City),
+ * the trip cover images, which fill their container (cropped to fit).
  */
 /** `square` fits the drawing into a size × size box (e.g. 64×64 in a Card's media slot). */
 export function Illustration({ name, size = 96, square }: { name: IllustrationName; size?: number; square?: boolean }) {

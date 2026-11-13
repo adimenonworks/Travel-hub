@@ -16,7 +16,7 @@ type Person = { id: string; name: string; photo?: string | null };
  * One component since 13 Nov 2026 (no Size): one 5:2 cover everywhere; lists leave out the people and the heads-up row.
  */
 export function HeroCard({ cover, photo, countdown, title, meta, people, to, headsUp }: {
-  /** Figma "Show cover": a photo or Cover scene; leave out for the panel alone */
+  /** Figma "Show cover": a photo or an Illustration (Size Cover); leave out for the panel alone */
   cover?: ReactNode;
   /** Figma "Show photo": a photo over the cover, with "Photo by <name> on Unsplash" (both names linked) */
   photo?: { url: string; credit: ReactNode };
