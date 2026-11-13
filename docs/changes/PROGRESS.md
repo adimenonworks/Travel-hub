@@ -36,9 +36,13 @@ Read this first when starting a session. If it disagrees with the code or Figma,
   - Left for A3 (they are rebuilt there): Illustration / Cover scene `Name`; Tile `Tone`; Hero card `Size`; Flow screen `Step`; Option card `Type=Plain`; Tag `Tone=Category` and `Tint`; the `tone` prop on EventCard, ListItem, IdeaRow, OptionCard (A3 moves event type into `.Category icon`).
   - Not done: inner layer names inside components weren't all checked for sentence case.
 
+- **A3, merge and remove** (one pull request per change):
+  - **Tile:** Orange, Green, Yellow and Pink removed (Figma set `331:3015` is now `Add` False / True; four archived copies on the Archive page were detached so they keep their look). Code: `Tile add` replaces `tone`.
+<!-- next A3 item goes above this line -->
+
 ## In progress
 
-- A3 (merge and remove): not started. Do one change per pull request, in the table's order; stop at the three design gates.
+- A3: Tag Tint next, then the rest of the table. Design gates (Hero card height, Map card, Number card) are shown to the owner before merging.
 
 ## Still to do
 

@@ -18,7 +18,7 @@ const SEGMENTS: Segment[] = ['upcoming', 'saved', 'past'];
 /** A country you've saved in, as a Figma "Tile" (Default tone: grey, flag-led, "24 saves · 3 cities"); opens its collection. */
 export function CountryTile({ country }: { country: { code: string; name: string; flag?: string; places: SavedPlace[] }; index?: number }) {
   return (
-    <Tile tone="default" to={`/saved/${country.code || 'unsorted'}`} title={country.name}
+    <Tile to={`/saved/${country.code || 'unsorted'}`} title={country.name}
       media={country.flag ? <img src={country.flag} alt="" /> : <Icon name="lightbulb" size={24} />}
       meta={placeCounts(country.places)} />
   );
@@ -70,7 +70,7 @@ export function Trips() {
               <div className={s.list}>
                 {upcoming.map((t) => <TripHero key={t.id} trip={t} size="compact" />)}
                 {/* Figma Tile Tone=Add, like Saved's "New place to go" */}
-                <Tile tone="add" icon="plus" title="Plan a new trip" onClick={() => newTrip()} />
+                <Tile add icon="plus" title="Plan a new trip" onClick={() => newTrip()} />
               </div>
             </>
           ))}
@@ -81,10 +81,10 @@ export function Trips() {
             <div className={ss.tileGrid}>
               {countries.map((c) => <CountryTile key={c.code} country={c} />)}
               {theirs.map((x) => (
-                <Tile key={x.id} tone="default" to={`/saved/${x.countryCode}/${x.id}`} title={`${countryName(x.countryCode)} · ${personName(owners, x.ownerId).split(' ')[0]}'s`}
+                <Tile key={x.id} to={`/saved/${x.countryCode}/${x.id}`} title={`${countryName(x.countryCode)} · ${personName(owners, x.ownerId).split(' ')[0]}'s`}
                   media={<img src={flagUrl(x.countryCode)} alt="" />} meta={`Shared with you · ${x.roles[me.uid] === 'member' ? 'Can edit' : 'Can view'}`} />
               ))}
-              <Tile tone="add" icon="plus" title="New place to go" onClick={() => openSave({ mode: 'link' })} />
+              <Tile add icon="plus" title="New place to go" onClick={() => openSave({ mode: 'link' })} />
             </div>
           ))}
           {seg === 'past' && (past.length === 0 ? (
