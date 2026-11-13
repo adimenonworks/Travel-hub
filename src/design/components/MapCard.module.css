@@ -1,4 +1,4 @@
-/* Figma "Location card": grey card (24 corners, an 8px frame round the map), the place, then its buttons */
+/* Figma "Map card": grey card (24 corners, an 8px frame round the map), the place, then its buttons */
 .card { display: flex; flex-direction: column; gap: var(--space-default-500); padding: var(--space-default-300); padding-bottom: var(--space-default-500); border-radius: var(--radius-600); background: var(--on-light-surface-secondary); }
 .map { border-radius: var(--radius-500); overflow: hidden; }
 .place { display: flex; align-items: center; gap: var(--space-default-300); padding-left: var(--space-default-300); }
@@ -8,3 +8,6 @@
 /* Without a map the content needs the full 16px all round (the 8px frame is only for the map) */
 .plain { padding: var(--space-default-500); }
 .plain .place, .plain .buttons { padding-left: 0; padding-right: 0; }
+/* The map as a button (a collection's preview: the full map opens on tap) */
+.mapButton { display: block; width: 100%; padding: 0; border: 0; background: none; cursor: pointer; }
+.mapButton :global(.leaflet-container) { pointer-events: none; }

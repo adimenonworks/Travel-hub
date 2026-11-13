@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import { Icon, type IconName } from './Icon';
-import { Avatar, AvatarStack } from './Misc';
+import { Avatar } from './Misc';
 import { Tag } from './Misc';
 import s from './Rows.module.css';
 
@@ -338,43 +338,6 @@ export function SpanCard({ start, end, footer }: { start: SpanEnd; end: SpanEnd;
     <div className={s.span}>
       <div className={s.spanEnds}>{col(start)}<span className={s.spanDivider} aria-hidden="true" />{col(end)}</div>
       {footer && <p className={s.spanLabel}>{footer}</p>}
-    </div>
-  );
-}
-
-/**
- * Figma "Collection header": the top of a country's collection. A real map with every place pinned (`map`; tap it for
- * the full-screen map), "24 places · 3 cities", who it's with (avatars and "Saved by you and Sam") and how much of it
- * you've visited ("6 of 24 visited", the Budget card's bar).
- */
-export function CollectionHeader({ map, onMap, title, meta, people, visited }: {
-  map?: ReactNode; onMap?: () => void; title: string; meta?: string;
-  people?: { id: string; name: string; photo?: string | null }[];
-  visited?: { done: number; total: number };
-}) {
-  const ratio = visited && visited.total ? visited.done / visited.total : 0;
-  return (
-    <div className={s.collection}>
-      {map && (onMap
-        ? <button type="button" className={s.collectionMap} onClick={onMap} aria-label="Open the map">{map}</button>
-        : <div className={s.collectionMap}>{map}</div>)}
-      <div className={s.collectionBody}>
-        <div className={s.collectionSummary}>
-          <div className={s.collectionText}>
-            <span className={s.collectionTitle}>{title}</span>
-            {meta && <span className={s.collectionMeta}>{meta}</span>}
-          </div>
-          {people && people.length > 0 && <AvatarStack people={people} />}
-        </div>
-        {visited && visited.total > 0 && (
-          <div className={s.collectionVisited}>
-            <span className={s.collectionMeta}>{`${visited.done} of ${visited.total} visited`}</span>
-            <div className={s.budgetTrack} role="progressbar" aria-label="Places visited" aria-valuemin={0} aria-valuemax={visited.total} aria-valuenow={visited.done}>
-              <span className={s.budgetFill} style={{ width: `${Math.min(1, ratio) * 100}%` }} />
-            </div>
-          </div>
-        )}
-      </div>
     </div>
   );
 }
