@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { Button, EventCard, PageHeader, PageSection, SectionHeader, EmptyState } from '../../design/components';
+import { Button, EventCard, PageHeader, PageSection, SectionHeader, Card, Illustration } from '../../design/components';
 import { ActivityForm } from './ActivityForm';
 import { formatDay, today } from '../../lib/dates';
 import { BOOKING_GROUPS, bookingGroupOf } from '../../lib/categories';
@@ -33,7 +33,7 @@ export function Bookings(ctx: TripCtx) {
     <>
       <PageHeader title={g.title} size="small" back={back} />
       <SectionHeader title={`${list.length} ${list.length === 1 ? g.one : g.many}`} meta={g.key === 'flights' ? 'Tap one for tickets, seats and bags' : 'Tap one for its details, tickets and notes'} />
-      {list.length === 0 ? <EmptyState illustration="calendar" title={`No ${g.many} yet`} message={`Add an event to the itinerary and choose its type, and it shows here.`} /> : days.map((d) => (
+      {list.length === 0 ? <Card layout="centre" media={<Illustration name="calendar" size={120} />} title={`No ${g.many} yet`} body={`Add an event to the itinerary and choose its type, and it shows here.`} /> : days.map((d) => (
         <PageSection key={d} title={formatDay(d)}>
           <div className={s.eventList}>
             {list.filter((a) => a.date === d).map((a) => <EventCard key={a.id} {...eventCardProps(a, ctx)} extras={unreadTag(unreadCount(reads, me.uid, a.id, ctx.comments))} />)}

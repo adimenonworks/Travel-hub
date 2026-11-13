@@ -1,7 +1,7 @@
 import { Fragment, useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { nextTransition } from '../../app/navigation';
-import { Button, EmptyState, IconButton, JourneyDetails, LayoverBlock, LinkButton, ListGroup, ListItem, MapCard, PageHeader, PageSection, Sheet, SpanCard, TextField, useToast } from '../../design/components';
+import { Button, IconButton, JourneyDetails, LayoverBlock, LinkButton, ListGroup, ListItem, MapCard, PageHeader, PageSection, Sheet, SpanCard, TextField, useToast, Card, Illustration } from '../../design/components';
 import type { Activity } from '../../data/types';
 import { daysBetween } from '../../lib/dates';
 import { store } from '../../data';
@@ -73,7 +73,7 @@ export function ActivityPage(ctx: TripCtx) {
     return (
       <>
         <PageHeader title="Event not found" back={{ to: itinerary, label: 'Itinerary' }} />
-        <EmptyState illustration="calendar" title="This event was deleted" message="It may have been removed from the itinerary." action={<LinkButton to={itinerary} tone="neutral">Back to itinerary</LinkButton>} />
+        <Card layout="centre" media={<Illustration name="calendar" size={120} />} title="This event was deleted" body="It may have been removed from the itinerary." action={<LinkButton to={itinerary} tone="neutral">Back to itinerary</LinkButton>} />
       </>
     );
 

@@ -1,7 +1,7 @@
 import { hasStep, stepTab, useSwipeTabs } from '../../app/useSwipeTabs';
 import { Fragment, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { Button, ContextMenu, DayCard, EmptyState, EventCard, SectionHeader, NowLine, TravelConnector, useToast, type ContextMenuItem, type EventState } from '../../design/components';
+import { Button, ContextMenu, DayCard, EventCard, SectionHeader, NowLine, TravelConnector, useToast, type ContextMenuItem, type EventState, Card, Illustration } from '../../design/components';
 import { useMe, usePlacesById } from '../../data/hooks';
 import type { Activity } from '../../data/types';
 import { dayWord, formatDay, formatTime, parseDay, today, tripDays } from '../../lib/dates';
@@ -123,7 +123,7 @@ export function Itinerary(ctx: TripCtx) {
           });
           const dateLine = list.some((e) => legsOf(e.a, activities).some(crossesDateLine));
           return list.length === 0 ? (
-            <EmptyState illustration="calendar" title="Nothing planned yet" message="Add something to do, or schedule an idea from the Ideas board."
+            <Card layout="centre" media={<Illustration name="calendar" size={120} />} title="Nothing planned yet" body="Add something to do, or schedule an idea from the Ideas board."
               action={ctx.canContribute ? <Button tone="neutral" icon="plus" onClick={() => setAdding(true)}>Add event</Button> : undefined} />
           ) : (
             <div className={s.eventList}>

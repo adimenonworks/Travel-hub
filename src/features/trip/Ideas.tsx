@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { SlideSwap } from '../shared/SlideSwap';
 import { useSearchParams } from 'react-router-dom';
-import { Button, EmptyState, IdeaRow, LinkButton, ListGroup, ListItem, PageSection, SectionHeader, SegmentControl, Select, Sheet, TextArea, TextField, useToast } from '../../design/components';
+import { Button, IdeaRow, LinkButton, ListGroup, ListItem, PageSection, SectionHeader, SegmentControl, Select, Sheet, TextArea, TextField, useToast, Card, Illustration } from '../../design/components';
 import { store } from '../../data';
 import { personName, useMe, usePlaces, usePlacesById } from '../../data/hooks';
 import type { Category, Idea, LinkItem, SavedPlace } from '../../data/types';
@@ -79,8 +79,8 @@ export function Ideas(ctx: TripCtx) {
       <div className={s.swipeArea}>
       <SlideSwap value={filter} id={filter} rank={FILTERS.indexOf(filter)}>{(filter) => { const shown = shownFor(filter); const top = topOf(shown); return (<div className={s.ideaList}>
       {shown.length === 0 ? (
-        <EmptyState illustration="ideas" title={filter === 'open' ? 'No ideas to decide on' : 'Nothing here yet'}
-          message={filter === 'open' ? 'Saw a great restaurant or tour? Add it so everyone can vote.' : undefined} />
+        <Card layout="centre" media={<Illustration name="ideas" size={120} />} title={filter === 'open' ? 'No ideas to decide on' : 'Nothing here yet'}
+          body={filter === 'open' ? 'Saw a great restaurant or tour? Add it so everyone can vote.' : undefined} />
       ) : (
         // Grouped by the Place's city (most-voted first inside each), then Links & notes for ideas with no place
         groupBy(shown, (i) => (i.placeId && places[i.placeId] ? cityOf(places[i.placeId]) : LINKS)).sort((x, y) => (x[0] === LINKS ? 1 : y[0] === LINKS ? -1 : 0)).map(([city, list]) => (

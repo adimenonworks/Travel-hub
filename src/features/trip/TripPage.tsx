@@ -2,7 +2,7 @@ import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { Navigate, Route, Routes, useLocation, useMatch, useNavigate, useParams, type Location } from 'react-router-dom';
 import { savedScroll } from '../../app/navigation';
 import { SlideSwap } from '../shared/SlideSwap';
-import { EmptyState, LinkButton, PageSkeleton, Tabs, PageHeader, type TabItem } from '../../design/components';
+import { LinkButton, PageSkeleton, Tabs, PageHeader, type TabItem, Card, Illustration } from '../../design/components';
 import { useMe, useProfiles, useRole, useSub, useTrip } from '../../data/hooks';
 import { useStarMigration } from '../saves/starEvent';
 import type { Activity, Album, Comment, Idea, Profile, Trip } from '../../data/types';
@@ -39,7 +39,7 @@ export function TripPage() {
   if (trip === null)
     return (
       <Content>
-        <EmptyState illustration="compass" title="Trip not found" message="It may have been deleted, or you're not a member yet. Ask the organizer for an invite link."
+        <Card layout="centre" media={<Illustration name="compass" size={120} />} title="Trip not found" body="It may have been deleted, or you're not a member yet. Ask the organizer for an invite link."
           action={<LinkButton to="/trips" tone="neutral">Back to trips</LinkButton>} />
       </Content>
     );

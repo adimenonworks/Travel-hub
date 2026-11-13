@@ -14,6 +14,8 @@
 .structured .body { font: var(--type-body); }
 .structured .buttons { flex-direction: column; align-self: stretch; margin-top: var(--space-default-200); } /* 20 below the text */
 .structured .buttons > * { width: 100%; }
+/* Layout=Centre (an empty state): everything centred */
+.centre { align-items: center; text-align: center; }
 
 .media { flex: none; display: grid; place-items: center; color: var(--on-light-icon-brand); }
 /* The Media slot's default: an icon on the light emerald tile */

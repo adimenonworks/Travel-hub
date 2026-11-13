@@ -1,7 +1,5 @@
 import type { CSSProperties, ReactNode } from 'react';
 import { Icon, type IconName } from './Icon';
-import { Illustration, type IllustrationName } from './Illustration';
-import { Card } from './Card';
 import s from './Misc.module.css';
 import type { CategoryTone } from './Rows';
 
@@ -70,13 +68,6 @@ export function Chip({ selected, icon, flag, onClick, label, type, children }: {
   return onClick
     ? <button type="button" className={cls} onClick={onClick} aria-label={label}>{body}</button>
     : <span className={cls}>{body}</span>;
-}
-
-/** An empty list or missing record: a Card with an illustration, a title, a line of help and an optional action. */
-export function EmptyState({ illustration, title, message, action }: { illustration: IllustrationName; title: string; message?: ReactNode; action?: ReactNode }) {
-  return (
-    <Card className={s.empty} media={<Illustration name={illustration} size={120} />} title={title} body={message} actions={action} />
-  );
 }
 
 export type BannerTone = 'warning' | 'success' | 'danger' | 'neutral' | 'accent';
