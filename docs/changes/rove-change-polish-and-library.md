@@ -329,6 +329,7 @@ The Save sheet keeps its **Collections · Trip** segment, and **both tabs now sh
   - a single-row group takes the radius on all four corners.
   - Do it with per-row radius, not clipping.
 - **Open rows** (G4) get the same full-width pressed fill with a small radius.
+- **No sticky hover on iPhone.** Several components' `:hover` rules (tabs, chips, rows, tiles, day cards) sit outside `@media (hover: hover)`, so on iPhone the hover look sticks after a tap. Move every `:hover` rule inside `@media (hover: hover)`. Touch feedback comes only from the pressed state (`:active`).
 
 ### G6. Files & links show what they are
 - **Links show the site's favicon,** in the icon holder:
