@@ -4,7 +4,7 @@ import {
   LinkButton, PageHeader, PageSection, SegmentControl, Select, Sheet, Tabs, TextArea, TextField, NowLine, Illustration,
   type IllustrationName, COVER_ILLUSTRATIONS, ICON_NAMES, useToast, BottomNav, Skeleton, Logo,
   ListItem, ListGroup, SectionHeader, EventCard, TravelConnector, IdeaRow, Tile, StatStrip, ProfileCard,
-  OptionCard, BudgetCard, Switch, SearchField, StepProgress, TripHeader, DayCard, CountryModal,
+  OptionCard, BudgetCard, Switch, StepProgress, TripHeader, DayCard, CountryModal,
   CategoryIcon, ContextMenu, Accordion, SpanCard, MapCard,
 } from '../../design/components';
 import { flagUrl } from '../../lib/countries';
@@ -395,8 +395,8 @@ export function DesignSystem() {
           <ProfileCard name="Alex Menon" email="alex.menon@gmail.com · Google" onClick={() => {}} />
         </Section>
 
-        <Section title="Flow" footer="Search field, Option cards and Step progress (used on the New trip screens, which are screens, not components).">
-          <SearchField label="Search a country or city" placeholder="Search a country or city" />
+        <Section title="Flow" footer="Text field with a leading icon (the old Search field), Option cards and Step progress (used on the New trip screens, which are screens, not components).">
+          <TextField icon="pin" type="search" aria-label="Search a country or city" placeholder="Search a country or city" />
           <div className={s.tiles}>
             <OptionCard icon="person" label="Just me" selected={opt === 'me'} onClick={() => setOpt('me')} />
             <OptionCard icon="people" label="With others" selected={opt === 'others'} onClick={() => setOpt('others')} />

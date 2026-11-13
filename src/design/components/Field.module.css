@@ -39,3 +39,5 @@ select.compact { min-height: var(--size-tap); padding-left: var(--space-default-
 .iconWrap { position: relative; display: block; }
 .leadingIcon { position: absolute; left: var(--space-default-600); top: 50%; transform: translateY(-50%); color: var(--on-light-icon-secondary); pointer-events: none; }
 .withIcon { padding-left: calc(var(--space-default-600) + 24px + var(--space-default-400)); }
+/* A search input (type=search, e.g. New trip's place search) never shows the browser's own clear button */
+.input::-webkit-search-cancel-button { -webkit-appearance: none; appearance: none; }

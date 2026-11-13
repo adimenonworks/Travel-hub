@@ -276,17 +276,6 @@ export function BudgetCard({ label, amount, caption, ratio, rows, over }: {
   );
 }
 
-/** Figma "Search field": a white pill with a 24px icon and a Body input. */
-export function SearchField({ icon = 'pin', label, ...rest }: React.InputHTMLAttributes<HTMLInputElement> & { icon?: IconName; label: string }) {
-  return (
-    <label className={s.search}>
-      <Icon name={icon} size={24} />
-      <span className="visually-hidden">{label}</span>
-      <input type="search" enterKeyHint="search" autoComplete="off" {...rest} />
-    </label>
-  );
-}
-
 /** Figma "Step progress": "1 of 4" and four segments, filled up to the current step. On the bright emerald flow screen. */
 export function StepProgress({ step, of = 4 }: { step: number; of?: number }) {
   return (

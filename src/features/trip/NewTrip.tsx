@@ -1,5 +1,5 @@
 import { Fragment, useEffect, useState } from 'react';
-import { Button, Calendar, Chip, Icon, Illustration, ListGroup, ListItem, OptionCard, SearchField, useToast } from '../../design/components';
+import { Button, Calendar, Chip, Icon, Illustration, ListGroup, ListItem, OptionCard, TextField, useToast } from '../../design/components';
 import { CelebrationScreen, FlowScreen } from './NewTripScreens';
 import { useCountries, placeCounts } from '../saves/Collections';
 import { store } from '../../data';
@@ -328,7 +328,7 @@ function DestinationSearch({ value, onPick }: { value: Place | null; onPick: (p:
   const shown = value && text === value.name ? [value] : results;
   return (
     <>
-      <SearchField label="Search a country or city" placeholder="Search a country or city" value={text} onChange={(e) => setText(e.target.value)} autoFocus />
+      <TextField icon="pin" type="search" enterKeyHint="search" autoComplete="off" aria-label="Search a country or city" placeholder="Search a country or city" value={text} onChange={(e) => setText(e.target.value)} autoFocus />
       {error && <p className={s.flowSummaryMeta} role="alert">City search isn’t working right now. Check your connection and try again.</p>}
       {shown.length > 0 && (
                 <ListGroup label="Places">
