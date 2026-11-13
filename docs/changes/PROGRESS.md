@@ -41,19 +41,24 @@ Read this first when starting a session. If it disagrees with the code or Figma,
   - **Tag:** Tint removed (Figma `6:36`: Neutral, Category, Success, Warning, Danger; two archived copies detached). Code: `TagTone` has no `tint`.
   - **Hover dropped (Figma only):** Button `5:122` 48 → 36 (Default / Pressed / Disabled), `.Tab` `6:60` and `.Segment` `6:96` 4 → 3, Text field `7:89` 15 → 9 (Default / Focus / Filled; Typing merged into Focus). Sets re-gridded by tone, size, then state. Code keeps its `@media (hover: hover)` CSS for the website. Noticed, not changed: several components' `:hover` rules (tabs, chips, rows, tiles, day cards) are not inside `@media (hover: hover)`, so on iPhone they can stick after a tap; and Text field's Text area variants are drawn the same height as Input in Figma.
   - **Flow screen deleted:** Figma set `354:3391` removed (5 variants). Its five variants are now plain frames on the Screens page: `600:1054`, `600:1108`, `600:1162`, `600:1216` (New trip · step 1–4) and `600:1301` (New trip · celebration); their content areas are empty, as the component's slot was. Seven copies in "Onboarding — exploration" on the Planning page were detached (same look, no longer linked). Code: `FlowScreen` and `CelebrationScreen` moved to `src/features/trip/NewTripScreens.tsx`; `Calendar` is now `src/design/components/Calendar.tsx`.
+  - **Number card: not merged (decided, per the owner's rule).** Stat and Day card share only "a big number over a label". Stat is a static figure (Heading 1, on the deep green sunken panel, inside a description list); Day card is a button (Display tiny number, 64px wide growing to 88px with a spring when selected, pressed and selected states, month markers). One component would need both sets of behaviour behind a switch, which is two components with one name. Both stay.
 <!-- next A3 item goes above this line -->
 
 ## In progress
 
-- A3: next in the table are Card + Empty state, Search field → Text field, Cover scene → Illustration, Profile card, Page header + Trip header, Journey card, event type in .Category icon; then the three design gates (Map card, Number card, Hero card), which are shown to the owner before merging.
+- **Stopped at design gates, waiting for the owner (13 Nov 2026).** Previews were shown in chat (screenshots at 393px, demo mode):
+  1. **Map card** (Location card + Collection header): built on a local side branch, not merged. Event page and place sheet come out pixel-identical; the collection page loses the progress bar and its second line becomes "0 of 5 visited · Saved by you" in Body (was Body small). How it's built: `MapCard({ map, onMap, title, meta, trailing, footer })` with the Location card's CSS; `trailing` takes the Avatar stack or the star Icon button, `footer` the Button pair. Waiting for a yes.
+  2. **Hero card, one cover height:** today Home's first card is 2:1 and lists are 3:1. Options shown: A 2:1 everywhere, B 3:1 everywhere, C 5:2 everywhere. Recommended: C. Waiting for a choice. Whatever is chosen, `Size` goes and `Show people` / `Show heads-up` / `Show countdown` become booleans (lists keep people and heads-up off).
+  3. **Search field → Text field:** the New trip search box gets 11px shorter (58 → 47px) and the content under it moves up. Recommended: accept. Waiting for a yes.
+- A3 changes not started: Card + Empty state → Card; Page header + Trip header → Page header; Journey details + Span card + Layover block → Journey card; event type only in `.Category icon` (Event card, List item, Idea row, Chip, Option card); Cover scene → Illustration; Profile card → List item (only if it matches).
 
 ## Still to do
 
-A3 (14 changes, one pull request each), A4, then the Check everything list.
+The rest of A3 (see In progress), A4, then the Check everything list.
 
 ## Figma changes so far
 
-See A1 and A2 above. **Variant count before the cleanup: 274** (Components section, not counting icons and flags); after A2: 270.
+See A1 and A2 above. **Variant count before the cleanup: 274** (Components section, not counting icons and flags); after A2: 270; after Tile, Tag, Hover and Flow screen: 240.
 
 ## How to check screens
 
