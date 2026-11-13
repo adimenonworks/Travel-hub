@@ -74,7 +74,7 @@ export function Home() {
           )}
           {upcoming.length > 0 && (
             <PageSection title={upcoming.length === 1 && !happening ? 'Upcoming trip' : 'Upcoming trips'}>
-              {upcoming.map((t, i) => <TripHero key={t.id} trip={t} size={happening || i > 0 ? 'compact' : undefined} />)}
+              {upcoming.map((t, i) => <TripHero key={t.id} trip={t} list={!!happening || i > 0} />)}
             </PageSection>
           )}
         </>

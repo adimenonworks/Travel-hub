@@ -1,12 +1,10 @@
-/* Figma "Hero card": the grey container, no border, 24 corners, cover 2:1 on top, then 16 / 16 / 4 padding with gap 12 */
+/* Figma "Hero card": the grey container, no border, 24 corners, cover 5:2 on top (one height everywhere since 13 Nov 2026), then 16 / 16 / 4 padding with gap 12 */
 .hero {
   display: flex; flex-direction: column; overflow: hidden; /* the cover is a deliberate viewport */
   border-radius: var(--radius-600);
   background: var(--on-light-surface-secondary);
 }
-.cover { position: relative; aspect-ratio: 2 / 1; overflow: hidden; }
-/* Size Compact: a shorter cover */
-.heroCompact .cover { aspect-ratio: 3 / 1; }
+.cover { position: relative; aspect-ratio: 5 / 2; overflow: hidden; }
 .cover > :first-child { position: absolute; inset: 0; width: 100%; height: 100%; }
 .cover > :first-child svg { width: 100%; height: 100%; }
 /* Show photo: the place's photo over the illustration, a bottom scrim (black 0 → 45%, 56px; the one raw value Figma
