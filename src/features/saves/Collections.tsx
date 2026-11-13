@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState, type ReactNode } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Button, Card, CategoryIcon, Chip, AvatarStack, TextField, EmptyState, Icon, IconButton, Illustration, LinkButton, ListGroup, ListItem, MapCard, PageHeader, PageSection, PageSkeleton, Select, Sheet, useToast, Tile } from '../../design/components';
+import { Button, Card, CategoryIcon, Chip, AvatarStack, TextField, Icon, IconButton, Illustration, LinkButton, ListGroup, ListItem, MapCard, PageHeader, PageSection, PageSkeleton, Select, Sheet, useToast, Tile } from '../../design/components';
 import { hostOf } from '../../lib/format';
 import { store } from '../../data';
 import { personName, useActivitiesFor, useMe, useMyTrips, usePlaces, useProfiles, useShares, useSharedPlaces } from '../../data/hooks';
@@ -223,7 +223,7 @@ export function CountryCollection() {
   if (shareId && !share) return (
     <Content>
       <PageHeader title={code ? countryName(code) : 'Collection'} back={{ to: '/trips', label: 'Collections' }} fit />
-      <EmptyState illustration="map" title="This collection isn't shared with you" message="Ask whoever shared it for a new invite link." />
+      <Card layout="centre" media={<Illustration name="map" size={120} />} title="This collection isn't shared with you" body="Ask whoever shared it for a new invite link." />
     </Content>
   );
   const title = code ? countryName(code) : 'Unsorted';
@@ -259,7 +259,7 @@ export function CountryCollection() {
       <PageHeader title={title} subtitle={ownerFirst ? `${ownerFirst}'s collection · ${collectionRoleName(role)}` : undefined} back={{ to: '/trips', label: 'Collections' }} fit
         action={shareable ? { icon: 'user-add', label: owner ? 'Share this collection' : 'People in this collection', onClick: () => { haptic('selection'); setPeople(true); } } : undefined} />
       {mine.length === 0 ? (
-        <EmptyState illustration="map" title={`Nothing saved in ${title}`} message="Save cafés, bars, stays and sights you find online."
+        <Card layout="centre" media={<Illustration name="map" size={120} />} title={`Nothing saved in ${title}`} body="Save cafés, bars, stays and sights you find online."
           action={role === 'viewer' ? undefined : <Button icon="plus" onClick={() => { openSave({ mode: 'link' }); navigate('/trips'); }}>Save a place</Button>} />
       ) : (
         <>

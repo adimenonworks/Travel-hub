@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { confirmAction } from '../../lib/native';
-import { Button, COVER_ILLUSTRATIONS, EmptyState, IconButton, Illustration, SectionHeader, Sheet, TextField } from '../../design/components';
+import { Button, COVER_ILLUSTRATIONS, IconButton, Illustration, SectionHeader, Sheet, TextField, Card } from '../../design/components';
 import { store } from '../../data';
 import { personName, useMe } from '../../data/hooks';
 import type { Album } from '../../data/types';
@@ -25,8 +25,8 @@ export function Photos(ctx: TripCtx) {
       <SectionHeader title="Shared albums" meta="Anyone on the trip can add one"
         action={ctx.canContribute ? <Button size="regular" icon="camera" onClick={() => setEditing("new")}>Add photos</Button> : undefined} />
       {sorted.length === 0 ? (
-        <EmptyState illustration="memories" title="No albums yet"
-          message="Make a shared album in Google Photos or Apple Photos, then add its link here so everyone can find the pictures." />
+        <Card layout="centre" media={<Illustration name="memories" size={120} />} title="No albums yet"
+          body="Make a shared album in Google Photos or Apple Photos, then add its link here so everyone can find the pictures." />
       ) : (
         <div className={s.albumGrid}>
           {sorted.map((a, i) => <AlbumCard key={a.id} album={a} ctx={ctx} index={i} onEdit={() => setEditing(a)} />)}

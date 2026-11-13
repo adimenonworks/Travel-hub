@@ -1,12 +1,5 @@
 import { useState, type CSSProperties } from 'react';
-import {
-  Avatar, AvatarStack, Tag, Chip, Banner, Button, Card, EmptyState, FieldRow, HeroCard, Icon, IconButton,
-  LinkButton, PageHeader, PageSection, SegmentControl, Select, Sheet, Tabs, TextArea, TextField, NowLine, Illustration,
-  type IllustrationName, COVER_ILLUSTRATIONS, ICON_NAMES, useToast, BottomNav, Skeleton, Logo,
-  ListItem, ListGroup, SectionHeader, EventCard, TravelConnector, IdeaRow, Tile, StatStrip, ProfileCard,
-  OptionCard, BudgetCard, Switch, StepProgress, DayCard, CountryModal,
-  CategoryIcon, ContextMenu, Accordion, SpanCard, MapCard,
-} from '../../design/components';
+import { Avatar, AvatarStack, Tag, Chip, Banner, Button, Card, FieldRow, HeroCard, Icon, IconButton, LinkButton, PageHeader, PageSection, SegmentControl, Select, Sheet, Tabs, TextArea, TextField, NowLine, Illustration, type IllustrationName, COVER_ILLUSTRATIONS, ICON_NAMES, useToast, BottomNav, Skeleton, Logo, ListItem, ListGroup, SectionHeader, EventCard, TravelConnector, IdeaRow, Tile, StatStrip, ProfileCard, OptionCard, BudgetCard, Switch, StepProgress, DayCard, CountryModal, CategoryIcon, ContextMenu, Accordion, SpanCard, MapCard } from '../../design/components';
 import { flagUrl } from '../../lib/countries';
 import { EVENT_TYPES, TYPE_TONE } from '../../lib/categories';
 import type { ReactNode } from 'react';
@@ -437,7 +430,7 @@ export function DesignSystem() {
             </div>
             <Switch checked={on} onChange={setOn} label="Also add to Portugal & Spain ideas" hint="Your trip covers Lisbon" />
           </Card>
-          <Card><EmptyState illustration="ideas" title="Empty state" message="Explains what goes here and how to start." action={<Button tone="neutral" onClick={() => setSheet(true)}>Open a sheet</Button>} /></Card>
+          <Card><Card layout="centre" media={<Illustration name="ideas" size={120} />} title="Empty state" body="Explains what goes here and how to start." action={<Button tone="neutral" onClick={() => setSheet(true)}>Open a sheet</Button>} /></Card>
         </Section>
       </div>
       <Sheet open={sheet} title="Save to Rove" subtitle="A short task over the current screen" onClose={() => setSheet(false)} onSubmit={() => setSheet(false)} submitLabel="Save">

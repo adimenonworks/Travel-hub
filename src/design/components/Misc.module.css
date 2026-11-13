@@ -29,8 +29,6 @@
 .badge-warning { background: var(--tag-warning-background); color: var(--tag-warning-text); }
 .badge-danger { background: var(--tag-danger-background); color: var(--tag-danger-text); }
 
-/* Empty state: a small Card with the illustration on top */
-.empty { align-items: center; text-align: center; }
 
 
 /* Notification (Figma): status background, 20px icon, Label + Body small */

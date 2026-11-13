@@ -1,6 +1,6 @@
 import { useSearchParams } from 'react-router-dom';
 import { SlideSwap } from '../shared/SlideSwap';
-import { Button, Card, EmptyState, Icon, Illustration, PageHeader, PageSkeleton, SegmentControl, Tile } from '../../design/components';
+import { Button, Card, Icon, Illustration, PageHeader, PageSkeleton, SegmentControl, Tile } from '../../design/components';
 import { personName, useMe, useMyTrips, useProfiles, useShares } from '../../data/hooks';
 import type { SavedPlace } from '../../data/types';
 import { tripPhase } from '../../lib/dates';
@@ -88,7 +88,7 @@ export function Trips() {
             </div>
           ))}
           {seg === 'past' && (past.length === 0 ? (
-            <EmptyState illustration="memories" title="No past trips yet" message="When a trip ends it moves here, with its plans and photos, so you can look back on it." />
+            <Card layout="centre" media={<Illustration name="memories" size={120} />} title="No past trips yet" body="When a trip ends it moves here, with its plans and photos, so you can look back on it." />
           ) : (
             <div className={s.list}>{past.map((t) => <TripHero key={t.id} trip={t} list />)}</div>
           ))}
