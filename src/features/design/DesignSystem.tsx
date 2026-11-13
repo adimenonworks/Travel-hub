@@ -5,7 +5,7 @@ import {
   type IllustrationName, COVER_ILLUSTRATIONS, ICON_NAMES, useToast, BottomNav, Skeleton, Logo,
   ListItem, ListGroup, SectionHeader, EventCard, TravelConnector, IdeaRow, Tile, StatStrip, ProfileCard,
   OptionCard, BudgetCard, Switch, SearchField, StepProgress, TripHeader, DayCard, CountryModal,
-  CategoryIcon, ContextMenu, Accordion, SpanCard, CollectionHeader,
+  CategoryIcon, ContextMenu, Accordion, SpanCard, MapCard,
 } from '../../design/components';
 import { flagUrl } from '../../lib/countries';
 import { EVENT_TYPES, TYPE_TONE } from '../../lib/categories';
@@ -350,8 +350,8 @@ export function DesignSystem() {
           </div>
         </Section>
 
-        <Section title="Collection header" footer="Figma Collection header: the top of a country's collection. The map with every place (tap for the full map), the counts, who it's with and how much you've visited.">
-          <CollectionHeader title="24 places · 3 cities" meta="Saved by you and Sam" people={[{ id: 'a', name: 'Alex Menon' }, { id: 's', name: 'Sam Lee' }]} visited={{ done: 6, total: 24 }} />
+        <Section title="Map card" footer="Figma Map card (Location card and Collection header merged): the map, a title and meta, a Trailing slot (Avatar stack or the star Icon button) and a Footer (a Button pair). No progress bar: visited is meta text.">
+          <MapCard title="24 places · 3 cities" meta="6 of 24 visited · Saved by you and Sam" trailing={<AvatarStack people={[{ id: "a", name: "Alex Menon" }, { id: "s", name: "Sam Lee" }]} />} />
         </Section>
 
         <Section title="Span card" footer="Figma Span card: the two ends of a stay, car, cruise, parking or luggage, at the top of its event page. A car shows its places; the footer says how long.">

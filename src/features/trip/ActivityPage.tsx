@@ -1,7 +1,7 @@
 import { Fragment, useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { nextTransition } from '../../app/navigation';
-import { Button, EmptyState, IconButton, JourneyDetails, LayoverBlock, LinkButton, ListGroup, ListItem, LocationCard, PageHeader, PageSection, Sheet, SpanCard, TextField, useToast } from '../../design/components';
+import { Button, EmptyState, IconButton, JourneyDetails, LayoverBlock, LinkButton, ListGroup, ListItem, MapCard, PageHeader, PageSection, Sheet, SpanCard, TextField, useToast } from '../../design/components';
 import type { Activity } from '../../data/types';
 import { daysBetween } from '../../lib/dates';
 import { store } from '../../data';
@@ -194,11 +194,11 @@ export function ActivityPage(ctx: TripCtx) {
       {/* Figma "Event detail — Location": the map, the address and the two ways to get there, together in one card */}
       {!journey && where && (
         <PageSection title="Location">
-          <LocationCard title={where.split(',')[0]} subtitle={where.includes(',') ? where.split(',').slice(1).join(',').trim() : undefined}
+          <MapCard title={where.split(',')[0]} meta={where.includes(',') ? where.split(',').slice(1).join(',').trim() : undefined}
             map={a.location ? <MapView pins={[{ lat: a.location.lat, lng: a.location.lng, label: a.title }]} center={a.location} zoom={15} height={160} /> : undefined}
-            action={behaviour !== 'open' && behaviour !== 'note' ? <IconButton icon="star" state={starred ? 'filled' : 'default'} aria-pressed={starred}
+            trailing={behaviour !== 'open' && behaviour !== 'note' ? <IconButton icon="star" state={starred ? 'filled' : 'default'} aria-pressed={starred}
               label={starred ? `Remove ${where.split(',')[0]} from favourites` : `Add ${where.split(',')[0]} to favourites`} onClick={star} /> : undefined}
-            buttons={<>
+            footer={<>
               <LinkButton href={mapsUrl(where, a.location, app)} tone="neutral" icon="map" label={`Directions to ${where} in ${mapsAppLabel(app)}`}>{mapsAppLabel(app)}</LinkButton>
               <LinkButton href={uberUrl(where, a.location)} tone="neutral" icon="car" label={`Get an Uber to ${where}`}>Uber</LinkButton>
             </>} />

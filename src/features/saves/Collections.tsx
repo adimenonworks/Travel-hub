@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState, type ReactNode } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Button, Card, CategoryIcon, Chip, CollectionHeader, TextField, EmptyState, Icon, IconButton, Illustration, LinkButton, ListGroup, ListItem, LocationCard, PageHeader, PageSection, PageSkeleton, Select, Sheet, useToast, Tile } from '../../design/components';
+import { Button, Card, CategoryIcon, Chip, AvatarStack, TextField, EmptyState, Icon, IconButton, Illustration, LinkButton, ListGroup, ListItem, MapCard, PageHeader, PageSection, PageSkeleton, Select, Sheet, useToast, Tile } from '../../design/components';
 import { hostOf } from '../../lib/format';
 import { store } from '../../data';
 import { personName, useActivitiesFor, useMe, useMyTrips, usePlaces, useProfiles, useShares, useSharedPlaces } from '../../data/hooks';
@@ -151,9 +151,9 @@ export function PlaceSheet({ place, onClose, role = 'owner', cities = [] }: {
         {(kindOf(place) === 'place' || maps) && (
           <section className={s.field} aria-labelledby={`where-${place.id}`}>
             <h3 className="t-heading-4" id={`where-${place.id}`}>Location</h3>
-            <LocationCard title={place.name} subtitle={where || undefined}
+            <MapCard title={place.name} meta={where || undefined}
               map={pos ? <MapView pins={[{ lat: pos.lat, lng: pos.lng, label: place.name }]} center={pos} zoom={15} height={160} /> : undefined}
-              buttons={<LinkButton href={maps ? place.url! : mapsUrl([place.name, where].filter(Boolean).join(', '), pos ? { name: place.name, lat: pos.lat, lng: pos.lng } : null)} tone="neutral" icon="map" label={`Open ${place.name} in Maps`}>Open in Maps</LinkButton>} />
+              footer={<LinkButton href={maps ? place.url! : mapsUrl([place.name, where].filter(Boolean).join(', '), pos ? { name: place.name, lat: pos.lat, lng: pos.lng } : null)} tone="neutral" icon="map" label={`Open ${place.name} in Maps`}>Open in Maps</LinkButton>} />
           </section>
         )}
         {place.url && !maps && (
@@ -263,13 +263,12 @@ export function CountryCollection() {
           action={role === 'viewer' ? undefined : <Button icon="plus" onClick={() => { openSave({ mode: 'link' }); navigate('/trips'); }}>Save a place</Button>} />
       ) : (
         <>
-          {/* Figma "Collection header": the map with every place, the counts, who it's with and how much you've visited */}
-          <CollectionHeader
+          {/* Figma "Map card": the map with every place, the counts, how much you've visited and who it's with */}
+          <MapCard
             map={pins.length > 0 ? <MapView pins={pins} height={180} /> : undefined} onMap={pins.length > 0 ? () => setMap(true) : undefined}
             title={[`${places.length || mine.length} ${(places.length || mine.length) === 1 ? (places.length ? 'place' : 'save') : (places.length ? 'places' : 'saves')}`, cityCount > 1 ? `${cityCount} cities` : ''].filter(Boolean).join(' · ')}
-            meta={`Saved by ${savedBy(everyone, me.uid, profiles)}`}
-            people={everyone.length > 1 ? everyone.map((id) => ({ id, name: id === me.uid ? me.name || 'You' : personName(profiles, id), photo: id === me.uid ? me.photo : profiles[id]?.photo })) : undefined}
-            visited={places.length ? { done: places.filter((p) => visited.has(p.id)).length, total: places.length } : undefined} />
+            meta={[places.length ? `${places.filter((p) => visited.has(p.id)).length} of ${places.length} visited` : '', `Saved by ${savedBy(everyone, me.uid, profiles)}`].filter(Boolean).join(' · ')}
+            trailing={everyone.length > 1 ? <AvatarStack people={everyone.map((id) => ({ id, name: id === me.uid ? me.name || 'You' : personName(profiles, id), photo: id === me.uid ? me.photo : profiles[id]?.photo }))} /> : undefined} />
           <ul className={s.chips} aria-label="Filter">
             {filters.map((f) => (
               <li key={f.value}><Chip selected={filter === f.value} onClick={() => { haptic('selection'); setFilter(f.value); }} label={`${f.label}, ${f.n}${filter === f.value ? ', selected' : ''}`}>{`${f.label} ${f.n}`}</Chip></li>

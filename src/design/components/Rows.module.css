@@ -241,13 +241,3 @@
 .spanDate { font: var(--type-heading-3); letter-spacing: -0.02em; color: var(--on-light-text-primary); }
 .spanTime { font: var(--type-body); color: var(--on-light-text-primary); }
 
-/* Figma "Collection header": grey card, an 8px frame round the map, then the summary (padding 0 12, gap 16) */
-.collection { display: flex; flex-direction: column; gap: var(--space-default-500); padding: var(--space-default-300); padding-bottom: var(--space-default-600); border-radius: var(--radius-600); background: var(--on-light-surface-secondary); }
-.collectionMap { display: block; width: 100%; padding: 0; border: 0; background: none; border-radius: var(--radius-500); overflow: hidden; cursor: pointer; }
-.collectionMap :global(.leaflet-container) { pointer-events: none; } /* a preview: the full map opens on tap */
-.collectionBody { display: flex; flex-direction: column; gap: var(--space-default-500); padding: 0 var(--space-default-400); }
-.collectionSummary { display: flex; align-items: center; gap: var(--space-default-400); }
-.collectionText { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: var(--space-default-100); }
-.collectionTitle { font: var(--type-heading-3); letter-spacing: -0.02em; color: var(--on-light-text-primary); }
-.collectionMeta { font: var(--type-body-small); color: var(--on-light-text-secondary); }
-.collectionVisited { display: flex; flex-direction: column; gap: var(--space-default-300); }
