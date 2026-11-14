@@ -2,22 +2,22 @@
 .reading { display: flex; flex-direction: column; gap: var(--space-default-300); }
 .row { display: grid; grid-template-columns: repeat(auto-fit, minmax(calc(120rem / 17), 1fr)); gap: var(--space-default-300); }
 .buttonPair { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-default-300); } /* Paste (Neutral) and Continue (Primary), side by side */
-.preview { display: flex; align-items: center; gap: var(--space-default-400); padding: var(--space-default-500); border-radius: var(--radius-600); background: var(--on-light-surface-secondary); }
-.previewThumb { flex: none; display: grid; place-items: center; width: 48px; height: 48px; border-radius: var(--radius-1000); overflow: hidden; background: var(--on-light-surface-primary); color: var(--on-light-icon-primary); }
+.preview { display: flex; align-items: center; gap: var(--space-default-400); padding: var(--space-default-500); border-radius: var(--radius-600); background: var(--surface-secondary); }
+.previewThumb { flex: none; display: grid; place-items: center; width: 48px; height: 48px; border-radius: var(--radius-1000); overflow: hidden; background: var(--surface-primary); color: var(--icon-primary); }
 .previewThumb img { width: 100%; height: 100%; object-fit: cover; }
 .previewText { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: var(--space-default-100); text-align: left; }
-.previewTitle { font: var(--type-heading-3); letter-spacing: -0.02em; color: var(--on-light-text-primary); overflow-wrap: anywhere; }
-.previewMeta { font: var(--type-body-small); color: var(--on-light-text-secondary); }
-.label { margin: 0; font: var(--type-body); color: var(--on-light-text-primary); }
+.previewTitle { font: var(--type-heading-3); letter-spacing: -0.02em; color: var(--text-primary); overflow-wrap: anywhere; }
+.previewMeta { font: var(--type-body-small); color: var(--text-secondary); }
+.label { margin: 0; font: var(--type-body); color: var(--text-primary); }
 /* A choice: 24 corners, subtle border; picked: brand surface with the focus border and a check */
 .target {
   display: flex; align-items: center; gap: var(--space-default-400); width: 100%;
   min-height: 64px; padding: var(--space-default-400) var(--space-default-500);
-  border-radius: var(--radius-600); border: 1px solid var(--on-light-border-subtle); background: var(--on-light-surface-primary);
+  border-radius: var(--radius-600); border: 1px solid var(--border-subtle); background: var(--surface-primary);
   cursor: pointer; transition: transform var(--motion-release), background var(--motion-fast);
 }
 .target:active { transform: scale(0.98); transition: transform var(--motion-press); }
-.check { flex: none; color: var(--on-light-icon-brand); }
+.check { flex: none; color: var(--icon-brand); }
 .flag { width: 32px; height: 32px; border-radius: 50%; }
 /* Saved destination */
 /* Filter chips: one row that scrolls sideways under the gutter (Figma "Filters (scroll)"). 8 above and below (taken
@@ -35,8 +35,8 @@
 .tileGrid > * { min-height: calc(180rem / 17); }
 .field { display: flex; flex-direction: column; gap: var(--space-default-500); }
 /* Collections */
-.marks { display: inline-flex; align-items: center; gap: var(--space-default-200); color: var(--on-light-text-secondary); font: var(--type-body-small); }
-.marks svg { color: var(--on-light-icon-brand); }
+.marks { display: inline-flex; align-items: center; gap: var(--space-default-200); color: var(--text-secondary); font: var(--type-body-small); }
+.marks svg { color: var(--icon-brand); }
 .category { display: flex; flex-direction: column; gap: var(--space-default-300); }
 
 /* Category and city chips in the Save sheet wrap onto more lines */
@@ -45,12 +45,12 @@
 .flag, .previewThumb img.flag { width: 24px; height: 24px; border-radius: var(--radius-1000); object-fit: cover; }
 /* Favourites: inside a city, a small titled group per category (icon + label, Label style) */
 .favCategory { display: flex; flex-direction: column; gap: var(--space-default-300); }
-.favCategoryTitle { display: flex; align-items: center; gap: var(--space-default-200); margin: 0; font: var(--type-label); color: var(--on-light-text-secondary); }
+.favCategoryTitle { display: flex; align-items: center; gap: var(--space-default-200); margin: 0; font: var(--type-label); color: var(--text-secondary); }
 .options { display: flex; flex-direction: column; gap: var(--space-default-300); }
 /* Sections 40 apart (--space-stack), things inside a section 16 apart: the rule on every screen and sheet */
 .sections { display: flex; flex-direction: column; gap: var(--space-stack); }
 .kindGroup { display: flex; flex-direction: column; gap: var(--space-default-300); }
-.kindGroupTitle { margin: 0; font: var(--type-body-small); color: var(--on-light-text-secondary); }
+.kindGroupTitle { margin: 0; font: var(--type-body-small); color: var(--text-secondary); }
 
 /* A saved place's key info: the category tile, the category and when it was saved, Edit and the Favourite star */
 .placeKey { display: flex; align-items: center; gap: var(--space-default-400); }

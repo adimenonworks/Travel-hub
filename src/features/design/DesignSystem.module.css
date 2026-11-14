@@ -3,16 +3,16 @@
 .accents { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: var(--space-default-400); margin-bottom: var(--space-default-400); }
 .swatches { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: var(--space-default-400); }
 .swatch { display: flex; flex-direction: column; gap: 6px; }
-.chip { height: 56px; border-radius: var(--radius-1000); box-shadow: inset 0 0 0 1px var(--on-light-border-subtle); }
-.code { font-family: var(--font-mono); font-size: var(--size-body-small); color: var(--on-light-text-secondary); overflow-wrap: anywhere; }
+.chip { height: 56px; border-radius: var(--radius-1000); box-shadow: inset 0 0 0 1px var(--border-subtle); }
+.code { font-family: var(--font-mono); font-size: var(--size-body-small); color: var(--text-secondary); overflow-wrap: anywhere; }
 .stack { display: flex; flex-direction: column; gap: var(--space-default-500); }
 .typeRow { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: var(--space-default-300) var(--space-default-500); }
 .spaceRow { display: grid; grid-template-columns: 110px 1fr; align-items: center; gap: var(--space-default-400); }
-.spaceBar { height: 16px; background: var(--on-light-icon-brand); border-radius: var(--radius-1000); }
+.spaceBar { height: 16px; background: var(--icon-brand); border-radius: var(--radius-1000); }
 .radii { display: flex; flex-wrap: wrap; gap: var(--space-default-400); }
-.radius { width: 96px; height: 64px; background: var(--on-light-surface-sunken); display: grid; place-items: center; }
+.radius { width: 96px; height: 64px; background: var(--surface-sunken); display: grid; place-items: center; }
 .icons { display: grid; grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); gap: var(--space-default-400); }
-.icon { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: var(--space-default-300); color: var(--on-light-icon-brand); text-align: center; }
+.icon { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: var(--space-default-300); color: var(--icon-brand); text-align: center; }
 .row { display: flex; flex-wrap: wrap; gap: var(--space-default-400); align-items: center; }
 .cards { display: grid; gap: var(--space-default-500); grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
 
@@ -21,9 +21,9 @@
 .coverBox > svg { height: 120px; border-radius: var(--radius-600); overflow: hidden; }
 .tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(calc(130rem / 17), 1fr)); gap: var(--space-default-300); }
 .quickRow { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--space-default-300); }
-.flowSample { padding: var(--space-default-500); border-radius: var(--radius-600); background: var(--on-mid-surface-primary); }
+.flowSample { padding: var(--space-default-500); border-radius: var(--radius-600); background: var(--map-pin); }
 .paletteRow { display: flex; flex-direction: column; gap: var(--space-default-200); }
 .paletteSteps { display: grid; grid-template-columns: repeat(11, 1fr); gap: var(--space-default-100); }
-.paletteChip { aspect-ratio: 1; border-radius: var(--radius-200); box-shadow: inset 0 0 0 1px var(--on-light-border-subtle); }
+.paletteChip { aspect-ratio: 1; border-radius: var(--radius-200); box-shadow: inset 0 0 0 1px var(--border-subtle); }
 .optionGrid { display: flex; flex-direction: column; gap: var(--space-default-300); }
 .chipRow { display: flex; flex-wrap: wrap; gap: var(--space-default-300); }

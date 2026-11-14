@@ -11,7 +11,7 @@
      taller scrolls inside the sheet */
   max-height: calc(100% - env(safe-area-inset-top) - var(--space-default-550) - var(--keyboard-height, 0px));
   display: flex; flex-direction: column;
-  background: var(--on-light-surface-primary);
+  background: var(--surface-primary);
   border-radius: var(--radius-600) var(--radius-600) 0 0;
   box-shadow: var(--shadow-overlay);
   animation: rise var(--motion-sheet);
@@ -28,11 +28,11 @@
   display: flex; flex-direction: column; align-items: stretch; gap: var(--space-default-600);
   padding: var(--space-default-400) var(--space-default-700) 0;
 }
-.grabber { align-self: center; width: 40px; height: 4px; border-radius: var(--radius-100); background: var(--on-light-border-subtle); }
+.grabber { align-self: center; width: 40px; height: 4px; border-radius: var(--radius-100); background: var(--border-subtle); }
 .header { display: flex; align-items: flex-start; gap: var(--space-default-300); }
 .headerText { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: var(--space-default-100); padding-top: var(--space-default-300); }
-.title { margin: 0; font: var(--type-heading-2); letter-spacing: -0.01em; color: var(--on-light-text-primary); }
-.subtitle { margin: 0; font: var(--type-body); color: var(--on-light-text-secondary); }
+.title { margin: 0; font: var(--type-heading-2); letter-spacing: -0.01em; color: var(--text-primary); }
+.subtitle { margin: 0; font: var(--type-body); color: var(--text-secondary); }
 .body {
   overflow-y: auto; overscroll-behavior: contain;
   padding: var(--space-default-600) var(--space-default-700) var(--space-default-900);

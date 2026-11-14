@@ -1,18 +1,18 @@
-.map { width: 100%; border-radius: var(--radius-600); overflow: hidden; background: var(--on-light-surface-sunken); z-index: 0; }
+.map { width: 100%; border-radius: var(--radius-600); overflow: hidden; background: var(--surface-sunken); z-index: 0; }
 :global([data-theme='dark']) .map :global(.leaflet-tile-pane) { filter: invert(1) hue-rotate(180deg) brightness(0.9) contrast(0.9); }
 @media (prefers-color-scheme: dark) {
   :global(:root:not([data-theme='light'])) .map :global(.leaflet-tile-pane) { filter: invert(1) hue-rotate(180deg) brightness(0.9) contrast(0.9); }
 }
 
-.homePin { display: grid !important; place-items: center; border-radius: 50%; background: var(--on-mid-surface-primary); color: var(--on-mid-icon-primary); box-shadow: 0 0 0 3px var(--on-mid-icon-primary); }
+.homePin { display: grid !important; place-items: center; border-radius: 50%; background: var(--map-pin); color: var(--map-pin-icon); box-shadow: 0 0 0 3px var(--map-pin-icon); }
 
 .links { display: flex; flex-wrap: wrap; gap: var(--space-default-300); }
 .chip {
   display: inline-flex; align-items: center; gap: var(--space-default-250);
   min-height: var(--size-tap); padding: 0 var(--space-default-500);
   border-radius: var(--radius-1000);
-  background: var(--interactive-button-inverse-neutral-background);
-  color: var(--interactive-button-inverse-neutral-text);
+  background: var(--button-neutral-background);
+  color: var(--button-neutral-text);
   font-size: var(--size-body-small); font-weight: var(--weight-semibold);
   max-width: 100%;
   text-decoration: none !important;
@@ -26,57 +26,57 @@
 .suggest { position: relative; }
 .suggestList {
   position: absolute; left: 0; right: 0; top: calc(100% + 4px); z-index: 10;
-  background: var(--on-light-surface-primary); box-shadow: var(--shadow-raised); border-radius: var(--radius-600);
+  background: var(--surface-primary); box-shadow: var(--shadow-raised); border-radius: var(--radius-600);
   box-shadow: var(--shadow-raised); overflow: hidden; padding: var(--space-default-300);
 }
 .suggestItem { display: block; width: 100%; text-align: left; padding: var(--space-default-400) var(--space-default-500); background: none; border: 0; border-radius: var(--radius-1000); min-height: var(--size-tap); }
-.suggestItem:hover, .suggestItem[aria-selected='true'] { background: var(--interactive-button-ghost-background-hover); }
+.suggestItem:hover, .suggestItem[aria-selected='true'] { background: var(--button-ghost-background-hover); }
 
 /* The comment area is one grey section: the thread and the box to write in */
-.comments { display: flex; flex-direction: column; gap: var(--space-default-500); padding: var(--space-default-500); border-radius: var(--radius-600); background: var(--on-light-surface-secondary); }
+.comments { display: flex; flex-direction: column; gap: var(--space-default-500); padding: var(--space-default-500); border-radius: var(--radius-600); background: var(--surface-secondary); }
 /* Messages-style thread: theirs on the left (avatar at the top of the bubble), yours on the right in deep green */
 .thread { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: var(--space-default-400); }
 /* A stack: who and when above (left for theirs, right for yours), then the bubbles 4px apart */
 .message { display: flex; flex-direction: column; gap: var(--space-default-100); }
 .mine { align-items: flex-end; }
 .theirs { align-items: flex-start; }
-.messageMeta { font: var(--type-body-small); color: var(--on-light-text-secondary); padding: 0 var(--space-default-300); margin-bottom: var(--space-default-100); }
+.messageMeta { font: var(--type-body-small); color: var(--text-secondary); padding: 0 var(--space-default-300); margin-bottom: var(--space-default-100); }
 .theirs .messageMeta { padding-left: calc(32px + var(--space-default-300) + var(--space-default-300)); } /* lines up with the bubbles, past the avatar column */
 /* A bubble's row: theirs have the avatar column (the avatar only beside the most recent bubble, top-aligned) */
 .messageRow { display: flex; align-items: flex-start; gap: var(--space-default-300); max-width: 85%; min-width: 0; }
 .mine .messageRow { justify-content: flex-end; align-items: center; }
 .avatarSpace { flex: none; width: 32px; }
-.edited { flex: none; font: var(--type-body-small); color: var(--on-light-text-secondary); }
+.edited { flex: none; font: var(--type-body-small); color: var(--text-secondary); }
 .mine .bubble { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; touch-action: manipulation; cursor: default; }
-.bubble:focus-visible { outline: 3px solid var(--on-light-border-focus); outline-offset: 2px; }
-.editingLine { flex-basis: 100%; display: flex; align-items: center; justify-content: space-between; font: var(--type-body-small); color: var(--on-light-text-secondary); }
-.editingCancel { background: none; border: 0; padding: 0 var(--space-default-200); min-height: var(--size-tap); font: var(--type-label); color: var(--on-light-link-default); cursor: pointer; }
+.bubble:focus-visible { outline: 3px solid var(--border-focus); outline-offset: 2px; }
+.editingLine { flex-basis: 100%; display: flex; align-items: center; justify-content: space-between; font: var(--type-body-small); color: var(--text-secondary); }
+.editingCancel { background: none; border: 0; padding: 0 var(--space-default-200); min-height: var(--size-tap); font: var(--type-label); color: var(--text-link); cursor: pointer; }
 .sendWrap { display: inline-flex; }
 .bubble {
   margin: 0; min-width: 0; overflow-wrap: anywhere; white-space: pre-wrap;
   padding: var(--space-default-300) var(--space-default-500); border-radius: var(--radius-600);
-  font: var(--type-body); background: var(--on-light-surface-primary); color: var(--on-light-text-primary); /* white on the grey section */
+  font: var(--type-body); background: var(--surface-primary); color: var(--text-primary); /* white on the grey section */
 }
 .theirs .bubble { border-top-left-radius: var(--radius-200); } /* the corner by the avatar, like a speech tail */
-.mine .bubble { background: var(--interactive-selected-primary-background); color: var(--interactive-selected-primary-text); border-bottom-right-radius: var(--radius-200); }
+.mine .bubble { background: var(--feature-surface); color: var(--feature-text); border-bottom-right-radius: var(--radius-200); }
 /* Writing a comment: the box stays in the grey section; the page scrolls it above the keyboard */
 .composer { display: flex; flex-wrap: wrap; gap: var(--space-default-300); align-items: center; }
 .composerWarning { flex-basis: 100%; } /* the limit warning sits above the box */
-.commentCount { font: var(--type-label-small); color: var(--on-light-text-secondary); }
-.commentCountOver { color: var(--on-light-status-error); }
+.commentCount { font: var(--type-label-small); color: var(--text-secondary); }
+.commentCountOver { color: var(--status-danger); }
 /* While typing, room below the comments the size of the keyboard, so the page can scroll the box up above it (the app
    doesn't resize for the keyboard). It sits after the grey section, which never changes size. */
 .composerSpacer { height: var(--keyboard-height, 0px); }
-.commentInput { flex: 1; min-height: var(--size-tap); border-radius: var(--radius-1000); border: 1px solid var(--on-light-border-bold); background: var(--on-light-surface-primary); padding: 0 var(--space-default-500); font-size: var(--size-body-small); outline: none; min-width: 0; }
-.commentInput::placeholder { color: var(--input-field-placeholder); opacity: 1; }
-.commentInput:hover { border-color: var(--on-light-border-bold); }
-.commentInput:focus { border-color: var(--on-light-border-focus); box-shadow: inset 0 0 0 1px var(--on-light-border-focus); }
+.commentInput { flex: 1; min-height: var(--size-tap); border-radius: var(--radius-1000); border: 1px solid var(--border-bold); background: var(--surface-primary); padding: 0 var(--space-default-500); font-size: var(--size-body-small); outline: none; min-width: 0; }
+.commentInput::placeholder { color: var(--input-placeholder); opacity: 1; }
+.commentInput:hover { border-color: var(--border-bold); }
+.commentInput:focus { border-color: var(--border-focus); box-shadow: inset 0 0 0 1px var(--border-focus); }
 
 /* Leaflet controls, rounded to match */
 .map :global(.leaflet-bar) { border: 0; border-radius: var(--radius-1000); overflow: hidden; box-shadow: var(--shadow-raised); }
-.map :global(.leaflet-bar a) { width: 40px; height: 40px; line-height: 40px; background: var(--on-light-surface-primary); color: var(--on-light-icon-primary); }
-.map :global(.leaflet-control-attribution) { border-top-left-radius: var(--radius-500); padding: 0 var(--space-default-300); background: var(--on-light-surface-primary); color: var(--on-light-text-secondary); }
-.map :global(.leaflet-control-attribution a) { color: var(--on-light-link-default); }
+.map :global(.leaflet-bar a) { width: 40px; height: 40px; line-height: 40px; background: var(--surface-primary); color: var(--icon-primary); }
+.map :global(.leaflet-control-attribution) { border-top-left-radius: var(--radius-500); padding: 0 var(--space-default-300); background: var(--surface-primary); color: var(--text-secondary); }
+.map :global(.leaflet-control-attribution a) { color: var(--text-link); }
 .map :global(.leaflet-tooltip) { border: 0; border-radius: var(--radius-1000); padding: var(--space-default-200) var(--space-default-400); font: var(--weight-semibold) var(--size-body-small)/1.4 var(--font-family); box-shadow: var(--shadow-raised); }
 /* The map's space while it loads */
-.mapLoading { border-radius: var(--radius-600); background: var(--on-light-surface-sunken); }
+.mapLoading { border-radius: var(--radius-600); background: var(--surface-sunken); }

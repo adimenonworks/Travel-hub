@@ -11,7 +11,7 @@
   pointer-events: auto;
   width: 100%; max-width: var(--size-content-max);
   display: flex; gap: 0; padding: var(--space-default-200);
-  border-radius: var(--radius-1000); border: 1px solid var(--on-light-border-subtle);
+  border-radius: var(--radius-1000); border: 1px solid var(--border-subtle);
   background: var(--overlay-bar); box-shadow: var(--elevation-floating-bar);
   -webkit-backdrop-filter: blur(var(--blur-overlay)); backdrop-filter: blur(var(--blur-overlay));
   touch-action: none; /* the bar's touches are all ours: iOS never takes a drag over to scroll (which dropped the pill) */
@@ -20,7 +20,7 @@
 .item {
   flex: 1 1 0; min-width: 0; min-height: calc(50rem / 17);
   display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--space-default-100);
-  border-radius: var(--radius-1000); color: var(--on-light-text-primary); font: var(--type-label-small);
+  border-radius: var(--radius-1000); color: var(--text-primary); font: var(--type-label-small);
   transition: background var(--motion-fast), transform var(--motion-release);
 }
 .item:active { transform: scale(0.96); transition: background var(--motion-fast), transform var(--motion-press); }
@@ -30,7 +30,7 @@
   position: absolute; top: var(--space-default-200); bottom: var(--space-default-200); left: var(--space-default-200);
   width: calc((100% - 2 * var(--space-default-200)) / var(--n));
   transform: translateX(calc(100% * var(--i)));
-  border-radius: var(--radius-1000); background: var(--on-light-surface-sunken);
+  border-radius: var(--radius-1000); background: var(--surface-sunken);
   transition: transform var(--duration-slow) var(--ease-spring);
 }
 /* While dragging, the pill follows the finger exactly (no easing) and grows a touch, like iOS */

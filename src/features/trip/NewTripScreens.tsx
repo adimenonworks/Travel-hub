@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type CSSProperties, type ReactNode } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 import { IconButton, StepProgress } from '../../design/components';
 import s from './NewTripScreens.module.css';
@@ -29,7 +29,7 @@ export function FlowScreen({ step, of, title, subtitle, onClose, children, foote
       <div className={s.inner}>
         <div className={s.bar}>
           <StepProgress step={step} of={of} />
-          <IconButton icon="x" tone="on-brand" label="Close" onClick={onClose} />
+          <IconButton icon="x" tone="on-feature" label="Close" onClick={onClose} />
         </div>
         <div key={stepKey} className={s.step}>
           <div className={s.heading}>
@@ -63,31 +63,18 @@ function useCountUp(to: number) {
   return n;
 }
 
-const CONFETTI = ['green', 'yellow', 'mid', 'orange', 'pink'] as const;
-
 /**
  * The celebration at the end of the New trip flow, on deep emerald (a screen, not a design-system component; Figma
- * frame "New trip · celebration" on the Screens page). Confetti falls, the illustration pops in,
- * the number counts up; then the primary action and a Ghost secondary one. Reduce Motion: fades only, no confetti.
+ * frame "New trip · celebration" on the Screens page). The illustration pops in, the number counts up; then the
+ * primary action and a Ghost secondary one. Reduce Motion: fades only. (No confetti since 14 Nov 2026, owner.)
  */
 export function CelebrationScreen({ illustration, title, subtitle, number, numberLabel, primary, secondary }: {
   illustration: ReactNode; title: string; subtitle?: string; number?: number; numberLabel?: string;
   primary: ReactNode; secondary?: ReactNode;
 }) {
   const n = useCountUp(number ?? 0);
-  const pieces = useMemo(() => Array.from({ length: 28 }, (_, i) => ({
-    left: (i * 37) % 100, delay: (i % 7) * 0.08, drift: ((i * 13) % 40) - 20, tone: CONFETTI[i % CONFETTI.length], round: i % 3 === 0, turn: (i * 47) % 360,
-  })), []);
   return createPortal(
     <div className={s.celebrate} role="dialog" aria-modal="true" aria-label={title}>
-      {!reduceMotion() && (
-        <div className={s.confetti} aria-hidden="true">
-          {pieces.map((p, i) => (
-            <span key={i} className={[s.piece, s[`piece-${p.tone}`], p.round && s.pieceRound].filter(Boolean).join(' ')}
-              style={{ left: `${p.left}%`, animationDelay: `${p.delay}s`, '--drift': `${p.drift}px`, '--fall': `${180 + ((p.left * 7) % 220)}px`, '--turn': `${p.turn}deg` } as CSSProperties} />
-          ))}
-        </div>
-      )}
       <div className={s.celebrateInner}>
         <div className={s.badge} aria-hidden="true">{illustration}</div>
         <h1 className={s.celebrateTitle}>{title}</h1>

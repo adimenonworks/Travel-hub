@@ -94,7 +94,7 @@ export type CategoryTone = 'neutral' | 'travel' | 'stays' | 'food' | 'activities
  *   tile, on a grey card), On dark (on the deep-green Next card, where the type colours take their 300 step).
  */
 export function CategoryIcon({ icon, type = 'neutral', size = 'regular', tone = 'secondary', className }: {
-  icon: IconName; type?: CategoryTone; size?: 'small' | 'regular' | 'large'; tone?: 'secondary' | 'primary' | 'on-dark'; className?: string;
+  icon: IconName; type?: CategoryTone; size?: 'small' | 'regular' | 'large'; tone?: 'secondary' | 'primary' | 'on-feature'; className?: string;
 }) {
   const cls = [s.catIcon, size !== 'regular' && s[`catIcon-${size}`], tone !== 'secondary' && s[`catIcon-${tone}`], type !== 'neutral' && s[`tone-${type}`], className];
   return <span className={cls.filter(Boolean).join(' ')} aria-hidden="true"><Icon name={icon} size={size === 'small' ? 16 : 24} /></span>;
@@ -118,11 +118,11 @@ export function EventCard({ title, time, timeIcon = 'clock', place, placeIcon = 
   status?: string;
   to?: string; onClick?: () => void;
 }) {
-  const cls = [s.event, s[`event-${layout}`], s[`event-${state}`], state === 'next' && 'surface-dark'].filter(Boolean).join(' ');
+  const cls = [s.event, s[`event-${layout}`], s[`event-${state}`], state === 'next' && 'feature'].filter(Boolean).join(' ');
   const stateText = state === 'next' ? ', up next' : state === 'done' ? ', done' : '';
   return (
     <Pressable to={to} onClick={onClick} className={cls} label={`${title}${favourite ? ', favourite' : ''}${time ? `, ${time}` : ''}${place ? `, ${place}` : ''}${amount ? `, ${amount} per person` : ''}${stateText}`}>
-      <CategoryIcon icon={icon} type={type} tone={state === 'next' ? 'on-dark' : 'primary'} className={s.eventIcon} />
+      <CategoryIcon icon={icon} type={type} tone={state === 'next' ? 'on-feature' : 'primary'} className={s.eventIcon} />
       <span className={s.eventBody} aria-hidden="true">
         <span className={s.eventHeader}>
           <span className={s.eventText}>

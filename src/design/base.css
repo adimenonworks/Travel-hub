@@ -28,8 +28,8 @@ body {
   -webkit-user-select: none; user-select: none;
   -webkit-touch-callout: none;
   min-height: 100dvh;
-  background: var(--on-light-surface-primary);
-  color: var(--on-light-text-primary);
+  background: var(--surface-primary);
+  color: var(--text-primary);
   font: var(--type-body);
   letter-spacing: 0;
   -webkit-font-smoothing: antialiased;
@@ -37,12 +37,12 @@ body {
 }
 
 h1, h2, h3, h4, p, ul, ol, figure, fieldset { margin: 0; }
-h1, h2, h3 { color: var(--on-light-text-primary); }
+h1, h2, h3 { color: var(--text-primary); }
 ul, ol { padding: 0; list-style: none; }
 fieldset { padding: 0; border: 0; min-width: 0; }
 img { max-width: 100%; display: block; }
 /* Plain text links are underlined so they don't rely on colour alone (WCAG 1.4.1). Styled links (with a class) opt out. */
-a { color: var(--on-light-link-default); }
+a { color: var(--text-link); }
 a:not([class]) { font-weight: var(--weight-semibold); text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 1px; }
 a:not([class]):hover { text-decoration-thickness: 2px; }
 a[class] { text-decoration: none; }
@@ -51,7 +51,7 @@ button { cursor: pointer; }
 
 /* A solid ring in the brand's high-contrast form, so it is visible on every surface (WCAG 2.4.7 / 2.4.11). */
 :focus-visible {
-  outline: 3px solid var(--on-light-border-focus);
+  outline: 3px solid var(--border-focus);
   outline-offset: 2px;
 }
 
@@ -72,33 +72,6 @@ button { cursor: pointer; }
 a, img, svg, [draggable] { -webkit-user-drag: none; user-drag: none; -webkit-touch-callout: none; }
 input, textarea, [contenteditable], .selectable { -webkit-user-select: text; user-select: text; -webkit-touch-callout: default; }
 
-/* Deep green surface (Figma on-dark/surface/brand): Event card Next, Stat strip, accent Card, initials Avatars.
-   Everything inside that asks for an on-light token gets the on-dark token of the same name (the sets match 1:1). */
-.surface-dark {
-  background: var(--on-dark-surface-brand);
-  color: var(--on-dark-text-primary);
-  --on-light-surface-primary: var(--on-dark-surface-primary);
-  --on-light-surface-secondary: var(--on-dark-surface-secondary);
-  --on-light-surface-brand: var(--on-dark-surface-brand);
-  --on-light-surface-sunken: var(--on-dark-surface-sunken);
-  --on-light-text-primary: var(--on-dark-text-primary);
-  --on-light-text-secondary: var(--on-dark-text-secondary);
-  --on-light-text-brand: var(--on-dark-text-brand);
-  --on-light-link-default: var(--on-dark-link-default);
-  --on-light-link-hover: var(--on-dark-link-hover);
-  --on-light-link-pressed: var(--on-dark-link-pressed);
-  --on-light-icon-primary: var(--on-dark-icon-primary);
-  --on-light-icon-secondary: var(--on-dark-icon-secondary);
-  --on-light-icon-brand: var(--on-dark-icon-brand);
-  --on-light-border-subtle: var(--on-dark-border-subtle);
-  --on-light-border-bold: var(--on-dark-border-bold);
-  --on-light-border-focus: var(--on-dark-border-focus);
-  --on-light-border-brand: var(--on-dark-border-brand);
-  --on-light-divider-default: var(--on-dark-divider-default);
-  --on-light-status-success: var(--on-dark-status-success);
-  --on-light-status-success-subtle: var(--on-dark-status-success-subtle);
-  --on-light-status-warning: var(--on-dark-status-warning);
-  --on-light-status-warning-subtle: var(--on-dark-status-warning-subtle);
-  --on-light-status-error: var(--on-dark-status-error);
-  --on-light-status-error-subtle: var(--on-dark-status-error-subtle);
-}
+/* Feature surfaces (deep green: the Next Event card, the accent Card, the Stat strip, the New trip flow). Each one
+   uses feature/* tokens directly; the only thing they share is a focus ring that stays visible on deep green. */
+.feature :focus-visible, .feature:focus-visible { outline-color: var(--feature-border-focus); }

@@ -267,7 +267,7 @@ The Save sheet keeps its **Collections · Trip** segment, and **both tabs now sh
 
 ### G1. One toast, bigger and clearer
 - **The large toast** (today's `size: 'large'`, used for chat messages) **becomes the only toast.** Remove the small one.
-- **Surface:** the **inverse** surface (dark neutral, `on-dark/*` text and icons, white icon). Errors keep the Danger tone.
+- **Surface:** the **inverse** surface (dark neutral, `feature/*` text and icons, white icon). Errors keep the Danger tone.
   - It's not deep green: deep green already means "Next" and feature surfaces, and a green toast would read as "success" even for neutral messages.
 - **Timing:** 4 seconds, or 6 seconds when it has an action (Undo, Open) or carries a message.
 - **Everything else stays:** position clear of the Dynamic Island, aria-live, haptics.
@@ -304,7 +304,7 @@ The Save sheet keeps its **Collections · Trip** segment, and **both tabs now sh
 
 ### G4. Fewer grey boxes
 - **The new rule:**
-  - a grey container (`on-light/surface/secondary`) means **one object**: an event, a trip (Hero card), a place, a map, a journey, a budget, a stat strip, a tile;
+  - a grey container (`surface/secondary`) means **one object**: an event, a trip (Hero card), a place, a map, a journey, a budget, a stat strip, a tile;
   - **lists of rows that lead somewhere sit open on the page**, with no container: icon, title, meta, chevron, and no dividers (Wise style);
   - a grey fill doesn't mean "tappable". The chevron and the row's pressed state show that.
 - **Open up these lists:**
@@ -317,7 +317,7 @@ The Save sheet keeps its **Collections · Trip** segment, and **both tabs now sh
 - **Keep in containers:**
   - Event cards, Hero cards, Tiles, the Map card, the Journey card, the Budget card, the Number card strip, the comment thread, Idea rows (they carry a vote button);
   - **Settings and Support on You**: iOS users expect grouped settings.
-- **Icon holders in open rows** become `on-light/surface/secondary` circles, because a white circle disappears on a white page. Inside containers they stay white.
+- **Icon holders in open rows** become `surface/secondary` circles, because a white circle disappears on a white page. Inside containers they stay white.
 - **Show before and after screenshots** of every changed screen in Figma, and stop for approval before coding.
 
 ### G5. Pressed states fill their container

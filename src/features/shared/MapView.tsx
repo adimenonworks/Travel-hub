@@ -39,8 +39,8 @@ export function MapView({ pins, center, zoom = 12, height = 280 }: { pins: MapPi
     if (!m || !g) return;
     g.clearLayers();
     // Leaflet draws with real colours, not CSS variables.
-    const ring = resolveColor('var(--on-light-text-brand)');
-    const accent = resolveColor('var(--on-mid-surface-primary)');
+    const ring = resolveColor('var(--map-pin-icon)');
+    const accent = resolveColor('var(--map-pin)');
     pins.forEach((p) => {
       const marker = p.kind === 'home'
         ? L.marker([p.lat, p.lng], { icon: homeIcon(), zIndexOffset: 1000 })

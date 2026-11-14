@@ -1,7 +1,7 @@
 /* Figma "Skeleton": surface/sunken shapes; a soft highlight sweeps across while loading. */
 .sk {
   display: block; flex: none;
-  background: var(--on-light-surface-sunken) linear-gradient(90deg, transparent 0, color-mix(in srgb, var(--on-light-surface-primary) 50%, transparent) 50%, transparent 100%) no-repeat;
+  background: var(--surface-sunken) linear-gradient(90deg, transparent 0, color-mix(in srgb, var(--surface-primary) 50%, transparent) 50%, transparent 100%) no-repeat;
   background-size: 50% 100%; background-position: -100% 0;
   animation: shimmer 1.4s var(--ease-standard) infinite;
 }
@@ -18,4 +18,4 @@
 }
 .bare { padding: 0; max-width: none; }
 /* Drawn before the app frame (which normally keeps pages clear of the status bar and Dynamic Island): add that space here */
-.fullscreen { min-height: 100dvh; padding-top: calc(env(safe-area-inset-top) + var(--space-page-top)); background: var(--on-light-surface-primary); }
+.fullscreen { min-height: 100dvh; padding-top: calc(env(safe-area-inset-top) + var(--space-page-top)); background: var(--surface-primary); }
