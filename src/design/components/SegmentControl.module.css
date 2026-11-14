@@ -3,11 +3,11 @@
   display: inline-grid;
   grid-auto-flow: column;
   grid-auto-columns: minmax(0, 1fr); /* equal widths, like iOS: the pill only ever slides; labels stay on one line */
-  padding: var(--space-default-200);
-  gap: var(--space-default-200);
+  padding: var(--space-200);
+  gap: var(--space-200);
   background: transparent;
   border: 1px solid var(--control-unselected-ghost-border);
-  border-radius: var(--radius-1000); /* Figma: a pill, segments too */
+  border-radius: var(--radius-full); /* Figma: a pill, segments too */
   max-width: 100%;
 }
 .block { display: grid; width: 100%; }
@@ -15,16 +15,16 @@
    that makes it fit; past 80% it also gets .noCount, which hides the counts from view (set by SegmentControl.tsx,
    measured on the device) */
 .text { white-space: nowrap; }
-.tight .option { padding-inline: var(--space-default-300); }
+.tight .option { padding-inline: var(--space-300); }
 .noCount .count { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; } /* still read out */
-.option { padding-inline: var(--space-default-300); }
+.option { padding-inline: var(--space-300); }
 .option {
   min-height: 34px;
   /* Side padding gives way as text grows (16px at the default size, 8px from about 23px text), so labels keep to one line */
   white-space: nowrap; overflow: hidden;
-  padding: var(--space-default-400) clamp(var(--space-default-300), calc(54px - 2rem), var(--space-default-500));
+  padding: var(--space-400) clamp(var(--space-300), calc(54px - 2rem), var(--space-500));
   border: 0;
-  border-radius: var(--radius-1000);
+  border-radius: var(--radius-full);
   background: transparent;
   /* Label, growing up to 1.4× like the titles (then it stops, so "Member" fits half a phone at accessibility sizes) */
   font: var(--weight-medium) calc(min(calc(14rem / 17), 20px) * var(--fit, 1))/1.5 var(--font-family);
@@ -40,10 +40,10 @@
 
 /* The sliding pill: one segment wide, moved by whole segments (segment width + the gap) on the GPU. */
 .thumb {
-  position: absolute; top: var(--space-default-200); bottom: var(--space-default-200); left: var(--space-default-200);
-  width: calc((100% - 2 * var(--space-default-200) - (var(--n) - 1) * var(--space-default-200)) / var(--n));
-  transform: translateX(calc(var(--i) * (100% + var(--space-default-200))));
-  border-radius: var(--radius-1000);
+  position: absolute; top: var(--space-200); bottom: var(--space-200); left: var(--space-200);
+  width: calc((100% - 2 * var(--space-200) - (var(--n) - 1) * var(--space-200)) / var(--n));
+  transform: translateX(calc(var(--i) * (100% + var(--space-200))));
+  border-radius: var(--radius-full);
   background: var(--control-selected-background);
   transition: transform var(--duration-slow) var(--ease-spring), background var(--motion-fast);
   will-change: transform;

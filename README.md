@@ -81,7 +81,7 @@ Deploy it (first time, and whenever `functions/` changes), from Google Cloud She
 | Layer | File | What's in it |
 | --- | --- | --- |
 | Primitives | `tokens/primitives.css` | Raw values: bright/deep colour pairs, neutrals (light and dark), Inter type scale, 4/8px spacing, radii, shadows, motion |
-| Semantic tokens | `tokens/semantic.css` | Role-based names components use (`--text-primary`, `--surface-secondary`, `--button-primary-background`, `--border-subtle`, `--space-gutter`, `--size-tap`…), including dark mode; same names as the Figma "Color" collection |
+| Semantic tokens | `tokens/semantic.css` | Role-based names components use (`--text-primary`, `--surface-secondary`, `--button-primary-background`, `--border-subtle`, `--space-page-gutter`, `--size-tap`…), including dark mode; same names as the Figma "Color" collection |
 | Components | `components/` | Button, IconButton, LinkButton, TextField/TextArea/Select, Card (default or accent), Section, List/ListRow, SegmentControl, Accordion, ColorPicker, Sheet, PageHeader, Tabs, Avatar(Stack), Badge, EmptyState, Spinner, Banner, Icon |
 
 Navigation is a slim top bar (your profile) at every width; each trip has its own section tabs. Breakpoints: **compact** < 744px (bottom sheets), **regular** 744–1067px (modal sheets), **wide** ≥ 1068px (a day list beside the timeline). Every tappable element is at least 44×44px.

@@ -6,10 +6,10 @@
 }
 /* Figma "Sheet": 12 / 24 / 40 / 24 padding, gap 20, 24px top corners, Shadow/Overlay */
 .sheet {
-  width: 100%; max-width: calc(var(--size-content-max) + 2 * var(--space-gutter)); /* the phone column on a computer */
+  width: 100%; max-width: calc(var(--size-content-max) + 2 * var(--space-page-gutter)); /* the phone column on a computer */
   /* Stops 24px below the status bar / Dynamic Island (its grabber always reachable) and above the keyboard; anything
      taller scrolls inside the sheet */
-  max-height: calc(100% - env(safe-area-inset-top) - var(--space-default-550) - var(--keyboard-height, 0px));
+  max-height: calc(100% - env(safe-area-inset-top) - var(--space-700) - var(--keyboard-height, 0px));
   display: flex; flex-direction: column;
   background: var(--surface-primary);
   border-radius: var(--radius-600) var(--radius-600) 0 0;
@@ -25,20 +25,20 @@
 .form { display: flex; flex-direction: column; min-height: 0; flex: 1; }
 .top {
   touch-action: none; /* the top (grabber and title) is the handle for drag-down-to-close */
-  display: flex; flex-direction: column; align-items: stretch; gap: var(--space-default-600);
-  padding: var(--space-default-400) var(--space-default-700) 0;
+  display: flex; flex-direction: column; align-items: stretch; gap: var(--space-600);
+  padding: var(--space-400) var(--space-700) 0;
 }
 .grabber { align-self: center; width: 40px; height: 4px; border-radius: var(--radius-100); background: var(--border-subtle); }
-.header { display: flex; align-items: flex-start; gap: var(--space-default-300); }
-.headerText { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: var(--space-default-100); padding-top: var(--space-default-300); }
+.header { display: flex; align-items: flex-start; gap: var(--space-300); }
+.headerText { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: var(--space-100); padding-top: var(--space-300); }
 .title { margin: 0; font: var(--type-heading-2); letter-spacing: -0.01em; color: var(--text-primary); }
 .subtitle { margin: 0; font: var(--type-body); color: var(--text-secondary); }
 .body {
   overflow-y: auto; overscroll-behavior: contain;
-  padding: var(--space-default-600) var(--space-default-700) var(--space-default-900);
-  display: flex; flex-direction: column; gap: var(--space-default-500);
+  padding: var(--space-600) var(--space-700) var(--space-900);
+  display: flex; flex-direction: column; gap: var(--space-500);
 }
-.footer { padding-top: var(--space-default-600); /* 20 + the sheet's 20 gap = 40 above the buttons */ display: flex; gap: var(--space-default-300); } /* secondary + primary, half and half */
+.footer { padding-top: var(--space-600); /* 20 + the sheet's 20 gap = 40 above the buttons */ display: flex; gap: var(--space-300); } /* secondary + primary, half and half */
 .footer > * { flex: 1 1 0; min-width: 0; }
 
 /* Closing: the sheet slides back down and the scrim fades, faster than it came in. */

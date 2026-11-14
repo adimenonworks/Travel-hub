@@ -1,21 +1,21 @@
-.head { display: flex; flex-direction: column; gap: var(--space-default-500); }
-.who { display: flex; gap: var(--space-default-500); align-items: center; }
+.head { display: flex; flex-direction: column; gap: var(--space-500); }
+.who { display: flex; gap: var(--space-500); align-items: center; }
 .whoText { min-width: 0; overflow-wrap: anywhere; }
 .avatarButton { flex: none; display: grid; place-items: center; min-width: var(--size-tap); min-height: var(--size-tap); margin: -2px; padding: 0; border: 0; background: none; border-radius: 50%; transition: transform var(--motion-release); }
 .avatarButton:active { transform: scale(0.94); transition: transform var(--motion-press); }
-.nameRow { display: flex; flex-wrap: wrap; gap: var(--space-default-400); align-items: flex-end; margin-bottom: calc(var(--space-default-400) * -1); }
+.nameRow { display: flex; flex-wrap: wrap; gap: var(--space-400); align-items: flex-end; margin-bottom: calc(var(--space-400) * -1); }
 .addField { flex: 1 1 calc(160rem / 17); min-width: 0; }
-.nameRow > button { margin-bottom: var(--space-default-100); } /* the 40px Icon button centred on the 48px field */
-.appearance { display: flex; flex-direction: column; gap: var(--space-default-700); padding: var(--space-default-500); } /* Figma: card padding 16 */
+.nameRow > button { margin-bottom: var(--space-100); } /* the 40px Icon button centred on the 48px field */
+.appearance { display: flex; flex-direction: column; gap: var(--space-700); padding: var(--space-500); } /* Figma: card padding 16 */
 /* The map of places you've been: a deliberate viewport, 24 corners */
 .map { border-radius: var(--radius-600); overflow: hidden; border: 1px solid var(--border-subtle); }
 
 .version { text-align: center; }
-.account { display: flex; flex-direction: column; gap: var(--space-default-400); }
+.account { display: flex; flex-direction: column; gap: var(--space-400); }
 /* A small, quiet link under the version (Settings → Privacy policy) */
 .privacy { color: inherit; text-decoration: underline; text-underline-offset: 2px; display: inline-flex; align-items: center; min-height: var(--size-tap); }
 /* Privacy policy: body text, bullet lists */
-.policy { display: flex; flex-direction: column; gap: var(--space-stack); }
-.policyText { display: flex; flex-direction: column; gap: var(--space-default-400); color: var(--text-primary); }
-.policyText ul { margin: 0; padding-left: var(--space-default-700); display: flex; flex-direction: column; gap: var(--space-default-300); }
+.policy { display: flex; flex-direction: column; gap: var(--space-page-section); }
+.policyText { display: flex; flex-direction: column; gap: var(--space-400); color: var(--text-primary); }
+.policyText ul { margin: 0; padding-left: var(--space-700); display: flex; flex-direction: column; gap: var(--space-300); }
 .policyText p { margin: 0; }

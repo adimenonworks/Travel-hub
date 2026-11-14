@@ -4,7 +4,7 @@
 .button {
   position: relative;
   display: inline-flex; align-items: center; justify-content: center;
-  border: 0; border-radius: var(--radius-1000);
+  border: 0; border-radius: var(--radius-full);
   max-width: 100%; text-align: center; text-decoration: none; user-select: none; /* a long label wraps at large text sizes instead of running off the screen */
   transition: background var(--motion-fast), color var(--motion-fast), transform var(--motion-release);
 }
@@ -12,10 +12,10 @@
 .glyph { flex: none; }
 
 /* Size=Large: 48px, padding 12 / 20, gap 4, Label, 24px icons. For the big moments: full-width actions (sheet and flow footers). */
-.large { min-height: var(--size-control); padding: var(--space-default-400) var(--space-default-600); gap: var(--space-default-200); font: var(--type-label); }
+.large { min-height: var(--size-control-large); padding: var(--space-400) var(--space-600); gap: var(--space-200); font: var(--type-label); }
 /* Size=Regular (Wise's small button): 32px, padding 6 / 12, gap 4, Label, 16px icons; still a 44px tap area. The default. */
-.regular { min-height: var(--size-control-sm); padding: var(--space-default-250) var(--space-default-400); gap: var(--space-default-200); font: var(--type-label); }
-.regular::after { content: ''; position: absolute; inset: calc((var(--size-control-sm) - var(--size-tap)) / 2) 0; }
+.regular { min-height: var(--size-control-small); padding: var(--space-250) var(--space-400); gap: var(--space-200); font: var(--type-label); }
+.regular::after { content: ''; position: absolute; inset: calc((var(--size-control-small) - var(--size-tap)) / 2) 0; }
 
 .primary { background: var(--button-primary-background); color: var(--button-primary-text); }
 @media (hover: hover) { .primary:hover:not(:disabled) { background: var(--button-primary-background-hover); } }
@@ -55,18 +55,18 @@
 .button:disabled { cursor: default; }
 .block { width: 100%; }
 /* Icon only ("Show text" off): the same pill with just the icon (Large 24px icon, Regular 16px) */
-.iconOnly.large { padding: var(--space-default-400) var(--space-default-500); }
+.iconOnly.large { padding: var(--space-400) var(--space-500); }
 
 /* Figma "Icon button": 40px circle, 24px icon, 44px tap area. Secondary and Ghost use the Button's tokens. */
 .iconButton {
   position: relative; flex: none; display: inline-grid; place-items: center;
-  width: 40px; height: 40px; padding: 0; border: 0; border-radius: var(--radius-1000);
+  width: 40px; height: 40px; padding: 0; border: 0; border-radius: var(--radius-full);
   cursor: pointer; transition: background var(--motion-fast), transform var(--motion-release);
 }
 .iconButton::after { content: ''; position: absolute; inset: -2px; }
 /* Size=Small: 32px circle, 16px icon, the same 44px tap area */
-.iconSmall { width: var(--size-control-sm); height: var(--size-control-sm); }
-.iconSmall::after { inset: calc((var(--size-control-sm) - var(--size-tap)) / 2); }
+.iconSmall { width: var(--size-control-small); height: var(--size-control-small); }
+.iconSmall::after { inset: calc((var(--size-control-small) - var(--size-tap)) / 2); }
 .iconButton:active:not(:disabled) { transform: scale(0.92); transition: background var(--motion-fast), transform var(--motion-press); }
 .icon-secondary { background: var(--surface-secondary); color: var(--icon-primary); } /* Figma Icon button Secondary: neutral grey */
 @media (hover: hover) { .icon-secondary:hover:not(:disabled) { box-shadow: inset 0 0 0 100vmax var(--control-unselected-ghost-background-hover); } }
@@ -93,6 +93,6 @@
 .button:disabled .glyph { color: inherit; }
 
 /* Loading: a ring in the label colour that turns (Reduce Motion: it stays still) */
-.spinner { flex: none; border-radius: var(--radius-1000); border: 2px solid currentColor; border-right-color: transparent; animation: spin 0.8s linear infinite; }
+.spinner { flex: none; border-radius: var(--radius-full); border: 2px solid currentColor; border-right-color: transparent; animation: spin 0.8s linear infinite; }
 @keyframes spin { to { transform: rotate(1turn); } }
 @media (prefers-reduced-motion: reduce) { .spinner { animation: none; } }

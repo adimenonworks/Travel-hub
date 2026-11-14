@@ -4,14 +4,14 @@
 .nav {
   position: fixed; left: 0; right: 0; bottom: 0; z-index: 40;
   display: flex; justify-content: center; pointer-events: none;
-  padding: 0 max(var(--space-default-450), env(safe-area-inset-left)) var(--space-default-550) max(var(--space-default-450), env(safe-area-inset-right));
+  padding: 0 max(var(--space-450), env(safe-area-inset-left)) var(--space-700) max(var(--space-450), env(safe-area-inset-right));
 }
 .bar {
   position: relative;
   pointer-events: auto;
   width: 100%; max-width: var(--size-content-max);
-  display: flex; gap: 0; padding: var(--space-default-200);
-  border-radius: var(--radius-1000); border: 1px solid var(--border-subtle);
+  display: flex; gap: 0; padding: var(--space-200);
+  border-radius: var(--radius-full); border: 1px solid var(--border-subtle);
   background: var(--overlay-bar); box-shadow: var(--elevation-floating-bar);
   -webkit-backdrop-filter: blur(var(--blur-overlay)); backdrop-filter: blur(var(--blur-overlay));
   touch-action: none; /* the bar's touches are all ours: iOS never takes a drag over to scroll (which dropped the pill) */
@@ -19,18 +19,18 @@
 /* Figma ".Nav item": icon over a Label small label */
 .item {
   flex: 1 1 0; min-width: 0; min-height: calc(50rem / 17);
-  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--space-default-100);
-  border-radius: var(--radius-1000); color: var(--text-primary); font: var(--type-label-small);
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--space-100);
+  border-radius: var(--radius-full); color: var(--text-primary); font: var(--type-label-small);
   transition: background var(--motion-fast), transform var(--motion-release);
 }
 .item:active { transform: scale(0.96); transition: background var(--motion-fast), transform var(--motion-press); }
 .item { position: relative; z-index: 1; }
 /* The selected pill: one shape that slides to the current tab (equal-width tabs, so it moves by whole tab widths) */
 .indicator {
-  position: absolute; top: var(--space-default-200); bottom: var(--space-default-200); left: var(--space-default-200);
-  width: calc((100% - 2 * var(--space-default-200)) / var(--n));
+  position: absolute; top: var(--space-200); bottom: var(--space-200); left: var(--space-200);
+  width: calc((100% - 2 * var(--space-200)) / var(--n));
   transform: translateX(calc(100% * var(--i)));
-  border-radius: var(--radius-1000); background: var(--surface-sunken);
+  border-radius: var(--radius-full); background: var(--surface-sunken);
   transition: transform var(--duration-slow) var(--ease-spring);
 }
 /* While dragging, the pill follows the finger exactly (no easing) and grows a touch, like iOS */
