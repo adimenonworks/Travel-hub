@@ -33,7 +33,9 @@ Read this first when starting a session. If it disagrees with the code or Figma,
   - Checked: build; every `var()` defined; demo mode at 320 and 393, text 17 and 33, light and dark, zero-tolerance diff against Main: identical apart from timing noise (the map, the blurred Bottom nav).
   - **Found (not caused by this):** at 320px with the largest text, the page title's shrink-to-fit is flaky: Saved · Country often shows "Aus…" at 67px, sometimes "Australia" fitted at 39px, on Main too.
 
-**Next: A5 (Typography).** Then A6, A7, B, C, D, E.
+- **A5, Typography:** Figma Typography 15 → 14 variables: `font/family` → `font/body`, `size/display tiny` → `size/display-small`, `size/heading 1–3` → `size/heading-1–3`, `size/body small` → `size/body-small`; `size/display secondary` deleted (unused). Text styles "Display tiny" → **Display small**, "Body Small" → **Body small** (all 12 now sentence case). No line-height variables: Figma can only bind a line height to a variable in pixels, and the styles use percentages (100 / 125 / 150%) so they scale; the text styles hold them. Code: `--font-body` (was `--font-family`), `--font-display` and `--font-mono` now hold the font stacks in `semantic.css`'s Typography block (moved from `primitives.css`); `--size-display-small`, `--type-display-small`, `.t-display-small`; `--size-display-secondary` deleted; the Label style uses `--size-body`. Screens identical (demo mode, 320/393, text 17/33, light and dark).
+
+**Next: A6 (Motion).** Then A7, B, C, D, E.
 
 **Noticed for later:** the Foundations section "Spacing & radius" (`35:2217`) documents names from long ago (`--space-xxs`, `--radius-button`, "Regular (744–1067px)"). Rebuild it in A4 with the new Layout names.
 

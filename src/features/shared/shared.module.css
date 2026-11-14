@@ -77,6 +77,6 @@
 .map :global(.leaflet-bar a) { width: 40px; height: 40px; line-height: 40px; background: var(--surface-primary); color: var(--icon-primary); }
 .map :global(.leaflet-control-attribution) { border-top-left-radius: var(--radius-500); padding: 0 var(--space-300); background: var(--surface-primary); color: var(--text-secondary); }
 .map :global(.leaflet-control-attribution a) { color: var(--text-link); }
-.map :global(.leaflet-tooltip) { border: 0; border-radius: var(--radius-full); padding: var(--space-200) var(--space-400); font: var(--weight-semibold) var(--size-body-small)/1.4 var(--font-family); box-shadow: var(--shadow-raised); }
+.map :global(.leaflet-tooltip) { border: 0; border-radius: var(--radius-full); padding: var(--space-200) var(--space-400); font: var(--weight-semibold) var(--size-body-small)/1.4 var(--font-body); box-shadow: var(--shadow-raised); }
 /* The map's space while it loads */
 .mapLoading { border-radius: var(--radius-600); background: var(--surface-sunken); }

@@ -30,7 +30,7 @@ const colorGroups: { title: string; tokens: string[]; feature?: boolean }[] = [
 // One row per Figma text style, at the default iPhone text size.
 const typeStyles = [
   ['t-display', 'Display', '48 · Poppins Black · 100%'],
-  ['t-display-tiny', 'Display tiny', '32 · Poppins Black · 100%'],
+  ['t-display-small', 'Display small', '32 · Poppins Black · 100%'],
   ['t-heading-1', 'Heading 1', '28 · Manrope Bold · 100%'],
   ['t-heading-2', 'Heading 2', '20 · Semibold · 100%'],
   ['t-heading-3', 'Heading 3', '18 · Semibold · 100%'],

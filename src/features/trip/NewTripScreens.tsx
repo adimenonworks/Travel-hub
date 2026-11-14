@@ -8,7 +8,7 @@ const reduceMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)')
 /**
  * A step of the New trip flow, full screen (a screen, not a design-system component, since 13 Nov 2026: the Figma
  * "Flow screen" component was deleted; the frames "New trip · step 1–4" on the Screens page show it). The close Icon button
- * (On brand) and Step progress, the title (Display tiny) and subtitle, the content, then the footer: one Inverse
+ * (On brand) and Step progress, the title (Display small) and subtitle, the content, then the footer: one Inverse
  * button and, only when the step is optional, a Ghost "Skip for now". Content slides 24px and fades between steps.
  */
 export function FlowScreen({ step, of, title, subtitle, onClose, children, footer, stepKey }: {

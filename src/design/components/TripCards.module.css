@@ -36,7 +36,7 @@
 .rows { border-top: 1px solid var(--border-divider); display: flex; flex-direction: column; }
 
 
-/* Figma "Day card": 24 corners, the date (Display tiny) over the weekday. Unselected: ghost with a border, 64 wide.
+/* Figma "Day card": 24 corners, the date (Display small) over the weekday. Unselected: ghost with a border, 64 wide.
    Selected: brand (selected primary) and wider (88), so it pushes the cards beside it aside; picking another day
    widens that one as this one narrows, a smooth, gentle push (400ms, no bounce). */
 .day {
@@ -56,7 +56,7 @@
 .daySelected:hover { background: var(--control-selected-background-hover); }
 .day:active { transform: scale(0.97); transition: transform var(--motion-press); }
 @media (prefers-reduced-motion: reduce) { .day { transition: background var(--motion-fast), color var(--motion-fast), border-color var(--motion-fast); } }
-.dayNum { font: var(--type-display-tiny); letter-spacing: -0.01em; }
+.dayNum { font: var(--type-display-small); letter-spacing: -0.01em; }
 .dayWord { font: var(--type-label-small); white-space: nowrap; }
 @media (prefers-reduced-motion: reduce) { .day, .daySelected { transition: background var(--motion-fast), color var(--motion-fast); } }
 

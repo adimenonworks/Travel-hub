@@ -27,7 +27,7 @@
   border-radius: var(--radius-full);
   background: transparent;
   /* Label, growing up to 1.4× like the titles (then it stops, so "Member" fits half a phone at accessibility sizes) */
-  font: var(--weight-medium) calc(min(calc(14rem / 17), 20px) * var(--fit, 1))/1.5 var(--font-family);
+  font: var(--weight-medium) calc(min(calc(14rem / 17), 20px) * var(--fit, 1))/1.5 var(--font-body);
   color: var(--control-selected-ghost-text);
   text-align: center;
   position: relative; z-index: 1;
