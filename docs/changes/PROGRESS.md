@@ -58,7 +58,14 @@ Read this first when starting a session. If it disagrees with the code or Figma,
 
 - **B8, unused icons kept:** Cloud, Rain, Snow, Bolt, Mask, Comment user and Train side are ordinary icons in Figma's Icons grid and in `icons.ts` (`cloud`, `rain`, `snow`, `bolt`, `mask`, `comment-user`, `train-side`); nothing to change.
 
-**Part B is done.** **Next: Part C (the Components section: readable group headers, layout check, section screenshot).** Then D, E and the Check everything list.
+**Part B is done.** Then a quick fix (owner, 14 Nov 2026): Message bubble padding 12 top and bottom (was 8), sides stay 16, Figma and code (pull request 140).
+
+- **Part C, the Components section** (`88:7142`, Figma only):
+  - New text style **Canvas heading** (Poppins Black 200px, 125%; font linked to `font/display` and `weight/black`; Figma canvas only, not used in the app). The eight group headers use it with `text/brand` (their old fill pointed at a variable from a deleted collection).
+  - Every kind's row re-flowed: most used first (instances placed directly in designs, not counting ones nested inside other components), then A to Z; 96px between sets, wrapping inside the 4,946px dividers; Text field, Text area and Dropdown stacked together. Checked by script: nothing overlaps, in the section or on the page. Section now 5,266 × 9,856.
+  - Screenshot: `docs/changes/images/library-v2-components.png`.
+
+**Next: Part D (code tidy-ups: delete what the mapping marks deleted, /#/design shows the new collections and names).** Then E and the Check everything list.
 
 **Noticed for later:** the Foundations section "Spacing & radius" (`35:2217`) documents names from long ago (`--space-xxs`, `--radius-button`, "Regular (744–1067px)"). Rebuild it in A4 with the new Layout names.
 
