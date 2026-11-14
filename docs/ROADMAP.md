@@ -215,7 +215,7 @@ What Rove does today (on Main, in the iPhone app).
 - **Planning a trip:** full-screen New trip (where; exact dates or a rough month; who; bring your saves), then the celebration.
 - **Trips library:** Upcoming · Collections · Past with Hero cards, the remembered segment, empty states.
 - **A trip:**
-  - Overview: Next stop, Bookings, Recently viewed, Good to know;
+  - Overview: Next stop, Bookings, Recently viewed, Countries you’re visiting;
   - Itinerary: day cards, travel times, now line, hold for Edit / Delete;
   - Ideas: votes, Add to a day;
   - Photos: shared album links;

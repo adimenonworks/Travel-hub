@@ -2,8 +2,8 @@ import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Avatar, Button, Card, IconButton, Dropdown, LinkButton, ListGroup, ListItem, PageHeader, PageSection, ProfileCard as FigmaProfileCard, SegmentControl, Sheet, StatStrip, TextField, useToast } from '../../design/components';
 import { store } from '../../data';
-import { useMe, useMyTrips, usePlaces, useProfile } from '../../data/hooks';
-import { countryName } from '../../lib/countries';
+import { useActivitiesFor, useMe, useMyTrips, usePlaces, useProfile } from '../../data/hooks';
+import { countryCodeOf, countryName, tripCountries } from '../../lib/countries';
 import { placeCategory } from '../../lib/places';
 import { PlaceRow, PlaceSheet } from '../saves/Collections';
 import { usePlaceMarks } from '../saves/placeMarks';
@@ -41,6 +41,8 @@ export function ProfilePage() {
   const visited = profile?.visited ?? [];
   const been = (trips ?? []).filter((t) => tripPhase(t.startDate, t.endDate) !== 'upcoming');
   const pastPlaces = been.filter((t) => t.destination).map((t) => t.destination!);
+  // Countries from trips go through tripCountries, so a stop you never reached isn't counted once the trip ends
+  const beenActs = useActivitiesFor(been.map((t) => t.id));
   const { visited: beenTo } = usePlaceMarks();
   // Favourite places: the Places you've starred (from Collections, or an idea or event on a trip).
   const favourites = (usePlaces() ?? []).filter((p) => p.starredBy?.includes(me.uid)).sort((x, y) => y.createdAt - x.createdAt);
@@ -48,7 +50,10 @@ export function ProfilePage() {
 
   // Your travels: places from trips that have started, plus the places you added yourself.
   const places = [...pastPlaces, ...visited];
-  const countries = new Set(places.map((p) => p.countryCode ?? p.country ?? p.name.split(',').pop()!.trim())).size;
+  const countries = new Set([
+    ...been.flatMap((t) => tripCountries(t, beenActs[t.id] ?? [])),
+    ...visited.map((p) => countryCodeOf(p) ?? p.country ?? p.name.split(',').pop()!.trim()),
+  ]).size;
   const cities = new Set(places.map((p) => p.name.split(',')[0].trim().toLowerCase())).size;
   const t0 = today();
   const daysAway = been.reduce((n, t) => n + daysBetween(t.startDate, t.endDate < t0 ? t.endDate : t0) + 1, 0);

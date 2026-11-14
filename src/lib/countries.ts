@@ -1,4 +1,5 @@
 import type { Place, Trip, Activity } from '../data/types';
+import { today } from './dates';
 
 // The flags from the Figma ".Flag styles" set, one small PNG per country code. Each is its own file, fetched only when shown.
 const FLAGS = import.meta.glob('../assets/flags/*.png', { query: '?url', import: 'default', eager: true }) as Record<string, string>;
@@ -39,12 +40,24 @@ export const samePlace = (a: Place, b: Place) =>
 /**
  * The countries a trip covers: its stops' countries in the order they were picked, then any other country an event
  * takes you to (a flight to Rome or a hotel in Athens adds Italy and Greece), in the order you'll arrive. Ideas don't
- * count. Everything that asks which countries a trip covers goes through here.
+ * count. Once the trip has ended, only the countries its events were in count: stops you never reached drop off by
+ * themselves (worked out here each time; nothing is deleted). A past trip with no events keeps its first stop.
+ * Everything that asks which countries a trip covers goes through here.
  */
 export function tripCountries(trip: Trip, activities: Activity[]): string[] {
   const out: string[] = [];
   const add = (c?: string) => { if (c && !out.includes(c)) out.push(c); };
-  tripStops(trip).forEach((p) => add(countryCodeOf(p)));
+  const ended = trip.endDate < today();
+  if (!ended) tripStops(trip).forEach((p) => add(countryCodeOf(p)));
+  eventCountries(activities).forEach(add);
+  if (!out.length) add(countryCodeOf(tripStops(trip)[0]));
+  return out;
+}
+
+/** The countries a trip's events are in, in the order you'll arrive. */
+export function eventCountries(activities: Activity[]): string[] {
+  const out: string[] = [];
+  const add = (c?: string) => { if (c && !out.includes(c)) out.push(c); };
   [...activities].sort((a, b) => (a.date + (a.startTime || '99')).localeCompare(b.date + (b.startTime || '99'))).forEach((a) => { add(countryCodeOf(a.location)); add(countryCodeOf(a.to)); });
   return out;
 }

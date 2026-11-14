@@ -4,7 +4,7 @@ import type { IconName } from '../../design/components';
 import { useMe, useProfile } from '../../data/hooks';
 import type { Place } from '../../data/types';
 import { BOOKING_GROUPS, TYPE_TONE, bookingGroupOf, categoryInfo, categoryTone, isEveryday } from '../../lib/categories';
-import { countryCodeOf, countryName, flagUrl, tripCountries, tripStops } from '../../lib/countries';
+import { countryCodeOf, countryName, eventCountries, flagUrl, tripCountries, tripStops } from '../../lib/countries';
 import { timeAgo } from '../../lib/dates';
 import { priceOf, useBudgetTotals } from '../../lib/currency';
 import { money } from '../../lib/format';
@@ -21,7 +21,7 @@ const KIND_ICON: Record<ViewKind, IconName> = { PDF: 'document', Email: 'mail', 
 /**
  * Trip "Overview" tab (Figma "Trip — Overview"): Next stop (the next event as the deep green Next card) → Bookings (a
  * list, one row per type with a plain count, each opening that type's list) → Recently viewed (documents, bookings
- * and places you last opened, on this device) → Good to know (each country's emergency number; opens the Country sheet).
+ * and places you last opened, on this device) → Countries you’re visiting (the trip's live list of countries: each one's emergency number, or "No plans yet" for a stop with no events; opens the Country sheet).
  */
 export function Overview(ctx: TripCtx) {
   const { trip, activities } = ctx;
@@ -38,10 +38,12 @@ export function Overview(ctx: TripCtx) {
   const me = useMe();
   const reads = useReads(me.uid);
   const home = useProfile(me.uid)?.home ?? null;
-  // Good to know is about where you're going: your home country (a flight out of Melbourne) is left out, unless the whole trip is at home.
+  // Countries you're visiting: the trip's live list (stops plus every event's place, see tripCountries). It's about where you're going: your home country (a flight out of Melbourne) is left out, unless the whole trip is at home.
   const homeCode = home ? countryCodeOf(home) : null;
   const all = tripCountries(trip, activities);
   const countries = all.some((c) => c !== homeCode) ? all.filter((c) => c !== homeCode) : all;
+  // A stop with no events yet says so (information only)
+  const planned = new Set(eventCountries(activities));
   // A spot on the trip in the chosen country, for its local time
   const spots: Place[] = [...tripStops(trip), ...activities.flatMap((a) => [a.location, a.to])].filter((p): p is Place => !!p);
   const spot = country ? spots.find((p) => countryCodeOf(p) === country) ?? null : null;
@@ -91,14 +93,14 @@ export function Overview(ctx: TripCtx) {
       )}
 
       {countries.length > 0 && (
-        <PageSection title="Good to know" meta="Emergency numbers and entry rules">
+        <PageSection title="Countries you’re visiting" meta="Emergency numbers and entry rules">
           <ListGroup label="Countries">
             {countries.map((c) => {
               const e = emergencyFor(c);
               const n = e?.general ?? e?.police;
               return (
                 <ListItem key={c} media={flagUrl(c) && <img src={flagUrl(c)} alt="" className={s.flagThumb} />} round
-                  title={countryName(c)} meta={`${n ? `Emergency ${n} · ` : ''}entry requirements`}
+                  title={countryName(c)} meta={planned.has(c) ? `${n ? `Emergency ${n} · ` : ''}entry requirements` : 'No plans yet'}
                   onClick={() => setCountry(c)} label={`${countryName(c)}: emergency number and entry requirements`} />
               );
             })}
