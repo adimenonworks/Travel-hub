@@ -8,7 +8,7 @@ Read this first when starting a session. If it disagrees with the code or Figma,
 
 `docs/changes/rove-change-library-v2.md` is **finished** (14 Nov 2026; results below).
 
-**Next: `docs/changes/rove-change-transparency-setup.md`** (14 Nov 2026): the start-up check and the Planning board redrawn from `docs/ROADMAP.md`. The transparency documents themselves (`ROADMAP.md`, `DECISIONS.md`, the split `CLAUDE.md` with `DESIGN-SYSTEM.md`, `APP-SPEC.md`, `FEEL-AND-NATIVE.md`) were merged from the claude.ai chat the same day. Then `rove-change-people-and-sharing.md`, then `rove-change-polish-and-library.md`.
+**Next: `docs/changes/rove-change-transparency-setup.md`** (14 Nov 2026): the start-up check and the Planning board redrawn from `docs/ROADMAP.md`. The transparency documents themselves (`ROADMAP.md`, `DECISIONS.md`, the split `CLAUDE.md` with `DESIGN-SYSTEM.md`, `APP-SPEC.md`, `FEEL-AND-NATIVE.md`) were merged from the claude.ai chat the same day. Then `rove-change-people-and-sharing.md`, then `rove-change-polish-and-library.md` (which now also has G8: Dropdown's size and Text area's height, the two Figma mismatches library v2 left).
 
 ### Library v2 status (14 Nov 2026)
 
@@ -96,7 +96,6 @@ Read this first when starting a session. If it disagrees with the code or Figma,
 - ✅ Counts: Figma variables 399 → 390 (Base 129 → 137, Color 228 → 154, Layout 27 → 66, Typography 15 → 14, Motion 0 → 19); code tokens 446 → 416; variants 200 → 200 in 49 → 51 components (Text area and Dropdown split out; Day card lost an option but kept its 2 variants); 328 icon and flag sets.
 - ✅ Conflicts found between code, Figma and the prompt, and how each was settled: Event card star orange in Figma vs emerald in code (code won, owner); Message bubbles in Figma were the old colours and grey (code won); the Now line uses the Time icon, not Clock as the prompt said (code won); the prompt's Motion durations (350) vs the code's (400 and others: kept as used, owner); `--font-mono` was used, not unused as A1 said (kept); Dropdown's `compact` size exists only in code (not changed); Text area is drawn at Input height in Figma (not changed).
 
-**Noticed for later:** the Foundations section "Spacing & radius" (`35:2217`) documents names from long ago (`--space-xxs`, `--radius-button`, "Regular (744–1067px)"). Rebuild it in A4 with the new Layout names.
 
 The component library prompt below is finished; its notes stay for reference.
 
