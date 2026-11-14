@@ -27,7 +27,7 @@ Built in this order. Progress is in `docs/changes/PROGRESS.md`.
 ### 1. New trip stops and Home's main button
 `docs/changes/rove-change-new-trip-stops.md`
 - **Home:** Plan a trip is the Primary button, Save a place Neutral.
-- **New trip takes several places** ("Add every stop, or just the first"); a trip covers its stops plus every place on its events. No stops list in Edit trip.
+- **New trip takes several places** ("Add every stop, or just the first"); a trip covers its stops plus every place on its events. Overview's "Countries you're visiting" (was Good to know) shows them, with "No plans yet" on unplanned stops; after the trip, only countries with events count. No stops list in Edit trip.
 - **Bring your saves** only shows the trip's countries, and is skipped when nothing matches. Add from saved also offers other countries.
 
 **How we'd build it:** the change prompt, run by Claude Code. A new `trip.stops` field (older trips read as their one place), possibly a rules update. Small to medium. Nothing for the owner beyond reviewing.

@@ -23,10 +23,19 @@
 - **Decision:** step one is "Where are you going?" ("Add every stop, or just the first. You can add more later.") and adds places to a list. Saved as `trip.stops`; the first stop is still `destination` (name and cover). A trip's countries are its stops plus every place on its events.
 - **Why:** trips often cross several countries. With one place only, "Bring your saves" and Good to know would miss every other country until events were added there. "Where are you starting?" alone was considered and rejected for that reason.
 
-### No stops list in Edit trip (owner)
-- **Decision:** Edit trip doesn't list or edit the stops. Countries keep themselves current from the stops and the events. A stop picked but never visited stays (harmless: one Good to know row, suggested saves).
-- **Why:** the owner saw no point in editing places by hand when events add them, and removing a place must never delete events. To still bring in saves from a country added later, Ideas → Add from saved also lists other saved countries.
-- **Replaces:** the people change's read-only "Started in Lisbon" line in Edit trip.
+### The trip's countries look after themselves (owner)
+- **Decision:**
+  - Edit trip doesn't list or edit the stops.
+  - Overview's "Good to know" becomes **"Countries you're visiting"**: the live list (stops plus event places), each row opening the Country sheet. A stop with no events says "No plans yet".
+  - After the trip ends, only countries with events count (the first stop is kept if there are none). Worked out on the fly, nothing deleted. You → Your travels counts countries this way.
+  - No prompt to remove unvisited countries.
+- **Why:**
+  - Removing a place must never delete events, and events already add countries.
+  - A read-only list doesn't belong in an edit sheet; Overview already had a row per country.
+  - Unvisited stops would otherwise inflate your travel stats.
+  - A prompt mid-trip would nag about countries you haven't reached yet.
+  - To bring in saves from a country added later, Ideas → Add from saved also lists other saved countries.
+- **Replaces:** the people change's read-only "Started in Lisbon" line in Edit trip. The owner's idea of a removal prompt in notifications was considered and dropped.
 
 ### Bring your saves matches the trip (owner)
 - **Decision:** the New trip step only offers saves from the trip's countries, and is skipped when none match.

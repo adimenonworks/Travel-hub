@@ -61,7 +61,8 @@ The owner decided all of it on 14 Nov 2026. The reasons are in `docs/DECISIONS.m
 - Check `firestore.rules` allows the new field on create and on update. If the rules change, update `tests/rules` and run them. Tell the owner if the rules need publishing.
 
 **A trip's countries:** `tripCountries` becomes the countries of the trip's **stops, in order, plus every place on its events** (as today). Ideas don't count. Everything that asks which countries a trip covers uses it:
-- Good to know;
+- Overview's Countries you're visiting (was Good to know);
+- You → Your travels (past trips);
 - Bring your saves;
 - Ideas → Add from saved;
 - the Save sheet's trip default;
@@ -76,12 +77,22 @@ The owner decided all of it on 14 Nov 2026. The reasons are in `docs/DECISIONS.m
 - **Skip the step** when none of your saves match. The step bars must count the right number of steps from the start, and update as stops are added or removed in step one.
 - Everything else about the step stays the same. Nothing comes along until it's picked, and Skip for now still works.
 
-## 4. No list of places in Edit trip (owner, 14 Nov 2026)
+## 4. The trip's countries look after themselves (owner, 14 Nov 2026)
 
-- Edit trip gets **no** place picker and **no** list of stops.
-- The trip's countries keep themselves up to date: the stops from step one, plus the places on its events.
-- Adding an event in a new country adds that country. Deleting events never removes a stop.
-- A stop picked at the start and never visited stays on the trip. That's accepted: it only adds a Good to know row and suggests that country's saves.
+**Edit trip:** no place picker and no list of stops. Everything in an edit sheet should be editable, so a list that can't be changed doesn't belong there.
+
+**Overview, "Countries you're visiting":** rename the "Good to know" section to **Countries you're visiting**. It's the trip's live list of countries.
+- One row per country, as today. Each row still opens the Country sheet (emergency numbers, entry rules, local time, currency). Your home country is still left out unless the whole trip is at home.
+- The list updates by itself as events are added and deleted. Adding an event in a new country adds it; deleting events never removes a stop while the trip is upcoming or happening.
+- **A stop with no events yet** shows **"No plans yet"** as its row's meta text. It's information only: no button and no prompt.
+- Keep the section's meta line ("Emergency numbers and entry rules") or shorten it, whichever reads better; show the owner.
+
+**After the trip ends:** a trip's countries are only the ones its events were in. Stops picked but never visited drop off.
+- Work this out each time in `tripCountries` (from the trip's end date). Don't delete anything from the trip, and don't run any background job.
+- A past trip with no events at all keeps its first stop, so it always has a country.
+- **You → Your travels** (`ProfilePage.tsx`) counts countries from past trips through `tripCountries` (today it counts only each trip's one destination), so a country you never reached is never counted. Cities stay as they are unless the same helper makes them easy to fix; say which.
+
+**No prompt to remove countries,** during the trip or after (owner, 14 Nov 2026). Unvisited stops leave by themselves when the trip ends.
 
 ## 5. Ideas → Add from saved: other countries too
 
@@ -97,7 +108,7 @@ The owner decided all of it on 14 Nov 2026. The reasons are in `docs/DECISIONS.m
 ## Write after
 
 In the same pull requests:
-- `docs/APP-SPEC.md`: Home's buttons, the New trip flow, Bring your saves, Add from saved, and what a trip's countries are.
+- `docs/APP-SPEC.md`: Home's buttons, the New trip flow, Bring your saves, Add from saved, Countries you're visiting, Your travels, and what a trip's countries are.
 - `docs/DECISIONS.md` already has the decisions. Add an entry only if something changes while building.
 - `docs/ROADMAP.md`: move "New trip stops" from Now to Built when done, then redraw the Figma Planning board.
 - `docs/changes/PROGRESS.md`: progress, then mark this prompt finished, with **Next** set to `rove-change-people-and-sharing.md`.
@@ -112,6 +123,8 @@ Report ✅, ❌ (with the reason) or ⚠️ (done, with a caveat) on every line.
 - [ ] `tripCountries` = stops plus event places, and every "which countries" use goes through it
 - [ ] Bring your saves shows only the trip's countries, in stop order, and is skipped (with the right step count) when nothing matches
 - [ ] Edit trip has no stops list or picker
+- [ ] Overview's "Countries you're visiting" (renamed from Good to know) updates with events; stops without events say "No plans yet"
+- [ ] Past trips count only countries with events (first stop kept if there are none); Your travels uses it
 - [ ] Add from saved: the trip's countries first, then "Other saved places" as collapsed Accordions
-- [ ] Demo mode with Playwright: one stop, three stops, a stop removed, no matching saves (step skipped), at 320 and 390px, text 17 and 33, light and dark
+- [ ] Demo mode with Playwright: one stop, three stops, a stop removed, no matching saves (step skipped), a past trip with an unvisited stop, at 320 and 390px, text 17 and 33, light and dark
 - [ ] `APP-SPEC.md`, `ROADMAP.md` and `PROGRESS.md` updated; Planning board redrawn
