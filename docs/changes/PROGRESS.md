@@ -69,7 +69,7 @@ Read this first when starting a session. If it disagrees with the code or Figma,
   - Checked in demo mode: Alex sees only his events; Sam's view shows Surf lesson with I'm in and no price, "You're in" on shared ones; choice remembered after reload; Surf lesson's page hides notes, links, comments, price until I'm in; Jo (follower, added by Sam) has no Me and starts on Sam, basics only; idea delete → Undo → still there; delete → gone for good after 6.5 s; 320/375/390/430, light/dark, text 17/23/33 on Itinerary, event page and /#/design: no horizontal scroll, no page errors.
   - **Not in this item:** the database still sends notes, prices etc. to everyone on the trip (item 8 moves them); opening on today and the Today chip (item 6).
 
-**Next: R1–R6 from the owner's review (15 Nov 2026), added to the prompt on Main (PR 173), then item 6 together with R7.** Item 6 also changed: thumbs down is Pass, only the suggester edits or deletes an idea, no buttons on notifications, and item 7 has a seat for each person on a booking.
+**Next: R1–R6 from the owner's review (15 Nov 2026), added to the prompt on Main (PR 174), then item 6 together with R7.** Item 6 also changed: thumbs down is Pass, only the suggester edits or deletes an idea, no buttons on notifications, and item 7 has a seat for each person on a booking.
 
 **Waiting on the owner:** publish `firestore.rules` (the new app needs the new rules: publish them before rebuilding the app in Xcode; the old app keeps working with the new rules).
 
