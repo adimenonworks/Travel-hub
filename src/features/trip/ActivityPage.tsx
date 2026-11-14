@@ -121,7 +121,7 @@ export function ActivityPage(ctx: TripCtx) {
     a.bookingRef && <ListItem key="ref" icon="ticket" title={<span className={s.selectable}>{a.bookingRef}</span>} meta={kind === 'restaurant' ? 'Reservation reference' : 'Booking reference'}
       action={<IconButton size="small" icon="copy" label="Copy booking reference" onClick={() => copy(a.bookingRef!, kind === 'restaurant' ? 'Reservation reference' : 'Booking reference')} />} />,
     a.seats && <ListItem key="seats" icon="user-add" title="Seats" meta={a.seats} />,
-    a.bags && <ListItem key="bags" icon="info" title="Bags" meta={a.bags} />,
+    a.bags && <ListItem key="bags" icon="information" title="Bags" meta={a.bags} />,
   ].filter(Boolean);
 
   // Something with two ends (a stay, a car, a cruise, parking, luggage): the Span card at the top says when (and for a
@@ -234,7 +234,7 @@ export function ActivityPage(ctx: TripCtx) {
               const name = l.label || hostOf(l.url);
               return (
                 <div key={i} className={s.docRow}>
-                  <ListItem icon={isPdf(l.url) ? 'doc' : 'link'} title={name} meta={`${isPdf(l.url) ? 'PDF' : hostOf(l.url)}${l.emailUrl ? ' · from email' : ''}`}
+                  <ListItem icon={isPdf(l.url) ? 'document' : 'link'} title={name} meta={`${isPdf(l.url) ? 'PDF' : hostOf(l.url)}${l.emailUrl ? ' · from email' : ''}`}
                     trailing={isPdf(l.url) ? 'PDF' : undefined} href={l.url} label={`${name} (opens in a new tab)`}
                     onClick={() => recordView(trip.id, { url: l.url, kind: isPdf(l.url) ? 'PDF' : 'Link', label: name, meta: a.title })} />
                   {l.emailUrl && <LinkButton href={l.emailUrl} size="small" tone="ghost" icon="mail" label={`Open the email for ${name}`} />}

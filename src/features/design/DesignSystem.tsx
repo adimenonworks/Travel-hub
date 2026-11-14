@@ -1,5 +1,5 @@
 import { useState, type CSSProperties } from 'react';
-import { Avatar, AvatarStack, Tag, Chip, Banner, Button, Card, FieldRow, HeroCard, Icon, IconButton, LinkButton, PageHeader, PageSection, SegmentControl, Select, Sheet, Tabs, TextArea, TextField, NowLine, Illustration, type IllustrationName, COVER_ILLUSTRATIONS, ICON_NAMES, useToast, BottomNav, Skeleton, Logo, ListItem, ListGroup, SectionHeader, EventCard, TravelConnector, IdeaRow, Tile, StatStrip, ProfileCard, OptionCard, BudgetCard, StepProgress, DayCard, CountryModal, CategoryIcon, ContextMenu, Accordion, Calendar, JourneyCard, JourneyLeg, JourneyStop, MapCard } from '../../design/components';
+import { Avatar, AvatarStack, Tag, Chip, Banner, Button, Card, FieldRow, HeroCard, Icon, IconButton, LinkButton, PageHeader, PageSection, SegmentControl, Select, Sheet, Tabs, TextArea, TextField, NowLine, Illustration, type IllustrationName, COVER_ILLUSTRATIONS, ICON_NAMES, useToast, BottomNavigation, Skeleton, Logo, ListItem, ListGroup, SectionHeader, EventCard, TravelConnector, IdeaRow, Tile, StatStrip, ProfileCard, OptionCard, BudgetCard, StepProgress, DayCard, CountryModal, CategoryIcon, ContextMenu, Accordion, Calendar, JourneyCard, JourneyLeg, JourneyStop, MapCard } from '../../design/components';
 import { flagUrl } from '../../lib/countries';
 import { EVENT_TYPES, TYPE_TONE } from '../../lib/categories';
 import type { ReactNode } from 'react';
@@ -154,9 +154,9 @@ export function DesignSystem() {
           </Card>
         </Section>
 
-        <Section title="Bottom nav and Skeleton" footer="Figma Bottom nav (.Nav item ×3: Home, Trip, You), floating on the frosted bar; hidden while typing. Figma Skeleton (Text, Block, Circle) replaces spinners while a page loads.">
+        <Section title="Bottom navigation and Skeleton" footer="Figma Bottom navigation (.Navigation item ×3: Home, Trip, You), floating on the frosted bar; hidden while typing. Figma Skeleton (Text, Block, Circle) replaces spinners while a page loads.">
           <Card>
-            <BottomNav inline tabs={[
+            <BottomNavigation inline tabs={[
               { to: '/design', label: 'Home', icon: 'home', active: () => true },
               { to: '/design', label: 'Trip', icon: 'plane', active: () => false },
               { to: '/design', label: 'You', icon: 'person', active: () => false },
@@ -242,7 +242,7 @@ export function DesignSystem() {
           <EventCard icon="coffee" title="Breakfast at Manteigaria" time="09:00 – 10:00" place="Chiado" amount="€12" state="done" to="/design" />
           <TravelConnector label="About 8 min walk" />
           <EventCard icon="utensils" title="Time Out Market" time="13:30 – 15:00" place="Cais do Sodré" amount="€25" state="next" to="/design"
-            extras={[{ icon: 'info', label: 'Next · in 1 hr' }, { icon: 'people', label: '2 of 4 going' }]} />
+            extras={[{ icon: 'information', label: 'Next · in 1 hr' }, { icon: 'people', label: '2 of 4 going' }]} />
           <TravelConnector label="About 20 min by car" icon="car" />
           <EventCard icon="plane" layout="journey" title="Lisbon → Porto" time="TP1946" place="TAP Air Portugal" amount="€89" status="Check-in open" to="/design"
             journey={{ fromTime: '08:30', fromPlace: 'LIS · T1', duration: '55m · direct', toTime: '09:25', toPlace: 'OPO' }} />
@@ -334,7 +334,7 @@ export function DesignSystem() {
           <ListGroup>
             <ListItem icon="utensils" title="Ichiran Shibuya" meta="Ramen · Tokyo · from TikTok" trailing="2h" onClick={() => {}} />
             <ListItem icon="link" title="10 things to do in Cusco" meta="Article · Peru · cntraveler.com" trailing="Yesterday" />
-            <ListItem size="small" icon="doc" title="TAP e-ticket" trailing="PDF · 2h ago" />
+            <ListItem size="small" icon="document" title="TAP e-ticket" trailing="PDF · 2h ago" />
             <BudgetCard label="Left to spend" amount="A$1,800" caption="of A$5,000 per person · A$3,200 planned" ratio={0.64}
               rows={[{ icon: 'plane', label: 'Flights', amount: 'A$1,900' }, { icon: 'bed', label: 'Stays', amount: 'A$900' }, { icon: 'key', label: 'Car rental', amount: 'A$180' }]} />
             <OptionCard icon="wallet" label="Yes" description="Add costs to your bookings to see what the trip adds up to" onClick={() => {}} />

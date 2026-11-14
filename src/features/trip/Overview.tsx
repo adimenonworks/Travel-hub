@@ -16,7 +16,7 @@ import type { TripCtx } from './TripPage';
 import { unreadCount, unreadTag, useReads } from '../../lib/reads';
 import s from './trip.module.css';
 
-const KIND_ICON: Record<ViewKind, IconName> = { PDF: 'doc', Email: 'mail', Link: 'link', Booking: 'ticket', Place: 'pin' };
+const KIND_ICON: Record<ViewKind, IconName> = { PDF: 'document', Email: 'mail', Link: 'link', Booking: 'ticket', Place: 'pin' };
 
 /**
  * Trip "Overview" tab (Figma "Trip — Overview"): Next stop (the next event as the deep green Next card) → Bookings (a

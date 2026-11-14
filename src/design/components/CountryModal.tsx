@@ -43,12 +43,12 @@ export function CountryModal({ code, onClose, place, home }: { code: string | nu
       <SectionHeader title="Emergency" meta={e?.note} />
       <ListGroup label="Emergency numbers">
         {rows.length > 0
-          ? rows.map((r) => <ListItem key={r.title} icon="info" title={r.title} meta={r.meta} trailing={r.n} href={`tel:${r.n}`} label={`Call ${r.title.toLowerCase()}: ${r.n}`} />)
-          : <ListItem icon="info" title="Check locally" meta={`We don’t have ${name}’s numbers yet. 112 works from mobiles in many countries.`} />}
+          ? rows.map((r) => <ListItem key={r.title} icon="information" title={r.title} meta={r.meta} trailing={r.n} href={`tel:${r.n}`} label={`Call ${r.title.toLowerCase()}: ${r.n}`} />)
+          : <ListItem icon="information" title="Check locally" meta={`We don’t have ${name}’s numbers yet. 112 works from mobiles in many countries.`} />}
       </ListGroup>
       <SectionHeader title="Before you go" />
       <ListGroup label="Before you go">
-        {entry && <ListItem icon="doc" title="Entry requirements" meta={entry.official ? `Official ${name} government site` : entry.label}
+        {entry && <ListItem icon="document" title="Entry requirements" meta={entry.official ? `Official ${name} government site` : entry.label}
           href={entry.url} label={`Entry requirements for ${name} (opens in a new tab)`} />}
         {diff && <ListItem icon="time" title="Local time" meta={diff} />}
         {money && <ListItem icon="wallet" title="Currency" meta={money} />}

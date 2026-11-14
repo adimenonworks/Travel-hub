@@ -74,7 +74,7 @@ export function CollectionPeople({ open, onClose, code, share, profiles }: {
   };
   const leave = async () => {
     if (!share || !confirmAction(`Leave ${ownerName}'s ${country} collection? Places you added stay yours.`)) return;
-    try { await store.setShareRole(share, me.uid, null); toast({ icon: 'signout', label: 'You left the collection' }); onClose(); navigate('/trips'); }
+    try { await store.setShareRole(share, me.uid, null); toast({ icon: 'sign-out', label: 'You left the collection' }); onClose(); navigate('/trips'); }
     catch { toast({ tone: 'danger', label: "Couldn't leave. Check your connection" }); }
   };
 
@@ -87,7 +87,7 @@ export function CollectionPeople({ open, onClose, code, share, profiles }: {
     <>
       <Sheet open={open && !person} title="People" subtitle={owner ? `Who sees your ${country} collection` : `${ownerName}'s ${country} collection`} onClose={onClose}
         onSubmit={owner ? invite : undefined} submitLabel="Share invite link" submitDisabled={busy}
-        secondary={!owner ? <Button tone="destructive" size="large" icon="signout" onClick={leave}>Leave</Button> : undefined}>
+        secondary={!owner ? <Button tone="destructive" size="large" icon="sign-out" onClick={leave}>Leave</Button> : undefined}>
         <div className={s.sections}>
           <ListGroup label="People in this collection">
             {people.map(({ id, role: r }) => {

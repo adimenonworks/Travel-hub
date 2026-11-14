@@ -110,7 +110,7 @@ export function ProfilePage() {
       </PageSection>
 
       <div className={s.account}>
-        <Button tone="neutral" block iconEnd="signout" onClick={() => store.signOut()}>Sign out</Button>
+        <Button tone="neutral" block iconEnd="sign-out" onClick={() => store.signOut()}>Sign out</Button>
         <Button tone="destructive" block iconEnd="trash" onClick={() => setOpen('delete')}>Delete account</Button>
       </div>
       <p className={['t-body-small t-secondary', s.version].join(' ')}>

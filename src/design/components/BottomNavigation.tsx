@@ -3,19 +3,19 @@ import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { haptic } from '../../lib/native';
 import { Icon, type IconName } from './Icon';
 import { nextTransition } from '../../app/navigation';
-import s from './BottomNav.module.css';
+import s from './BottomNavigation.module.css';
 
 export type NavTab = { to: string; label: string; icon: IconName; active: (path: string) => boolean };
 
 /**
- * Figma "Bottom nav": the app's tab bar, a frosted pill (Elevation/Floating bar) floating 16px from the sides and bottom,
- * always on top while the page scrolls under it. Each tab is a Figma ".Nav item": the current one sits on a grey pill
+ * Figma "Bottom navigation": the app's tab bar, a frosted pill (Elevation/Floating bar) floating 16px from the sides and bottom,
+ * always on top while the page scrolls under it. Each tab is a Figma ".Navigation item": the current one sits on a grey pill
  * (which slides between tabs) with its filled icon. Tapping the current tab scrolls it back to the top, as on iPhone.
  * You can also press and drag along the bar, like iOS: the pill follows your finger, the tab under it lights up (a
  * selection tick as it crosses each one), and letting go opens the nearest tab. Once dragging it keeps hold wherever
  * your thumb goes on the screen (above or beside the bar) until you lift it. Taps stay silent.
  */
-export function BottomNav({ tabs, inline }: { tabs: NavTab[]; /** In the page flow instead of fixed to the bottom (the /#/design page) */ inline?: boolean }) {
+export function BottomNavigation({ tabs, inline }: { tabs: NavTab[]; /** In the page flow instead of fixed to the bottom (the /#/design page) */ inline?: boolean }) {
   const { pathname } = useLocation();
   const navigate = useNavigate();
   const current = tabs.findIndex((t) => t.active(pathname));

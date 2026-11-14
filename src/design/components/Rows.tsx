@@ -216,7 +216,7 @@ export function Tile({ title, meta, icon, media, add, ...press }: Press & {
 
 
 
-/** Figma "Stat strip" of "Stat"s: big numbers (Heading 1) with a label, on the light emerald surface. */
+/** Figma "Stat strip" of ".Stat"s: big numbers (Heading 1) with a label, on the light emerald surface. */
 export function StatStrip({ stats }: { stats: { value: ReactNode; label: string }[] }) {
   return (
     <dl className={s.stats}>

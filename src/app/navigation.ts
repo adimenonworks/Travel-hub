@@ -5,7 +5,7 @@ import { useLocation, useNavigationType, type Location, type NavigateFunction } 
  * How screens change, like an iPhone app:
  * - opening something (a link, a card) slides the new screen in from the right;
  * - a back button slides the previous screen back in from the left;
- * - the Bottom nav cross-fades quickly between tabs (no haptic: navigation is silent), and each tab keeps its own scroll position;
+ * - the Bottom navigation cross-fades quickly between tabs (no haptic: navigation is silent), and each tab keeps its own scroll position;
  * - swiping in from the left edge drags this screen away over the previous one (SwipeBack in Shell.tsx), like iOS.
  * Each screen also remembers its scroll position, and going back returns you there.
  */
