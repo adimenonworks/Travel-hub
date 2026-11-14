@@ -77,6 +77,8 @@ function TripGroup({ trip, list, before, profiles }: { trip: Trip; list: Entry[]
 /** Where an entry leads: its event while it exists, the People tab for joins and roles, else the trip. */
 function targetOf(e: Entry) {
   const base = `/trip/${e.trip.id}`;
+  // "Sam and Priya are going to Fado night": its day, with the suggestion highlighted (you answer it there)
+  if (e.notice?.kind === 'going' && e.event && !e.event.deletedAt) return `${base}/itinerary?day=${e.event.date}&focus=event-${e.event.id}`;
   if (e.event && !e.event.deletedAt && e.notice?.kind !== 'deleted') return `${base}/plan/${e.event.id}`;
   if (e.notice?.kind === 'joined' || e.notice?.kind === 'role') return `${base}/people`;
   if (e.notice?.kind === 'dates') return base;

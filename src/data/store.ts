@@ -60,6 +60,9 @@ export interface Store {
   updateEvent(tripId: string, before: Activity, patch: Partial<Activity>, restoredFrom?: string): Promise<void>;
   /** An event's change history, newest first, at most `limit` entries. */
   watchHistory(tripId: string, eventId: string, limit: number, cb: (changes: EventChange[]) => void): Unsubscribe;
+  /** The first I'm in on a suggested idea (item 6): makes its event and takes it out of Ideas, at once for everyone. If
+   *  someone got there first, nothing is made and their event's id comes back with `made: false` (then just say I'm in). */
+  acceptIdea(tripId: string, ideaId: string, event: NewDoc<Activity>, notices: NewNotice[]): Promise<{ id: string; made: boolean }>;
   /** Atomically add or remove `uid` from an array field / map field on a sub-document. */
   toggleInArray(tripId: string, name: SubName, id: string, field: string, uid: string, on: boolean): Promise<void>;
   /** Set one person's vote on an idea: up, down, or none. A person has at most one of the two. */

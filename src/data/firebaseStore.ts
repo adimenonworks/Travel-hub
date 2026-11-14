@@ -5,7 +5,7 @@ import {
 } from 'firebase/auth';
 import {
   Timestamp, addDoc, arrayRemove, arrayUnion, collection, deleteDoc, deleteField, doc, getDoc, getDocFromCache, getDocs,
-  initializeFirestore, limit, onSnapshot, orderBy, persistentLocalCache, persistentMultipleTabManager, query, setDoc, updateDoc, where, writeBatch, type DocumentData, type Firestore,
+  initializeFirestore, limit, onSnapshot, orderBy, persistentLocalCache, persistentMultipleTabManager, query, runTransaction, setDoc, updateDoc, where, writeBatch, type DocumentData, type Firestore,
 } from 'firebase/firestore';
 import type { Store } from './store';
 import { isTravelling, migratedRoles } from './roles';
@@ -403,6 +403,22 @@ export function createFirebaseStore(config: FirebaseOptions): Store {
       // An event's history goes with it (the rules allow that only once the event is in Recently deleted)
       if (name === 'activities') await deleteAll(collection(db, 'trips', tripId, 'activities', id, 'history'));
       await deleteDoc(doc(db, 'trips', tripId, name, id));
+    },
+    async acceptIdea(tripId, ideaId, event, notices) {
+      const by = auth.currentUser!.uid;
+      const ideaRef = doc(db, 'trips', tripId, 'ideas', ideaId);
+      const ref = doc(collection(db, 'trips', tripId, 'activities'));
+      // A transaction, so two people tapping I'm in at once can't make two events
+      return runTransaction(db, async (tx) => {
+        const idea = await tx.get(ideaRef);
+        const made = idea.data()?.activityId as string | undefined;
+        if (made) return { id: made, made: false };
+        tx.set(ref, { ...event, createdBy: by, createdAt: Date.now() });
+        tx.update(ideaRef, { status: 'approved', activityId: ref.id });
+        const at = Date.now();
+        for (const n of notices) if (n.to.length) tx.set(doc(collection(db, 'trips', tripId, 'notices')), { ...n, eventId: ref.id, by, at });
+        return { id: ref.id, made: true };
+      });
     },
     async updateEvent(tripId, before, patch, restoredFrom) {
       const { id: _id, ...rest } = patch;

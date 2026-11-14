@@ -70,6 +70,8 @@
 .event-done .eventIcon, .event-done .eventBody { opacity: 0.48; }
 /* Note: white with a subtle border */
 .event-note { background: var(--surface-primary); border-color: var(--border-subtle); }
+/* Suggested (item 6): a dated idea on its day: white like a Note, with a dashed border */
+.event-suggested { background: var(--surface-primary); border: var(--border-width-thin) dashed var(--border-subtle); }
 .eventBody { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: var(--space-400); }
 .eventHeader { display: flex; gap: var(--space-500); align-items: flex-start; }
 .eventText { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: var(--space-200); }
@@ -91,7 +93,7 @@
 .eventWithAction { position: relative; }
 .eventCover { position: absolute; inset: 0; border-radius: inherit; }
 .eventWithAction:has(.eventCover[data-pressed]) { transform: scale(0.97); transition: transform var(--motion-press); }
-.eventAction { position: relative; z-index: 1; margin-left: auto; }
+.eventActions { position: relative; z-index: 1; margin-left: auto; display: flex; flex-wrap: wrap; gap: var(--space-200); }
 .route { display: flex; flex-direction: column; gap: var(--space-400); padding-top: var(--space-400); border-top: var(--border-width-thin) solid var(--border-divider); }
 .routeTimes { display: flex; align-items: center; gap: var(--space-300); }
 .routeEnd { flex: none; display: flex; flex-direction: column; gap: var(--space-100); }
@@ -119,7 +121,9 @@
 .voted { background: var(--surface-brand); color: var(--text-brand); }
 
 /* Idea row */
-.ideaRow { display: flex; align-items: center; gap: var(--space-400); min-height: var(--size-1100); padding: var(--space-300) 0; }
+.ideaRow { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; column-gap: var(--space-400); min-height: var(--size-1100); padding: var(--space-300) 0; }
+/* Show Button: under the text (it can't sit inside the row's own tap area), lined up with the title; the vote stays on the right */
+.ideaAction { grid-column: 1; grid-row: 2; display: flex; padding-left: calc(var(--size-category-icon-large) + var(--space-400)); margin-top: calc(-1 * var(--space-100)); }
 .ideaMain { flex: 1 1 auto; min-width: 0; display: flex; align-items: center; gap: var(--space-400); }
 .ideaMain.pressable { transition: opacity var(--motion-screen); }
 .ideaMain.pressable[data-pressed] { transform: none; opacity: 0.6; transition: opacity 0s; }

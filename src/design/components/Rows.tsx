@@ -77,7 +77,8 @@ export function PageSection({ title, meta, action, children, label }: { title: R
   );
 }
 
-export type EventState = 'default' | 'next' | 'done';
+/** `suggested` (item 6): a dated idea on its day, not an event yet for you: white, dashed border, I'm in and Pass. */
+export type EventState = 'default' | 'next' | 'done' | 'suggested';
 
 /**
  * Figma "Event card" (Layout Standard / Journey / Note × State Default / Next / Done). The icon in a 40px circle,
@@ -102,7 +103,7 @@ export function CategoryIcon({ icon, type = 'neutral', size = 'medium', tone = '
   return <span className={cls.filter(Boolean).join(' ')} aria-hidden="true"><Icon name={icon} size={size === 'small' ? 16 : 24} /></span>;
 }
 
-export function EventCard({ title, time, timeIcon = 'clock', place, placeIcon = 'pin', amount, icon, layout = 'standard', state = 'default', type = 'neutral', journey, extras, status, favourite, people, going, action, to, onClick }: {
+export function EventCard({ title, time, timeIcon = 'clock', place, placeIcon = 'pin', amount, icon, layout = 'standard', state = 'default', type = 'neutral', journey, extras, status, favourite, people, going, action, secondaryAction, to, onClick }: {
   title: string; time?: string; place?: string; amount?: string; icon: IconName;
   /** Figma Event card: the time and the place sit on their own lines, each after a small icon. The place's icon is a pin
    *  unless it isn't a place (a note's text, a stay's nights): pass null for no icon. */
@@ -123,10 +124,12 @@ export function EventCard({ title, time, timeIcon = 'clock', place, placeIcon = 
   /** Figma "Show Button" in the footer: a small Neutral Button (Inverse on the Next card), e.g. I'm in or I'm out. The
    *  card stays one link: the Button sits above it, so tapping it never opens the event. */
   action?: { label: string; onClick: () => void };
+  /** A second, Ghost Button after it (the Suggested state's Pass). */
+  secondaryAction?: { label: string; onClick: () => void };
   to?: string; onClick?: () => void;
 }) {
-  const cls = [s.event, s[`event-${layout}`], s[`event-${state}`], state === 'next' && 'feature', action && s.eventWithAction].filter(Boolean).join(' ');
-  const stateText = state === 'next' ? ', up next' : state === 'done' ? ', done' : '';
+  const cls = [s.event, s[`event-${layout}`], s[`event-${state}`], state === 'next' && 'feature', (action || secondaryAction) && s.eventWithAction].filter(Boolean).join(' ');
+  const stateText = state === 'next' ? ', up next' : state === 'done' ? ', done' : state === 'suggested' ? ', suggested' : '';
   const label = `${title}${favourite ? ', favourite' : ''}${time ? `, ${time}` : ''}${place ? `, ${place}` : ''}${amount ? `, ${amount} per person` : ''}${going ? `, ${going}` : ''}${stateText}`;
   const content = (
     <>
@@ -160,17 +163,22 @@ export function EventCard({ title, time, timeIcon = 'clock', place, placeIcon = 
         {extras && extras.length > 0 && (
           <span className={s.eventExtras} aria-hidden="true">{extras.map((e) => <Tag key={e.label} tone="neutral" icon={e.icon}>{e.label}</Tag>)}</span>
         )}
-        {(people?.length || action) && (
+        {(people?.length || action || secondaryAction) && (
           <span className={s.eventFooter}>
             {people && people.length > 0 && <span className={s.eventPeople} aria-hidden="true"><AvatarStack people={people} />{going && <span>{going}</span>}</span>}
-            {action && <Button size="small" tone={state === 'next' ? 'inverse' : 'neutral'} className={s.eventAction} onClick={action.onClick} aria-label={`${action.label}: ${title}`}>{action.label}</Button>}
+            {(action || secondaryAction) && (
+              <span className={s.eventActions}>
+                {action && <Button size="small" tone={state === 'next' ? 'inverse' : 'neutral'} onClick={action.onClick} aria-label={`${action.label}: ${title}`}>{action.label}</Button>}
+                {secondaryAction && <Button size="small" tone="ghost" onClick={secondaryAction.onClick} aria-label={`${secondaryAction.label}: ${title}`}>{secondaryAction.label}</Button>}
+              </span>
+            )}
           </span>
         )}
       </span>
     </>
   );
   // With a Button inside, the card is a plain box and an invisible link covers it (a button can't sit inside a link)
-  if (action) return <div className={cls}><Pressable to={to} onClick={onClick} className={s.eventCover} label={label}><span /></Pressable>{content}</div>;
+  if (action || secondaryAction) return <div className={cls}><Pressable to={to} onClick={onClick} className={s.eventCover} label={label}><span /></Pressable>{content}</div>;
   return <Pressable to={to} onClick={onClick} className={cls} label={label}>{content}</Pressable>;
 }
 
@@ -190,11 +198,13 @@ export function VoteButton({ count, selected, onClick, label }: { count: number;
 }
 
 /** Figma "Idea row": thumb, title (Heading 3), meta, an optional tag under it, and the Vote button. */
-export function IdeaRow({ title, meta, icon, type, tag, vote, onClick }: {
+export function IdeaRow({ title, meta, icon, type, tag, vote, action, onClick }: {
   title: string; meta?: ReactNode; icon: IconName; tag?: { icon?: IconName; label: string };
   /** The nested `.Category icon`'s Type: the icon tile's colour (the idea's category type). */
   type?: CategoryTone;
   vote: { count: number; selected: boolean; onClick: () => void };
+  /** Figma "Show Button": a Ghost Small Button under the meta, e.g. "Add to a day" or "Go to day" (item 6). */
+  action?: { label: string; onClick: () => void };
   onClick?: () => void;
 }) {
   return (
@@ -209,6 +219,7 @@ export function IdeaRow({ title, meta, icon, type, tag, vote, onClick }: {
       </Pressable>
       <VoteButton count={vote.count} selected={vote.selected} onClick={vote.onClick}
         label={`${vote.selected ? 'Remove your vote for' : 'Vote for'} ${title}, ${vote.count} ${vote.count === 1 ? 'vote' : 'votes'}`} />
+      {action && <span className={s.ideaAction}><Button size="small" tone="ghost" iconEnd="chevron-right" onClick={action.onClick} aria-label={`${action.label}: ${title}`}>{action.label}</Button></span>}
     </div>
   );
 }

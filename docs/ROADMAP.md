@@ -31,8 +31,8 @@ Built in this order. Progress is in `docs/changes/PROGRESS.md`.
 - **Who's in, per event.** Being added means you're in; I'm out removes it from your itinerary only. Guests can join a single event. *(built 14 Nov: who's in on every event, defaults, I'm in / I'm out with Undo, only people in an event edit it, Just me / Remove for everyone; guests with item 9)*
 - **Undo and per-event change history** with Restore. *(built 14 Nov: Undo on event edits, deletes, I'm in and I'm out; Changes on the event page)*
 - **In-app Notification centre** (lock-screen push stays in Later). *(built 14 Nov: Bell on Home with the count also on the Home tab; added you, took you out, is out, moved, removed for everyone, joined, made you, changed the dates, and unread chat; opening it clears the count)*
-- **Itinerary shows only your events,** with a switch to see one other traveller's. It opens on today, with a Today chip. *(built 14 Nov: Person switcher, remembered per trip, followers start on whoever added them, events you're not in show only the basics; opening on today and the Today chip come with item 6)*
-- **Ideas:** To decide · Passed. A dated idea shows on its day as a suggestion with I'm in and Pass.
+- **Itinerary shows only your events,** with a switch to see one other traveller's. It opens on today, with a Today chip. *(built 14 Nov: Person switcher, remembered per trip, followers start on whoever added them, events you're not in show only the basics; built with item 6: opening on today and the Today chip)*
+- **Ideas:** To decide · Passed. A dated idea shows on its day as a suggestion with I'm in and Pass. *(built 15 Nov: optional day and time on ideas, Add to a day / Go to day, Suggested cards, first I'm in makes the event, Pass rules, the Itinerary opens on today with a Today chip)*
 - **Bookings:** one shared event, with each person's own "Your booking" (reference, seat, bags, files).
 - **Prices** are a total split by who's in (or "Each"), each in its own currency. **Budgets are personal and private,** in your Settings currency.
 - **Trip edit:** the trip's places aren't edited after creation (built 14 Nov: New trip stops).
