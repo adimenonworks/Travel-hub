@@ -1,0 +1,6 @@
+/* "Sam added you to Dinner": I'm out and View on their own line under the text (lined up with it), so the sentence
+   keeps the row's full width */
+.actions {
+  flex: 1 0 100%; display: flex; flex-wrap: wrap; gap: var(--space-200);
+  padding-inline-start: calc(var(--size-avatar-large) + var(--space-400));
+}

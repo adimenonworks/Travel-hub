@@ -60,6 +60,9 @@ export function useWhosIn(trip: Trip, profiles: Record<string, Profile>) {
     const item = { kind: 'event' as const, tripId: trip.id, id: a.id };
     try {
       await store.setDeleted(item, true);
+      // The others in it hear "Sam removed Fado night for everyone"
+      const others = peopleOf(a, trip).filter((id) => id !== me.uid);
+      if (others.length) store.addNotices(trip.id, [{ kind: 'deleted', to: others, eventId: a.id, title: a.title, date: a.date, startTime: a.startTime ?? '' }]).catch(() => {});
       toast({ icon: 'trash', label: 'Event deleted', action: { label: 'Undo', onClick: () => { store.setDeleted(item, false).catch(() => {}); } } });
       onDeleted?.(a);
     } catch { toast({ tone: 'danger', label: "Couldn't delete. Check your connection" }); }

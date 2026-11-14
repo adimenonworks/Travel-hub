@@ -5,6 +5,7 @@ import { store } from '../data';
 import { ScreenStack } from './ScreenStack';
 import { SwipeBack } from './SwipeBack';
 import { ChatAlerts } from './ChatAlerts';
+import { NotificationsProvider, useNotifications } from '../features/notifications/notifications';
 import { NewTrip } from '../features/trip/NewTrip';
 import { SaveSheet, type SaveRequest } from '../features/saves/SaveSheet';
 import { onOpenPath, onSharedLink } from '../lib/native';
@@ -18,9 +19,9 @@ export const useNewTrip = () => useContext(NewTripContext);
 const SaveContext = createContext<(r: SaveRequest) => void>(() => {});
 export const useSave = () => useContext(SaveContext);
 
-/** Bottom navigation (Figma): Home, Trips (your trips, and each trip's pages) and You. */
+/** Bottom navigation (Figma): Home (with the count of unread notifications), Trips (your trips, and each trip's pages) and You. */
 const TABS: NavTab[] = [
-  { to: '/', label: 'Home', icon: 'home', active: (p) => p === '/' },
+  { to: '/', label: 'Home', icon: 'home', active: (p) => p === '/' || p === '/notifications' },
   { to: '/trips', label: 'Trips', icon: 'plane', active: (p) => p === '/trips' || p.startsWith('/trip/') },
   { to: '/profile', label: 'You', icon: 'person', active: (p) => p.startsWith('/profile') },
 ];
@@ -37,7 +38,6 @@ export function Shell({ children }: { children: ReactNode }) {
   useEffect(() => onOpenPath((path) => navigate(path)), [navigate]);
   usePurgeDeleted();
   const { pathname } = useLocation();
-  const tabs = TABS;
   const showNav = !pathname.startsWith('/join/') && pathname !== '/design';
 
   return (
@@ -45,6 +45,7 @@ export function Shell({ children }: { children: ReactNode }) {
       <SaveContext.Provider value={setSaving}>
       <ToastProvider>
       <ChatAlerts />
+      <NotificationsProvider>
       <div className={s.shell}>
         <SwipeBack routes={<div className={[s.main, showNav && s.withNav].filter(Boolean).join(' ')}>{children}</div>}>
           <main id="main" className={[s.main, showNav && s.withNav].filter(Boolean).join(' ')}>
@@ -56,14 +57,22 @@ export function Shell({ children }: { children: ReactNode }) {
             <ScreenStack>{children}</ScreenStack>
           </main>
         </SwipeBack>
-        {showNav && <BottomNavigation tabs={tabs} />}
+        {showNav && <Navigation />}
         <NewTrip open={creating} onClose={() => setCreating(false)} onOpenTrip={(id) => navigate(`/trip/${id}`)} />
         <SaveSheet request={saving} onClose={() => setSaving(null)} />
       </div>
+      </NotificationsProvider>
       </ToastProvider>
       </SaveContext.Provider>
     </NewTripContext.Provider>
   );
+}
+
+/** The Bottom navigation, with the unread notifications count on Home (owner, 14 Nov 2026: Bell on Home + this badge). */
+function Navigation() {
+  const { unread } = useNotifications();
+  const tabs = TABS.map((t) => (t.to === '/' ? { ...t, badge: unread, badgeLabel: `${unread} new notification${unread === 1 ? '' : 's'}` } : t));
+  return <BottomNavigation tabs={tabs} />;
 }
 
 export function Content({ children, className }: { children: ReactNode; className?: string }) {

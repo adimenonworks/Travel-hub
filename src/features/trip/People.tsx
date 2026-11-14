@@ -63,6 +63,7 @@ export function People({ trip, profiles, isTraveller }: TripCtx) {
     const name = id === me.uid ? 'You' : personName(profiles, id).split(' ')[0];
     try {
       await store.setRole(trip, id, role);
+      if (id !== me.uid) store.addNotices(trip.id, [{ kind: 'role', to: [id], role }]).catch(() => {});
       haptic('selection');
       toast({ icon: 'check', label: `${name} ${id === me.uid ? 'are' : 'is'} ${ROLE_NAME[role].toLowerCase()}`, action: { label: 'Undo', onClick: () => { store.setRole(trip, id, was).catch(() => {}); } } });
     } catch { toast({ tone: 'danger', label: "Couldn't save. Check your connection" }); }

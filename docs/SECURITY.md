@@ -32,6 +32,7 @@ personal data.
 | A trip | Its members only | Any traveller (there's no owner): details, cover, people and roles, Recently deleted. Nobody can change `createdBy` (who started it, a record only). Deleting for good only from Recently deleted. Anyone can leave. Followers change nothing. Older trips' `owner`/`editor`/`member` count as traveller and `viewer` as follower until migrated |
 | Links to join (`invites`) | Anyone signed in, by code | Any traveller makes one, Travelling or Following (`role`); joining gives exactly the link's role (older links have none and mean travelling) |
 | An event's change history (`activities/{id}/history`) | Members | Travellers append as themselves (known fields only); nobody edits; deleted only with the event or trip once it's in Recently deleted |
+| Notification centre entries (`notices`) | Only the people an entry is addressed to (`to`); a traveller may list them all once the trip is in Recently deleted, to delete them with it | Anyone on the trip writes as themselves, never to themselves, only to people on the trip (at most 50), known kinds and fields only; nobody edits one; deleted only with the trip from Recently deleted |
 | A trip's events, ideas, albums | Members | Travellers add, update and delete; followers only comment |
 | A trip's comments | Members | Only the author edits or deletes; at most 150 characters |
 | Joining a trip | – | Someone with a valid, unexpired invite. They can only add themselves, as a member |
@@ -81,6 +82,8 @@ The rules have their own automated tests (`tests/rules/`). Run them whenever the
    or bring it back from Recently deleted; its history takes entries only from people in it. Older events without
    `people` stay open to every traveller until the app migrates them. Ideas and albums are still editable by any
    traveller (on purpose: planning together, voting).
+   Notification centre entries (`trips/{id}/notices`, item 4) are written by the device of whoever made the change and
+   read only by the people they're addressed to; the catch-all rule for a trip's other collections skips `notices`.
 4. **Skipped for now (10 Nov): the Worker can be called by anyone who knows its address.** That can't leak data, but it
    can use up the Unsplash and flight quotas. *Fix later:* a Cloudflare rate-limiting rule, and optionally require a
    Firebase sign-in token. In `docs/ROADMAP.md` under Later.

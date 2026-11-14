@@ -20,7 +20,7 @@ export function PageHeader({ title, subtitle, meta, back, action, fit, size = 'l
   meta?: ReactNode;
   back?: { to: string; label: string };
   /** Figma "Show trailing": the one optional button, e.g. edit the trip */
-  action?: { icon: IconName; label: string; onClick: () => void };
+  action?: { icon: IconName; label: string; onClick: () => void; /** A count on it (Home's Bell: unread notifications) */ badge?: number };
   /** Keep the title on one line: if it doesn't fit, it steps down to the Heading 1 size, then as small as it needs */
   fit?: boolean;
   /** Figma "Size": Large (tabs: Display) or Small (pushed pages and a trip's pages: Heading 1) */
@@ -90,7 +90,7 @@ export function PageHeader({ title, subtitle, meta, back, action, fit, size = 'l
         </div>
         {action && (
           <div className={s.actions}>
-            <IconButton icon={action.icon} label={action.label} tone="secondary" onClick={action.onClick} />
+            <IconButton icon={action.icon} label={action.label} tone="secondary" badge={action.badge} onClick={action.onClick} />
           </div>
         )}
       </div>

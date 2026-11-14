@@ -1,7 +1,8 @@
 import { isTravelling, migratedRoles } from './roles';
 import type { Store } from './store';
 import { changesOf } from '../lib/eventHistory';
-import type { EventChange, ChatReads, CollectionRole, CollectionShare, Invite, Profile, SavedPlace, SubName, Trip, User } from './types';
+import { eventNotices } from '../lib/notices';
+import type { Activity, EventChange, NewNotice, Notice, ChatReads, CollectionRole, CollectionShare, Invite, Profile, SavedPlace, SubName, Trip, User } from './types';
 import { randomCode } from './util';
 
 /**
@@ -19,6 +20,8 @@ type DB = {
   invites: Record<string, Invite>;
   /** Event change history: tripId -> eventId -> changes */
   history?: Record<string, Record<string, EventChange[]>>;
+  /** Notification centre entries: tripId -> entries */
+  notices?: Record<string, Notice[]>;
   shares?: Record<string, CollectionShare>;
 };
 
@@ -65,6 +68,10 @@ export function createLocalStore(): Store {
     listeners.add(run);
     queueMicrotask(run);
     return () => { listeners.delete(run); };
+  };
+  const notify = (tripId: string, list: NewNotice[]) => {
+    const at = Date.now();
+    for (const n of list) if (n.to.length) ((db.notices ??= {})[tripId] ??= []).push({ ...structuredClone(n), id: randomCode(16), by: me(), at });
   };
   const sub = (tripId: string, name: SubName) => ((db.subs[tripId] ??= {})[name] ??= {});
 
@@ -151,8 +158,16 @@ export function createLocalStore(): Store {
       db.trips[id] = { ...db.trips[id], ...patch, id };
       save();
     },
+    watchNotices(tripId, uid, cb) {
+      return watch(() => (db.notices?.[tripId] ?? []).filter((n) => n.to.includes(uid)), cb);
+    },
+    async addNotices(tripId, list) {
+      notify(tripId, list);
+      save();
+    },
     async deleteTrip(id) {
       delete db.trips[id];
+      if (db.notices) delete db.notices[id];
       delete db.subs[id];
       if (db.history) delete db.history[id];
       save();
@@ -200,6 +215,7 @@ export function createLocalStore(): Store {
     queueSub(tripId, name, data) {
       const id = randomCode(16);
       sub(tripId, name)[id] = { ...data, id, createdBy: me(), createdAt: Date.now() };
+      if (name === 'activities') notify(tripId, eventNotices(null, { ...(data as unknown as Activity), id }, me()));
       save();
       return { id, saved: Promise.resolve() };
     },
@@ -248,6 +264,7 @@ export function createLocalStore(): Store {
     async addSub(tripId, name, data) {
       const id = randomCode(16);
       sub(tripId, name)[id] = { ...data, id, createdBy: me(), createdAt: Date.now() };
+      if (name === 'activities') notify(tripId, eventNotices(null, { ...(data as unknown as Activity), id }, me()));
       save();
       return id;
     },
@@ -268,6 +285,7 @@ export function createLocalStore(): Store {
       const list = (((db.history ??= {})[tripId] ??= {})[before.id] ??= []);
       const at = Date.now();
       for (const c of changesOf(before, patch)) list.push({ ...structuredClone(c), id: randomCode(16), by: me(), at, ...(restoredFrom ? { restoredFrom } : {}) });
+      notify(tripId, eventNotices(before, { ...before, ...patch, id: before.id }, me()));
       save();
     },
     watchHistory(tripId, eventId, max, cb) {
@@ -342,6 +360,8 @@ export function createLocalStore(): Store {
       if (!t.memberIds.includes(uid)) {
         t.memberIds.push(uid);
         t.roles[uid] = invite.role === 'follower' ? 'follower' : 'traveller';
+        // Everyone already on it hears "Jo joined Portugal & Spain"
+        notify(t.id, [{ kind: 'joined', to: t.memberIds.filter((m) => m !== uid) }]);
       }
       save();
     },

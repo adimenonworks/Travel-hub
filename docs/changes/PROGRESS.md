@@ -52,7 +52,15 @@ Read this first when starting a session. If it disagrees with the code or Figma,
   - Checked in demo mode: migration (plan → everyone, stay → who it named), I'm out + Undo, I'm in, opening clears New, Delete → Just me, history of each, Add event defaults (plan: all; stay: just you), follower sees no buttons; 320/375/390/430, light/dark, 17/23/33: no horizontal scroll, no page errors.
   - **Not in this item:** hiding events you're out of (item 5), the Notification centre entry (item 4), guests (item 9), I'm out as a swipe (conflicts with day swipes; see DECISIONS).
 
-**Next: item 4, Notification centre.**
+- **Item 4: Notification centre** (pull request 171):
+  - Owner's answers first (14 Nov 2026): Bell on Home + the count on Home in the Bottom navigation (no Trip header Bell); opening the centre clears the count; the chat alert stays, and unread chat gets a row per event.
+  - Figma first: icon **Bell** (`692:563`, from Backup icons fi-rr-bell / fi-sr-bell, every size and state; Icons grid re-sorted A to Z); new **`.Badge`** (`692:582`, Feedback row: emerald count pill, text property Count); **Icon button** and **.Navigation item** got **Show Badge** (`Show Badge#692:1`, `Show Badge#692:10`). Screens: Home (`500:509`) and Home · during a trip (`545:2217`) show the Bell with a badge and the Home tab's badge; draft **Notification centre** (`692:3654`) with a note (`693:3291`).
+  - Code: `Notice` type; `store.watchNotices` / `addNotices`; `updateEvent`, `addSub` / `queueSub` (events) write entries in the same batch (`eventNotices` in `src/lib/notices.ts`: added, removed, out, moved); joining (`redeemInvite`), role changes, trip dates and Remove for everyone write theirs. `NotificationsProvider` in the shell (entries, unread, read state key `notices`, waits for the account's read state before marking seen); `/notifications` page; `Badge` component, `IconButton badge`, `PageHeader action.badge`, `NavTab badge`; /#/design shows them.
+  - Rules: `trips/{id}/notices`: read only by the people in `to` (and by travellers once the trip is in Recently deleted, to delete them with it); create by anyone on the trip as themselves, not to themselves, only to members, known kinds and keys; no updates. The catch-all rule skips `notices`. 204 rules tests pass.
+  - Checked in demo mode: count 3 on the Bell and Home tab, the centre's rows (chat, added with I'm out / View, moved, joined), opening clears the count, Sam's I'm out reaches Alex and Priya, I'm out from the centre (Undo toast, writes "out" for the others), cold start keeps "New"; 320/375/390/430, light/dark, text 17/23/33: no horizontal scroll, no page errors. Badge measured on /#/design: 16 × 16 at (20, 6) on a 40px Icon button, as in Figma.
+  - **Not in this item:** guests ("added a guest", item 9); new ideas and suggestions as entries, message previews and the C2 dots (polish prompt, Part C); lock-screen push (Later).
+
+**Next: item 5, Itinerary: yours, or one person's.**
 
 **Changed on Main while item 4 was running (14 Nov 2026, PR 168):** the owner's rule that on events you're not in you see only the title, date and time, place and who's in, added to items 2, 5 and 8 and the Check everything list. Re-read those before item 5.
 

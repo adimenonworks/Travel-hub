@@ -12,6 +12,7 @@ import { ProfilePage } from '../features/profile/ProfilePage';
 import { Privacy } from '../features/profile/Privacy';
 import { RecentlyDeleted } from '../features/profile/RecentlyDeleted';
 import { Shell } from './Shell';
+import { NotificationCentre } from '../features/notifications/NotificationCentre';
 import { GetApp } from '../features/auth/GetApp';
 import { joinOnly } from '../lib/site';
 
@@ -44,6 +45,7 @@ function Routed() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/trips" element={<Trips />} />
+        <Route path="/notifications" element={<NotificationCentre />} />
         {/* Links shared to Rove arrive at #/save?url=… (the Shell opens Save to Rove) */}
         <Route path="/save" element={<Home />} />
         <Route path="/trip/:tripId/*" element={<TripPage />} />

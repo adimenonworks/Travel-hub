@@ -5,12 +5,13 @@ import {
 } from 'firebase/auth';
 import {
   Timestamp, addDoc, arrayRemove, arrayUnion, collection, deleteDoc, deleteField, doc, getDoc, getDocFromCache, getDocs,
-  initializeFirestore, limit, onSnapshot, orderBy, persistentLocalCache, persistentMultipleTabManager, query, setDoc, updateDoc, where, writeBatch, type DocumentData,
+  initializeFirestore, limit, onSnapshot, orderBy, persistentLocalCache, persistentMultipleTabManager, query, setDoc, updateDoc, where, writeBatch, type DocumentData, type Firestore,
 } from 'firebase/firestore';
 import type { Store } from './store';
 import { isTravelling, migratedRoles } from './roles';
-import type { ChatReads, CollectionShare, EventChange, Invite, LinkPreview, Profile, SavedPlace, SubName, Trip } from './types';
+import type { Activity, ChatReads, CollectionShare, EventChange, Invite, LinkPreview, NewNotice, Notice, Profile, SavedPlace, SubName, Trip } from './types';
 import { changesOf } from '../lib/eventHistory';
+import { eventNotices } from '../lib/notices';
 import { getFunctions, httpsCallable } from 'firebase/functions';
 import { randomCode } from './util';
 import { googleIosClientId, isNativeApp } from '../lib/native';
@@ -23,6 +24,12 @@ async function deleteAll(ref: ReturnType<typeof collection>) {
     snap.docs.slice(i, i + 400).forEach((d) => batch.delete(d.ref));
     await batch.commit();
   }
+}
+
+/** Add Notification centre entries to a batch (nobody-to-tell entries are dropped). */
+function putNotices(batch: ReturnType<typeof writeBatch>, db: Firestore, tripId: string, list: NewNotice[], by: string) {
+  const at = Date.now();
+  for (const n of list) if (n.to.length) batch.set(doc(collection(db, 'trips', tripId, 'notices')), { ...n, by, at });
 }
 
 const SUBS: SubName[] = ['activities', 'ideas', 'expenses', 'comments', 'albums'];
@@ -245,6 +252,17 @@ export function createFirebaseStore(config: FirebaseOptions): Store {
       }
     },
 
+    watchNotices(tripId, uid, cb) {
+      // Only the entries addressed to you (the rules allow nothing else)
+      const q = query(collection(db, 'trips', tripId, 'notices'), where('to', 'array-contains', uid));
+      return onSnapshot(q, (s) => cb(s.docs.map((d) => withId<Notice>(d.id, d.data()))), () => cb([]));
+    },
+    async addNotices(tripId, list) {
+      if (!list.some((n) => n.to.length)) return;
+      const batch = writeBatch(db);
+      putNotices(batch, db, tripId, list, auth.currentUser!.uid);
+      await batch.commit();
+    },
     watchMyTrips(uid, cb) {
       const q = query(collection(db, 'trips'), where('memberIds', 'array-contains', uid));
       return onSnapshot(q, (s) => cb(s.docs.map((d) => withId<Trip>(d.id, d.data()))));
@@ -270,6 +288,8 @@ export function createFirebaseStore(config: FirebaseOptions): Store {
     async deleteTrip(id) {
       // Each event's history first (a subcollection isn't deleted with its document)
       for (const a of (await getDocs(collection(db, 'trips', id, 'activities'))).docs) await deleteAll(collection(db, 'trips', id, 'activities', a.id, 'history'));
+      // Notification centre entries (the rules let a traveller list them all only once the trip is in Recently deleted)
+      await deleteAll(collection(db, 'trips', id, 'notices')).catch(() => { /* rules not published yet: they stay behind, unreadable */ });
       for (const name of SUBS) {
         const snap = await getDocs(collection(db, 'trips', id, name));
         for (let i = 0; i < snap.docs.length; i += 400) {
@@ -312,8 +332,12 @@ export function createFirebaseStore(config: FirebaseOptions): Store {
     },
     queueSub(tripId, name, data) {
       const ref = doc(collection(db, 'trips', tripId, name));
-      const saved = setDoc(ref, { ...data, createdBy: auth.currentUser!.uid, createdAt: Date.now() });
-      return { id: ref.id, saved };
+      const by = auth.currentUser!.uid;
+      const batch = writeBatch(db);
+      batch.set(ref, { ...data, createdBy: by, createdAt: Date.now() });
+      // A new event tells the people it puts in it (Notification centre)
+      if (name === 'activities') putNotices(batch, db, tripId, eventNotices(null, { ...(data as unknown as Activity), id: ref.id }, by), by);
+      return { id: ref.id, saved: batch.commit() };
     },
     queueTrip(data) {
       const uid = auth.currentUser!.uid;
@@ -367,8 +391,9 @@ export function createFirebaseStore(config: FirebaseOptions): Store {
       }
     },
     async addSub(tripId, name, data) {
-      const ref = await addDoc(collection(db, 'trips', tripId, name), { ...data, createdBy: auth.currentUser!.uid, createdAt: Date.now() });
-      return ref.id;
+      const { id, saved } = this.queueSub(tripId, name, data);
+      await saved;
+      return id;
     },
     async updateSub(tripId, name, id, patch) {
       const { id: _id, ...rest } = patch as Record<string, unknown>;
@@ -386,6 +411,7 @@ export function createFirebaseStore(config: FirebaseOptions): Store {
       const by = auth.currentUser!.uid, at = Date.now();
       for (const c of changesOf(before, patch))
         batch.set(doc(collection(db, 'trips', tripId, 'activities', before.id, 'history')), { ...c, by, at, ...(restoredFrom ? { restoredFrom } : {}) });
+      putNotices(batch, db, tripId, eventNotices(before, { ...before, ...patch, id: before.id }, by), by);
       await batch.commit();
     },
     watchHistory(tripId, eventId, max, cb) {
@@ -471,11 +497,17 @@ export function createFirebaseStore(config: FirebaseOptions): Store {
         await updateDoc(doc(db, 'collectionShares', invite.shareId!), { memberIds: arrayUnion(uid), [`roles.${uid}`]: invite.role ?? 'viewer', joinedVia: invite.code });
         return;
       }
-      await updateDoc(doc(db, 'trips', invite.tripId), {
+      const ref = doc(db, 'trips', invite.tripId);
+      await updateDoc(ref, {
         memberIds: arrayUnion(uid),
         [`roles.${uid}`]: invite.role === 'follower' ? 'follower' : 'traveller',
         joinedVia: invite.code,
       });
+      // Everyone already on it hears "Jo joined Portugal & Spain" (best effort: joining has worked either way)
+      try {
+        const others = ((await getDoc(ref)).data()?.memberIds as string[] | undefined ?? []).filter((m) => m !== uid);
+        await this.addNotices(invite.tripId, [{ kind: 'joined', to: others.slice(0, 50) }]);
+      } catch { /* offline or rules not published yet */ }
     },
   };
 }

@@ -2,6 +2,7 @@ import type React from 'react';
 import type { ButtonHTMLAttributes, ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import { Icon, type IconName } from './Icon';
+import { Badge } from './Misc';
 import s from './Button.module.css';
 
 /** Figma Button "Tone". Inverse is the deep emerald button for brand surfaces; Neutral the dark grey one; Tertiary is outlined. */
@@ -59,16 +60,19 @@ export type IconButtonTone = 'secondary' | 'ghost' | 'on-feature' | 'primary';
  * emerald, for the one main action in a row (Send a comment).
  * `label` is required: it's what screen readers announce.
  */
-export function IconButton({ icon, label, tone, state, size = 'large', className, type = 'button', ...rest }: Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'size'> & {
+export function IconButton({ icon, label, tone, state, size = 'large', badge, className, type = 'button', ...rest }: Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'size'> & {
   icon: IconName; label: string; tone?: IconButtonTone;
   /** Figma Icon button Size: Large (default) a 40px circle with a 24px icon; Small a 32px circle with a 16px icon
    *  (still a 44px tap area), e.g. deleting a comment */ size?: 'small' | 'large';
   /** Show the filled icon (e.g. a starred event) */ state?: 'default' | 'filled';
+  /** Figma "Show Badge": a count over the icon (e.g. unread notifications on the Bell); 0 shows none. Say it in `label`. */
+  badge?: number;
 }) {
   const t = tone ?? 'ghost';
   return (
     <button type={type} className={[s.iconButton, size === 'small' && s.iconSmall, s[`icon-${t}`], className].filter(Boolean).join(' ')} aria-label={label} title={label} {...rest}>
       <Icon name={icon} size={size === 'small' ? 16 : 24} state={state} className={s.glyph} />
+      {!!badge && <Badge count={badge} className={s.badge} />}
     </button>
   );
 }

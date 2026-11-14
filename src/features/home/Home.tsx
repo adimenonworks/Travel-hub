@@ -13,6 +13,8 @@ import { PlaceRow, PlaceSheet, useCountries } from '../saves/Collections';
 import { usePlaceMarks } from '../saves/placeMarks';
 import { CountryTile } from './Trips';
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useNotifications } from '../notifications/notifications';
 import s from './Home.module.css';
 import ss from '../saves/saves.module.css';
 
@@ -40,6 +42,8 @@ function NextUp({ trip }: { trip: Trip }) {
 }
 export function Home() {
   const me = useMe();
+  const navigate = useNavigate();
+  const { unread } = useNotifications();
   const trips = useMyTrips();
   const profile = useProfile(me.uid);
   const name = profile?.name || me.name;
@@ -59,7 +63,8 @@ export function Home() {
 
   return (
     <Content>
-      <PageHeader title={`Hi, ${name.split(' ')[0]}`} fit />
+      <PageHeader title={`Hi, ${name.split(' ')[0]}`} fit
+        action={{ icon: 'bell', label: unread ? `Notifications, ${unread} new` : 'Notifications', badge: unread, onClick: () => navigate('/notifications') }} />
       <nav className={s.quickActions} aria-label="Quick actions">
         <Button size="small" icon="calendar" onClick={() => newTrip()}>Plan a trip</Button>
         <Button size="small" tone="neutral" icon="plus" onClick={() => openSave({ mode: 'link' })}>Save a place</Button>

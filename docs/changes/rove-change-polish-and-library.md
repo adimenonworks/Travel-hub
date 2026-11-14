@@ -141,8 +141,10 @@ Design this in Figma first and stop for approval. It replaces the separate "Add 
 
 **[People prompt]** item 4 defines the in-app list as "Inbox". Its name is now **Notification centre**, and this part adds badges.
 
+**Already built (14 Nov 2026, people and sharing item 4; see `docs/APP-SPEC.md`):** the Bell on Home (**not** in the Trip header: owner, 14 Nov), the Notification centre screen (grouped by trip, newest first, opens the event), and a `.Badge` **count** on the Bell and on Home in the Bottom navigation. That `.Badge` is emerald (the primary button colours), not red: it's a count, not an error. Before building C2, confirm the colour with the owner; C2's dots should reuse `.Badge` (add a dot Layout) rather than make a second component. Still to do here: new ideas and suggestions as entries, message previews, scrolling to the message, and the dots in C2.
+
 ### C1. Notification centre
-- **A bell Icon button** sits top right on the Home Page header, on the same line as the title. The Trip header keeps one too ([People prompt]).
+- **A bell Icon button** sits top right on the Home Page header, on the same line as the title. ~~The Trip header keeps one too~~ (owner, 14 Nov 2026: Home and the Home tab's count only).
 - **The screen** is a time-stamped list, newest first, grouped by trip. It covers:
   - messages, with a preview;
   - new ideas;
