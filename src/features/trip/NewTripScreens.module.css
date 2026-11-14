@@ -18,7 +18,7 @@
 .footer { display: flex; flex-direction: column; align-items: center; gap: var(--space-500); }
 .footer > :first-child { width: 100%; }
 @keyframes expand { from { opacity: 0; transform: scale(0.94); border-radius: var(--radius-700); } }
-@keyframes stepIn { from { opacity: 0; transform: translateX(24px); } }
+@keyframes stepIn { from { opacity: 0; transform: translateX(var(--space-700)); } }
 
 /* Figma "Celebration screen": deep emerald, centred, 96 top */
 .celebrate { position: fixed; inset: 0; z-index: 160; overflow-y: auto; background: var(--feature-surface); color: var(--feature-text); animation: flood var(--duration-celebrate) var(--easing-standard); } /* dark green floods the screen */
@@ -29,7 +29,7 @@
 }
 /* Figma paints the circle and the number on-mid/surface/primary, which in dark mode is the same deep emerald as this screen;
    the primary button's emerald (the same in both modes) keeps them visible. */
-.badge { display: grid; place-items: center; width: 176px; height: 176px; border-radius: var(--radius-full); background: var(--button-primary-background); animation: pop var(--duration-celebrate) var(--easing-bounce) var(--duration-quick) both; }
+.badge { display: grid; place-items: center; width: var(--size-1600); height: var(--size-1600); border-radius: var(--radius-full); background: var(--button-primary-background); animation: pop var(--duration-celebrate) var(--easing-bounce) var(--duration-quick) both; }
 .celebrateTitle { margin: 0; font: var(--type-display-small); letter-spacing: -0.01em; color: var(--feature-text); }
 .celebrateSubtitle { margin: 0; font: var(--type-body); color: var(--feature-text-secondary); }
 .count { display: flex; flex-direction: column; align-items: center; gap: var(--space-100); }

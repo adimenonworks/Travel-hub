@@ -11,7 +11,7 @@
   pointer-events: auto;
   width: 100%; max-width: var(--size-content-max);
   display: flex; gap: 0; padding: var(--space-200);
-  border-radius: var(--radius-full); border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-full); border: var(--border-width-thin) solid var(--border-subtle);
   background: var(--overlay-bar); box-shadow: var(--elevation-floating-bar);
   -webkit-backdrop-filter: blur(var(--blur-overlay)); backdrop-filter: blur(var(--blur-overlay));
   touch-action: none; /* the bar's touches are all ours: iOS never takes a drag over to scroll (which dropped the pill) */

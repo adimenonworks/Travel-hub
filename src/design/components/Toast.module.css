@@ -22,8 +22,8 @@
 .error { background: var(--status-danger-subtle); color: var(--status-danger); } /* Tone=Error */
 .error .icon { color: var(--status-danger); }
 .leaving { animation: toastOut var(--motion-sheet-out) both; }
-@keyframes toastIn { from { transform: translateY(calc(-100% - 40px)); opacity: 0; } to { transform: none; opacity: 1; } }
-@keyframes toastOut { from { transform: none; opacity: 1; } to { transform: translateY(calc(-100% - 40px)); opacity: 0; } }
+@keyframes toastIn { from { transform: translateY(calc(-100% - var(--space-900))); opacity: 0; } to { transform: none; opacity: 1; } }
+@keyframes toastOut { from { transform: none; opacity: 1; } to { transform: translateY(calc(-100% - var(--space-900))); opacity: 0; } }
 @media (prefers-reduced-motion: reduce) {
   .toast, .leaving { animation-name: fade; }
   .leaving { animation-direction: reverse; }
@@ -33,4 +33,4 @@
 /* Toast action (e.g. Undo): a short ghost text button with a 44px tap area */
 .action { position: relative; pointer-events: auto; margin-left: var(--space-200); padding: 0; border: 0; background: none; font: var(--type-label-small); color: var(--text-link); cursor: pointer; }
 .action::before { content: '·'; color: var(--text-secondary); margin-right: var(--space-200); }
-.action::after { content: ''; position: absolute; inset: -14px -8px; }
+.action::after { content: ''; position: absolute; inset: calc((var(--size-icon-small) - var(--size-tap)) / 2) calc(-1 * var(--space-300)); }

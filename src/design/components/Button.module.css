@@ -41,11 +41,11 @@
 .neutral:disabled { background: var(--button-neutral-disabled-background); color: var(--button-neutral-disabled-text); }
 
 /* Tertiary: outlined (1.5px on Regular, 2px on Large), used on accent surfaces */
-.tertiary { background: var(--button-tertiary-background); color: var(--button-tertiary-text); box-shadow: inset 0 0 0 1.5px var(--button-tertiary-border); }
-.tertiary.large { box-shadow: inset 0 0 0 2px var(--button-tertiary-border); }
+.tertiary { background: var(--button-tertiary-background); color: var(--button-tertiary-text); box-shadow: inset 0 0 0 var(--border-width-medium) var(--button-tertiary-border); }
+.tertiary.large { box-shadow: inset 0 0 0 var(--border-width-thick) var(--button-tertiary-border); }
 @media (hover: hover) { .tertiary:hover:not(:disabled) { background: var(--button-tertiary-background-hover); } }
 .tertiary:active:not(:disabled) { background: var(--button-tertiary-background-pressed); }
-.tertiary:disabled { background: var(--button-tertiary-disabled-background); color: var(--button-tertiary-disabled-text); box-shadow: inset 0 0 0 1.5px var(--button-tertiary-disabled-text); }
+.tertiary:disabled { background: var(--button-tertiary-disabled-background); color: var(--button-tertiary-disabled-text); box-shadow: inset 0 0 0 var(--border-width-medium) var(--button-tertiary-disabled-text); }
 
 .ghost { background: var(--button-ghost-background); color: var(--button-ghost-text); }
 @media (hover: hover) { .ghost:hover:not(:disabled) { background: var(--button-ghost-background-hover); } }
@@ -60,10 +60,10 @@
 /* Figma "Icon button": 40px circle, 24px icon, 44px tap area. Secondary and Ghost use the Button's tokens. */
 .iconButton {
   position: relative; flex: none; display: inline-grid; place-items: center;
-  width: 40px; height: 40px; padding: 0; border: 0; border-radius: var(--radius-full);
+  width: var(--size-800); height: var(--size-800); padding: 0; border: 0; border-radius: var(--radius-full);
   cursor: pointer; transition: background var(--motion-fast), transform var(--motion-release);
 }
-.iconButton::after { content: ''; position: absolute; inset: -2px; }
+.iconButton::after { content: ''; position: absolute; inset: calc((var(--size-800) - var(--size-tap)) / 2); }
 /* Size=Small: 32px circle, 16px icon, the same 44px tap area */
 .iconSmall { width: var(--size-control-small); height: var(--size-control-small); }
 .iconSmall::after { inset: calc((var(--size-control-small) - var(--size-tap)) / 2); }
@@ -93,6 +93,6 @@
 .button:disabled .glyph { color: inherit; }
 
 /* Loading: a ring in the label colour that turns (Reduce Motion: it stays still) */
-.spinner { flex: none; border-radius: var(--radius-full); border: 2px solid currentColor; border-right-color: transparent; animation: spin var(--duration-spin) var(--easing-linear) infinite; }
+.spinner { flex: none; border-radius: var(--radius-full); border: var(--border-width-thick) solid currentColor; border-right-color: transparent; animation: spin var(--duration-spin) var(--easing-linear) infinite; }
 @keyframes spin { to { transform: rotate(1turn); } }
 @media (prefers-reduced-motion: reduce) { .spinner { animation: none; } }

@@ -261,7 +261,7 @@ All 20 used in both. Code's `categoryTone()` / `TYPE_TONE` write `food` as the C
 | — | `size/category-icon-small` (32), `-medium` (40), `-large` (48) | `.Category icon` CSS |
 | — | `size/tab-bar` (60, rem) | was `--size-tab-bar` |
 | — | `size/content-max` (480) | was `--size-content-max` |
-| — | `size/{step}` (numbered scale aliasing `base/size/{px}`, like spacing) for every other fixed size (owner) | |
+| — | `size/{step}` (numbered scale aliasing `base/size/{px}`, like spacing; built in A7: 100 = 4 … 1900 = 560) for every other fixed size (owner) | |
 | — | `border-width/thin` (1), `medium` (1.5), `thick` (2), `focus` (3) | 1px ×52, 1.5px ×3, 2px ×14, 3px ×6 in code today |
 
 ## A5. Typography

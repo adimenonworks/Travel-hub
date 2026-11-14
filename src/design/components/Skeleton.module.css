@@ -6,8 +6,8 @@
   animation: shimmer var(--duration-shimmer) var(--easing-standard) infinite;
 }
 .text { width: 100%; height: calc(14rem / 17); border-radius: var(--radius-full); } /* a pill line */
-.block { width: 100%; height: 120px; border-radius: var(--radius-600); }
-.circle { width: 32px; height: 32px; border-radius: var(--radius-full); }
+.block { width: 100%; height: var(--size-1500); border-radius: var(--radius-600); }
+.circle { width: var(--size-avatar-medium); height: var(--size-avatar-medium); border-radius: var(--radius-full); }
 @keyframes shimmer { to { background-position: 200% 0; } }
 @media (prefers-reduced-motion: reduce) { .sk { animation: none; } }
 

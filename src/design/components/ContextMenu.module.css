@@ -16,7 +16,7 @@
   min-height: var(--size-tap); padding: var(--space-400) var(--space-500); border: 0;
   background: none; font: var(--type-label); color: var(--text-primary); text-align: left; cursor: pointer;
 }
-.item + .item { box-shadow: inset 0 1px 0 var(--border-divider); }
+.item + .item { box-shadow: inset 0 var(--border-width-thin) 0 var(--border-divider); }
 .item:active { background: var(--button-ghost-background-pressed); }
 .destructive { color: var(--status-danger); }
 @keyframes dimIn { from { opacity: 0; } }

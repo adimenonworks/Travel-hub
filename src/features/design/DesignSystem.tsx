@@ -11,7 +11,6 @@ function Section({ title, footer, children }: { title: string; footer?: ReactNod
 }
 
 // Colour by surface: same groups and names as the Figma "Color" collection. Every set has the same token names
-// (accents leave out status), so each one is shown on its own surface.
 const PALETTES = ['emerald', 'green', 'orange', 'red', 'yellow', 'pink', 'sky', 'violet', 'neutral'];
 const STEPS = [0, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000];
 // Figma's Color collection: one set (no surface sets since library v2). Feature tokens are shown on a feature surface.
