@@ -16,6 +16,7 @@ Read this first when starting a session. If it disagrees with the code or Figma,
 
 - **1, Home's main button:** Plan a trip is Primary on the left (calendar icon), Save a place Neutral on the right (plus icon), in Figma Screens (both Home frames, `500:535` and `545:2219`, instances only) and `Home.tsx`; APP-SPEC's Home line updated.
 - **2, several stops:** step one is "Where are you going?" with a stops list (existing List group, List item with its Show action Icon button, Text field); `trip.stops` saved in order, `destination` = first stop, `tripStops` reads older trips, cap 30 (`MAX_STOPS`). `tripCountries` = stops then event places; `tripCountryCodes` (Collections, Ideas) and the Save sheet's default now go through it (`tripCoversCity` checks every stop). Rules allow the field already (no key allowlist on trips), so no rules change. Edit trip's place picker was removed here rather than in item 4, so the first stop can't drift from `stops[0]`.
+- **3, Bring your saves:** only saves in the stops' countries, in stop order (places, links and notes); skipped with 4 step bars when nothing matches, and the bars update as stops change (tested: Madrid + Lisbon → Spain then Portugal, Japan left out; Paris → skipped; Lisbon + Paris with Lisbon removed → skipped).
 
 ### Transparency setup status (14 Nov 2026)
 

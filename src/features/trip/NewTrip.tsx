@@ -24,7 +24,7 @@ const defaultCurrency = () => (Intl.NumberFormat().resolvedOptions().locale.star
  * stop, or just the first: saved as `stops`, the first is also `destination`, which names the trip and finds its cover)
  * → When are you going? (a date range on the Calendar) → Who's coming? (Option cards) → Create my trip → the
  * Celebration screen with a days-to-go count-up. A trip is never made from a collection: when you have saved Places
- * in the destination's country, step 4 "Bring your saves?" lets you pick cities, and their Places become the new trip's
+ * in the trip's countries, step 4 "Bring your saves?" lets you pick cities, and their Places become the new trip's
  * Ideas (each one points at the Place). The trip is named after its city; rename it any time in Edit trip.
  */
 export function NewTrip({ open, onClose, onOpenTrip }: { open: boolean; onClose: () => void; onOpenTrip: (id: string) => void }) {
@@ -49,15 +49,15 @@ export function NewTrip({ open, onClose, onOpenTrip }: { open: boolean; onClose:
   const [budget, setBudget] = useState<PriceDraft>({ amount: '', currency: '' });
   const home = useHomeCurrency();
   const toast = useToast();
-  // Step 4 offers your saved Places by country (the trip's country first, then the most saved), then by city,
-  // with each country's links and notes as one more group.
+  // Step 4 offers only your saves in the trip's countries, in the order of the stops: places by city, plus each
+  // country's links and notes as one more group. With none, the step is skipped (and the step bars count one less).
   const places = usePlaces() ?? [];
   const me = useMe();
-  const code = countryCodeOf(place);
-  const mine = places.filter((p) => p.ownerId === me.uid && p.countryCode);
+  const codes = [...new Set(stops.map((p) => countryCodeOf(p)).filter((c): c is string => !!c))];
+  const mine = places.filter((p) => p.ownerId === me.uid && p.countryCode && codes.includes(p.countryCode));
   const groupOf = (p: (typeof mine)[number]) => ((p.type ?? 'place') === 'place' ? cityOf(p) : 'Links & notes');
   const byCountry = groupBy(mine, (p) => p.countryCode!)
-    .sort((a, b) => (a[0] === code ? -1 : b[0] === code ? 1 : b[1].length - a[1].length))
+    .sort((a, b) => codes.indexOf(a[0]) - codes.indexOf(b[0]))
     .map(([c, list]) => ({
       code: c, list,
       groups: groupBy(list, groupOf).sort((a, b) => (a[0] === 'Links & notes' ? 1 : b[0] === 'Links & notes' ? -1 : b[1].length - a[1].length)),
