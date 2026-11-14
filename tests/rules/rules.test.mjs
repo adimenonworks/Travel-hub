@@ -1,6 +1,6 @@
 import { initializeTestEnvironment, assertSucceeds, assertFails } from '@firebase/rules-unit-testing';
 import { readFileSync } from 'node:fs';
-import { doc, getDoc, setDoc, updateDoc, deleteDoc, addDoc, collection, getDocs, query, where, arrayUnion, arrayRemove, deleteField, Timestamp } from 'firebase/firestore';
+import { doc, getDoc, setDoc, updateDoc, deleteDoc, addDoc, collection, getDocs, query, where, arrayUnion, arrayRemove, deleteField, Timestamp, writeBatch } from 'firebase/firestore';
 
 const env = await initializeTestEnvironment({ projectId: 'demo-triphub', firestore: { rules: readFileSync(new URL('../../firestore.rules', import.meta.url), 'utf8'), host: '127.0.0.1', port: 8080 } });
 const db = (u) => env.authenticatedContext(u).firestore();
@@ -271,6 +271,26 @@ await t('Member cannot change roles', assertFails(updateDoc(doc(E, 'collectionSh
 await t('owner makes the Viewer a Member', assertSucceeds(updateDoc(doc(D, 'collectionShares/dave_jp'), { 'roles.frank': 'member' })));
 await t('Viewer-turned-Member leaves', assertSucceeds(updateDoc(doc(F, 'collectionShares/dave_jp'), { memberIds: arrayRemove('frank'), 'roles.frank': deleteField() })));
 await t('after leaving, cannot list it', assertFails(getDocs(query(collection(F, 'places'), where('sharedIn', '==', 'dave_jp')))));
+
+// Suggested ideas (item 6): the first I'm in makes the event (suggester + you) and takes the idea off the board; Pass only
+// adds yourself to `passed`; "going" entries name who's going
+await env.withSecurityRulesDisabled(async (c) => {
+  await setDoc(doc(c.firestore(), 'trips/t11/ideas/s1'), { title: 'Fado', createdBy: 'bob', status: 'open', date: '2026-11-03', startTime: '20:00', votes: {} });
+});
+{
+  const b = writeBatch(H);
+  b.set(doc(H, 'trips/t11/activities/s1e'), { title: 'Fado', createdBy: 'hana', people: ['bob', 'hana'], fromIdea: 'bob', passed: [], added: {} });
+  b.update(doc(H, 'trips/t11/ideas/s1'), { status: 'approved', activityId: 's1e' });
+  b.set(doc(H, 'trips/t11/notices/g1'), { kind: 'going', to: ['dan'], people: ['bob', 'hana'], at: 1, by: 'hana', eventId: 's1e', title: 'Fado' });
+  await t('the first I\'m in makes the event, takes the idea off the board and tells the others', assertSucceeds(b.commit()));
+}
+const D2 = db('dan');
+await t('Pass adds only yourself to passed', assertSucceeds(updateDoc(doc(D2, 'trips/t11/activities/s1e'), { passed: ['dan'] })));
+await t('Pass cannot add someone else', assertFails(updateDoc(doc(D2, 'trips/t11/activities/s1e'), { passed: ['dan', 'carol'] })));
+await t('a traveller not in it says I\'m in after passing', assertSucceeds(updateDoc(doc(D2, 'trips/t11/activities/s1e'), { people: ['bob', 'hana', 'dan'] })));
+await t('a follower cannot pass on an event', assertFails(updateDoc(doc(C, 'trips/t11/activities/s1e'), { passed: ['dan', 'carol'] })));
+await t('"going" entries name only people on the trip', assertFails(setDoc(doc(B, 'trips/t11/notices/g2'), { kind: 'going', to: ['dan'], people: ['zoe'], at: 1, by: 'bob' })));
+await t('a traveller passes on an idea', assertSucceeds(updateDoc(doc(B, 'trips/t11/ideas/s1'), { 'passed.bob': true })));
 
 console.log(`\n${pass} passed, ${fail} failed`);
 await env.cleanup();

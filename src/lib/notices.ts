@@ -57,6 +57,11 @@ export function noticeText(n: Notice, profiles: Record<string, Profile>, tripNam
       const when = [n.date && n.date !== n.prevDate ? day(n.date) : '', formatTime(n.startTime ?? '')].filter(Boolean).join(', ');
       return `${who} moved ${title}${when ? ` to ${when}` : ''}`;
     }
+    case 'going': {
+      const names = (n.people?.length ? n.people : [n.by]).map((id) => first(profiles, id));
+      const list = new Intl.ListFormat('en-GB', { type: 'conjunction' }).format(names);
+      return `${list} ${names.length === 1 ? 'is' : 'are'} going to ${title}${n.date ? ` · ${day(n.date)}` : ''}`;
+    }
     case 'joined': return `${who} joined ${tripName}`;
     case 'role': return `${who} made you ${n.role === 'follower' ? 'Following' : 'Travelling'}`;
     case 'dates': return n.startDate && n.endDate ? `${who} changed the dates to ${formatRange(n.startDate, n.endDate)}` : `${who} changed the dates`;

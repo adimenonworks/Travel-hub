@@ -126,12 +126,13 @@ service cloud.firestore {
         allow create: if isMember(tripId)
           && n().by == uid()
           && n().at is number
-          && n().kind in ['added', 'removed', 'moved', 'out', 'deleted', 'joined', 'role', 'dates']
+          && n().kind in ['added', 'removed', 'moved', 'out', 'deleted', 'joined', 'role', 'dates', 'going']
+          && (!('people' in n()) || (n().people is list && n().people.size() <= 50 && n().people.hasOnly(tripData(tripId).memberIds)))
           && n().to is list && n().to.size() > 0 && n().to.size() <= 50
           && n().to.hasOnly(tripData(tripId).memberIds)
           && !(uid() in n().to)
           && (!('title' in n()) || (n().title is string && n().title.size() <= 200))
-          && n().keys().hasOnly(['kind', 'by', 'to', 'at', 'eventId', 'title', 'date', 'prevDate', 'startTime', 'role', 'startDate', 'endDate']);
+          && n().keys().hasOnly(['kind', 'by', 'to', 'at', 'eventId', 'title', 'date', 'prevDate', 'startTime', 'role', 'startDate', 'endDate', 'people']);
         allow update: if false;
         allow delete: if isTraveller(tripId) && 'deletedAt' in tripData(tripId);
       }
@@ -154,10 +155,11 @@ service cloud.firestore {
         function peopleOk() { return !('people' in d()) || (d().people is list && d().people.hasOnly(members())); }
         function inEvent() { return !('people' in resource.data) || uid() in resource.data.people; }
         function onlyMe(a, b) { return a.toSet().difference(b.toSet()).union(b.toSet().difference(a.toSet())).hasOnly([uid()]); }
-        // I'm in / I'm out / opened it: only your own place in `people` and your own key in `added`
+        // I'm in / I'm out / Pass / opened it: only your own place in `people` and `passed`, and your own key in `added`
         function myPlaceOnly() {
-          return d().diff(resource.data).affectedKeys().hasOnly(['people', 'added'])
+          return d().diff(resource.data).affectedKeys().hasOnly(['people', 'added', 'passed'])
             && onlyMe(d().get('people', []), resource.data.get('people', []))
+            && onlyMe(d().get('passed', []), resource.data.get('passed', []))
             && d().get('added', {}).diff(resource.data.get('added', {})).affectedKeys().hasOnly([uid()]);
         }
         function restoring() { return d().diff(resource.data).affectedKeys().hasOnly(['deletedAt', 'deletedBy']) && !('deletedAt' in d()); }

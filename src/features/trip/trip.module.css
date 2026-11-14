@@ -36,6 +36,13 @@
 /* A month marker between Day cards ("Dec"): small secondary text, centred on the cards */
 .monthMark { flex: none; align-self: center; font: var(--type-label-small); color: var(--text-secondary); padding: 0 var(--space-100); }
 
+.stripRow { display: flex; align-items: center; gap: var(--space-300); }
+.stripRow > .days { flex: 1 1 auto; min-width: 0; }
+.stripRow > :not(.days) { flex: none; }
+.daysWithToday { margin-right: 0; padding-right: 0; } /* the Today Chip takes the strip's right edge */
+/* Go to day: the suggestion it lands on is tinted for a moment, then fades back */
+.flash > * { animation: flash 1.6s var(--easing-standard) both; }
+@keyframes flash { 0%, 30% { background: var(--control-unselected-background-pressed); } 100% { background: var(--surface-primary); } }
 .itinLayout { display: flex; flex-direction: column; gap: var(--space-page-section); } /* 40 from the day cards to the day's plan */
 .whoAndDay { display: flex; flex-direction: column; gap: var(--space-500); } /* Person switcher, then the day strip: one section, 16 apart */
 

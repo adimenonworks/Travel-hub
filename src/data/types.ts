@@ -126,6 +126,11 @@ export type Activity = {
   /** Who added whom: `{ [uid]: addedByUid }` for people put in it by someone else, until they open it (the card's
    *  "New · added by Sam" Tag). */
   added?: Record<string, string>;
+  /** Made from a suggested (dated) idea (item 6): who suggested it. Travellers who haven't said I'm in or Pass still see it
+   *  on their day as a suggestion. */
+  fromIdea?: string;
+  /** Who passed on it (it's hidden from their itinerary). */
+  passed?: string[];
   /** Older events: who's going (usually just whoever added it). Migrated to `people` by the first traveller to open the trip. */
   attendeeIds?: string[];
   /** The saved Place this event is at, when it came from Collections or was starred. Starring the event stars the Place. */
@@ -171,8 +176,15 @@ export type Idea = {
   votes: Record<string, true>;
   /** Thumbs-down votes. Older ideas don't have this field. */
   downvotes?: Record<string, true>;
+  /** Ideas have only To decide (`open`) and Passed (`rejected`); `approved` ideas (on a day) are events now and are
+   *  left out of Ideas (item 6). */
   status: IdeaStatus;
   activityId?: string;
+  /** A suggested day and time (item 6): the idea shows on that day of the Itinerary as a suggestion, with I'm in and Pass. */
+  date?: string;
+  startTime?: string;
+  /** Who passed on it. It moves to Passed when every other traveller has, or when its suggester does. */
+  passed?: Record<string, true>;
   createdBy: string;
   createdAt: number;
 };
@@ -238,12 +250,13 @@ export type EventChange = { id: string; by: string; at: number; field: TrackedFi
  *  - added: `by` put the reader in an event; removed: took them out of it; moved: changed its date or time
  *    (`prevDate` is the day it was on); out: `by` left an event the reader is in; deleted: removed it for everyone
  *  - joined: `by` joined the trip; role: made the reader Travelling or Following; dates: changed the trip's dates
+ *  - going (item 6): a suggested idea became an event; `people` are going ("Sam and Priya are going to Fado night")
  */
-export type NoticeKind = 'added' | 'removed' | 'moved' | 'out' | 'deleted' | 'joined' | 'role' | 'dates';
+export type NoticeKind = 'added' | 'removed' | 'moved' | 'out' | 'deleted' | 'joined' | 'role' | 'dates' | 'going';
 export type Notice = {
   id: string; kind: NoticeKind; by: string; to: string[]; at: number;
   eventId?: string; title?: string; date?: string; prevDate?: string; startTime?: string;
-  role?: Role; startDate?: string; endDate?: string;
+  role?: Role; startDate?: string; endDate?: string; people?: string[];
 };
 export type NewNotice = Omit<Notice, 'id' | 'by' | 'at'>;
 

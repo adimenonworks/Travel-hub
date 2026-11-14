@@ -219,6 +219,16 @@ export function createLocalStore(): Store {
       save();
       return { id, saved: Promise.resolve() };
     },
+    async acceptIdea(tripId, ideaId, event, notices) {
+      const idea = sub(tripId, 'ideas')[ideaId] as { activityId?: string; status: string } | undefined;
+      if (idea?.activityId) return { id: idea.activityId, made: false };
+      const id = randomCode(16);
+      sub(tripId, 'activities')[id] = { ...event, id, createdBy: me(), createdAt: Date.now() };
+      if (idea) { idea.status = 'approved'; idea.activityId = id; }
+      notify(tripId, notices.map((n) => ({ ...n, eventId: id })));
+      save();
+      return { id, made: true };
+    },
     queueTrip(data) {
       const id = randomCode(16);
       const uid = me();

@@ -1,7 +1,7 @@
 import { hasStep, stepTab, useSwipeTabs } from '../../app/useSwipeTabs';
 import { Fragment, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
-import { useSearchParams } from 'react-router-dom';
-import { Button, ContextMenu, DayCard, EventCard, PersonSwitcher, SectionHeader, NowLine, TravelConnector, type ContextMenuItem, type EventState, Card, Illustration } from '../../design/components';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { Button, Chip, ContextMenu, DayCard, EventCard, PersonSwitcher, SectionHeader, NowLine, TravelConnector, type ContextMenuItem, type EventState, Card, Illustration } from '../../design/components';
 import { useMe, usePlacesById } from '../../data/hooks';
 import type { Activity } from '../../data/types';
 import { dayWord, formatDay, formatTime, parseDay, today, tripDays } from '../../lib/dates';
@@ -17,6 +17,9 @@ import { crossesDateLine, localNow, zoneOfDay } from '../../lib/timezone';
 import type { TripCtx } from './TripPage';
 import { peopleOf, startingPerson, travellersOf } from '../../data/eventPeople';
 import { getItineraryPerson, setItineraryPerson } from '../../lib/prefs';
+import { awaitsAnswer, isSuggestion, passedIdea, useSuggestions } from './suggestions';
+import { categoryTone } from '../../lib/categories';
+import type { Idea } from '../../data/types';
 import { goingText, useWhosIn } from './whosIn';
 import { personName } from '../../data/hooks';
 import s from './trip.module.css';
@@ -43,12 +46,14 @@ export function Itinerary(ctx: TripCtx) {
   const [params, setParams] = useSearchParams();
   const t = today();
   const fallback = days.includes(t) ? t : days[0];
+  // It opens on today during the trip, else on the first day; a link (Go to day, Home, the Notification centre, Back
+  // from an event) opens on its own day with ?day=
   const fromUrl = params.get('day');
   const day = days.includes(fromUrl ?? '') ? fromUrl! : fallback;
   const stripRef = useRef<HTMLDivElement>(null);
-  const setDay = (d: string) => {
-    if (d === day) return;
-    setParams({ day: d }, { replace: true });
+  const setDay = (d: string, force = false) => {
+    if (d === day && !force) return;
+    if (d !== day) setParams({ day: d }, { replace: true });
     // Make sure all of the tapped card is on screen (phones scroll the strip sideways).
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     stripRef.current?.querySelector(`[data-day="${d}"]`)?.scrollIntoView({ block: 'nearest', inline: 'nearest', behavior: reduce ? 'auto' : 'smooth' });
@@ -57,6 +62,20 @@ export function Itinerary(ctx: TripCtx) {
   // Swipe the day's plan sideways to go to the next or previous day (the plan slides, the strip follows)
   const planBox = useRef<HTMLDivElement>(null);
   useSwipeTabs(planBox, (dir) => { const n = stepTab(days, day, dir); if (n) setDay(n); }, (dir) => hasStep(days, day, dir));
+
+  // Back to today: a Today Chip at the end of the day strip while the trip is on, whenever today isn't the selected day or
+  // has scrolled out of view
+  const tripOn = days.includes(t);
+  const [todayInView, setTodayInView] = useState(true);
+  useEffect(() => {
+    const strip = stripRef.current, el = strip?.querySelector(`[data-day="${t}"]`);
+    if (!strip || !el || typeof IntersectionObserver === 'undefined') return;
+    const io = new IntersectionObserver(([e]) => setTodayInView(e.intersectionRatio > 0.6), { root: strip, threshold: [0, 0.6, 1] });
+    io.observe(el);
+    return () => io.disconnect();
+  }, [t, tripOn]);
+  const showToday = tripOn && (day !== t || !todayInView);
+  const backToToday = () => { haptic('selection'); setDay(t, true); };
 
   // On arrival, slide the strip (sideways only, never the page) so the selected day starts fully in view.
   useEffect(() => {
@@ -72,6 +91,58 @@ export function Itinerary(ctx: TripCtx) {
   // I'm in, I'm out and Delete (Just me or Remove for everyone), each with Undo
   const whosIn = useWhosIn(trip, ctx.profiles);
   const travellerCount = travellersOf(trip).length;
+  const navigate = useNavigate();
+  const suggest = useSuggestions(trip, ctx.activities);
+
+  // Suggestions on your own itinerary (item 6): dated ideas you haven't passed, and events made from one that you haven't
+  // answered. They're not yours yet, so they don't count in the day's plans, Next or the budget.
+  type Suggestion = { id: string; time: string; idea?: Idea; a?: Activity };
+  const suggestionsOn = (d: string): Suggestion[] => person !== me.uid || !ctx.isTraveller ? [] : [
+    ...ctx.ideas.filter((i) => isSuggestion(i) && i.date === d && !passedIdea(i, me.uid)).map((idea) => ({ id: `idea-${idea.id}`, time: idea.startTime ?? '', idea })),
+    ...ctx.activities.filter((a) => a.date === d && awaitsAnswer(a, trip, me.uid)).map((a) => ({ id: `event-${a.id}`, time: a.startTime ?? '', a })),
+  ].sort((x, y) => (x.time || '99').localeCompare(y.time || '99'));
+  const ideaPlaces = usePlacesById(ctx.ideas.flatMap((i) => (isSuggestion(i) && i.placeId ? [i.placeId] : [])));
+
+  // Go to day lands on the suggestion and tints it briefly (?focus=idea-<id>); suggestions are on your own itinerary
+  const focus = params.get('focus');
+  const [flash, setFlash] = useState<string | null>(null);
+  useEffect(() => {
+    if (!focus) return;
+    if (person !== me.uid && travellers.includes(me.uid)) { setChosen(me.uid); setItineraryPerson(trip.id, me.uid); return; }
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const id = window.setTimeout(() => {
+      document.querySelector(`[data-focus="${focus}"]`)?.scrollIntoView({ block: 'center', behavior: reduce ? 'auto' : 'smooth' });
+      setFlash(focus);
+      setParams({ day }, { replace: true });
+    }, 300);
+    return () => window.clearTimeout(id);
+  }, [focus, person]); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => { if (!flash) return; const id = window.setTimeout(() => setFlash(null), 1700); return () => window.clearTimeout(id); }, [flash]);
+
+  const suggestedCard = (sg: Suggestion) => {
+    const { idea, a } = sg;
+    const place = idea?.placeId ? ideaPlaces[idea.placeId] : undefined;
+    const category = idea ? (a?.category ?? idea.category) : a!.category;
+    const by = idea ? idea.createdBy : a!.fromIdea!;
+    const people = a ? peopleOf(a, trip) : [];
+    const base = a ? eventCardProps(a, ctx) : null;
+    return (
+      <div key={sg.id} data-focus={sg.id} className={[s.timelineItem, flash === sg.id && s.flash].filter(Boolean).join(' ')}>
+        <EventCard {...(base ?? { icon: categoryInfo(category).icon, type: categoryTone(category) })}
+          title={a ? a.title : place?.name ?? idea!.title}
+          time={a ? base!.time : idea!.startTime ? `${formatTime(idea!.startTime)} onwards` : undefined}
+          place={a ? base!.place : place ? [place.name, place.city].filter(Boolean).join(', ') : undefined}
+          state="suggested" amount={undefined}
+          extras={[{ icon: 'lightbulb', label: `Idea · from ${by === me.uid ? 'you' : personName(ctx.profiles, by).split(' ')[0]}` }]}
+          people={people.length ? people.map((id) => ({ id, name: personName(ctx.profiles, id), photo: ctx.profiles[id]?.photo })) : undefined}
+          going={people.length ? `${people.length} going` : undefined}
+          action={{ label: 'I’m in', onClick: () => (idea ? suggest.imInIdea(idea, place) : whosIn.imIn(a!)) }}
+          secondaryAction={{ label: 'Pass', onClick: () => (idea ? suggest.passIdea(idea) : suggest.passEvent(a!)) }}
+          to={a ? `/trip/${trip.id}/plan/${a.id}` : undefined}
+          onClick={idea ? () => navigate(`/trip/${trip.id}/ideas?idea=${idea.id}`) : undefined} />
+      </div>
+    );
+  };
 
   // What's on each day (a Stay counts on its check-in and check-out days).
   const byDay = useMemo(() => Object.fromEntries(days.map((d) => [d, eventsOn(activities, d)])), [activities, trip.startDate, trip.endDate]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -101,7 +172,8 @@ export function Itinerary(ctx: TripCtx) {
     <div className={s.itinLayout}>
       <div className={s.whoAndDay}>
       {choices.length > 1 && <PersonSwitcher value={person} onChange={choose} people={choices} />}
-      <div ref={stripRef} className={s.days} role="group" aria-label="Trip days">
+      <div className={s.stripRow}>
+      <div ref={stripRef} className={[s.days, showToday && s.daysWithToday].filter(Boolean).join(' ')} role="group" aria-label="Trip days">
         {days.map((d, i) => (
           <Fragment key={d}>
           {/* A month marker where the month changes (and before the first day, when the trip isn't all in this month) */}
@@ -113,6 +185,8 @@ export function Itinerary(ctx: TripCtx) {
             onClick={() => { haptic('selection'); setDay(d); }} />
           </Fragment>
         ))}
+      </div>
+      {showToday && <Chip onClick={backToToday} label="Back to today">Today</Chip>}
       </div>
       </div>
 
@@ -137,7 +211,13 @@ export function Itinerary(ctx: TripCtx) {
             return (last.endDate || last.date) === d && (last.endDate || last.date) > a.date && last.endTime ? [{ a, last }] : [];
           });
           const dateLine = list.some((e) => legsOf(e.a, activities).some(crossesDateLine));
-          return list.length === 0 ? (
+          // Suggestions go in time order among the day's events (untimed ones at the end)
+          const sugg = suggestionsOn(d);
+          const slot = (sg: Suggestion) => { const i = sg.time ? list.findIndex((e) => (entryTime(e) || '99') > sg.time) : -1; return i === -1 ? list.length : i; };
+          const suggAt = (n: number) => sugg.filter((sg) => slot(sg) === n).map(suggestedCard);
+          return list.length === 0 && sugg.length ? (
+            <div className={s.eventList}>{sugg.map(suggestedCard)}</div>
+          ) : list.length === 0 ? (
             <Card layout="centre" media={<Illustration name="calendar" size={120} />} title={person === me.uid ? 'Nothing planned yet' : `Nothing on ${personName(ctx.profiles, person).split(' ')[0]}’s day`}
               body={person === me.uid ? 'Add something to do, or schedule an idea from the Ideas board.' : undefined}
               actions={ctx.isTraveller && person === me.uid ? <Button tone="neutral" icon="plus" onClick={() => setAdding(true)}>Add event</Button> : undefined} />
@@ -150,7 +230,9 @@ export function Itinerary(ctx: TripCtx) {
                 const state = stateOf(n);
                 const trip2 = n > 0 ? travelEstimate(list[n - 1].a, a) : null;
                 return (
-                  <div key={`${a.id}-${e.part ?? ''}`} className={s.timelineItem}>
+                  <Fragment key={`${a.id}-${e.part ?? ''}`}>
+                  {suggAt(n)}
+                  <div className={s.timelineItem}>
                     {trip2 && <TravelConnector label={trip2.label} icon={trip2.icon} />}
                     {showNow && n === nextIndex && nowLine}
                     {(() => {
@@ -186,8 +268,10 @@ export function Itinerary(ctx: TripCtx) {
                       return items.length ? <HoldMenu label={`${a.title} actions`} items={items}>{card}</HoldMenu> : card;
                     })()}
                   </div>
+                  </Fragment>
                 );
               })}
+              {suggAt(list.length)}
               {showNow && nextIndex === -1 && nowLine}
             </div>
           );

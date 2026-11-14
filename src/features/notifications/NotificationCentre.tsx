@@ -6,6 +6,7 @@ import type { Profile, Trip } from '../../data/types';
 import { timeAgo } from '../../lib/dates';
 import { Content } from '../../app/Shell';
 import { useWhosIn } from '../trip/whosIn';
+import { awaitsAnswer, useSuggestions } from '../trip/suggestions';
 import { useNotifications, type Entry } from './notifications';
 import s from './NotificationCentre.module.css';
 
@@ -45,7 +46,8 @@ export function NotificationCentre() {
 
 function TripGroup({ trip, list, before, profiles }: { trip: Trip; list: Entry[]; before: number; profiles: Record<string, Profile> }) {
   const me = useMe();
-  const { imOut, sheet } = useWhosIn(trip, profiles);
+  const { imIn, imOut, sheet } = useWhosIn(trip, profiles);
+  const { passEvent } = useSuggestions(trip, []);
   return (
     <PageSection title={trip.name}>
       <ListGroup label={`${trip.name} notifications`}>
@@ -63,6 +65,17 @@ function TripGroup({ trip, list, before, profiles }: { trip: Trip; list: Entry[]
                 action={<span className={s.actions}>
                   <Button size="small" tone="ghost" onClick={() => imOut(event)}>I’m out</Button>
                   <LinkButton size="small" tone="ghost" to={to}>View</LinkButton>
+                </span>} />
+            );
+          }
+          // "Sam and Priya are going to Fado night": I'm in and Pass, until you answer
+          if (e.notice?.kind === 'going' && e.event && awaitsAnswer(e.event, trip, me.uid)) {
+            const event = e.event;
+            return (
+              <ListItem key={e.id} media={media} round title={e.text} meta={meta}
+                action={<span className={s.actions}>
+                  <Button size="small" tone="ghost" onClick={() => imIn(event)}>I’m in</Button>
+                  <Button size="small" tone="ghost" onClick={() => passEvent(event)}>Pass</Button>
                 </span>} />
             );
           }

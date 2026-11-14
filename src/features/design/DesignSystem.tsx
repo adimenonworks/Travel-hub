@@ -288,6 +288,8 @@ export function DesignSystem() {
           <EventCard icon="notebook" layout="note" title="Bag drop closes 40 min before" place="Sam has the passports" />
           <EventCard icon="utensils" type="food" title="Fado in Alfama" time="21:00" place="Tasca do Chico" to="/design" extras={[{ icon: 'user-add', label: 'New · added by Sam' }]}
             people={[{ id: 'a', name: 'Sam Kerr' }, { id: 'b', name: 'Priya Shah' }]} going="2 of 4 going" action={{ label: 'I’m out', onClick: () => {} }} />
+          <EventCard icon="music" type="activities" state="suggested" title="Fado night" time="20:00 onwards" place="Alfama" to="/design" extras={[{ icon: 'lightbulb', label: 'Idea · from Sam' }]}
+            people={[{ id: 'a', name: 'Sam Kerr' }, { id: 'b', name: 'Priya Shah' }]} going="2 going" action={{ label: 'I’m in', onClick: () => {} }} secondaryAction={{ label: 'Pass', onClick: () => {} }} />
         </Section>
 
         <Section title="Event categories" footer="Every category, by type, with its icon and the type's colour (src/lib/categories.ts). The icon tells categories apart; the colour tells types apart.">
@@ -384,7 +386,8 @@ export function DesignSystem() {
           </ListGroup>
           <ListGroup>
             <IdeaRow icon="star" title="Fado night in Alfama" meta="Show · Clube de Fado · €30 · Sam" tag={{ icon: 'star', label: 'Most votes' }} vote={{ count: 4, selected: true, onClick: () => {} }} />
-            <IdeaRow icon="utensils" title="Pastéis de Belém" meta="Bakery · Belém · Priya" vote={{ count: 2, selected: false, onClick: () => {} }} />
+            <IdeaRow icon="utensils" title="Pastéis de Belém" meta="Bakery · Belém · Priya" vote={{ count: 2, selected: false, onClick: () => {} }} action={{ label: 'Add to a day', onClick: () => {} }} />
+            <IdeaRow icon="music" type="activities" title="Fado night" meta="Thu 12 Dec, 20:00 · Show · Sam" vote={{ count: 1, selected: false, onClick: () => {} }} action={{ label: 'Go to day', onClick: () => {} }} />
           </ListGroup>
           <div className={s.tiles}>
             <Tile media={<img src={flagUrl('jp')} alt="" />} title="Japan" meta="24 saves · 3 cities" />

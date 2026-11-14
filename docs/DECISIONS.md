@@ -22,6 +22,18 @@
 
 ---
 
+## 15 Nov 2026
+
+### Ideas and the Itinerary: built (people and sharing, item 6)
+- **Decision (owner):** an idea row keeps its vote on the right and gets its action ("Add to a day" / "Go to day") as a small Ghost button under the meta. **Turned down:** replacing the vote with the action (voting a tap further away) and keeping the action only in the idea's sheet.
+- **Settled while building:**
+  - "Every other traveller has passed" means every traveller except the suggester (the suggester passing moves it to Passed straight away).
+  - An event made from a suggestion remembers who suggested it (`fromIdea`) and who passed (`passed`), so the travellers who haven't answered keep seeing it on their day. The first I'm in is a transaction, so two people answering at once make one event, not two.
+  - The suggester hears "Priya is going to Fado night" when someone else's I'm in makes the event.
+  - Undated ideas keep the old Pass (straight to Passed for everyone): they aren't on anyone's day, so there's nothing to hide for one person.
+  - A suggestion's place comes from its saved Place when it has one; an idea with no Place makes an event with no map position (like an event typed without a place).
+- **Where:** `src/features/trip/suggestions.tsx`, `store.acceptIdea`, Event card `State=Suggested`, Idea row `Show Button`.
+
 ## 14 Nov 2026
 
 ### Itinerary: yours, or one person's: built (people and sharing, item 5)

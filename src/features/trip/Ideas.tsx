@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { SlideSwap } from '../shared/SlideSwap';
-import { useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Accordion, Button, IdeaRow, LinkButton, ListGroup, ListItem, PageSection, SectionHeader, SegmentControl, Dropdown, Sheet, TextArea, TextField, useToast, Card, Illustration } from '../../design/components';
 import { store } from '../../data';
 import { personName, useMe, usePlaces, usePlacesById } from '../../data/hooks';
@@ -21,14 +21,17 @@ import type { TripCtx } from './TripPage';
 import s from './trip.module.css';
 import { isMapsLink } from '../../lib/links';
 import { deleteLater } from '../../lib/deleteLater';
+import { dayWord, formatDay, formatTime, tripDays } from '../../lib/dates';
+import { isSuggestion, passedIdea, useSuggestions } from './suggestions';
 
-type Filter = 'open' | 'approved' | 'rejected';
+/** To decide · Passed (item 6). Ideas on a day (`approved`) are events now, in the Itinerary, and left out here. */
+type Filter = 'open' | 'rejected';
 
 const ups = (i: Idea) => Object.keys(i.votes ?? {}).length;
 
 /**
- * Trip "Ideas" tab (Figma "Trip — Ideas"): things the group might do. A Section header, the To decide · Planned ·
- * Passed segments, then a List group of Idea rows sorted by votes (the leader gets a "Most votes" tag). Tapping a
+ * Trip "Ideas" tab (Figma "Trip — Ideas"): things the group might do. A Section header, the To decide · Passed
+ * segments, then a List group of Idea rows sorted by votes (the leader gets a "Most votes" tag). Tapping a
  * row opens the idea: its notes, links and comments, and (for travellers) "Add to a day" or "Pass".
  */
 const LINKS = 'Links & notes';
@@ -50,12 +53,15 @@ export function Ideas(ctx: TripCtx) {
   }, [linked]); // eslint-disable-line react-hooks/exhaustive-deps
   const [scheduling, setScheduling] = useState<Idea | null>(null);
   const toast = useToast();
+  const navigate = useNavigate();
+  const suggest = useSuggestions(trip, ctx.activities);
+  // A dated idea's day in the Itinerary, where you answer it (it's highlighted when you land)
+  const goToDay = (i: Idea) => navigate(`/trip/${trip.id}/itinerary?day=${i.date}&focus=idea-${i.id}`);
 
   const shownFor = (f: Filter) => ideas.filter((i) => i.status === f).sort((a, b) => ups(b) - ups(a) || b.createdAt - a.createdAt);
   const count = (f: Filter) => ideas.filter((i) => i.status === f).length;
   const topOf = (shown: Idea[]) => shown[0] && ups(shown[0]) > 0 && (shown.length === 1 || ups(shown[0]) > ups(shown[1])) ? shown[0].id : null;
-  // Swipe the list sideways to move between To decide · Planned · Passed (the list slides like the trip's days)
-  const FILTERS: Filter[] = ['open', 'approved', 'rejected'];
+  const FILTERS: Filter[] = ['open', 'rejected'];
   const vote = async (i: Idea) => {
     if (!ctx.isTraveller) { toast({ label: 'Followers can see the votes but not vote' }); return; }
     const mine = !!i.votes?.[me.uid];
@@ -74,7 +80,6 @@ export function Ideas(ctx: TripCtx) {
         action={ctx.isTraveller ? <Button size="small" icon="lightbulb" onClick={() => setAdding(true)}>Add idea</Button> : undefined} />
       <SegmentControl label="Show ideas" block value={filter} onChange={setFilter} options={[
         { value: 'open', label: 'To decide', count: count('open') },
-        { value: 'approved', label: 'Planned', count: count('approved') },
         { value: 'rejected', label: 'Passed', count: count('rejected') },
       ]} />
       <div className={s.swipeArea}>
@@ -91,12 +96,17 @@ export function Ideas(ctx: TripCtx) {
                 const place = i.placeId ? places[i.placeId] : undefined;
                 const cat = categoryInfo(i.category);
                 const kind = place ? [place.kind || placeCategory(place.category).one, place.city].filter(Boolean).join(' · ') : cat.label;
-                const meta = [kind, priceOf(i, trip) ? priceText(priceOf(i, trip)!) : '', i.createdBy === me.uid ? 'you' : personName(ctx.profiles, i.createdBy).split(' ')[0]].filter(Boolean).join(' · ');
+                // A dated idea's meta starts with its day: "Thu 12 Dec, 20:00 · Activity · Sam"
+                const when = i.date ? [formatDay(i.date, { weekday: 'short', day: 'numeric', month: 'short' }), i.startTime ? formatTime(i.startTime) : ''].filter(Boolean).join(', ') : '';
+                const meta = [when, kind, i.status === 'open' && passedIdea(i, me.uid) ? 'you passed' : '', priceOf(i, trip) ? priceText(priceOf(i, trip)!) : '', i.createdBy === me.uid ? 'you' : personName(ctx.profiles, i.createdBy).split(' ')[0]].filter(Boolean).join(' · ');
                 return (
                   <IdeaRow key={i.id} title={place?.name ?? i.title} meta={meta} icon={place ? placeCategory(place.category).icon : i.links.length ? 'link' : cat.icon}
                     type={place ? placeCategory(place.category).tone : i.links.length ? undefined : categoryTone(i.category)}
                     tag={i.id === top ? { icon: 'star', label: 'Most votes' } : undefined}
                     vote={{ count: ups(i), selected: !!i.votes?.[me.uid], onClick: () => vote(i) }}
+                    action={!ctx.isTraveller || i.status !== 'open' ? undefined
+                      : isSuggestion(i) ? { label: 'Go to day', onClick: () => goToDay(i) }
+                        : { label: 'Add to a day', onClick: () => setScheduling(i) }}
                     onClick={() => { setViewing(i); if (place) recordView(trip.id, { url: `/trip/${trip.id}/ideas?idea=${i.id}`, label: place.name, kind: 'Place' }); }} />
                 );
               })}
@@ -109,8 +119,10 @@ export function Ideas(ctx: TripCtx) {
       <AddIdeaSheet open={adding} ctx={ctx} onClose={() => setAdding(false)} onNew={() => { setAdding(false); setEditing('new'); }} />
       <IdeaSheet idea={live} place={live?.placeId ? places[live.placeId] : undefined} ctx={ctx} onClose={() => setViewing(null)}
         onEdit={() => { setEditing(live); setViewing(null); }}
-        onSchedule={() => { setScheduling(live); setViewing(null); }} />
-      <IdeaForm open={!!editing} tripId={trip.id} currency={trip.currency} idea={editing === 'new' ? undefined : editing ?? undefined} onClose={() => setEditing(null)} />
+        onSchedule={() => { setScheduling(live); setViewing(null); }}
+        onGoToDay={() => { if (live) { setViewing(null); goToDay(live); } }}
+        onPass={() => { if (live) { setViewing(null); suggest.passIdea(live); } }} />
+      <IdeaForm open={!!editing} tripId={trip.id} days={tripDays(trip.startDate, trip.endDate)} start={trip.startDate} currency={trip.currency} idea={editing === 'new' ? undefined : editing ?? undefined} onClose={() => setEditing(null)} />
       <ActivityForm
         open={!!scheduling}
         trip={trip}
@@ -190,7 +202,7 @@ function AddIdeaSheet({ open, ctx, onClose, onNew }: { open: boolean; ctx: TripC
 }
 
 /** One idea opened: what it is (its Place, when it has one), links, who added it, comments; travellers add it to a day or pass on it. */
-function IdeaSheet({ idea, place, ctx, onClose, onEdit, onSchedule }: { idea: Idea | null; place?: SavedPlace; ctx: TripCtx; onClose: () => void; onEdit: () => void; onSchedule: () => void }) {
+function IdeaSheet({ idea, place, ctx, onClose, onEdit, onSchedule, onGoToDay, onPass }: { idea: Idea | null; place?: SavedPlace; ctx: TripCtx; onClose: () => void; onEdit: () => void; onSchedule: () => void; onGoToDay: () => void; onPass: () => void }) {
   const me = useMe();
   const toast = useToast();
   const { visited, starred } = usePlaceMarks();
@@ -205,10 +217,12 @@ function IdeaSheet({ idea, place, ctx, onClose, onEdit, onSchedule }: { idea: Id
   const cat = categoryInfo(idea.category);
   const canEdit = ctx.isTraveller;
   const setStatus = async (status: Idea['status'], label: string) => {
-    const was = idea.status;
+    const was = { status: idea.status, passed: idea.passed ?? {} };
+    // Back to To decide starts the passes again
+    const patch = status === 'open' ? { status, passed: {} } : { status };
     try {
-      await store.updateSub(ctx.trip.id, 'ideas', idea.id, { status });
-      toast({ icon: 'check', label, action: { label: 'Undo', onClick: () => { store.updateSub(ctx.trip.id, 'ideas', idea.id, { status: was }).catch(() => {}); } } });
+      await store.updateSub(ctx.trip.id, 'ideas', idea.id, patch);
+      toast({ icon: 'check', label, action: { label: 'Undo', onClick: () => { store.updateSub(ctx.trip.id, 'ideas', idea.id, was).catch(() => {}); } } });
       onClose();
     }
     catch { toast({ tone: 'danger', label: "Couldn't save. Check your connection" }); }
@@ -226,7 +240,16 @@ function IdeaSheet({ idea, place, ctx, onClose, onEdit, onSchedule }: { idea: Id
           <Button tone="neutral" icon="star" onClick={star}>{starred(place) ? 'Favourite' : 'Add to favourites'}</Button>
         </div>
       )}
-      {ctx.isTraveller && idea.status === 'open' && (
+      {idea.date && idea.status === 'open' && (
+        <p className="t-body">Suggested for {formatDay(idea.date, { weekday: 'long', day: 'numeric', month: 'long' })}{idea.startTime ? `, ${formatTime(idea.startTime)}` : ''}. Answer it on that day of the itinerary.</p>
+      )}
+      {ctx.isTraveller && isSuggestion(idea) && (
+        <div className={s.ideaButtons}>
+          <Button tone="neutral" onClick={onPass} disabled={passedIdea(idea, me.uid)}>{passedIdea(idea, me.uid) ? 'You passed' : 'Pass'}</Button>
+          <Button icon="calendar" onClick={onGoToDay}>Go to day</Button>
+        </div>
+      )}
+      {ctx.isTraveller && idea.status === 'open' && !idea.date && (
         <div className={s.ideaButtons}>
           <Button tone="neutral" onClick={() => setStatus('rejected', 'Idea passed')}>Pass</Button>
           <Button icon="calendar" onClick={onSchedule}>Add to a day</Button>
@@ -238,23 +261,24 @@ function IdeaSheet({ idea, place, ctx, onClose, onEdit, onSchedule }: { idea: Id
   );
 }
 
-type Form = { title: string; category: Category; notes: string; price: PriceDraft; links: LinkItem[] };
+type Form = { title: string; category: Category; notes: string; price: PriceDraft; links: LinkItem[]; date: string; startTime: string };
 
-function IdeaForm({ open, tripId, currency, idea, onClose }: { open: boolean; tripId: string; currency: string; idea?: Idea; onClose: () => void }) {
-  const blank: Form = { title: '', category: 'restaurant', notes: '', price: toPriceDraft(null, currency), links: [] };
+function IdeaForm({ open, tripId, currency, idea, days, start, onClose }: { open: boolean; tripId: string; currency: string; idea?: Idea; days: string[]; start: string; onClose: () => void }) {
+  const blank: Form = { title: '', category: 'restaurant', notes: '', price: toPriceDraft(null, currency), links: [], date: '', startTime: '' };
   const [f, setF] = useState<Form>(blank);
   useEffect(() => {
-    if (open) setF(idea ? { title: idea.title, category: idea.category, notes: idea.notes, price: toPriceDraft(priceOf(idea, { currency }), currency), links: idea.links } : blank);
+    if (open) setF(idea ? { title: idea.title, category: idea.category, notes: idea.notes, price: toPriceDraft(priceOf(idea, { currency }), currency), links: idea.links, date: idea.date ?? '', startTime: idea.startTime ?? '' } : blank);
   }, [open, idea]);
   const set = (p: Partial<Form>) => setF((x) => ({ ...x, ...p }));
   const toast = useToast();
 
   const submit = async () => {
-    const data = { title: f.title.trim(), category: f.category, notes: f.notes.trim(), price: fromPriceDraft(f.price), cost: 0, links: cleanLinks(f.links) };
+    // An optional day and time make it a suggestion on that day of the Itinerary (item 6)
+    const data = { title: f.title.trim(), category: f.category, notes: f.notes.trim(), price: fromPriceDraft(f.price), cost: 0, links: cleanLinks(f.links), date: f.date, startTime: f.date ? f.startTime : '' };
     try {
       if (idea) {
         await store.updateSub(tripId, 'ideas', idea.id, data);
-        const was = { title: idea.title, category: idea.category, notes: idea.notes, price: idea.price ?? null, cost: idea.cost ?? 0, links: idea.links };
+        const was = { title: idea.title, category: idea.category, notes: idea.notes, price: idea.price ?? null, cost: idea.cost ?? 0, links: idea.links, date: idea.date ?? '', startTime: idea.startTime ?? '' };
         toast({ icon: 'check', label: 'Idea saved', action: { label: 'Undo', onClick: () => { store.updateSub(tripId, 'ideas', idea.id, was).catch(() => {}); } } });
       } else {
         await store.addSub(tripId, 'ideas', { ...data, votes: {}, status: 'open' });
@@ -280,6 +304,11 @@ function IdeaForm({ open, tripId, currency, idea, onClose }: { open: boolean; tr
           <optgroup key={t.value} label={t.label}>{t.kinds.map((c) => <option key={c.value} value={c.value}>{c.label}</option>)}</optgroup>
         ))}
       </Dropdown>
+      <Dropdown label="Day (optional)" hint="Pick a day to suggest it: it shows on that day for everyone to say I’m in or Pass." value={f.date} onChange={(e) => set({ date: e.target.value })}>
+        <option value="">No day yet</option>
+        {days.map((d) => <option key={d} value={d}>{dayWord(d, start)} · {formatDay(d)}</option>)}
+      </Dropdown>
+      {f.date && <TextField label="Time (optional)" type="time" value={f.startTime} onChange={(e) => set({ startTime: e.target.value })} />}
       {!isEveryday(f.category) && <PriceField value={f.price} onChange={(price) => set({ price })} />}
       <TextArea label="Why it's great" value={f.notes} onChange={(e) => set({ notes: e.target.value })} />
       <LinkEditor links={f.links} onChange={(links) => set({ links })} />
