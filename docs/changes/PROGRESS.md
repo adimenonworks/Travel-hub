@@ -52,7 +52,9 @@ Read this first when starting a session. If it disagrees with the code or Figma,
 
 - **B5, Card props** (code only; Figma's Card already had none of them): `icon` (an icon on a light emerald tile) and `flush` (no padding) were used nowhere, and Figma's Show media covers an icon, so both are removed, with their CSS. `action` was an old alias for `actions`, used by 9 empty-state cards; they now pass `actions` and the alias is gone. Card's props now match Figma: `tone`, `layout`, `media`, `title`, `body`, `actions` (plus `to`). Empty states pixel-identical.
 
-**Next: B6 (Message component).** Then B7, B8, C, D, E.
+- **B6, Message:** Figma Message (`452:3461`) first: it had drifted from the app, so code won: Mine bubble `feature/surface` + `feature/text` (was the old selected emerald-700), Theirs bubble `surface/primary` (white on the grey section; was grey `surface/secondary`), Mine row gap `space/300`; new **Show edited** boolean ("Edited", Body small, `text/secondary`; before the bubble for mine, after it for theirs) because the app shows it. Code: `Message` in `src/design/components/Message.tsx` (+ `.module.css`, moved out of `shared.module.css`): `layout`, `meta`, `avatar`, `edited`, `bubbleProps`, `wrapBubble`; `Comments.tsx` renders each person's run as a stack of Messages (meta on the first, avatar beside the last). On /#/design. Every comment element's position is identical to before (measured to 0.01px).
+
+**Next: B7 (Text field, Text area, Dropdown).** Then B8, C, D, E.
 
 **Noticed for later:** the Foundations section "Spacing & radius" (`35:2217`) documents names from long ago (`--space-xxs`, `--radius-button`, "Regular (744–1067px)"). Rebuild it in A4 with the new Layout names.
 
