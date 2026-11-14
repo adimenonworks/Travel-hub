@@ -169,6 +169,9 @@ await t('notices: the person it is for reads it', assertSucceeds(getDoc(doc(db('
 await t('notices: its writer cannot read it back', assertFails(getDoc(doc(B, 'trips/t11/notices/n1'))));
 await t('notices: someone else on the trip cannot read it', assertFails(getDoc(doc(H, 'trips/t11/notices/n1'))));
 await t('notices: you list the ones addressed to you', assertSucceeds(getDocs(query(collection(db('dan'), 'trips/t11/notices'), where('to', 'array-contains', 'dan')))));
+await t('notices: someone else cannot delete it', assertFails(deleteDoc(doc(H, 'trips/t11/notices/n1'))));
+await t('notices: its writer cannot delete it', assertFails(deleteDoc(doc(B, 'trips/t11/notices/n1'))));
+await t('notices: the person it is for deletes it (kept 30 days)', assertSucceeds(deleteDoc(doc(db('dan'), 'trips/t11/notices/n1'))));
 await t('notices: you cannot list them all', assertFails(getDocs(collection(db('dan'), 'trips/t11/notices'))));
 await t('notices: nobody edits one', assertFails(updateDoc(doc(db('dan'), 'trips/t11/notices/n1'), { title: 'x' })));
 await t('notices: nobody deletes one while the trip is live', assertFails(deleteDoc(doc(B, 'trips/t11/notices/n1'))));

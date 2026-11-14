@@ -24,6 +24,11 @@
 
 ## 15 Nov 2026
 
+### Notifications have no buttons (owner's rule, review R2)
+- **Decision (owner):** no Notification centre entry carries an action (I'm out, I'm in, Pass, View). Tapping an entry opens what it's about: an event's page, a suggestion's day (highlighted), People for joins. Unread entries have a dot and a bold title, read ones a regular, secondary title. Entries are kept 30 days, then deleted by the people they're for.
+- **Replaces:** item 4's "Sam added you to Dinner" row with I'm out and View, and item 6's "going" row with I'm in and Pass; and the 60 days entries were shown for.
+- **Settled while building:** "unread" keeps item 4's meaning (arrived since you last opened the centre), so opening it still clears the count; there's no per-entry read state. The dot is `icon/brand` (emerald-800 in light mode, 3:1 or better on the grey List group), not the Badge's light emerald, and the bold title means it never relies on colour.
+
 ### Ideas and the Itinerary: built (people and sharing, item 6)
 - **Decision (owner):** an idea row keeps its vote on the right and gets its action ("Add to a day" / "Go to day") as a small Ghost button under the meta. **Turned down:** replacing the vote with the action (voting a tap further away) and keeping the action only in the idea's sheet.
 - **Settled while building:**

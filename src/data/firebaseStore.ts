@@ -263,6 +263,13 @@ export function createFirebaseStore(config: FirebaseOptions): Store {
       putNotices(batch, db, tripId, list, auth.currentUser!.uid);
       await batch.commit();
     },
+    async deleteNotices(tripId, ids) {
+      for (let i = 0; i < ids.length; i += 400) {
+        const batch = writeBatch(db);
+        for (const id of ids.slice(i, i + 400)) batch.delete(doc(db, 'trips', tripId, 'notices', id));
+        await batch.commit();
+      }
+    },
     watchMyTrips(uid, cb) {
       const q = query(collection(db, 'trips'), where('memberIds', 'array-contains', uid));
       return onSnapshot(q, (s) => cb(s.docs.map((d) => withId<Trip>(d.id, d.data()))));

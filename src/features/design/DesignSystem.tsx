@@ -372,12 +372,14 @@ export function DesignSystem() {
           </Accordion>
         </Section>
 
-        <Section title="Rows, groups and tiles" footer="Section header, List group of List items (Large / Small), Idea rows with Vote buttons, Tiles, Map card, Stat strip, Profile card.">
+        <Section title="Rows, groups and tiles" footer="Section header, List group of List items (Large / Small; State Unread / Read for the Notification centre), Idea rows with Vote buttons, Tiles, Map card, Stat strip, Profile card.">
           <SectionHeader title="Collections" meta="4 places · 61 saves" action={<LinkButton to="/design" tone="ghost" size="small" iconEnd="chevron-right">See all</LinkButton>} />
           <ListGroup>
             <ListItem icon="utensils" title="Ichiran Shibuya" meta="Ramen · Tokyo · from TikTok" trailing="2h" onClick={() => {}} />
             <ListItem icon="link" title="10 things to do in Cusco" meta="Article · Peru · cntraveler.com" trailing="Yesterday" />
             <ListItem size="small" icon="document" title="TAP e-ticket" trailing="PDF · 2h ago" />
+            <ListItem media={<Avatar name="Priya Shah" size="large" />} round title="Priya moved Tram 28 to 14:00" meta="2 min ago" state="unread" to="/design" />
+            <ListItem media={<Avatar name="Jo Ortiz" size="large" />} round title="Jo joined Portugal & Spain" meta="Mon 2 Dec" state="read" to="/design" />
             <ListItem icon="person" title="Sam Lee" action={<Button tone="ghost" size="small" iconEnd="chevron-down" onClick={() => {}}>Travelling</Button>} />
             <BudgetCard label="Left to spend" amount="A$1,800" caption="of A$5,000 per person · A$3,200 planned" ratio={0.64}
               rows={[{ icon: 'plane', label: 'Flights', amount: 'A$1,900' }, { icon: 'bed', label: 'Stays', amount: 'A$900' }, { icon: 'key', label: 'Car rental', amount: 'A$180' }]} />
