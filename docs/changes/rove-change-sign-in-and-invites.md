@@ -2,7 +2,7 @@
 
 **Sources of truth:** the Figma file `cXoK1GzmzgqY0cmcgJw66W` and the code on Main. Decided with the owner on 14 Nov 2026.
 
-**Run it after the people change** (`rove-change-people-and-sharing.md`). It builds on that prompt's roles, its Notification centre (item 4) and its privacy rules.
+**Run it straight after the people change, before the polish prompt** (owner, 14 Nov 2026). The people change is `rove-change-people-and-sharing.md`. It builds on that prompt's roles, its Notification centre (item 4) and its privacy rules.
 
 **What this changes:**
 - **Part A, buildable now:** joining becomes **asking to join**, approved by a traveller. Invite links show a **rich preview card** with only the trip's name and dates. People who install Rove from a link are told to **tap the link again**.
@@ -11,7 +11,7 @@
 **Not in this prompt:**
 - Email sign-in with a code goes to **Later**. There's no magic link and no email-and-password sign-in.
 - Lock-screen push for join requests waits for Notifications push (Later). The in-app entries are shaped so they can be sent as push.
-- Collection invites keep joining straight in (Can edit / Can view). Only trip links ask to join.
+- Collection invites and **guest links** (the people change's item 9, one event only) keep joining straight in (owner, 14 Nov 2026). Only trip links ask to join.
 
 ## How to work
 
@@ -80,7 +80,7 @@ This **replaces** the people change's straight join (item 1's "Join trip" button
   - reads nothing else on the trip until approved.
 - **Travellers** read every request. Approving is one batch: add the member with the request's role, then delete the request. Declining deletes it.
 - **Followers** can't read or change requests.
-- Joining a trip without a request is no longer allowed. Remove the old straight-join path from the rules. Keep it for collection links.
+- Joining a trip without a request is no longer allowed. Remove the old straight-join path from the rules. Keep it for collection links and guest links.
 - Requests older than 30 days are ignored and can be deleted by anyone on the trip.
 
 ## 2. The rich preview card
@@ -172,7 +172,7 @@ This moves the existing Later item into this prompt, because the new link addres
   - on events you're not in, you see only the title, time, place and who's in;
   - sign-in is Google and Apple only, with no email and password and no magic link; email with a code is Later.
 - **`ROADMAP.md`:**
-  - add this prompt to **Now**, after the people change;
+  - add this prompt to **Now**, after the people change and before the polish prompt;
   - remove "Airbnb-style invite" from Next and Universal Links from Later (both are in here);
   - add **"Sign in with an email code"** to Later. How we'd build it: a code emailed by Rove's server, checked there, then a Firebase custom token, which needs a service account key as a Worker secret and an email service. Medium;
   - add **"A Rove web address"** to Next (a custom domain for links). Small, about A$15–25 a year;
@@ -191,7 +191,7 @@ Report ✅, ❌ (with the reason) or ⚠️ (done, with a caveat) on every line.
 - [ ] The first Approve adds the person with the link's role; the others see who answered; Undo works
 - [ ] Decline removes the request; the joiner gets the gentle entry, with no name
 - [ ] Before approval, the requester can read nothing on the trip but their own request (rules emulator)
-- [ ] Joining without a request is refused by the rules; collection links still join straight in
+- [ ] Joining without a request is refused by the rules; collection links and guest links still join straight in
 - [ ] Reset invite links makes both old links stop working, and their previews give "This link no longer works"
 - [ ] A link sent in Messages shows the card with only the trip's name and dates; an expired link shows no trip details
 - [ ] Old `#/join/` links still work
