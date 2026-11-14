@@ -56,7 +56,9 @@ Read this first when starting a session. If it disagrees with the code or Figma,
 
 - **B7, three fields:** Figma Text field (`7:89`) split by its Layout into **Text field** (`7:89`, State Default / Focus / Filled; its unused `Icon` property removed), **Text area** (`661:595`) and **Dropdown** (`661:596`, keeps the chevron `Icon`), stacked together in the Controls row (rows below moved down 208px). Text area had no instances; Dropdown only on Archive (still linked). Code: `Select` → **`Dropdown`** (8 files); `TextField`, `TextArea` unchanged. Glossary updated. **Found, not changed:** code's `Dropdown compact` (44px, to sit beside a small button) has no Figma Size yet; and Text area is still drawn at Input height in Figma (noted in the earlier prompt).
 
-**Next: B8 (keep unused icons).** Then C, D, E.
+- **B8, unused icons kept:** Cloud, Rain, Snow, Bolt, Mask, Comment user and Train side are ordinary icons in Figma's Icons grid and in `icons.ts` (`cloud`, `rain`, `snow`, `bolt`, `mask`, `comment-user`, `train-side`); nothing to change.
+
+**Part B is done.** **Next: Part C (the Components section: readable group headers, layout check, section screenshot).** Then D, E and the Check everything list.
 
 **Noticed for later:** the Foundations section "Spacing & radius" (`35:2217`) documents names from long ago (`--space-xxs`, `--radius-button`, "Regular (744–1067px)"). Rebuild it in A4 with the new Layout names.
 
