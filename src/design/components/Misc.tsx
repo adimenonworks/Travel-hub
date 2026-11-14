@@ -24,7 +24,8 @@ export function Avatar({ name, photo, size = 'medium' }: { name: string; photo?:
 }
 
 /** Figma "Avatar stack": up to three Medium (32px) avatars overlapping by 6px, then a "+n" More avatar. */
-export function AvatarStack({ people, max = 3, size = 'medium' }: { people: { id: string; name: string; photo?: string | null }[]; max?: number; size?: AvatarSize }) {
+export function AvatarStack({ people, max = 3 }: { people: { id: string; name: string; photo?: string | null }[]; max?: number }) {
+  const size: AvatarSize = 'medium'; /* Figma Avatar stack has one size (Medium avatars) */
   const shown = people.slice(0, max);
   const extra = people.length - shown.length;
   const px = AVATAR_PX[size];
