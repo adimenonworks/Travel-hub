@@ -2,20 +2,18 @@ import { useEffect, useRef, useState } from 'react';
 import { confirmAction } from '../../lib/native';
 import { Button, FieldRow, Dropdown, Sheet, TextField, useToast } from '../../design/components';
 import { store } from '../../data';
-import type { Place, Trip } from '../../data/types';
+import type { Trip } from '../../data/types';
 import { addDays, today } from '../../lib/dates';
 import { CURRENCIES } from '../../lib/format';
 import { shrinkPhoto } from '../../lib/image';
-import { CityPicker } from '../shared/CityPicker';
 import { PriceField, fromPriceDraft, toPriceDraft, type PriceDraft } from '../shared/Price';
 import s from './trip.module.css';
 
-type Draft = { name: string; destination: Place | null; startDate: string; endDate: string; currency: string; coverPhoto: string | null; coverPosition: Pos | null; budget: PriceDraft };
+type Draft = { name: string; startDate: string; endDate: string; currency: string; coverPhoto: string | null; coverPosition: Pos | null; budget: PriceDraft };
 type Pos = { x: number; y: number };
 
 const fromTrip = (t?: Trip): Draft => ({
   name: t?.name ?? '',
-  destination: t?.destination ?? null,
   startDate: t?.startDate ?? addDays(today(), 30),
   endDate: t?.endDate ?? addDays(today(), 34),
   currency: t?.currency ?? (Intl.NumberFormat().resolvedOptions().locale.startsWith('en-GB') ? 'GBP' : 'USD'),
@@ -25,7 +23,8 @@ const fromTrip = (t?: Trip): Draft => ({
 });
 
 /**
- * Create a trip (no `trip`) or edit one. Calls onSaved with the trip id.
+ * Create a trip (no `trip`) or edit one. The trip's places aren't here: they're picked in New trip and grow with its
+ * events (a list you can't change doesn't belong in an edit sheet; owner, 14 Nov 2026). Calls onSaved with the trip id.
  * Pass onDeleted to show a Delete trip button (only the owner can delete; the security rules enforce it too).
  */
 export function TripForm({ open, trip, onClose, onSaved, onDeleted }: { open: boolean; trip?: Trip; onClose: () => void; onSaved?: (id: string) => void; onDeleted?: () => void }) {
@@ -40,7 +39,6 @@ export function TripForm({ open, trip, onClose, onSaved, onDeleted }: { open: bo
   const submit = async () => {
     const data = {
       name: d.name.trim(),
-      destination: d.destination,
       startDate: d.startDate,
       endDate: d.endDate,
       currency: d.currency,
@@ -55,7 +53,7 @@ export function TripForm({ open, trip, onClose, onSaved, onDeleted }: { open: bo
         toast({ icon: 'check', label: 'Changes saved' });
         onSaved?.(trip.id);
       } else {
-        const id = await store.createTrip(data);
+        const id = await store.createTrip({ ...data, destination: null });
         toast({ icon: 'check', label: 'Trip created' });
         onSaved?.(id);
       }
@@ -82,7 +80,6 @@ export function TripForm({ open, trip, onClose, onSaved, onDeleted }: { open: bo
     <Sheet open={open} mode={trip ? 'edit' : 'default'} title={trip ? 'Edit trip' : 'New trip'} onClose={onClose} onSubmit={submit} submitLabel={trip ? 'Save' : 'Create'} submitDisabled={!valid}
       secondary={trip && onDeleted ? <Button tone="destructive" size="large" onClick={remove}>Delete trip</Button> : undefined}>
       <TextField label="Trip name" placeholder="Summer in Lisbon" value={d.name} onChange={(e) => set({ name: e.target.value })} required />
-      <CityPicker hint="Your first stop. Add more stops to the itinerary and they'll show on the trip header." value={d.destination} onChange={(p) => set({ destination: p, name: d.name || (p ? `${p.name.split(',')[0]} trip` : '') })} />
       <FieldRow>
         <TextField label="Start" type="date" value={d.startDate} onChange={(e) => set({ startDate: e.target.value, endDate: d.endDate < e.target.value ? e.target.value : d.endDate })} />
         <TextField label="End" type="date" value={d.endDate} min={d.startDate} onChange={(e) => set({ endDate: e.target.value })} />

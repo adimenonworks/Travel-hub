@@ -23,14 +23,28 @@ export function countryCodeOf(p?: Place | null): string | undefined {
 /** The display name for a country code ("pt" → "Portugal"). */
 export const countryName = (code: string) => names?.of(code.toUpperCase()) ?? code.toUpperCase();
 
+/** The most stops one trip can have. */
+export const MAX_STOPS = 30;
+
+/** A trip's stops, in order. Older trips have only `destination`, read as their one stop. */
+export function tripStops(trip: Pick<Trip, 'destination' | 'stops'>): Place[] {
+  if (trip.stops?.length) return trip.stops;
+  return trip.destination ? [trip.destination] : [];
+}
+
+/** Is this the same place? Same name (its first part) in the same country, so "Portugal" picked twice counts once. */
+export const samePlace = (a: Place, b: Place) =>
+  a.name.split(',')[0].trim().toLowerCase() === b.name.split(',')[0].trim().toLowerCase() && (countryCodeOf(a) ?? '') === (countryCodeOf(b) ?? '');
+
 /**
- * The countries a trip visits: its destination's, then any country an event takes you to
- * (a flight to Rome or a hotel in Athens adds Italy and Greece), in the order you'll arrive.
+ * The countries a trip covers: its stops' countries in the order they were picked, then any other country an event
+ * takes you to (a flight to Rome or a hotel in Athens adds Italy and Greece), in the order you'll arrive. Ideas don't
+ * count. Everything that asks which countries a trip covers goes through here.
  */
 export function tripCountries(trip: Trip, activities: Activity[]): string[] {
   const out: string[] = [];
   const add = (c?: string) => { if (c && !out.includes(c)) out.push(c); };
-  add(countryCodeOf(trip.destination));
+  tripStops(trip).forEach((p) => add(countryCodeOf(p)));
   [...activities].sort((a, b) => (a.date + (a.startTime || '99')).localeCompare(b.date + (b.startTime || '99'))).forEach((a) => { add(countryCodeOf(a.location)); add(countryCodeOf(a.to)); });
   return out;
 }

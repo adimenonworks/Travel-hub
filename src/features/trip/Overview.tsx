@@ -4,7 +4,7 @@ import type { IconName } from '../../design/components';
 import { useMe, useProfile } from '../../data/hooks';
 import type { Place } from '../../data/types';
 import { BOOKING_GROUPS, TYPE_TONE, bookingGroupOf, categoryInfo, categoryTone, isEveryday } from '../../lib/categories';
-import { countryCodeOf, countryName, flagUrl, tripCountries } from '../../lib/countries';
+import { countryCodeOf, countryName, flagUrl, tripCountries, tripStops } from '../../lib/countries';
 import { timeAgo } from '../../lib/dates';
 import { priceOf, useBudgetTotals } from '../../lib/currency';
 import { money } from '../../lib/format';
@@ -43,7 +43,7 @@ export function Overview(ctx: TripCtx) {
   const all = tripCountries(trip, activities);
   const countries = all.some((c) => c !== homeCode) ? all.filter((c) => c !== homeCode) : all;
   // A spot on the trip in the chosen country, for its local time
-  const spots: Place[] = [trip.destination, ...activities.flatMap((a) => [a.location, a.to])].filter((p): p is Place => !!p);
+  const spots: Place[] = [...tripStops(trip), ...activities.flatMap((a) => [a.location, a.to])].filter((p): p is Place => !!p);
   const spot = country ? spots.find((p) => countryCodeOf(p) === country) ?? null : null;
 
   return (
