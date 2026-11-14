@@ -8,7 +8,7 @@
   max-width: 100%; text-align: center; text-decoration: none; user-select: none; /* a long label wraps at large text sizes instead of running off the screen */
   transition: background var(--motion-fast), color var(--motion-fast), transform var(--motion-release);
 }
-.button:active:not(:disabled) { transform: scale(0.96); transition: background var(--motion-fast), color var(--motion-fast), transform var(--motion-press); }
+.button[data-pressed]:not(:disabled) { transform: scale(0.96); transition: background var(--motion-fast), color var(--motion-fast), transform var(--motion-press); }
 .glyph { flex: none; }
 
 /* Size=Large: 48px, padding 12 / 20, gap 4, Label, 24px icons. For the big moments: full-width actions (sheet and flow footers). */
@@ -19,37 +19,37 @@
 
 .primary { background: var(--button-primary-background); color: var(--button-primary-text); }
 @media (hover: hover) { .primary:hover:not(:disabled) { background: var(--button-primary-background-hover); } }
-.primary:active:not(:disabled) { background: var(--button-primary-background-pressed); }
+.primary[data-pressed]:not(:disabled) { background: var(--button-primary-background-pressed); }
 .primary:disabled { background: var(--button-primary-disabled-background); color: var(--button-primary-disabled-text); }
 
 
 .destructive { background: var(--button-destructive-background); color: var(--button-destructive-text); }
 @media (hover: hover) { .destructive:hover:not(:disabled) { background: var(--button-destructive-background-hover); } }
-.destructive:active:not(:disabled) { background: var(--button-destructive-background-pressed); }
+.destructive[data-pressed]:not(:disabled) { background: var(--button-destructive-background-pressed); }
 .destructive:disabled { background: var(--button-destructive-disabled-background); color: var(--button-destructive-disabled-text); }
 
 /* Inverse: the deep emerald button that sits on a brand (emerald) surface */
 .inverse { background: var(--button-inverse-background); color: var(--button-inverse-text); }
 @media (hover: hover) { .inverse:hover:not(:disabled) { background: var(--button-inverse-background-hover); } }
-.inverse:active:not(:disabled) { background: var(--button-inverse-background-pressed); }
+.inverse[data-pressed]:not(:disabled) { background: var(--button-inverse-background-pressed); }
 .inverse:disabled { background: var(--button-inverse-disabled-background); color: var(--button-inverse-disabled-text); }
 
 /* Neutral: the dark grey button */
 .neutral { background: var(--button-neutral-background); color: var(--button-neutral-text); }
 @media (hover: hover) { .neutral:hover:not(:disabled) { background: var(--button-neutral-background-hover); } }
-.neutral:active:not(:disabled) { background: var(--button-neutral-background-pressed); }
+.neutral[data-pressed]:not(:disabled) { background: var(--button-neutral-background-pressed); }
 .neutral:disabled { background: var(--button-neutral-disabled-background); color: var(--button-neutral-disabled-text); }
 
 /* Tertiary: outlined (1.5px on Regular, 2px on Large), used on accent surfaces */
 .tertiary { background: var(--button-tertiary-background); color: var(--button-tertiary-text); box-shadow: inset 0 0 0 var(--border-width-medium) var(--button-tertiary-border); }
 .tertiary.large { box-shadow: inset 0 0 0 var(--border-width-thick) var(--button-tertiary-border); }
 @media (hover: hover) { .tertiary:hover:not(:disabled) { background: var(--button-tertiary-background-hover); } }
-.tertiary:active:not(:disabled) { background: var(--button-tertiary-background-pressed); }
+.tertiary[data-pressed]:not(:disabled) { background: var(--button-tertiary-background-pressed); }
 .tertiary:disabled { background: var(--button-tertiary-disabled-background); color: var(--button-tertiary-disabled-text); box-shadow: inset 0 0 0 var(--border-width-medium) var(--button-tertiary-disabled-text); }
 
 .ghost { background: var(--button-ghost-background); color: var(--button-ghost-text); }
 @media (hover: hover) { .ghost:hover:not(:disabled) { background: var(--button-ghost-background-hover); } }
-.ghost:active:not(:disabled) { background: var(--button-ghost-background-pressed); }
+.ghost[data-pressed]:not(:disabled) { background: var(--button-ghost-background-pressed); }
 .ghost:disabled { background: var(--button-ghost-disabled-background); color: var(--button-ghost-disabled-text); }
 
 .button:disabled { cursor: default; }
@@ -69,18 +69,18 @@
 .badge { position: absolute; top: calc(50% - var(--size-650) / 2); left: 50%; }
 .iconSmall { width: var(--size-control-small); height: var(--size-control-small); }
 .iconSmall::after { inset: calc((var(--size-control-small) - var(--size-tap)) / 2); }
-.iconButton:active:not(:disabled) { transform: scale(0.92); transition: background var(--motion-fast), transform var(--motion-press); }
+.iconButton[data-pressed]:not(:disabled) { transform: scale(0.92); transition: background var(--motion-fast), transform var(--motion-press); }
 .icon-secondary { background: var(--surface-secondary); color: var(--icon-primary); } /* Figma Icon button Secondary: neutral grey */
 @media (hover: hover) { .icon-secondary:hover:not(:disabled) { box-shadow: inset 0 0 0 100vmax var(--control-unselected-ghost-background-hover); } }
-.icon-secondary:active:not(:disabled) { box-shadow: inset 0 0 0 100vmax var(--control-unselected-ghost-background-pressed); }
+.icon-secondary[data-pressed]:not(:disabled) { box-shadow: inset 0 0 0 100vmax var(--control-unselected-ghost-background-pressed); }
 .icon-ghost { background: var(--button-ghost-background); color: var(--button-ghost-icon); }
 @media (hover: hover) { .icon-ghost:hover:not(:disabled) { background: var(--button-ghost-background-hover); } }
-.icon-ghost:active:not(:disabled) { background: var(--button-ghost-background-pressed); }
+.icon-ghost[data-pressed]:not(:disabled) { background: var(--button-ghost-background-pressed); }
 .icon-on-feature { background: var(--feature-surface-sunken); color: var(--feature-icon); }
 /* Figma Icon button Primary: emerald, for the one main action in a row (Send a comment) */
 .icon-primary { background: var(--button-primary-background); color: var(--button-primary-icon); }
 @media (hover: hover) { .icon-primary:hover:not(:disabled) { background: var(--button-primary-background-hover); } }
-.icon-primary:active:not(:disabled) { background: var(--button-primary-background-pressed); }
+.icon-primary[data-pressed]:not(:disabled) { background: var(--button-primary-background-pressed); }
 @media (hover: hover) { .icon-on-feature:hover:not(:disabled) { background: var(--button-ghost-background-pressed); } }
 .iconButton:disabled { cursor: default; color: var(--button-ghost-disabled-text); }
 .icon-primary:disabled { background: var(--button-primary-disabled-background); color: var(--button-primary-disabled-text); }

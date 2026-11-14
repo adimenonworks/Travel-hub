@@ -29,7 +29,7 @@
 /* The name's link covers the whole card; the chips, avatars and the row sit above it */
 .nameLink::after { content: ''; position: absolute; inset: 0; z-index: 1; }
 .hero:has(.nameLink) { position: relative; cursor: pointer; transition: transform var(--motion-release); }
-.hero:has(.nameLink):active { transform: scale(0.98); transition: transform var(--motion-press); }
+.hero:has(.nameLink[data-pressed]) { transform: scale(0.98); transition: transform var(--motion-press); }
 .chips, .rows { position: relative; z-index: 2; }
 .meta { font: var(--type-body); color: var(--text-secondary); }
 .chips { margin: 0; padding: 0; list-style: none; display: flex; flex-wrap: wrap; gap: var(--space-300); }
@@ -54,7 +54,7 @@
   border-color: transparent; background: var(--control-selected-background); color: var(--control-selected-text);
 }
 .daySelected:hover { background: var(--control-selected-background-hover); }
-.day:active { transform: scale(0.97); transition: transform var(--motion-press); }
+.day[data-pressed] { transform: scale(0.97); transition: transform var(--motion-press); }
 @media (prefers-reduced-motion: reduce) { .day { transition: background var(--motion-fast), color var(--motion-fast), border-color var(--motion-fast); } }
 .dayNum { font: var(--type-display-small); letter-spacing: -0.01em; }
 .dayWord { font: var(--type-label-small); white-space: nowrap; }

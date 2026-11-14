@@ -33,10 +33,10 @@
   position: relative; z-index: 1;
   transition: background var(--motion-fast), color var(--motion-fluid), transform var(--motion-release);
 }
-.option:active { transform: scale(0.96); transition: background var(--motion-fast), color var(--motion-fluid), transform var(--motion-press); }
+.option[data-pressed] { transform: scale(0.96); transition: background var(--motion-fast), color var(--motion-fluid), transform var(--motion-press); }
 .option:hover { background: var(--control-selected-ghost-background-hover); }
-.option:active { background: var(--control-selected-ghost-background-pressed); }
-.option[aria-checked='true'], .option[aria-checked='true']:hover, .option[aria-checked='true']:active { background: transparent; color: var(--control-selected-text); }
+.option[data-pressed] { background: var(--control-selected-ghost-background-pressed); }
+.option[aria-checked='true'], .option[aria-checked='true']:hover, .option[aria-checked='true'][data-pressed] { background: transparent; color: var(--control-selected-text); }
 
 /* The sliding pill: one segment wide, moved by whole segments (segment width + the gap) on the GPU. */
 .thumb {
@@ -50,4 +50,4 @@
 }
 @media (prefers-reduced-motion: reduce) { .thumb { transition: background var(--motion-fast); } }
 .control:has(.option[aria-checked='true']:hover) .thumb { background: var(--control-selected-background-hover); }
-.control:has(.option[aria-checked='true']:active) .thumb { background: var(--control-selected-background-pressed); }
+.control:has(.option[aria-checked='true'][data-pressed]) .thumb { background: var(--control-selected-background-pressed); }

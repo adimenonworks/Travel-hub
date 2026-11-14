@@ -23,7 +23,7 @@
   border-radius: var(--radius-full); color: var(--text-primary); font: var(--type-label-small);
   transition: background var(--motion-fast), transform var(--motion-release);
 }
-.item:active { transform: scale(0.96); transition: background var(--motion-fast), transform var(--motion-press); }
+.item[data-pressed] { transform: scale(0.96); transition: background var(--motion-fast), transform var(--motion-press); }
 .item { position: relative; z-index: 1; }
 /* The selected pill: one shape that slides to the current tab (equal-width tabs, so it moves by whole tab widths) */
 .indicator {
