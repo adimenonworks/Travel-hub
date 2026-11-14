@@ -10,7 +10,7 @@ Read this first when starting a session. If it disagrees with the code or Figma,
 
 `docs/changes/rove-change-transparency-setup.md` is **finished** (14 Nov 2026; results below).
 
-**Next: `docs/changes/rove-change-people-and-sharing.md`**, then `rove-change-polish-and-library.md` (which also has G8: Dropdown's size and Text area's height, the two Figma mismatches library v2 left).
+**Next: `docs/changes/rove-change-new-trip-stops.md`** (owner, 14 Nov 2026: Home's Primary button, several stops in New trip, Bring your saves matched to the trip), then `rove-change-people-and-sharing.md`, then `rove-change-polish-and-library.md` (which also has G8: Dropdown's size and Text area's height, the two Figma mismatches library v2 left).
 
 ### Transparency setup status (14 Nov 2026)
 

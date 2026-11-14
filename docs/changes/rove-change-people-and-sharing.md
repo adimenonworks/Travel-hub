@@ -65,9 +65,9 @@ One Claude Code account does this work now (owner, 13 Nov 2026), so the old two-
   - add people and change roles;
   - remove someone;
   - delete the trip.
-- **The trip's location is locked after creation.**
-  - Edit trip shows it as read-only text ("Started in Lisbon, Portugal"), with no picker.
-  - So that the lock never traps anyone, the trip's places come from its events. The countries and cities a trip "covers" (used for Good to know, Bring your saves, Add from saved, the Save sheet's trip default, and Collections' trip row) are the starting location **plus** every place on its events.
+- **The trip's places can't be edited after creation** (built in `rove-change-new-trip-stops.md`, which runs first):
+  - Edit trip has no place picker and no list of stops (owner, 14 Nov 2026).
+  - The countries a trip "covers" (used for Good to know, Bring your saves, Add from saved, the Save sheet's trip default, and Collections' trip row) are its **stops** from New trip **plus** every place on its events (`tripStops`, `tripCountries`). Keep using those helpers.
   - The cover photo is still changed with Change photo.
 - **Edit trip loses two fields:** **Budget per person** (now personal, on the Budget card, item 8) and **Local currency** (each price has its own currency, item 8). Remove both from Edit trip and from the New trip flow, and delete `trip.currency` and `trip.budget` after migrating them.
 - **Deleting a trip:**

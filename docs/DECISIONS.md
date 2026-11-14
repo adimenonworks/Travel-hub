@@ -14,6 +14,27 @@
 
 ## 14 Nov 2026
 
+### Home: Plan a trip is the main button (owner)
+- **Decision:** Plan a trip is Primary and on the left; Save a place is Neutral. Never two Primary buttons side by side.
+- **Why:** most saves arrive through the iPhone share sheet, but a trip can only be started in the app. Two emerald buttons would compete; Wise and iOS keep one main action.
+- **Replaces:** Save a place as the Primary quick action.
+
+### New trip takes several stops (owner)
+- **Decision:** step one is "Where are you going?" ("Add every stop, or just the first. You can add more later.") and adds places to a list. Saved as `trip.stops`; the first stop is still `destination` (name and cover). A trip's countries are its stops plus every place on its events.
+- **Why:** trips often cross several countries. With one place only, "Bring your saves" and Good to know would miss every other country until events were added there. "Where are you starting?" alone was considered and rejected for that reason.
+
+### No stops list in Edit trip (owner)
+- **Decision:** Edit trip doesn't list or edit the stops. Countries keep themselves current from the stops and the events. A stop picked but never visited stays (harmless: one Good to know row, suggested saves).
+- **Why:** the owner saw no point in editing places by hand when events add them, and removing a place must never delete events. To still bring in saves from a country added later, Ideas → Add from saved also lists other saved countries.
+- **Replaces:** the people change's read-only "Started in Lisbon" line in Edit trip.
+
+### Bring your saves matches the trip (owner)
+- **Decision:** the New trip step only offers saves from the trip's countries, and is skipped when none match.
+- **Why:** offering every save was noise; the step should only appear when it's useful.
+
+### New trip stops before the people change (owner)
+- **Decision:** `rove-change-new-trip-stops.md` runs before `rove-change-people-and-sharing.md`.
+
 ### Page header keeps its simple back button and trailing button
 - **Decision (owner):** no separate "Back label" property and no free-form trailing slot on the Page header. The back label stays the label of the Button nested inside it, and the trailing spot stays one Icon button, shown or hidden.
 - **Why:** the back label can already be changed in Figma by editing the nested Button, and the app only ever puts the edit button on the right. Both would be settings nothing uses.
