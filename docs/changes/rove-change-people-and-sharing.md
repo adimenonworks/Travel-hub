@@ -105,7 +105,8 @@ One Claude Code account does this work now (owner, 13 Nov 2026), so the old two-
 
 | What | Who can change it |
 | --- | --- |
-| Trip details, ideas, photo albums | Any traveller |
+| Trip details, photo albums | Any traveller |
+| An idea | Only the traveller who suggested it edits or deletes it (owner, 15 Nov 2026). Every traveller votes |
 | An event's shared details (title, date, time, place, notes, total price, who's in) | Any traveller **who is in that event**. Travellers who aren't in it see it read-only, with **I'm in** |
 | Your booking details and your own seat or bags | Only you, plus the person who made the booking if it covers you |
 | Anything | Followers and guests can't change anything |
@@ -156,7 +157,7 @@ One Claude Code account does this work now (owner, 13 Nov 2026), so the old two-
   - it shows a dot with a count when something is unread;
   - it opens a **Notification centre** screen, newest first, grouped by trip.
 - **Entries:**
-  - "Sam added you to Dinner at Ramiro · Thu 12 Dec", with **I'm out** and **View**;
+  - "Sam added you to Dinner at Ramiro · Thu 12 Dec" (tapping it opens the event, where I'm in / I'm out is; see R2);
   - "Priya moved Tram 28 to 14:00";
   - "Jo is out of Fado night";
   - "Sam joined Portugal & Spain";
@@ -188,7 +189,7 @@ One Claude Code account does this work now (owner, 13 Nov 2026), so the old two-
 **Ideas have two segments: To decide · Passed.**
 - **Remove the Planned segment.** Once an idea is on a day, it's an event and lives in the Itinerary, not in Ideas.
 - **Migration:** ideas currently marked Planned leave the Ideas list; their events stay as they are.
-- **Voting stays as it is** on To decide ideas.
+- **Voting is thumbs up and thumbs down** on To decide ideas (owner, 15 Nov 2026): **thumbs down is Pass**, with the same rules as Pass below. There's no separate downvote. Both show their counts, on the idea card and in its sheet (R7).
 
 **An idea can be suggested with or without a day.** When adding an idea, the date and time are optional fields.
 
@@ -207,7 +208,7 @@ One Claude Code account does this work now (owner, 13 Nov 2026), so the old two-
 - **I'm in:**
   - the first I'm in turns it into a real event, with the suggester and you in it;
   - it **leaves Ideas for everyone**, so there's one place to answer: the day;
-  - every traveller who hasn't answered still sees it on that day as a Suggested card, with **I'm in** and **Pass**, and gets a Notification centre entry ("Sam and Priya are going to Fado night · Thu 12 Dec", with I'm in and Pass).
+  - every traveller who hasn't answered still sees it on that day as a Suggested card, with **I'm in** and **Pass**, and gets a Notification centre entry ("Sam and Priya are going to Fado night · Thu 12 Dec") that opens that day with the card highlighted.
   - **It stays opt-in.** Unlike an event someone adds you to directly (item 3, where silence means yes), people who haven't answered are **not** counted as in until they tap I'm in.
   - The suggested card shows who's in so far ("2 going").
 - **Pass:**
@@ -239,6 +240,11 @@ One Claude Code account does this work now (owner, 13 Nov 2026), so the old two-
   - reference (tap to copy), your seat, your bags, files and **Manage booking**;
   - "Booked by Sam" when someone else holds it;
   - with no booking: **Add your booking details** (reference, seat, file), which creates a booking covering you.
+- **One booking, a seat for each person on it** (owner, 15 Nov 2026):
+  - adding or editing a booking on a travel event (flight, train, ferry, coach and so on) asks **Who's on this booking?**: avatar toggle Chips, everyone in the event ticked by default;
+  - then one **Seat** field (and Bags) **per person on it**, all under the one reference;
+  - people in the event who aren't on it booked separately, and add their own booking the same way;
+  - everyone on a booking sees its reference and every seat on it; nobody else does.
 - **Privacy:** a booking is visible only to the people it covers and its holder. Other people's bookings are never shown.
 - **The Journey details card shows only shared information:** times, terminals, gate, status and duration. Seats move into Your booking.
 - **Merging:** when a second person forwards or adds the same flight (same number and date), add them to the existing event with their own booking, rather than creating a new event. Do the same for trains and ferries that have a service number.
@@ -285,6 +291,74 @@ One Claude Code account does this work now (owner, 13 Nov 2026), so the old two-
   - not listed on the People tab.
 - **On the guest's own Home**, the event shows in an **"Invited to"** section until it has passed.
 - **Making a guest a full member:** any traveller can choose **Add to trip** from Who's in, which offers Travelling or Following.
+
+## Owner's review (15 Nov 2026): do these next
+
+Items 1–5 are built. The owner reviewed them on the phone. Do **R1–R6 next, as one pull request each**, then item 6 together with R7. Figma first wherever a component or core screen changes. Add a dated `DECISIONS.md` entry for R2, R3, R5 and R7 (each changes an earlier decision).
+
+### R1. A press never sticks when you scroll (everywhere)
+- Starting a scroll on something tappable (an event card, a list row, a button) leaves it looking pressed. Fix it once, in the shared press handling, so every component gets it.
+- **Like iOS:**
+  - the pressed look appears only after a short delay (about 80–100 ms), or straight away on a quick tap;
+  - it's cancelled as soon as the finger moves more than about 10px, or the page scrolls, or on `pointercancel` / `touchcancel`;
+  - a cancelled press never fires the tap.
+- Holding for the Edit / Delete menu cancels the same way when the finger moves.
+- Test with Playwright touch drags on the Itinerary, Ideas, Trips, People and Collections, at 320 and 430px. After a drag, nothing should look pressed and nothing should open.
+
+### R2. Notifications have no buttons (owner's rule, 15 Nov 2026)
+- **No entry in the Notification centre carries an action** (no I'm out, I'm in, Pass, View, Approve or Decline). Tapping an entry opens exactly what it's about:
+  - an event, on its event page;
+  - a suggested idea, on its day with the card highlighted;
+  - a join, on the People tab.
+- **Read and unread:**
+  - an unread entry has a small dot (`status`-style, with an accessible label "Unread") and a bold title;
+  - a read entry has no dot, a regular-weight title and secondary text colour, still at least 4.5:1 contrast;
+  - never colour alone.
+- **Entries are kept for 30 days,** then deleted (the rules let the person they're addressed to delete their own).
+- Figma: the Notification centre's List item variants lose their buttons and gain the unread dot.
+
+### R3. I'm in / I'm out on the event page
+- The event page has a **Segment control: I'm in | I'm out**, with your current answer selected. One tap switches, with a selection haptic and the Undo toast. It's the place to change your mind.
+- Travellers who aren't in see it with **I'm out** selected. Followers and guests don't get it, except that a guest can choose I'm out on their own event.
+- It replaces the I'm out Button in the Who's in row, and the separate I'm in button on the event page. Cards keep their own I'm in / I'm out actions.
+
+### R4. Event page order
+From the top:
+1. title, date and time;
+2. **Who's in** (Avatar stack and names) and the **price** (total, and your share);
+3. the I'm in | I'm out Segment control (R3);
+4. then the place, the map and everything else as now.
+
+Update the Event core screen in Figma (`506:1221`).
+
+### R5. Changes: subtle, at the very bottom
+- Changes moves to the **end of the event page, below Comments**.
+- Make a new **Accordion** variant, `Tone = Subtle`, in Figma then code:
+  - no container, fill or border;
+  - the header in Body small, secondary text, with a small chevron;
+  - rows in secondary text, smaller and lighter than the rest of the page.
+- It's there when needed, not a focus. Keep Restore as a Ghost Small button.
+
+### R6. Person picker: a subtle dropdown, not a Chip row
+- Remove the Chip row of people above the day strip.
+- Put a **subtle dropdown** next to the Add event button:
+  - Ghost Small Button: your Avatar (small) plus **Me**, with a Chevron down;
+  - it opens a Context menu listing Me, then each traveller (avatar and first name), with the current one ticked;
+  - when viewing someone else, the button shows **their** avatar and first name, so it's always clear whose itinerary it is.
+- Everything else from item 5 stays the same.
+- Followers see the same dropdown without Me.
+- Update the Itinerary core screen in Figma, and remove the Person switcher component from Figma and code if nothing else uses it.
+
+### R7. The idea sheet and idea card (with item 6)
+- **Tapping an idea opens a simpler Sheet:**
+  - no Favourite button;
+  - **Edit** (in the Sheet's header) only for the person who suggested it. Delete is in Edit, and also only theirs;
+  - a row of **Icon buttons**: **Open in Maps** (hidden when the idea has no place), **thumbs up** (keen) and **thumbs down** (Pass), each with its count;
+  - the chosen vote shows as a filled icon plus its accessible state, never colour alone;
+  - below them: **Go to day** (Ghost Large) and **Add to a day** (Primary Large), side by side when the idea has a suggested day. **Add to a day alone, full width,** when it has none.
+- **The idea card in the Ideas tab** gets the thumbs down next to the thumbs up, each with its count, **shown even at 0**, as long as both keep 44 × 44 tap areas at 320px and at the largest text. If they don't fit, keep thumbs up on the card, keep both in the sheet, and say so in the report.
+- Followers see the sheet with Open in Maps only.
+- Rules: only the suggester can update or delete an idea (votes and passes still by any traveller, on their own entry). Add tests.
 
 ---
 
@@ -365,6 +439,12 @@ Report ✅, ❌ (with the reason) or ⚠️ (done, with a caveat) on every line.
 - [ ] Ideas has only To decide · Passed; ideas already on a day are gone from Ideas, and their events are untouched
 - [ ] An undated idea offers Add to a day (date and time), which makes an event and removes the idea
 - [ ] A dated idea shows Go to day, and appears on that day as a Suggested card with I'm in and Pass; Go to day lands on it, highlighted
+- [ ] R1: after a drag starting on anything tappable, nothing looks pressed and nothing opens (everywhere)
+- [ ] R2: no Notification centre entry has a button; tapping opens its event, day or People; unread entries have a dot and bold title; entries older than 30 days are gone
+- [ ] R3–R5: the event page has the I'm in | I'm out Segment control; Who's in and price sit above the place; Changes is the subtle Accordion at the very bottom
+- [ ] R6: the person picker is a dropdown next to Add event, showing whose itinerary it is; no Chip row
+- [ ] R7: the idea sheet has Maps, thumbs up and thumbs down (Pass), and Go to day / Add to a day as described; Edit and Delete only for the suggester (rules emulator); the card shows thumbs down at 0 if it fits
+- [ ] A booking on a travel event asks who's on it and has a seat for each of them
 - [ ] The first I'm in turns a suggestion into an event and removes it from Ideas for everyone; travellers who haven't answered still see it on the day as a Suggested card (with who's in so far) plus a Notification centre entry, and aren't counted as in until they tap I'm in
 - [ ] Pass hides it for you only; an idea moves to Passed once all others have passed, or when the suggester passes it
 - [ ] Suggestions don't count in going counts, budgets or Next up
