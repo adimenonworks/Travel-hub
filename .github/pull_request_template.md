@@ -3,8 +3,11 @@
 ## Figma (components never drift)
 - [ ] Components built in Figma first, then code, matching 1:1 (every variant touched, icons, /#/design)
 - [ ] Touched components compared side by side (Figma vs /#/design)
-- [ ] Planning page (bigger features only): built / decided / dropped features moved to their column
-- (Flows screens are no longer maintained)
+- [ ] Core screens on the Screens page updated if one changed in code
+- [ ] Planning board redrawn from `docs/ROADMAP.md` if the roadmap changed (never edited directly)
+
+## Docs (read first, write after)
+- [ ] `docs/DECISIONS.md` and `docs/ROADMAP.md` updated (or not needed), and the reference file for the area changed is current.
 
 ## Checks
 - [ ] `npm run build`

@@ -40,7 +40,7 @@
 - **Decision:**
   - A claude.ai chat (the Rove project) reviews ideas, pushes back, audits Figma against the code, and writes and merges the change documents.
   - Claude Code, running locally on the owner's Mac (the desktop app's Code tab, not a worktree), builds them.
-  - Every session starts by pulling the latest Main and re-reading `CLAUDE.md`.
+  - Every session starts by checking whether the local copy is behind Main; it pulls only after the owner says yes, then re-reads `CLAUDE.md` (see "Session start: check and ask" above).
 - **Why:** planning and checking separate from building. Local Claude Code sees changes immediately in Xcode, can run the app, and has fewer restrictions than the cloud.
 
 ### The project left iCloud

@@ -68,12 +68,8 @@ Built in this order. Progress is in `docs/changes/PROGRESS.md`.
 
 ## Next
 
-### Set up Rove's small server (owner)
-Live since 10 Nov at `rove-api.adimenon9.workers.dev`; flight status answers. Left as of 11 Nov: paste the updated `server/worker.js` and Deploy (it fixes a header that blocked the app), and set `UNSPLASH_ACCESS_KEY` (covers failed with 401 then). Steps in `server/README.md`. **Check whether this is done.**
-**How we'd build it:** in the Cloudflare dashboard: paste `server/worker.js`, Deploy, add `UNSPLASH_ACCESS_KEY` and `RAPIDAPI_KEY` as secrets. Small. No code.
-
 ### Unsplash production approval (owner)
-After covers are live: screenshots of a cover and its credit, for about 1,000 requests an hour.
+Covers are live (checked 14 Nov: the server answers with Unsplash photos). Send screenshots of a cover and its credit, for about 1,000 requests an hour.
 **How we'd build it:** apply on Unsplash's developer site with the screenshots. No code change. Small.
 
 ### Airbnb-style invite (owner designing)
@@ -205,7 +201,7 @@ Reversed (once on this list, now planned): **per-event "who's going"** and **act
 
 What Rove does today (on Main, in the iPhone app).
 
-- **Saving places:** from any app (Share → Rove), a pasted link or a search. Rove reads the link and finds the place, city and category; "Saving to · Change", Undo toast, works offline, merges duplicates. Share to Rove can also add to a trip (11 Nov; Now, 2 narrows the Trip tab to ideas).
+- **Saving places:** from any app (Share → Rove) or a pasted link. Rove reads the link and finds the place, city and category; "Saving to · Change", Undo toast, works offline, merges duplicates. Share to Rove can also add to a trip (11 Nov; Now, 2 narrows the Trip tab to ideas).
 - **Collections:** every place filed country → city → category; links & notes per country; Map card; Visited ✓ and favourite ★.
 - **Shared collections** (11 Nov): share a country's collection by link, as Can edit or Can view; "Saved by you and Sam"; enforced by the rules.
 - **Planning a trip:** full-screen New trip (where; exact dates or a rough month; who; bring your saves), then the celebration.
@@ -216,7 +212,7 @@ What Rove does today (on Main, in the iPhone app).
   - Ideas: votes, Add to a day;
   - Photos: shared album links;
   - People: Planner and Viewer roles, invite links.
-- **Events:** 6 types and 43 categories; the category sets the icon, colour and behaviour (journey, span, at a place, open time, note). **Colour-coded event types** everywhere.
+- **Events:** 6 types and 46 categories; the category sets the icon, colour and behaviour (journey, span, at a place, open time, note). **Colour-coded event types** everywhere.
 - **Layovers and time zones:** connections as one Journey card; each event keeps its place's time zone.
 - **Event chat:** Messages-style comments, alerts while the app is open, "new message" tags, read state synced across devices.
 - **Budgets** (10 Nov): a per-person trip budget, prices per person on bookings, and an Overview Budget card. Now, 1 makes it personal and private.
@@ -224,5 +220,5 @@ What Rove does today (on Main, in the iPhone app).
 - **You:** profile, travel stats and map, Favourites, Settings (home city, currency, maps app, appearance), Recently deleted (30 days), Delete account, privacy policy.
 - **Join-only website** (11 Nov): sign in, accept the invite, open the app.
 - **Feel:** both screens move on navigation, swipe back with the real previous screen, swipe between days, haptics, rubber-band bounce, sheets that rise with the keyboard, dark mode, iPhone text sizes, 24-hour times.
-- **Behind the scenes:** Firebase sign-in and database, offline cache, security rules with tests, share extension, Rove's small server (Unsplash covers, live flight status).
+- **Behind the scenes:** Firebase sign-in and database, offline cache, security rules with tests, share extension, Rove's small server (Unsplash covers, live flight status; set up by the owner, live since 10–11 Nov).
 - **Design system** (13–14 Nov): component library cleanup and library v2. Tokens are Base · Color · Layout · Typography · Motion; every value comes from a variable; Figma and code match 1:1 (`docs/token-migration.md`).
