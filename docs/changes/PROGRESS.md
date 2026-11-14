@@ -50,7 +50,9 @@ Read this first when starting a session. If it disagrees with the code or Figma,
 - **B3, orphaned icons:** the old `fi-rr-time-oclock` (`128:582`) and `fi-rr-star` (`128:570`) weren't placed in Now line, Map card or Idea row directly: they were nested inside the library's own **Icon/Time** and **Icon/Star** (Default variants), which those components use. Fixed there (see B3 Figma note below), so nothing references a component that's on no page. **Conflict:** the prompt says swap Now line's icon for Icon/Clock, but the app's Now line uses the Time icon (`TripCards.tsx`), so Figma keeps Icon/Time to match the code.
 - **B4, single-choice options:** Day card's `Layout=Strip` removed (variants are now `State=Default / Selected`). Avatar stack (`85:591`), Now line (`128:560`) and List group (`347:2668`) had one variant each, and a set can't drop its only variant property, so each is now a plain component (instances stayed linked: 7, 2 and 18; Avatar stack's `Show more` values and List group's `Items` slot content unchanged, checked). Code: `AvatarStack` lost its unused `size` prop; `DayCard`, `NowLine` and `ListGroup` had no such prop.
 
-**Next: B5 (Card props).** Then B6–B8, C, D, E.
+- **B5, Card props** (code only; Figma's Card already had none of them): `icon` (an icon on a light emerald tile) and `flush` (no padding) were used nowhere, and Figma's Show media covers an icon, so both are removed, with their CSS. `action` was an old alias for `actions`, used by 9 empty-state cards; they now pass `actions` and the alias is gone. Card's props now match Figma: `tone`, `layout`, `media`, `title`, `body`, `actions` (plus `to`). Empty states pixel-identical.
+
+**Next: B6 (Message component).** Then B7, B8, C, D, E.
 
 **Noticed for later:** the Foundations section "Spacing & radius" (`35:2217`) documents names from long ago (`--space-xxs`, `--radius-button`, "Regular (744–1067px)"). Rebuild it in A4 with the new Layout names.
 

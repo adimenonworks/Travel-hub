@@ -6,7 +6,6 @@
   padding: var(--space-600);
   color: var(--text-primary);
 }
-.flush { padding: 0; overflow: hidden; }
 
 /* Media, text and buttons stacked (Figma's Small card; the Large row layout is archived) */
 .structured { display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-500); padding: var(--space-500); }
@@ -18,9 +17,6 @@
 .centre { align-items: center; text-align: center; }
 
 .media { flex: none; display: grid; place-items: center; color: var(--icon-brand); }
-/* The Media slot's default: an icon on the light emerald tile */
-.mediaTile { display: grid; place-items: center; padding: var(--space-300); border-radius: var(--radius-300); background: var(--surface-brand); color: var(--icon-brand); }
-.structured .mediaTile { padding: 0; border-radius: var(--radius-200); background: none; color: var(--icon-primary); } /* Figma Card Media: a plain 16px icon */
 .content { min-width: 0; display: flex; flex-direction: column; gap: var(--space-300); }
 .title { color: var(--text-primary); }
 .body { color: var(--text-secondary); }
@@ -30,7 +26,7 @@
 .accent { border-color: transparent; background: var(--feature-surface); color: var(--feature-text); }
 .accent .title { color: var(--feature-text); }
 .accent .body { color: var(--feature-text-secondary); }
-.accent .media, .accent .structured .mediaTile, .accent.structured .mediaTile { color: var(--feature-icon); }
+.accent .media { color: var(--feature-icon); }
 
 .interactive { position: relative; isolation: isolate; cursor: pointer; transition: transform var(--motion-release), background var(--motion-fast); text-align: left; width: 100%; color: inherit; display: block; }
 .interactive.structured { display: flex; } /* a structured Card that is a link keeps its column layout */

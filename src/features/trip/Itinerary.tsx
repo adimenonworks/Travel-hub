@@ -124,7 +124,7 @@ export function Itinerary(ctx: TripCtx) {
           const dateLine = list.some((e) => legsOf(e.a, activities).some(crossesDateLine));
           return list.length === 0 ? (
             <Card layout="centre" media={<Illustration name="calendar" size={120} />} title="Nothing planned yet" body="Add something to do, or schedule an idea from the Ideas board."
-              action={ctx.canContribute ? <Button tone="neutral" icon="plus" onClick={() => setAdding(true)}>Add event</Button> : undefined} />
+              actions={ctx.canContribute ? <Button tone="neutral" icon="plus" onClick={() => setAdding(true)}>Add event</Button> : undefined} />
           ) : (
             <div className={s.eventList}>
               {arrivals.map(({ a, last }) => <TravelConnector key={`arr-${a.id}`} icon={categoryInfo(a.category).icon} label={`Arrives ${formatTime(last.endTime)} from ${(a.fromText ?? '').split(',')[0].replace(/\s*\([^)]*\)/, '')}`} />)}
