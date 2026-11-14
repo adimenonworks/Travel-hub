@@ -12,7 +12,7 @@
 .bar { display: flex; align-items: center; gap: var(--space-500); }
 .step { flex: 1; display: flex; flex-direction: column; gap: var(--space-700); animation: stepIn var(--duration-base) var(--ease-fluid); }
 .heading { display: flex; flex-direction: column; gap: var(--space-300); }
-.title { margin: 0; font: var(--type-display-tiny); letter-spacing: -0.01em; color: var(--feature-text); }
+.title { margin: 0; font: var(--type-display-small); letter-spacing: -0.01em; color: var(--feature-text); }
 .subtitle { margin: 0; font: var(--type-body); color: var(--feature-text-secondary); }
 .content { display: flex; flex-direction: column; gap: var(--space-500); }
 .footer { display: flex; flex-direction: column; align-items: center; gap: var(--space-500); }
@@ -30,7 +30,7 @@
 /* Figma paints the circle and the number on-mid/surface/primary, which in dark mode is the same deep emerald as this screen;
    the primary button's emerald (the same in both modes) keeps them visible. */
 .badge { display: grid; place-items: center; width: 176px; height: 176px; border-radius: var(--radius-full); background: var(--button-primary-background); animation: pop 500ms var(--ease-bounce) 150ms both; }
-.celebrateTitle { margin: 0; font: var(--type-display-tiny); letter-spacing: -0.01em; color: var(--feature-text); }
+.celebrateTitle { margin: 0; font: var(--type-display-small); letter-spacing: -0.01em; color: var(--feature-text); }
 .celebrateSubtitle { margin: 0; font: var(--type-body); color: var(--feature-text-secondary); }
 .count { display: flex; flex-direction: column; align-items: center; gap: var(--space-100); }
 .countValue { font: var(--type-display); letter-spacing: -0.01em; color: var(--button-primary-background); font-variant-numeric: tabular-nums; }
