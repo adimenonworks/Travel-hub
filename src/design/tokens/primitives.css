@@ -1,29 +1,30 @@
 /*
- * Primitives — raw values, named exactly like the Figma "Primitives" collection
- * (color/emerald/300 → --color-emerald-300, space/16 → --space-16, radius/24 → --radius-24).
- * Components never use these directly: they use the semantic tokens in semantic.css.
+ * Base — raw values, named exactly like the Figma "Base" collection
+ * (base/color/emerald/300 → --base-color-emerald-300, base/space/16 → --base-space-16, base/radius/24 → --base-radius-24).
+ * Components never use these directly: only other tokens (semantic.css, typography.css) do.
+ * Every colour palette and step is kept; raw spaces and corners exist only while a Layout token uses them.
  * Every palette's steps sit at the same contrast against white (neutral is pure grey, no brand tint);
  * yellow and pink were made to match emerald step for step, so the accents share one tone; sky (hue 232°) and violet
  * (hue 295°) were solved the same way (OKLCH, emerald's colour-strength curve) for event categories. Only neutral has a 1000.
  */
 :root {
-  --color-emerald-50: #e9fef6; --color-emerald-100: #d4fded; --color-emerald-200: #74fed2; --color-emerald-300: #2ee6b6; --color-emerald-400: #00c69a; --color-emerald-500: #00a983; --color-emerald-600: #168669; --color-emerald-700: #1f6450; --color-emerald-800: #214a3c; --color-emerald-900: #1e332b;
-  --color-green-100: #ddfdd5; --color-green-200: #9dfd85; --color-green-300: #7ee465; --color-green-400: #60c545; --color-green-500: #44aa25; --color-green-600: #318812; --color-green-700: #2b661b; --color-green-800: #264b1d; --color-green-900: #20331c;
-  --color-orange-100: #fdf2ec; --color-orange-200: #fee0d0; --color-orange-300: #ffbe9b; --color-orange-400: #ff9353; --color-orange-500: #ef7000; --color-orange-600: #bd5b13; --color-orange-700: #8a471c; --color-orange-800: #63371e; --color-orange-900: #40291c;
-  --color-red-50: #fef8f8; --color-red-100: #fdf1f1; --color-red-200: #fedfde; --color-red-300: #ffbcbb; --color-red-400: #ff8e90; --color-red-500: #fc606a; --color-red-600: #d3424f; --color-red-700: #a72837; --color-red-800: #76272d; --color-red-900: #4b2223;
-  --color-yellow-50: #fff9de; --color-yellow-100: #fff5c2; --color-yellow-200: #ffe66e; --color-yellow-300: #eacc04; --color-yellow-400: #c9af0a; --color-yellow-500: #ac9401; --color-yellow-600: #897603; --color-yellow-700: #675904; --color-yellow-800: #4e4201; --color-yellow-900: #372e01;
-  --color-pink-50: #fef8fa; --color-pink-100: #fef1f6; --color-pink-200: #feddeb; --color-pink-300: #feb9d6; --color-pink-400: #ff88c0; --color-pink-500: #e769a7; --color-pink-600: #c44887; --color-pink-700: #a12669; --color-pink-800: #840152; --color-pink-900: #60013a;
-  --color-sky-50: #f3faff; --color-sky-100: #e7f6ff; --color-sky-200: #c8ebff; --color-sky-300: #88d6ff; --color-sky-400: #10bbfa; --color-sky-500: #00a0d7; --color-sky-600: #007fac; --color-sky-700: #006082; --color-sky-800: #004763; --color-sky-900: #023247;
-  --color-violet-50: #faf9ff; --color-violet-100: #f5f2ff; --color-violet-200: #e8e3ff; --color-violet-300: #d2c4ff; --color-violet-400: #b9a0ff; --color-violet-500: #a085e6; --color-violet-600: #8069bb; --color-violet-700: #604e90; --color-violet-800: #483a6c; --color-violet-900: #32294b;
-  --color-neutral-0: #ffffff; --color-neutral-50: #fafafa; --color-neutral-100: #f4f4f4; --color-neutral-200: #e6e6e6; --color-neutral-300: #cdcdcd; --color-neutral-400: #afafaf; --color-neutral-500: #959595; --color-neutral-600: #767676; --color-neutral-700: #595959; --color-neutral-800: #434343; --color-neutral-900: #2e2e2e; --color-neutral-1000: #1c1c1c;
-  --space--40: -40px; --space--24: -24px; --space--16: -16px; --space--10: -10px; --space--8: -8px; --space--6: -6px; --space--4: -4px; --space--2: -2px;
-  --space-0: 0px; --space-2: 2px; --space-4: 4px; --space-6: 6px; --space-8: 8px; --space-10: 10px; --space-12: 12px; --space-16: 16px; --space-18: 18px; --space-20: 20px; --space-24: 24px; --space-32: 32px; --space-40: 40px; --space-48: 48px; --space-96: 96px; --space-120: 120px;
-  --radius-0: 0px; --radius-2: 2px; --radius-4: 4px; --radius-8: 8px; --radius-12: 12px; --radius-16: 16px; --radius-20: 20px; --radius-24: 24px; --radius-32: 32px; --radius-40: 40px; --radius-48: 48px; --radius-64: 64px; --radius-80: 80px; --radius-96: 96px; --radius-999: 999px;
+  --base-color-emerald-50: #e9fef6; --base-color-emerald-100: #d4fded; --base-color-emerald-200: #74fed2; --base-color-emerald-300: #2ee6b6; --base-color-emerald-400: #00c69a; --base-color-emerald-500: #00a983; --base-color-emerald-600: #168669; --base-color-emerald-700: #1f6450; --base-color-emerald-800: #214a3c; --base-color-emerald-900: #1e332b;
+  --base-color-green-100: #ddfdd5; --base-color-green-200: #9dfd85; --base-color-green-300: #7ee465; --base-color-green-400: #60c545; --base-color-green-500: #44aa25; --base-color-green-600: #318812; --base-color-green-700: #2b661b; --base-color-green-800: #264b1d; --base-color-green-900: #20331c;
+  --base-color-orange-100: #fdf2ec; --base-color-orange-200: #fee0d0; --base-color-orange-300: #ffbe9b; --base-color-orange-400: #ff9353; --base-color-orange-500: #ef7000; --base-color-orange-600: #bd5b13; --base-color-orange-700: #8a471c; --base-color-orange-800: #63371e; --base-color-orange-900: #40291c;
+  --base-color-red-50: #fef8f8; --base-color-red-100: #fdf1f1; --base-color-red-200: #fedfde; --base-color-red-300: #ffbcbb; --base-color-red-400: #ff8e90; --base-color-red-500: #fc606a; --base-color-red-600: #d3424f; --base-color-red-700: #a72837; --base-color-red-800: #76272d; --base-color-red-900: #4b2223;
+  --base-color-yellow-50: #fff9de; --base-color-yellow-100: #fff5c2; --base-color-yellow-200: #ffe66e; --base-color-yellow-300: #eacc04; --base-color-yellow-400: #c9af0a; --base-color-yellow-500: #ac9401; --base-color-yellow-600: #897603; --base-color-yellow-700: #675904; --base-color-yellow-800: #4e4201; --base-color-yellow-900: #372e01;
+  --base-color-pink-50: #fef8fa; --base-color-pink-100: #fef1f6; --base-color-pink-200: #feddeb; --base-color-pink-300: #feb9d6; --base-color-pink-400: #ff88c0; --base-color-pink-500: #e769a7; --base-color-pink-600: #c44887; --base-color-pink-700: #a12669; --base-color-pink-800: #840152; --base-color-pink-900: #60013a;
+  --base-color-sky-50: #f3faff; --base-color-sky-100: #e7f6ff; --base-color-sky-200: #c8ebff; --base-color-sky-300: #88d6ff; --base-color-sky-400: #10bbfa; --base-color-sky-500: #00a0d7; --base-color-sky-600: #007fac; --base-color-sky-700: #006082; --base-color-sky-800: #004763; --base-color-sky-900: #023247;
+  --base-color-violet-50: #faf9ff; --base-color-violet-100: #f5f2ff; --base-color-violet-200: #e8e3ff; --base-color-violet-300: #d2c4ff; --base-color-violet-400: #b9a0ff; --base-color-violet-500: #a085e6; --base-color-violet-600: #8069bb; --base-color-violet-700: #604e90; --base-color-violet-800: #483a6c; --base-color-violet-900: #32294b;
+  --base-color-neutral-0: #ffffff; --base-color-neutral-50: #fafafa; --base-color-neutral-100: #f4f4f4; --base-color-neutral-200: #e6e6e6; --base-color-neutral-300: #cdcdcd; --base-color-neutral-400: #afafaf; --base-color-neutral-500: #959595; --base-color-neutral-600: #767676; --base-color-neutral-700: #595959; --base-color-neutral-800: #434343; --base-color-neutral-900: #2e2e2e; --base-color-neutral-1000: #1c1c1c;
+  --base-space--6: -6px;
+  --base-space-0: 0px; --base-space-2: 2px; --base-space-4: 4px; --base-space-6: 6px; --base-space-8: 8px; --base-space-12: 12px; --base-space-16: 16px; --base-space-18: 18px; --base-space-20: 20px; --base-space-24: 24px; --base-space-32: 32px; --base-space-40: 40px; --base-space-48: 48px; --base-space-96: 96px;
+  --base-radius-2: 2px; --base-radius-4: 4px; --base-radius-8: 8px; --base-radius-12: 12px; --base-radius-16: 16px; --base-radius-24: 24px; --base-radius-32: 32px; --base-radius-48: 48px; --base-radius-64: 64px; --base-radius-999: 999px;
 
   /* Type families (Figma Typography: font/family, font/display). Both bundled in main.tsx, both SIL Open Font License. */
   --font-manrope: "Manrope Variable", Manrope, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   --font-poppins: Poppins, "Manrope Variable", Manrope, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  --font-mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --font-mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace; /* code only: token names on /#/design */
 
   /* Motion (code only — Figma has no motion tokens) */
   --duration-fast: 150ms; --duration-base: 250ms; --duration-slow: 400ms; --duration-fluid: 420ms; --duration-sheet: 520ms;

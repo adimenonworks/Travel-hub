@@ -6,7 +6,24 @@ Read this first when starting a session. If it disagrees with the code or Figma,
 
 `docs/changes/rove-change-component-library.md` (component library cleanup) is **finished** (13 Nov 2026; caveats in the Check everything results below).
 
-**Next: `docs/changes/rove-change-library-v2.md`** (owner, 14 Nov 2026), written from the 14 Nov Figma and code audit: token restructure, Size names, naming rules, component fixes. Then the transparency setup, then `rove-change-people-and-sharing.md`, then `rove-change-polish-and-library.md`.
+**Now: `docs/changes/rove-change-library-v2.md`** (owner, 14 Nov 2026), written from the 14 Nov Figma and code audit: token restructure, Size names, naming rules, component fixes. Then the transparency setup, then `rove-change-people-and-sharing.md`, then `rove-change-polish-and-library.md`.
+
+### Library v2 status (14 Nov 2026)
+
+**Items done:**
+- **A1, mapping (approved by the owner, 14 Nov 2026).** `docs/token-migration.md` holds the old → new table and the owner's 11 answers (plus: delete `feature/text-brand`, `overlay/image`, `illustration/warm`; merge `space/550` into `space/700`; delete `radius/800`; no `size/heading-4`; size scale `base/size/{px}` + `size/{step}` and role tokens only, no one-off sizes). Polish prompt B7 got the owner's note about a tighter Motion scale. Correction found in A2: `--font-mono` is used (/#/design), so it's kept.
+- **A2, collections** (pull request 126, with A1):
+  - Figma: collection Primitives → **Base** (`VariableCollectionId` of the old Primitives; 129 → 115 variables, all named `base/…`). Deleted raw values nothing used: `space/-40, -24, -16, -10, -8, -4, -2, 10, 120`, `radius/0, 20, 40, 80, 96`, and Layout's `radius/0` (`291:5563`). Layout's mode is now **Value**. Effect style **Shadow/Subtle** deleted, with its swatch on Foundations (`47:2`). The Foundations section `35:1719` is now "Base".
+  - On the Archive page, 12 layers bound to `radius/20` now hold the raw 20, and the old Badge `102:458` holds Shadow/Subtle's effects directly (same look, detached).
+  - Code: `--color-*`, `--space-{px}`, `--radius-{px}` → `--base-color-*`, `--base-space-*`, `--base-radius-*` (`primitives.css`, `semantic.css`, /#/design's palette); the same unused values deleted; `--shadow-subtle` deleted.
+  - Checked: every `var()` the code refers to is defined (same as Main); demo mode at 393 and 320, light and dark: Home, Trips, Overview, Itinerary, Ideas, You, Saved · Country pixel-identical to Main (two dark-mode differences flipped direction on re-runs: timing noise). /#/design differs only in its palette caption ("Base colours …", one line longer).
+  - **Motion is created in A6** (with its values), not as an empty collection now.
+
+**Next: A3 (Color).** Then A4–A7, B, C, D, E.
+
+**Noticed for later:** the Foundations section "Spacing & radius" (`35:2217`) documents names from long ago (`--space-xxs`, `--radius-button`, "Regular (744–1067px)"). Rebuild it in A4 with the new Layout names.
+
+The component library prompt below is finished; its notes stay for reference.
 
 ## Owner's decisions for this prompt (13 Nov 2026)
 

@@ -132,6 +132,7 @@ Design this in Figma first and stop for approval. It replaces the separate "Add 
 - **Motion tokens.** Add these and use them for every transition:
   - `motion/duration/quick` 150ms, `motion/duration/regular` 250ms, `motion/duration/gentle` 350ms;
   - `motion/ease/standard` (ease-out), `motion/ease/spring`.
+  - **Library v2 already made the Motion collection** (`duration/*`, `easing/*`; see `docs/token-migration.md`, A6), keeping every value the code used. Use those. **Consolidate the Motion durations to a tighter scale** (e.g. 200/220/250 and 400/420 are near-duplicates); show before/after (owner, 14 Nov 2026).
 - **Nothing is instant.** No position or size change happens instantly, including scroll resets, sheets, cards appearing, sections expanding and toasts.
 - **Reduce Motion:** crossfades instead of movement.
 - **Audit every screen and list each jolt you find and fix.**

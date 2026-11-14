@@ -71,14 +71,14 @@ export function DesignSystem() {
   return (
     <>
       <div className={s.page}>
-        <PageHeader title="Design system" action={{ icon: 'pencil', label: 'Example header button', onClick: () => {} }} subtitle="Primitives → semantic tokens → components. One brand colour (emerald), light and dark mode. Every text pairing meets WCAG 2.2 AA." />
-        <Section title="Palettes" footer="Primitives from src/design/tokens/primitives.css. Every step sits at the same contrast against white in every palette (600 is the first that passes for text on white). Components use semantic tokens, never these.">
+        <PageHeader title="Design system" action={{ icon: 'pencil', label: 'Example header button', onClick: () => {} }} subtitle="Base → semantic tokens → components. One brand colour (emerald), light and dark mode. Every text pairing meets WCAG 2.2 AA." />
+        <Section title="Palettes" footer="Base colours (Figma Base collection) from src/design/tokens/primitives.css. Every step sits at the same contrast against white in every palette (600 is the first that passes for text on white). Components use semantic tokens, never these.">
           {PALETTES.map((p) => (
             <div key={p} className={s.paletteRow}>
               <div className="t-body-small">{p[0].toUpperCase() + p.slice(1)}</div>
               <div className={s.paletteSteps}>
                 {STEPS.map((n) => (p === 'neutral' || (n > 0 && n < 1000))
-                  ? <div key={n} className={s.paletteChip} title={`--color-${p}-${n}`} style={{ background: `var(--color-${p}-${n})` }} />
+                  ? <div key={n} className={s.paletteChip} title={`--base-color-${p}-${n}`} style={{ background: `var(--base-color-${p}-${n})` }} />
                   : <div key={n} aria-hidden="true" />)}
               </div>
             </div>
