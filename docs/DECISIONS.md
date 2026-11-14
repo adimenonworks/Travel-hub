@@ -1,8 +1,18 @@
 # Rove decisions
 
-**Why Rove is the way it is.** Every product, design and working decision, with its date and reason. Newest first.
+**Why Rove is the way it is.** Decisions with their date and reason, newest first. **This file holds the current month only**; older months are in `docs/decisions/` (one file per month, e.g. `2026-11.md`). Search those when you're changing something and need the reason behind it.
 
-**Keep it current:** any change that makes, changes or reverses a decision adds an entry here in the same pull request. A reversal says what it replaces, and the old entry gets a "Reversed on …" note. Don't delete old entries: the history is the point.
+**What goes in** (owner, 14 Nov 2026), anything someone might later question or be tempted to undo:
+- a rule ("every value comes from a variable");
+- a real choice between options, with what was turned down;
+- a reversal of an earlier decision;
+- something deliberately **not** built.
+
+**What doesn't:** bug fixes, tweaks and small adjustments (a spacing value, a renamed label). The reference files say how things are now, and the pull request records the change.
+
+**Keep it current:** a change that makes, changes or reverses a decision adds an entry in the same pull request. A reversal says what it replaces, and the old entry gets a "Reversed on …" note. Don't delete old entries.
+
+**Each month:** in the first change of a new month, move the previous month's entries to `docs/decisions/YYYY-MM.md` (word for word), leaving this file with the new month only.
 
 - **How Rove works now** is in `CLAUDE.md` and the reference files it links to.
 - **Where it's going** is in `docs/ROADMAP.md`.
@@ -13,6 +23,13 @@
 ---
 
 ## 14 Nov 2026
+
+### Keep the docs every session reads short (owner)
+- **Decision:**
+  - `DECISIONS.md` only takes decisions someone might question or undo (rules, real choices, reversals, things not built), and holds the current month; older months move to `docs/decisions/`.
+  - `PROGRESS.md` only holds the prompt being worked on; finished prompts and their results move to `docs/changes/done/`.
+  - Sessions read the roadmap only when planning, and only the part of a reference file that touches the work.
+- **Why:** every session reads these first. After two days they were about 30,000 words a session (DECISIONS 4,600, PROGRESS 8,400), which makes every session slower and costlier. Nothing is deleted; it's just not all read every time.
 
 ### Travelling and Following: built (people and sharing, item 2, first part)
 - **Decision:** Add people opens a sheet with two Option cards, Travelling and Following (each with its one line), then Share link makes a link carrying that role and opens the share sheet ("Join us on <trip> in Rove", or "Follow <trip> in Rove" for a Following link). The join page says what a follower gets. People is one list with a role dropdown on each row (List item "Show Button", a Ghost Button) that opens the Context menu: Travelling, Following (the current one ticked) and Remove from trip, or Leave trip on your own row. Followers see roles as plain text and leave with a button at the end. Changing a role confirms with a Toast with Undo.

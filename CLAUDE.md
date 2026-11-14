@@ -12,8 +12,8 @@ A collaborative vacation planner. People create trips, invite others with a link
 Rove's repo is meant to explain itself completely: any AI or person should be able to read it and understand what Rove is now, why, and where it's going.
 
 1. **At the start of a session,** check whether this copy is behind Main on GitHub (the start-up check, `.claude/hooks/session-start.sh`, looks for you: it fetches, never changes files, and says nothing when all is well). If it is, tell the owner what's new (for example "4 changes behind, including a new CLAUDE.md") and **ask before pulling**. If the folder has unsaved changes, point them out first and let the owner decide. After pulling, re-read this file if it changed.
-2. **Read first:** before planning, deciding or starting new work, read this file, `docs/DECISIONS.md`, `docs/ROADMAP.md`, `docs/changes/PROGRESS.md` and any change prompt in `docs/changes/` that touches the work, plus the reference file for the area you're changing (see "Where things are"). If they disagree with each other, or with the code or Figma, fix that before going on. Tiny fixes (a typo, a colour tweak) don't need the full read.
-3. **Write after:** in the same pull request as the change, update whatever it affects: this file (rules), the reference files (how things work), `docs/DECISIONS.md` (a dated entry for any decision or reversal, with the reason), `docs/ROADMAP.md` (when a feature is built, decided, added or dropped, then redraw the Figma Planning board from it) and `PROGRESS.md` (while working through a change prompt).
+2. **Read first:** before planning, deciding or starting new work, read this file, `docs/changes/PROGRESS.md`, the change prompt you're working on, `docs/DECISIONS.md` (this month only; older months are in `docs/decisions/`, so search them when you change something and need its reason) and the part of the reference file that covers the area you're changing (see "Where things are"). Read `docs/ROADMAP.md` when planning or deciding what to build; a written change prompt already says what to update in it. If they disagree with each other, or with the code or Figma, fix that before going on. Tiny fixes (a typo, a colour tweak) don't need the full read.
+3. **Write after:** in the same pull request as the change, update whatever it affects: this file (rules), the reference files (how things work), `docs/DECISIONS.md` (a dated entry only for a decision that meets its bar: a rule, a real choice between options, a reversal, or something deliberately not built; not bug fixes or tweaks), `docs/ROADMAP.md` (when a feature is built, decided, added or dropped, then redraw the Figma Planning board from it) and `PROGRESS.md` (while working through a change prompt). When a change prompt is finished, move it to `docs/changes/done/` together with its results from `PROGRESS.md`, so `PROGRESS.md` only ever holds the prompt being worked on.
 
 ## Where things are
 
@@ -25,8 +25,8 @@ Rove's repo is meant to explain itself completely: any AI or person should be ab
 | `docs/token-migration.md` | Any old token name you meet (library v2's old → new table) |
 | `docs/HOW-ROVE-IS-BUILT.md`, `docs/DEPENDENCIES-AND-RISKS.md`, `docs/SECURITY.md` | Platforms and services, limits and costs, security rules |
 | `docs/ROADMAP.md` | What's built, what's next, and what's been decided against |
-| `docs/DECISIONS.md` | Why something is the way it is |
-| `docs/changes/` + `PROGRESS.md` | The change prompts being built, and how far they've got |
+| `docs/DECISIONS.md` (+ `docs/decisions/` for older months) | Why something is the way it is |
+| `docs/changes/` + `PROGRESS.md` | The change prompts being built, and how far they've got (finished ones and their results are in `docs/changes/done/`) |
 
 These files moved out of this one on 14 Nov 2026 word for word; this file keeps the rules every session needs.
 
