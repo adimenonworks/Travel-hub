@@ -17,8 +17,8 @@ import s from './Home.module.css';
 import ss from '../saves/saves.module.css';
 
 /**
- * Home (Figma "Home — v2"): what's happening now. The greeting, two quick actions side by side (Save a place, Plan a
- * trip), then your trips: while one is on, "Happening now" (Next up: the next event as the deep-green Next card, as on
+ * Home (Figma "Home — v2"): what's happening now. The greeting, two quick actions side by side (Plan a trip, the
+ * one Primary, then Save a place: most saves arrive through the share sheet), then your trips: while one is on, "Happening now" (Next up: the next event as the deep-green Next card, as on
  * the trip's Overview, then the trip's card), and "Upcoming trips" (the soonest as a full Hero card, the rest compact).
  * Then "Collections" (your saves by country as Tiles) and "Recently saved". With no trip or no saves, an accent Card
  * with an illustration takes their place.
@@ -61,8 +61,8 @@ export function Home() {
     <Content>
       <PageHeader title={`Hi, ${name.split(' ')[0]}`} fit />
       <nav className={s.quickActions} aria-label="Quick actions">
-        <Button size="small" icon="plus" onClick={() => openSave({ mode: 'link' })}>Save a place</Button>
-        <Button size="small" tone="neutral" icon="calendar" onClick={() => newTrip()}>Plan a trip</Button>
+        <Button size="small" icon="calendar" onClick={() => newTrip()}>Plan a trip</Button>
+        <Button size="small" tone="neutral" icon="plus" onClick={() => openSave({ mode: 'link' })}>Save a place</Button>
       </nav>
       {trips === null ? <PageSkeleton bare /> : happening || upcoming.length > 0 ? (
         <>
