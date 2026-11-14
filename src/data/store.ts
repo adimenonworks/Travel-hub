@@ -42,6 +42,8 @@ export interface Store {
   setRole(trip: Trip, uid: string, role: Role): Promise<void>;
   /** Older trips: owner/editor/member → traveller, viewer → follower, `ownerId` → `createdBy` (any traveller, once). */
   migrateRoles(trip: Trip): Promise<void>;
+  /** Older events: writes who's in (`people`) and drops the old `attendeeIds`, in one batch. */
+  migrateEventPeople(tripId: string, events: { id: string; people: string[] }[]): Promise<void>;
 
   watchSub<K extends SubName>(tripId: string, name: K, cb: (items: SubCollections[K][]) => void): Unsubscribe;
   addSub<K extends SubName>(tripId: string, name: K, data: NewDoc<SubCollections[K]>): Promise<string>;

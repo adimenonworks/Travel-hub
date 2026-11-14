@@ -4,7 +4,7 @@ export { TextField, TextArea, Dropdown, FieldRow } from './Field';
 export { Card } from './Card';
 export { SegmentControl } from './SegmentControl';
 export { Sheet } from './Sheet';
-export { Avatar, AvatarStack, Tag, Chip, Banner, type AvatarSize, type TagTone, type BannerTone } from './Misc';
+export { Avatar, AvatarStack, Tag, Chip, WhosInRow, Banner, type AvatarSize, type TagTone, type BannerTone } from './Misc';
 export { Skeleton, PageSkeleton } from './Skeleton';
 export { BottomNavigation, type NavTab } from './BottomNavigation';
 export { PageHeader, Tabs, type TabItem } from './Bars';

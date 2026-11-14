@@ -2,7 +2,8 @@ import type { ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import { Icon, type IconName } from './Icon';
 import { Avatar } from './Misc';
-import { Tag } from './Misc';
+import { AvatarStack, Tag } from './Misc';
+import { Button } from './Button';
 import s from './Rows.module.css';
 
 type Press = { to?: string; href?: string; onClick?: () => void; label?: string };
@@ -101,7 +102,7 @@ export function CategoryIcon({ icon, type = 'neutral', size = 'medium', tone = '
   return <span className={cls.filter(Boolean).join(' ')} aria-hidden="true"><Icon name={icon} size={size === 'small' ? 16 : 24} /></span>;
 }
 
-export function EventCard({ title, time, timeIcon = 'clock', place, placeIcon = 'pin', amount, icon, layout = 'standard', state = 'default', type = 'neutral', journey, extras, status, favourite, to, onClick }: {
+export function EventCard({ title, time, timeIcon = 'clock', place, placeIcon = 'pin', amount, icon, layout = 'standard', state = 'default', type = 'neutral', journey, extras, status, favourite, people, going, action, to, onClick }: {
   title: string; time?: string; place?: string; amount?: string; icon: IconName;
   /** Figma Event card: the time and the place sit on their own lines, each after a small icon. The place's icon is a pin
    *  unless it isn't a place (a note's text, a stay's nights): pass null for no icon. */
@@ -117,15 +118,21 @@ export function EventCard({ title, time, timeIcon = 'clock', place, placeIcon = 
   extras?: { icon?: IconName; label: string }[];
   /** Figma "Show status", e.g. "Check-in open" */
   status?: string;
+  /** Figma "Show footer": who's in (an Avatar stack and "2 of 4 going") */
+  people?: { id: string; name: string; photo?: string | null }[]; going?: string;
+  /** Figma "Show Button" in the footer: a small Neutral Button (Inverse on the Next card), e.g. I'm in or I'm out. The
+   *  card stays one link: the Button sits above it, so tapping it never opens the event. */
+  action?: { label: string; onClick: () => void };
   to?: string; onClick?: () => void;
 }) {
-  const cls = [s.event, s[`event-${layout}`], s[`event-${state}`], state === 'next' && 'feature'].filter(Boolean).join(' ');
+  const cls = [s.event, s[`event-${layout}`], s[`event-${state}`], state === 'next' && 'feature', action && s.eventWithAction].filter(Boolean).join(' ');
   const stateText = state === 'next' ? ', up next' : state === 'done' ? ', done' : '';
-  return (
-    <Pressable to={to} onClick={onClick} className={cls} label={`${title}${favourite ? ', favourite' : ''}${time ? `, ${time}` : ''}${place ? `, ${place}` : ''}${amount ? `, ${amount} per person` : ''}${stateText}`}>
+  const label = `${title}${favourite ? ', favourite' : ''}${time ? `, ${time}` : ''}${place ? `, ${place}` : ''}${amount ? `, ${amount} per person` : ''}${going ? `, ${going}` : ''}${stateText}`;
+  const content = (
+    <>
       <CategoryIcon icon={icon} type={type} tone={state === 'next' ? 'on-feature' : 'primary'} className={s.eventIcon} />
-      <span className={s.eventBody} aria-hidden="true">
-        <span className={s.eventHeader}>
+      <span className={s.eventBody}>
+        <span className={s.eventHeader} aria-hidden="true">
           <span className={s.eventText}>
             <span className={s.eventTitleRow}><span className={s.eventTitle}>{title}</span>{favourite && <Icon name="star" size={16} state="filled" />}</span>
             {time && <span className={s.eventLine}>{timeIcon && <Icon name={timeIcon} size={16} />}<span className={s.eventTime}>{time}</span></span>}
@@ -139,7 +146,7 @@ export function EventCard({ title, time, timeIcon = 'clock', place, placeIcon = 
           )}
         </span>
         {layout === 'journey' && journey && (
-          <span className={s.route}>
+          <span className={s.route} aria-hidden="true">
             <span className={s.routeTimes}>
               <span className={s.routeEnd}><span className={s.routeTime}>{journey.fromTime}</span>{journey.fromPlace && <span className={s.routePlace}>{journey.fromPlace}</span>}</span>
               <span className={s.routeMid}>
@@ -151,11 +158,20 @@ export function EventCard({ title, time, timeIcon = 'clock', place, placeIcon = 
           </span>
         )}
         {extras && extras.length > 0 && (
-          <span className={s.eventExtras}>{extras.map((e) => <Tag key={e.label} tone="neutral" icon={e.icon}>{e.label}</Tag>)}</span>
+          <span className={s.eventExtras} aria-hidden="true">{extras.map((e) => <Tag key={e.label} tone="neutral" icon={e.icon}>{e.label}</Tag>)}</span>
+        )}
+        {(people?.length || action) && (
+          <span className={s.eventFooter}>
+            {people && people.length > 0 && <span className={s.eventPeople} aria-hidden="true"><AvatarStack people={people} />{going && <span>{going}</span>}</span>}
+            {action && <Button size="small" tone={state === 'next' ? 'inverse' : 'neutral'} className={s.eventAction} onClick={action.onClick} aria-label={`${action.label}: ${title}`}>{action.label}</Button>}
+          </span>
         )}
       </span>
-    </Pressable>
+    </>
   );
+  // With a Button inside, the card is a plain box and an invisible link covers it (a button can't sit inside a link)
+  if (action) return <div className={cls}><Pressable to={to} onClick={onClick} className={s.eventCover} label={label}><span /></Pressable>{content}</div>;
+  return <Pressable to={to} onClick={onClick} className={cls} label={label}>{content}</Pressable>;
 }
 
 /** Figma "Travel connector": the line between two Event cards with how long getting there takes. */

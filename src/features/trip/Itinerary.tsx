@@ -1,13 +1,12 @@
 import { hasStep, stepTab, useSwipeTabs } from '../../app/useSwipeTabs';
 import { Fragment, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { Button, ContextMenu, DayCard, EventCard, SectionHeader, NowLine, TravelConnector, useToast, type ContextMenuItem, type EventState, Card, Illustration } from '../../design/components';
+import { Button, ContextMenu, DayCard, EventCard, SectionHeader, NowLine, TravelConnector, type ContextMenuItem, type EventState, Card, Illustration } from '../../design/components';
 import { useMe, usePlacesById } from '../../data/hooks';
 import type { Activity } from '../../data/types';
 import { dayWord, formatDay, formatTime, parseDay, today, tripDays } from '../../lib/dates';
-import { confirmAction, haptic } from '../../lib/native';
+import { haptic } from '../../lib/native';
 import { unreadCount, unreadTag, useReads } from '../../lib/reads';
-import { store } from '../../data';
 import { travelEstimate } from '../../lib/trips';
 import { SlideSwap } from '../shared/SlideSwap';
 import { ActivityForm, ConnectionForm } from './ActivityForm';
@@ -16,6 +15,9 @@ import { behaviourOf, categoryInfo, isEveryday } from '../../lib/categories';
 import { priceOf, priceText } from '../../lib/currency';
 import { crossesDateLine, localNow, zoneOfDay } from '../../lib/timezone';
 import type { TripCtx } from './TripPage';
+import { peopleOf, travellersOf } from '../../data/eventPeople';
+import { goingText, useWhosIn } from './whosIn';
+import { personName } from '../../data/hooks';
 import s from './trip.module.css';
 
 export const byTime = (a: Activity, b: Activity) => (a.startTime || '99').localeCompare(b.startTime || '99') || a.createdAt - b.createdAt;
@@ -54,15 +56,9 @@ export function Itinerary(ctx: TripCtx) {
   const [adding, setAdding] = useState(false);
   const [editing, setEditing] = useState<Activity | null>(null);
   const [connectFrom, setConnectFrom] = useState<Activity | null>(null);
-  const toast = useToast();
-  const remove = async (a: Activity) => {
-    if (!confirmAction(`Delete "${a.title}"? It stays in Recently deleted for 30 days.`)) return;
-    try {
-      await store.setDeleted({ kind: 'event', tripId: trip.id, id: a.id }, true);
-      toast({ icon: 'trash', label: 'Event deleted', action: { label: 'Undo', onClick: () => { store.setDeleted({ kind: 'event', tripId: trip.id, id: a.id }, false).catch(() => {}); } } });
-    }
-    catch { toast({ tone: 'danger', label: "Couldn't delete. Check your connection" }); }
-  };
+  // I'm in, I'm out and Delete (Just me or Remove for everyone), each with Undo
+  const whosIn = useWhosIn(trip, ctx.profiles);
+  const travellerCount = travellersOf(trip).length;
 
   // What's on each day (a Stay counts on its check-in and check-out days).
   const byDay = useMemo(() => Object.fromEntries(days.map((d) => [d, eventsOn(activities, d)])), [activities, trip.startDate, trip.endDate]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -138,23 +134,33 @@ export function Itinerary(ctx: TripCtx) {
                     {trip2 && <TravelConnector label={trip2.label} icon={trip2.icon} />}
                     {showNow && n === nextIndex && nowLine}
                     {(() => {
+                      // Who's in: shown when it isn't everyone (silence means everyone), with I'm in when you're not,
+                      // and I'm out while it's new to you (someone else put you in it)
+                      const people = peopleOf(a, trip);
+                      const mine = people.includes(me.uid);
+                      const addedBy = mine ? a.added?.[me.uid] : undefined;
+                      const action = !ctx.isTraveller ? undefined
+                        : !mine ? { label: 'I’m in', onClick: () => whosIn.imIn(a) }
+                          : addedBy && people.length > 1 ? { label: 'I’m out', onClick: () => whosIn.imOut(a) } : undefined;
+                      const showPeople = travellerCount > 1 && (people.length < travellerCount || !!action);
                       const card = (
                         <EventCard {...eventCardProps(e, ctx)} amount={amountOf(e)} state={state} favourite={!!(a.placeId && places[a.placeId]?.starredBy?.includes(me.uid))}
+                          people={showPeople ? people.map((id) => ({ id, name: personName(ctx.profiles, id), photo: ctx.profiles[id]?.photo })) : undefined}
+                          going={showPeople ? (people.length ? goingText(people, travellerCount, me.uid) : 'Nobody yet') : undefined}
+                          action={action}
                           extras={[
-                            ...(state === 'next' ? [
-                              { icon: 'information' as const, label: `Next · ${startsIn(e)}` },
-                              ...(a.attendeeIds.length > 0 ? [{ icon: 'people' as const, label: a.attendeeIds.includes(me.uid) && a.attendeeIds.length === 1 ? 'You’re going' : `${a.attendeeIds.length} of ${trip.memberIds.length} going` }] : []),
-                            ] : []),
+                            ...(addedBy ? [{ icon: 'user-add' as const, label: `New · added by ${personName(ctx.profiles, addedBy).split(' ')[0]}` }] : []),
+                            ...(state === 'next' ? [{ icon: 'information' as const, label: `Next · ${startsIn(e)}` }] : []),
                             ...unreadTag(unreadCount(reads, me.uid, a.id, ctx.comments)),
                           ]} />
                       );
-                      // Press and hold for Edit and Delete (travellers: they can change the itinerary); sideways swipes change day
-                      return ctx.isTraveller ? (
-                        <HoldMenu label={`${a.title} actions`} items={[
-                          { label: 'Edit', icon: 'pencil', onClick: () => setEditing(a) },
-                          { label: 'Delete', icon: 'trash', tone: 'danger', onClick: () => remove(a) },
-                        ]}>{card}</HoldMenu>
-                      ) : card;
+                      // Press and hold for Edit, I'm out and Delete (the travellers in it), or I'm in; sideways swipes change day
+                      const items: ContextMenuItem[] = !ctx.isTraveller ? [] : !mine ? [{ label: 'I’m in', icon: 'check', onClick: () => whosIn.imIn(a) }] : [
+                        { label: 'Edit', icon: 'pencil', onClick: () => setEditing(a) },
+                        ...(people.length > 1 ? [{ label: 'I’m out', icon: 'sign-out' as const, onClick: () => whosIn.imOut(a) }] : []),
+                        { label: 'Delete', icon: 'trash', tone: 'danger', onClick: () => whosIn.remove(a) },
+                      ];
+                      return items.length ? <HoldMenu label={`${a.title} actions`} items={items}>{card}</HoldMenu> : card;
                     })()}
                   </div>
                 );
@@ -166,6 +172,7 @@ export function Itinerary(ctx: TripCtx) {
         </div>
       </section>
 
+      {whosIn.sheet}
       <ActivityForm open={adding} trip={trip} date={day} onClose={() => setAdding(false)} />
       <ActivityForm open={!!editing} trip={trip} date={editing?.date ?? day} activity={editing ?? undefined} onClose={() => setEditing(null)}
         onAddConnection={() => setConnectFrom(editing)} />

@@ -296,6 +296,13 @@ export function createFirebaseStore(config: FirebaseOptions): Store {
     async setRole(trip, uid, role) {
       await updateDoc(doc(db, 'trips', trip.id), { [`roles.${uid}`]: role });
     },
+    async migrateEventPeople(tripId, events) {
+      for (let i = 0; i < events.length; i += 400) {
+        const batch = writeBatch(db);
+        for (const e of events.slice(i, i + 400)) batch.update(doc(db, 'trips', tripId, 'activities', e.id), { people: e.people, attendeeIds: deleteField() });
+        await batch.commit();
+      }
+    },
     async migrateRoles(trip) {
       await updateDoc(doc(db, 'trips', trip.id), { roles: migratedRoles(trip), createdBy: trip.createdBy ?? trip.ownerId ?? deleteField(), ownerId: deleteField() });
     },

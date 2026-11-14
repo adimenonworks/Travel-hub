@@ -179,6 +179,11 @@ export function createLocalStore(): Store {
       db.trips[trip.id].roles[uid] = role;
       save();
     },
+    async migrateEventPeople(tripId, events) {
+      const c = sub(tripId, 'activities');
+      for (const e of events) if (c[e.id]) { c[e.id].people = e.people; delete c[e.id].attendeeIds; }
+      save();
+    },
     async migrateRoles(trip) {
       const t = db.trips[trip.id];
       if (!t) return;

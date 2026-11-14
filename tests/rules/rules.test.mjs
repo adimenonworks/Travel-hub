@@ -36,7 +36,7 @@ await t('join cannot change other fields', assertFails(updateDoc(doc(B, 'trips/t
 await t('join cannot add a friend too', assertFails(updateDoc(doc(B, 'trips/t1'), { memberIds: arrayUnion('bob', 'carol'), 'roles.bob': 'traveller', joinedVia: 'good' })));
 await t('bob joins with invite as a traveller', assertSucceeds(updateDoc(doc(B, 'trips/t1'), { memberIds: arrayUnion('bob'), 'roles.bob': 'traveller', joinedVia: 'good' })));
 await t('member reads trip', assertSucceeds(getDoc(doc(B, 'trips/t1'))));
-await t('traveller writes activity', assertSucceeds(updateDoc(doc(B, 'trips/t1/activities/a1'), { attendeeIds: arrayUnion('bob') })));
+await t('any traveller edits an older event (no people yet)', assertSucceeds(updateDoc(doc(B, 'trips/t1/activities/a1'), { attendeeIds: arrayUnion('bob') })));
 await t('traveller adds photo album', assertSucceeds(setDoc(doc(B, 'trips/t1/albums/p1'), { title: 'Lisbon', url: 'https://photos.app.goo.gl/x', createdBy: 'bob' })));
 await t('non-member cannot add photo album', assertFails(setDoc(doc(C, 'trips/t1/albums/p2'), { title: 'x', url: 'https://x', createdBy: 'carol' })));
 await t('non-member cannot read photo albums', assertFails(getDocs(collection(C, 'trips/t1/albums'))));
@@ -123,6 +123,33 @@ await t('nobody edits a change', assertFails(updateDoc(doc(B, 'trips/t10/activit
 await t('nobody deletes a change while the event is live', assertFails(deleteDoc(doc(B, 'trips/t10/activities/e9/history/h1'))));
 await env.withSecurityRulesDisabled(async (c) => updateDoc(doc(c.firestore(), 'trips/t10/activities/e9'), { deletedAt: 1 }));
 await t('a change goes with its event once it is in Recently deleted', assertSucceeds(deleteDoc(doc(B, 'trips/t10/activities/e9/history/h1'))));
+// Who's in (item 3): only the travellers in an event change it; others only put themselves in or out
+const H = db('hana');
+await env.withSecurityRulesDisabled(async (c) => {
+  await setDoc(doc(c.firestore(), 'trips/t11'), { name: 'Rome', createdBy: 'bob', memberIds: ['bob', 'carol', 'hana', 'dan'], roles: { bob: 'traveller', hana: 'traveller', dan: 'traveller', carol: 'follower' } });
+  await setDoc(doc(c.firestore(), 'trips/t11/activities/w1'), { title: 'Colosseum', createdBy: 'bob', people: ['bob', 'dan'], added: { dan: 'bob' } });
+  await setDoc(doc(c.firestore(), 'trips/t11/activities/w2'), { title: 'Old event', createdBy: 'bob', attendeeIds: ['bob'] });
+});
+await t('someone in an event edits it', assertSucceeds(updateDoc(doc(B, 'trips/t11/activities/w1'), { title: 'Colosseum tour' })));
+await t('a traveller not in it cannot edit it', assertFails(updateDoc(doc(H, 'trips/t11/activities/w1'), { title: 'x' })));
+await t('a traveller not in it cannot bin it', assertFails(updateDoc(doc(H, 'trips/t11/activities/w1'), { deletedAt: 1, deletedBy: 'hana' })));
+await t('a traveller says I\'m in', assertSucceeds(updateDoc(doc(H, 'trips/t11/activities/w1'), { people: ['bob', 'dan', 'hana'] })));
+await t('I\'m out takes only yourself out', assertSucceeds(updateDoc(doc(H, 'trips/t11/activities/w1'), { people: ['bob', 'dan'] })));
+await t('cannot take someone else out without being in', assertFails(updateDoc(doc(H, 'trips/t11/activities/w1'), { people: ['bob'] })));
+await t('cannot put someone else in without being in', assertFails(updateDoc(doc(H, 'trips/t11/activities/w1'), { people: ['bob', 'dan', 'hana', 'carol'] })));
+await t('cannot clear someone else\'s New mark', assertFails(updateDoc(doc(H, 'trips/t11/activities/w1'), { added: {} })));
+await t('opening it clears your own New mark', assertSucceeds(updateDoc(doc(db('dan'), 'trips/t11/activities/w1'), { added: {} })));
+await t('who\'s in lists only people on the trip', assertFails(updateDoc(doc(B, 'trips/t11/activities/w1'), { people: ['bob', 'zoe'] })));
+await t('a follower cannot say I\'m in', assertFails(updateDoc(doc(C, 'trips/t11/activities/w1'), { people: ['bob', 'dan', 'carol'] })));
+await t('a new event must include whoever adds it', assertFails(setDoc(doc(H, 'trips/t11/activities/w3'), { title: 'x', createdBy: 'hana', people: ['bob'] })));
+await t('a new event with you in it', assertSucceeds(setDoc(doc(H, 'trips/t11/activities/w3'), { title: 'Gelato', createdBy: 'hana', people: ['hana', 'bob'], added: { bob: 'hana' } })));
+await t('any traveller migrates an older event', assertSucceeds(updateDoc(doc(H, 'trips/t11/activities/w2'), { people: ['bob', 'hana', 'dan'], attendeeIds: deleteField() })));
+await t('someone in it removes it for everyone', assertSucceeds(updateDoc(doc(B, 'trips/t11/activities/w1'), { deletedAt: 1, deletedBy: 'bob' })));
+await t('a traveller not in it brings it back from Recently deleted', assertSucceeds(updateDoc(doc(H, 'trips/t11/activities/w1'), { deletedAt: deleteField(), deletedBy: deleteField() })));
+const ch2 = { at: 1, field: 'people', before: ['bob'], after: ['bob', 'hana'] };
+await t('history: someone in it records a change', assertSucceeds(setDoc(doc(B, 'trips/t11/activities/w1/history/x1'), { ...ch2, by: 'bob' })));
+await t('history: a traveller not in it cannot record a change', assertFails(setDoc(doc(H, 'trips/t11/activities/w1/history/x2'), { ...ch2, by: 'hana' })));
+
 // Recently deleted: any traveller bins and restores the trip; deleting for good only from there
 await env.withSecurityRulesDisabled(async (c) => setDoc(doc(c.firestore(), 'trips/t8'), { name: 'Oslo', createdBy: 'alice', memberIds: ['alice', 'bob', 'carol'], roles: { alice: 'traveller', bob: 'traveller', carol: 'follower' } }));
 await env.withSecurityRulesDisabled(async (c) => setDoc(doc(c.firestore(), 'trips/t8/activities/e1'), { title: 'Fjord', createdBy: 'alice' }));

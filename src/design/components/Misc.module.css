@@ -62,6 +62,10 @@
 .chip-activities { background: var(--category-activities-surface); color: var(--category-activities-icon); border-color: transparent; }
 .chip-notes { background: var(--category-notes-surface); color: var(--category-notes-icon); border-color: transparent; }
 .chip-inactive { background: var(--control-unselected-background); color: var(--control-unselected-text); border-color: var(--control-unselected-border); }
+.chipAvatarBox { display: inline-flex; flex: none; }
+.whosIn { display: flex; flex-direction: column; gap: var(--space-300); }
+.whosInLabel { font: var(--type-body-small); color: var(--text-secondary); margin: 0; }
+.whosInChips { display: flex; flex-wrap: wrap; gap: var(--space-300); }
 .chipFlag { width: var(--size-icon-small); height: var(--size-icon-small); border-radius: 50%; flex: none; }
 .chipButton { position: relative; z-index: 2; cursor: pointer; transition: background var(--motion-fast), transform var(--motion-release); }
 .chipButton::after { content: ''; position: absolute; inset: calc((var(--size-650) - var(--size-tap)) / 2) calc(-1 * var(--space-100)); } /* 44px tap area */

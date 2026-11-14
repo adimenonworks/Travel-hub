@@ -57,18 +57,40 @@ export function Tag({ tone = 'neutral', icon, iconState, flag, children }: {
 }
 
 /** Figma Chip: a country or filter with a flag or icon. State=Selected is filled deep emerald. */
-export function Chip({ selected, icon, flag, onClick, label, type, children }: {
+export function Chip({ selected, icon, flag, avatar, onClick, label, pressed, type, children }: {
   selected?: boolean; icon?: IconName; /** Image URL of a country flag */ flag?: string;
+  /** Figma "Show Avatar": a Small Avatar before the label (Who's in row) */ avatar?: ReactNode;
   /** Figma "Type": when selected, the chip takes an event type's colour (the category chips when adding an event or saving a place). */
   type?: CategoryTone;
   /** Makes the chip a button (e.g. a country chip opens its quick-info modal) */ onClick?: () => void; /** Fuller name for screen readers */ label?: string;
+  /** A toggle (Who's in): announced as on or off */ pressed?: boolean;
   children: ReactNode;
 }) {
   const cls = [s.chip, selected ? s['chip-active'] : s['chip-inactive'], selected && type && type !== 'neutral' && s[`chip-${type}`], onClick && s.chipButton].filter(Boolean).join(' ');
-  const body = <>{flag ? <img src={flag} alt="" className={s.chipFlag} /> : icon && <Icon name={icon} size={16} />}{children}</>;
+  const body = <>{avatar ? <span className={s.chipAvatarBox} aria-hidden="true">{avatar}</span> : flag ? <img src={flag} alt="" className={s.chipFlag} /> : icon && <Icon name={icon} size={16} />}{children}</>;
   return onClick
-    ? <button type="button" className={cls} onClick={onClick} aria-label={label}>{body}</button>
+    ? <button type="button" className={cls} onClick={onClick} aria-label={label} aria-pressed={pressed}>{body}</button>
     : <span className={cls}>{body}</span>;
+}
+
+/**
+ * Figma "Who's in row": who's in an event, in Add or Edit event. A Chip with an Avatar for each traveller; tapping one
+ * puts them in or takes them out. `locked` people can't be taken out (you, when you add it).
+ */
+export function WhosInRow({ label = 'Who’s in', people, onToggle }: {
+  label?: string; people: { id: string; name: string; photo?: string | null; selected: boolean; locked?: boolean }[]; onToggle: (id: string) => void;
+}) {
+  return (
+    <div className={s.whosIn} role="group" aria-label={label}>
+      <h3 className={s.whosInLabel}>{label}</h3>
+      <div className={s.whosInChips}>
+        {people.map((p) => (
+          <Chip key={p.id} selected={p.selected} pressed={p.selected} avatar={<Avatar name={p.name} photo={p.photo} size="small" />}
+            label={`${p.name}${p.locked ? ', always in' : ''}`} onClick={p.locked ? undefined : () => onToggle(p.id)}>{p.name}</Chip>
+        ))}
+      </div>
+    </div>
+  );
 }
 
 export type BannerTone = 'warning' | 'success' | 'danger' | 'neutral' | 'accent';

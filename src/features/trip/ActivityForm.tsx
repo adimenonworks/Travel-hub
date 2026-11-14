@@ -1,13 +1,15 @@
 import { undoPatch } from '../../lib/eventHistory';
 import { useEffect, useState } from 'react';
-import { Button, CategoryIcon, Chip, FieldRow, OptionCard, Dropdown, Sheet, TextArea, TextField, useToast } from '../../design/components';
+import { Button, CategoryIcon, Chip, FieldRow, OptionCard, Dropdown, Sheet, TextArea, TextField, WhosInRow, useToast } from '../../design/components';
+import { addedAfter, defaultPeople, peopleOf, travellersOf } from '../../data/eventPeople';
+import { useWhosIn } from './whosIn';
 import { store } from '../../data';
-import { useMe, useRole, useSub } from '../../data/hooks';
+import { personName, useMe, useProfiles, useSub } from '../../data/hooks';
 import type { Activity, Category, LinkItem, Place, Trip } from '../../data/types';
 import { addDays, dayWord, formatDay, formatTime, tripDays } from '../../lib/dates';
 import { geocodePlace } from '../../lib/geocode';
 import { EVENT_TYPES, TYPE_TONE, behaviourOf, eventKind, isEveryday, kindInfo, spanWords, type EventKind, type EventType } from '../../lib/categories';
-import { haptic, confirmAction, readClipboard } from '../../lib/native';
+import { haptic, readClipboard } from '../../lib/native';
 import { cleanTitle, findUrl, readLink } from '../../lib/links';
 import { LinkEditor, cleanLinks } from '../shared/Links';
 import { zoneAt, zoneOfDay } from '../../lib/timezone';
@@ -16,7 +18,9 @@ import { priceOf } from '../../lib/currency';
 import { eventsOn, entryEnd, entryTime, legsOf, sameDaySpan } from './events';
 import s from './trip.module.css';
 
-export type ActivityDraft = Partial<Pick<Activity, 'title' | 'category' | 'notes' | 'links' | 'date' | 'startTime' | 'endTime' | 'locationText' | 'placeId' | 'fromText' | 'journeyId'>>;
+export type ActivityDraft = Partial<Pick<Activity, 'title' | 'category' | 'notes' | 'links' | 'date' | 'startTime' | 'endTime' | 'locationText' | 'placeId' | 'fromText' | 'journeyId'>> & {
+  /** An idea added to a day: who voted for it (they start in it, with you) */ voters?: string[];
+};
 
 type Form = {
   /** Step 1 picks the type; step 2 a category inside it (null until picked) */
@@ -89,9 +93,16 @@ export function ActivityForm({ open, trip, date, activity, draft, onClose, onCre
   /** After a delete: e.g. the event's own page goes back to its day in the itinerary */ onDeleted?: (a: Activity) => void;
 }) {
   const me = useMe();
-  // Delete for any traveller (the rules refuse followers)
-  const { isTraveller } = useRole(trip);
   const toast = useToast();
+  // Who's in: everyone for a plan, just you for a booking, the voters and you for an idea. You're always in when you
+  // add it. Until you change it, picking another category picks its default again.
+  const travellers = travellersOf(trip);
+  const profiles = useProfiles(travellers);
+  const whosIn = useWhosIn(trip, profiles);
+  const startPeople = (k: string | null | undefined) => activity ? peopleOf(activity, trip) : defaultPeople(trip, me.uid, k ?? 'activity', draft?.voters);
+  const [people, setPeople] = useState<string[]>(() => startPeople(activity?.category ?? draft?.category));
+  const [peopleTouched, setPeopleTouched] = useState(false);
+  useEffect(() => { if (open) { setPeople(startPeople(activity?.category ?? draft?.category)); setPeopleTouched(false); } }, [open, activity, draft]); // eslint-disable-line react-hooks/exhaustive-deps
   const activities = useSub(trip.id, 'activities') ?? [];
   const budgetCurrency = trip.budget?.currency ?? trip.currency;
   const [f, setF] = useState<Form>(() => toForm(activity ?? draft, date, budgetCurrency));
@@ -147,6 +158,7 @@ export function ActivityForm({ open, trip, date, activity, draft, onClose, onCre
   // Free time and rest: suggest the day's first free gap (when the times are still empty)
   const suggestion = behaviour === 'open' ? suggestFreeTime(activities, f.date, activity?.id) : null;
   const pickKind = (k: EventKind) => {
+    if (!activity && !peopleTouched) setPeople(startPeople(k));
     const b = kindInfo(k).behaviour;
     const free = b === 'open' && !f.startTime ? suggestFreeTime(activities, f.date, activity?.id) : null;
     set({
@@ -231,10 +243,14 @@ export function ActivityForm({ open, trip, date, activity, draft, onClose, onCre
         ...(toTz ? { toTz } : {}),
         ...(!activity && draft?.journeyId ? { journeyId: draft.journeyId } : {}),
       };
+      // Who's in (kept in trip order); anyone newly put in sees "New · added by" you until they open it
+      const was = activity ? peopleOf(activity, trip) : [];
+      const now = travellers.filter((id) => people.includes(id) || (!activity && id === me.uid));
+      if (!activity || now.join() !== was.join()) { data.people = now; data.added = addedAfter(activity ?? {}, was, now, me.uid); }
       // Edits are recorded in the event's history (Changes) and can be undone from the toast
       if (activity) await store.updateEvent(trip.id, activity, data);
       else {
-        const id = await store.addSub(trip.id, 'activities', { ...(data as Omit<Activity, 'id' | 'createdBy' | 'createdAt' | 'attendeeIds'>), ...(draft?.placeId ? { placeId: draft.placeId } : {}), attendeeIds: [me.uid] });
+        const id = await store.addSub(trip.id, 'activities', { ...(data as Omit<Activity, 'id' | 'createdBy' | 'createdAt'>), ...(draft?.placeId ? { placeId: draft.placeId } : {}) });
         onCreated?.(id);
       }
       if (activity) {
@@ -249,17 +265,11 @@ export function ActivityForm({ open, trip, date, activity, draft, onClose, onCre
     }
   };
 
-  const remove = async () => {
-    if (!activity || !confirmAction(`Delete "${activity.title}"? It stays in Recently deleted for 30 days.`)) return;
-    try {
-      const item = { kind: 'event' as const, tripId: trip.id, id: activity.id };
-      await store.setDeleted(item, true);
-      toast({ icon: 'trash', label: 'Event deleted', action: { label: 'Undo', onClick: () => { store.setDeleted(item, false).catch(() => {}); } } });
-      onClose();
-      onDeleted?.(activity);
-    } catch {
-      toast({ tone: 'danger', label: "Couldn't delete. Check your connection" });
-    }
+  // Delete: Recently deleted when only you are in it, else Just me (I'm out) or Remove for everyone
+  const remove = () => {
+    if (!activity) return;
+    onClose();
+    whosIn.remove(activity, onDeleted);
   };
 
   // End days (check-out, pick-up, drop-off, collect) are the trip's days only: the itinerary shows nothing outside the trip (owner)
@@ -302,6 +312,10 @@ export function ActivityForm({ open, trip, date, activity, draft, onClose, onCre
         <TextField label={kind === 'restaurant' ? 'Reservation reference (optional)' : 'Booking reference (optional)'} placeholder="TP-7XK2LQ" autoCapitalize="characters"
           value={f.bookingRef} onChange={(e) => set({ bookingRef: e.target.value })} />
       )}
+      {travellers.length > 1 && (
+        <WhosInRow people={travellers.map((id) => ({ id, name: id === me.uid ? 'You' : personName(profiles, id).split(' ')[0], photo: profiles[id]?.photo, selected: people.includes(id), locked: !activity && id === me.uid }))}
+          onToggle={(id) => { haptic('selection'); setPeopleTouched(true); setPeople((p) => (p.includes(id) ? p.filter((x) => x !== id) : [...p, id])); }} />
+      )}
       {priced && <PriceField label="Price per person (optional)" value={f.price} onChange={(price) => set({ price })} />}
       {behaviour !== 'note' && <TextArea label="Notes" placeholder={behaviour === 'open' ? 'Beach, a nap, wander the old town…' : 'What to bring, who has the tickets…'} value={f.notes} onChange={(e) => set({ notes: e.target.value })} />}
       {behaviour !== 'open' && behaviour !== 'note' && <LinkEditor links={f.links} onChange={(links) => set({ links })} />}
@@ -310,10 +324,12 @@ export function ActivityForm({ open, trip, date, activity, draft, onClose, onCre
   const sheetTitle = activity ? `Edit ${info?.label.toLowerCase() ?? 'event'}` : 'Add to itinerary'; // the type row under it names the type
 
   return (
+    <>
+    {whosIn.sheet}
     <Sheet open={open} mode={activity ? 'edit' : 'default'} title={sheetTitle}
       subtitle={!f.type ? 'What are you adding?' : undefined}
-      onClose={onClose} onSubmit={kind ? submit : undefined} submitLabel={activity ? 'Save' : `Add to ${formatDay(f.date)}`} submitDisabled={!valid || busy}
-      secondary={activity && kind && isTraveller ? <Button tone="destructive" size="large" onClick={remove}>Delete</Button> : undefined}>
+      onClose={onClose} onSubmit={kind ? submit : undefined} submitLabel={activity ? 'Save' : `Add to ${formatDay(f.date)}`} submitDisabled={!valid || busy || people.length === 0}
+      secondary={activity && kind ? <Button tone="destructive" size="large" onClick={remove}>Delete</Button> : undefined}>
       {!f.type ? (
         // Step 1: the 6 types, each with what it covers, in its colour
         <div className={s.typeList} role="group" aria-label="Type">
@@ -461,6 +477,7 @@ export function ActivityForm({ open, trip, date, activity, draft, onClose, onCre
         </>
       )}
     </Sheet>
+    </>
   );
 }
 

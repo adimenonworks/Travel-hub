@@ -99,7 +99,10 @@ service cloud.firestore {
       match /activities/{eventId}/history/{changeId} {
         function eventDoc() { return /databases/$(database)/documents/trips/$(tripId)/activities/$(eventId); }
         allow read: if isMember(tripId);
+        // Only the travellers in the event add to it: in before the change (an edit, I'm out) or after it (I'm in)
+        function inIt(e) { return !('people' in e.data) || uid() in e.data.people; }
         allow create: if isTraveller(tripId)
+          && (inIt(get(eventDoc())) || inIt(getAfter(eventDoc())))
           && request.resource.data.by == uid()
           && request.resource.data.at is number
           && request.resource.data.field in ['title', 'date', 'time', 'place', 'price', 'people']
@@ -110,7 +113,10 @@ service cloud.firestore {
       }
 
       // Activities, ideas, albums, comments (and old expenses): people on the trip only.
-      // Travellers add and update (votes, who's going); followers can only comment. Only the person who added
+      // Travellers add and update (votes, ideas, albums); followers can only comment. An event is changed only by the
+      // travellers in it (`people`, item 3); any other traveller may only put themselves in or take themselves out
+      // (I'm in, I'm out, clearing their own "New" mark) or bring it back from Recently deleted. Older events without
+      // `people` stay open to every traveller until the app migrates them. Only the person who added
       // something, or any traveller, can delete it; comments can only be edited or deleted by their author. Text has size limits:
       // comments 150 characters, titles 200, notes 2,000 (so nobody can store huge documents everyone has to load).
       match /{sub}/{docId} {
@@ -119,15 +125,30 @@ service cloud.firestore {
         function sizesOk() { return shortText('title', 200) && shortText('notes', 2000) && shortText('text', 150) && shortText('locationText', 300); }
         function addedByMe() { return resource.data.get('createdBy', '') == uid() || resource.data.get('authorId', '') == uid(); }
         function noAuthor() { return !('createdBy' in resource.data) && !('authorId' in resource.data); }
+        function members() { return tripData(tripId).memberIds; }
+        // Who's in lists only people on the trip
+        function peopleOk() { return !('people' in d()) || (d().people is list && d().people.hasOnly(members())); }
+        function inEvent() { return !('people' in resource.data) || uid() in resource.data.people; }
+        function onlyMe(a, b) { return a.toSet().difference(b.toSet()).union(b.toSet().difference(a.toSet())).hasOnly([uid()]); }
+        // I'm in / I'm out / opened it: only your own place in `people` and your own key in `added`
+        function myPlaceOnly() {
+          return d().diff(resource.data).affectedKeys().hasOnly(['people', 'added'])
+            && onlyMe(d().get('people', []), resource.data.get('people', []))
+            && d().get('added', {}).diff(resource.data.get('added', {})).affectedKeys().hasOnly([uid()]);
+        }
+        function restoring() { return d().diff(resource.data).affectedKeys().hasOnly(['deletedAt', 'deletedBy']) && !('deletedAt' in d()); }
+        function eventWriteOk() { return sub != 'activities' || (peopleOk() && (inEvent() || myPlaceOnly() || restoring())); }
 
         allow read: if isMember(tripId);
         allow create: if isMember(tripId) && sizesOk()
           && (sub == 'comments' || isTraveller(tripId))
           && d().get('createdBy', uid()) == uid()
+          && (sub != 'activities' || (peopleOk() && (!('people' in d()) || uid() in d().people)))
           && (sub != 'comments' || (d().authorId == uid() && d().text is string && d().text.size() > 0));
         allow update: if isMember(tripId) && sizesOk()
           && (sub == 'comments' || isTraveller(tripId))
           && d().get('createdBy', '') == resource.data.get('createdBy', '')
+          && eventWriteOk()
           && (sub != 'comments' || addedByMe());
         allow delete: if isMember(tripId) && (addedByMe() || noAuthor() || (sub != 'comments' && isTraveller(tripId)));
       }

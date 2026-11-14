@@ -1,5 +1,5 @@
 import { useState, type CSSProperties } from 'react';
-import { Avatar, AvatarStack, Message, Tag, Chip, Banner, Button, Card, FieldRow, HeroCard, Icon, IconButton, LinkButton, PageHeader, PageSection, SegmentControl, Dropdown, Sheet, Tabs, TextArea, TextField, NowLine, Illustration, type IllustrationName, COVER_ILLUSTRATIONS, ICON_NAMES, useToast, BottomNavigation, Skeleton, Logo, ListItem, ListGroup, SectionHeader, EventCard, TravelConnector, IdeaRow, Tile, StatStrip, ProfileCard, OptionCard, BudgetCard, StepProgress, DayCard, CountryModal, CategoryIcon, ContextMenu, Accordion, Calendar, JourneyCard, JourneyLeg, JourneyStop, MapCard } from '../../design/components';
+import { Avatar, AvatarStack, Message, Tag, Chip, WhosInRow, Banner, Button, Card, FieldRow, HeroCard, Icon, IconButton, LinkButton, PageHeader, PageSection, SegmentControl, Dropdown, Sheet, Tabs, TextArea, TextField, NowLine, Illustration, type IllustrationName, COVER_ILLUSTRATIONS, ICON_NAMES, useToast, BottomNavigation, Skeleton, Logo, ListItem, ListGroup, SectionHeader, EventCard, TravelConnector, IdeaRow, Tile, StatStrip, ProfileCard, OptionCard, BudgetCard, StepProgress, DayCard, CountryModal, CategoryIcon, ContextMenu, Accordion, Calendar, JourneyCard, JourneyLeg, JourneyStop, MapCard } from '../../design/components';
 import { flagUrl } from '../../lib/countries';
 import { EVENT_TYPES, TYPE_TONE } from '../../lib/categories';
 import type { ReactNode } from 'react';
@@ -249,7 +249,9 @@ export function DesignSystem() {
             <Chip flag={flagUrl('pt')} onClick={() => setCountry('pt')} label="About Portugal">Portugal</Chip>
             <Chip selected flag={flagUrl('es')}>Spain</Chip>
             <Chip icon="people">4 going</Chip>
+            <Chip selected avatar={<Avatar name="Priya Shah" size="small" />} onClick={() => {}} pressed>Priya</Chip>
           </div>
+          <WhosInRow people={[{ id: 'a', name: 'You', selected: true, locked: true }, { id: 'b', name: 'Priya', selected: true }, { id: 'c', name: 'Sam', selected: true }, { id: 'd', name: 'Leo', selected: false }]} onToggle={() => {}} />
           <div className={s.row}>
             <Tag icon="calendar">In 9 days</Tag><Tag tone="category" icon="camera">Category</Tag><Tag tone="success" icon="check">Success</Tag><Tag tone="warning">Warning</Tag><Tag tone="danger">Danger</Tag>
           </div>
@@ -279,6 +281,8 @@ export function DesignSystem() {
           <EventCard icon="plane" layout="journey" title="Lisbon → Porto" time="TP1946" place="TAP Air Portugal" amount="€89" status="Check-in open" to="/design"
             journey={{ fromTime: '08:30', fromPlace: 'LIS · T1', duration: '55m · direct', toTime: '09:25', toPlace: 'OPO' }} />
           <EventCard icon="notebook" layout="note" title="Bag drop closes 40 min before" place="Sam has the passports" />
+          <EventCard icon="utensils" type="food" title="Fado in Alfama" time="21:00" place="Tasca do Chico" to="/design" extras={[{ icon: 'user-add', label: 'New · added by Sam' }]}
+            people={[{ id: 'a', name: 'Sam Kerr' }, { id: 'b', name: 'Priya Shah' }]} going="2 of 4 going" action={{ label: 'I’m out', onClick: () => {} }} />
         </Section>
 
         <Section title="Event categories" footer="Every category, by type, with its icon and the type's colour (src/lib/categories.ts). The icon tells categories apart; the colour tells types apart.">
