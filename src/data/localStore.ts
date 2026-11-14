@@ -1,6 +1,6 @@
 import { isTravelling, migratedRoles } from './roles';
 import type { Store } from './store';
-import type { ChatReads, CollectionShare, Invite, Profile, SavedPlace, SubName, Trip, User } from './types';
+import type { ChatReads, CollectionRole, CollectionShare, Invite, Profile, SavedPlace, SubName, Trip, User } from './types';
 import { randomCode } from './util';
 
 /**
@@ -298,9 +298,9 @@ export function createLocalStore(): Store {
       else { s.memberIds = s.memberIds.filter((x) => x !== uid); delete s.roles[uid]; }
       save();
     },
-    async createInvite(trip) {
+    async createInvite(trip, role) {
       const code = randomCode();
-      db.invites[code] = { code, tripId: trip.id, tripName: trip.name, createdBy: me(), expiresAt: Date.now() + 14 * 86400_000 };
+      db.invites[code] = { code, tripId: trip.id, tripName: trip.name, role, createdBy: me(), expiresAt: Date.now() + 14 * 86400_000 };
       save();
       return code;
     },
@@ -311,7 +311,7 @@ export function createLocalStore(): Store {
       if (invite.kind === 'collection') {
         const s = db.shares?.[invite.shareId ?? ''];
         if (!s) throw new Error('This collection is no longer shared.');
-        if (s.ownerId !== me() && !s.memberIds.includes(me())) { s.memberIds.push(me()); s.roles[me()] = invite.role ?? 'viewer'; save(); }
+        if (s.ownerId !== me() && !s.memberIds.includes(me())) { s.memberIds.push(me()); s.roles[me()] = (invite.role as CollectionRole | undefined) ?? 'viewer'; save(); }
         return;
       }
       const t = db.trips[invite.tripId];
@@ -319,7 +319,7 @@ export function createLocalStore(): Store {
       const uid = me();
       if (!t.memberIds.includes(uid)) {
         t.memberIds.push(uid);
-        t.roles[uid] = 'traveller';
+        t.roles[uid] = invite.role === 'follower' ? 'follower' : 'traveller';
       }
       save();
     },

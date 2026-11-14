@@ -14,6 +14,11 @@
 
 ## 14 Nov 2026
 
+### Travelling and Following: built (people and sharing, item 2, first part)
+- **Decision:** Add people opens a sheet with two Option cards, Travelling and Following (each with its one line), then Share link makes a link carrying that role and opens the share sheet ("Join us on <trip> in Rove", or "Follow <trip> in Rove" for a Following link). The join page says what a follower gets. People is one list with a role dropdown on each row (List item "Show Button", a Ghost Button) that opens the Context menu: Travelling, Following (the current one ticked) and Remove from trip, or Leave trip on your own row. Followers see roles as plain text and leave with a button at the end. Changing a role confirms with a Toast with Undo.
+- **Settled while building:** there's always at least one traveller: the last one can't make themselves Following (a Toast says to make someone else Travelling first), since only travellers can change anything. The rules check the role against the link: a Following link can only make you a follower; links from older app versions carry no role and still mean travelling.
+- **Split:** item 2's Undo-on-everything and per-event change history come next as their own pull request; "only people in an event edit it" and "Just me / Remove for everyone" need item 3's who's in, so they're built with item 3.
+
 ### Page header: the meta line sits with the title (owner)
 - **Decision:** the meta (a trip's dates) moves into the title's column, after the subtitle, 12px apart; with no subtitle it sits where the subtitle would. Polish prompt G11.
 - **Why:** it was placed under the whole title row, so the edit button or the category icon pushed it far from the title. The owner spotted the real cause.

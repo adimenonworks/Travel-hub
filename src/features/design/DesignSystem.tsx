@@ -367,6 +367,7 @@ export function DesignSystem() {
             <ListItem icon="utensils" title="Ichiran Shibuya" meta="Ramen · Tokyo · from TikTok" trailing="2h" onClick={() => {}} />
             <ListItem icon="link" title="10 things to do in Cusco" meta="Article · Peru · cntraveler.com" trailing="Yesterday" />
             <ListItem size="small" icon="document" title="TAP e-ticket" trailing="PDF · 2h ago" />
+            <ListItem icon="person" title="Sam Lee" action={<Button tone="ghost" size="small" iconEnd="chevron-down" onClick={() => {}}>Travelling</Button>} />
             <BudgetCard label="Left to spend" amount="A$1,800" caption="of A$5,000 per person · A$3,200 planned" ratio={0.64}
               rows={[{ icon: 'plane', label: 'Flights', amount: 'A$1,900' }, { icon: 'bed', label: 'Stays', amount: 'A$900' }, { icon: 'key', label: 'Car rental', amount: 'A$180' }]} />
             <OptionCard icon="wallet" label="Yes" description="Add costs to your bookings to see what the trip adds up to" onClick={() => {}} />

@@ -27,7 +27,7 @@ Built in this order. Progress is in `docs/changes/PROGRESS.md`.
 ### 1. People, sharing and money
 `docs/changes/rove-change-people-and-sharing.md`
 - **One shared trip, everyone equal.** "Join", never "invited into my trip"; any traveller can edit or delete it (Recently deleted keeps it 30 days). *(built 14 Nov, with the Travelling / Following roles; the Add people role choice comes with the next item)*
-- **Travelling and Following** replace Planner and Viewer. Followers see the plan and chat, never prices or bookings.
+- **Travelling and Following** replace Planner and Viewer. Followers see the plan and chat, never prices or bookings. *(built 14 Nov: Add people asks which, the link carries it, People rows have a role dropdown; hiding prices and bookings from followers comes with items 7 and 8)*
 - **Who's in, per event.** Being added means you're in; I'm out removes it from your itinerary only. Guests can join a single event.
 - **Undo and per-event change history** with Restore.
 - **In-app Notification centre** (lock-screen push stays in Later).

@@ -1,86 +1,121 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Avatar, Button, Card, Illustration, ListGroup, ListItem, SectionHeader, SegmentControl, Sheet, useToast } from '../../design/components';
+import { Avatar, Button, Card, ContextMenu, Illustration, ListGroup, ListItem, OptionCard, SectionHeader, Sheet, useToast, type ContextMenuItem } from '../../design/components';
 import { store } from '../../data';
 import { personName, useMe } from '../../data/hooks';
 import type { TripCtx } from './TripPage';
 import type { Role } from '../../data/types';
 import { isTravelling, peopleInOrder, roleOf } from '../../data/roles';
-import { isNativeApp, PUBLIC_SITE, shareLink, confirmAction } from '../../lib/native';
+import { haptic, isNativeApp, PUBLIC_SITE, shareLink, confirmAction } from '../../lib/native';
 
 /**
- * Trip "People" tab (Figma "Trip — People"): everyone on the trip as one List group (travellers first, then followers),
- * then the invite card. Everyone is equal: there's no owner. Two roles, Travelling and Following; any traveller taps
- * someone to change their role or remove them, and anyone can leave (the last traveller leaving deletes the trip).
+ * Trip "People" tab (Figma Screens → "People & sharing — draft" → Trip · People): everyone on the trip as one List
+ * group, travellers first, then followers. Everyone is equal: there's no owner. Each row has a role dropdown (a Ghost
+ * Button, List item "Show Button") that opens a Context menu: Travelling, Following, and Remove from trip (your own
+ * row: Leave trip). Followers see roles as plain text and leave with the button at the end.
+ * Add people opens a sheet: Travelling or Following first, then a link carrying that role goes to the share sheet.
  */
-const ROLE_HELP: Record<Role, string> = {
+export const ROLE_HELP: Record<Role, string> = {
   traveller: 'On the trip. Plans with everyone and has their own bookings and budget.',
   follower: 'Not on the trip, like family at home. Sees the plan and chats, but never prices or bookings, and can’t change anything.',
 };
-const ROLE_NAME: Record<Role, string> = { traveller: 'Travelling', follower: 'Following' };
+export const ROLE_NAME: Record<Role, string> = { traveller: 'Travelling', follower: 'Following' };
 
 export function People({ trip, profiles, isTraveller }: TripCtx) {
   const me = useMe();
   const navigate = useNavigate();
   const toast = useToast();
   const [busy, setBusy] = useState(false);
+  const [adding, setAdding] = useState(false);
+  const [as, setAs] = useState<Role>('traveller');
+  const [menu, setMenu] = useState<string | null>(null);
 
-  // "Add people" makes a fresh link and opens the share sheet straight away (or copies it where there's no share sheet).
-  // The link itself is never shown on the page: it's long, and the share sheet is where it's used.
-  const makeLink = async () => {
+  // The link itself is never shown: it's long, and the share sheet is where it's used. Inside the iPhone app the page
+  // address is capacitor://localhost, which nobody else can open, so links point at the public site.
+  const share = async () => {
     setBusy(true);
     try {
-      const code = await store.createInvite(trip);
-      // Inside the iPhone app the page address is capacitor://localhost, which nobody else can open, so invite links
-      // point at the public site; in a browser they point at wherever this copy of the site is running.
+      const code = await store.createInvite(trip, as);
       const url = `${isNativeApp ? PUBLIC_SITE : location.origin + location.pathname}#/join/${code}`;
-      return url;
+      setAdding(false);
+      const text = as === 'follower' ? `Follow ${trip.name} in Rove` : `Join us on ${trip.name} in Rove`;
+      if (await shareLink({ title: `Join ${trip.name}`, text, url })) return;
+      try { await navigator.clipboard.writeText(url); toast({ icon: 'copy', label: 'Link to join copied' }); } catch { toast({ tone: 'danger', label: "Couldn't share the link. Try again" }); }
+    } catch {
+      toast({ tone: 'danger', label: "Couldn't make a link. Check your connection" });
     } finally {
       setBusy(false);
     }
   };
-  const share = async (url: string) => {
-    if (await shareLink({ title: `Join ${trip.name}`, text: `Join us on ${trip.name} in Rove`, url })) return;
-    try { await navigator.clipboard.writeText(url); toast({ icon: 'copy', label: 'Link to join copied' }); } catch { toast({ tone: 'danger', label: "Couldn't share the link. Try again" }); }
-  };
-  const invite = async () => {
-    const url = await makeLink();
-    await share(url);
-  };
 
   const members = peopleInOrder(trip);
   const roleName = (id: string) => ROLE_NAME[roleOf(trip, id) ?? 'follower'];
-  const [person, setPerson] = useState<string | null>(null);
-  const [role, setRoleDraft] = useState<Role>('traveller');
-  const open = (id: string) => { setRoleDraft(roleOf(trip, id) ?? 'follower'); setPerson(id); };
-  const saveRole = async () => {
-    if (!person) return;
-    if (roleOf(trip, person) === role) { setPerson(null); return; }
-    try { await store.setRole(trip, person, role); toast({ icon: 'check', label: 'Role updated' }); setPerson(null); }
-    catch { toast({ tone: 'danger', label: "Couldn't save. Check your connection" }); }
+  const travellers = members.filter((id) => isTravelling(trip, id));
+
+  const setRole = async (id: string, role: Role) => {
+    const was = roleOf(trip, id);
+    if (!was || was === role) return;
+    // There's always someone travelling: they're the ones who can change things
+    if (role === 'follower' && travellers.length === 1 && travellers[0] === id) {
+      toast({ label: 'Someone has to be travelling. Make someone else Travelling first' });
+      return;
+    }
+    const name = id === me.uid ? 'You' : personName(profiles, id).split(' ')[0];
+    try {
+      await store.setRole(trip, id, role);
+      haptic('selection');
+      toast({ icon: 'check', label: `${name} ${id === me.uid ? 'are' : 'is'} ${ROLE_NAME[role].toLowerCase()}`, action: { label: 'Undo', onClick: () => { store.setRole(trip, id, was).catch(() => {}); } } });
+    } catch { toast({ tone: 'danger', label: "Couldn't save. Check your connection" }); }
   };
 
-  const removePerson = async () => {
-    if (!person) return;
-    const name = personName(profiles, person);
-    if (!confirmAction(`Remove ${name} from this trip?`)) return;
-    try { await store.removeMember(trip, person); toast({ icon: 'trash', label: `${name} removed` }); setPerson(null); }
+  const remove = async (id: string) => {
+    const name = personName(profiles, id);
+    if (!confirmAction(`Remove ${name} from "${trip.name}"?`)) return;
+    try { await store.removeMember(trip, id); toast({ icon: 'trash', label: `${name} removed` }); }
     catch { toast({ tone: 'danger', label: "Couldn't remove. Check your connection" }); }
+  };
+
+  // Anyone can leave. The last traveller leaving deletes the trip, into Recently deleted like Delete trip
+  const leave = async () => {
+    const last = isTraveller && !members.some((id) => id !== me.uid && isTravelling(trip, id));
+    if (!confirmAction(last
+      ? `You're the only one travelling, so leaving deletes "${trip.name}"${members.length > 1 ? ' for everyone' : ''}. You can bring it back from Recently deleted for 30 days.`
+      : `Leave "${trip.name}"? It stays with everyone else.`)) return;
+    try { await store.leaveTrip(trip.id, me.uid); navigate('/'); }
+    catch { toast({ tone: 'danger', label: "Couldn't leave. Check your connection" }); }
+  };
+
+  const menuItems = (id: string): ContextMenuItem[] => {
+    const current = roleOf(trip, id);
+    return [
+      { label: 'Travelling', icon: current === 'traveller' ? 'check' : 'plane', onClick: () => setRole(id, 'traveller') },
+      { label: 'Following', icon: current === 'follower' ? 'check' : 'home', onClick: () => setRole(id, 'follower') },
+      id === me.uid
+        ? { label: 'Leave trip', icon: 'sign-out', tone: 'danger', onClick: leave }
+        : { label: 'Remove from trip', icon: 'trash', tone: 'danger', onClick: () => remove(id) },
+    ];
   };
 
   return (
     <>
       <SectionHeader title="People"
-        action={isTraveller ? <Button size="small" icon="user-add" onClick={invite} disabled={busy}>Add people</Button> : undefined} />
+        action={isTraveller ? <Button size="small" icon="user-add" onClick={() => { setAs('traveller'); setAdding(true); }}>Add people</Button> : undefined} />
       <ListGroup label="People">
         {members.map((id) => {
           const name = personName(profiles, id);
-          // Any traveller changes anyone else's role or removes them (your own row: Leave trip, below)
-          const editable = isTraveller && id !== me.uid;
+          const dropdown = (
+            <Button tone="ghost" size="small" iconEnd="chevron-down" aria-haspopup="menu" aria-expanded={menu === id}
+              aria-label={`${id === me.uid ? 'Your' : `${name}'s`} role: ${roleName(id)}`} onClick={() => { haptic('light'); setMenu(id); }}>
+              {roleName(id)}
+            </Button>
+          );
           return (
             <ListItem key={id} media={<Avatar name={name} photo={profiles[id]?.photo} size="large" />} round
-              title={name} meta={`${roleName(id)}${id === me.uid ? ' · you' : ''}`}
-              onClick={editable ? () => open(id) : undefined} label={editable ? `${name}, ${roleName(id)}: change role` : undefined} />
+              title={name} meta={id === me.uid ? 'You' : undefined}
+              trailing={isTraveller ? undefined : roleName(id)}
+              action={isTraveller ? (menu === id
+                ? <ContextMenu label={`${name}'s role`} align="end" onClose={() => setMenu(null)} items={menuItems(id)}>{dropdown}</ContextMenu>
+                : dropdown) : undefined} />
           );
         })}
       </ListGroup>
@@ -88,24 +123,19 @@ export function People({ trip, profiles, isTraveller }: TripCtx) {
       {isTraveller && (
         <Card media={<Illustration name="friends" size={120} />}>
           <h2 className="t-heading-2">The more the merrier</h2>
-          <p className="t-body-small t-secondary">Tap Add people to get a link for friends to plan this trip with you. Anyone with the link can join for the next 14 days after signing in.</p>
+          <p className="t-body-small t-secondary">Add people makes a link to join as Travelling or Following. Anyone with it can join for the next 14 days after signing in.</p>
         </Card>
       )}
 
-      {/* Anyone can leave. The last traveller leaving deletes the trip, into Recently deleted like Delete trip */}
-      <Button tone="destructive" icon="sign-out" onClick={async () => {
-        const last = isTraveller && !members.some((id) => id !== me.uid && isTravelling(trip, id));
-        if (!confirmAction(last
-          ? `You're the only one travelling, so leaving deletes "${trip.name}"${members.length > 1 ? ' for everyone' : ''}. You can bring it back from Recently deleted for 30 days.`
-          : `Leave "${trip.name}"? It stays with everyone else.`)) return;
-        try { await store.leaveTrip(trip.id, me.uid); navigate('/'); }
-        catch { toast({ tone: 'danger', label: "Couldn't leave. Check your connection" }); }
-      }}>Leave trip</Button>
+      {/* Travellers leave from their own row's menu; followers have no menu, so they get the button */}
+      {!isTraveller && <Button tone="destructive" icon="sign-out" onClick={leave}>Leave trip</Button>}
 
-      <Sheet open={!!person} mode="edit" title={person ? personName(profiles, person) : ''} subtitle="Their role on this trip" onClose={() => setPerson(null)} onSubmit={saveRole} submitLabel="Save"
-        secondary={person ? <Button tone="destructive" size="large" onClick={removePerson}>Remove from trip</Button> : undefined}>
-        <SegmentControl label="Role" block value={role} onChange={setRoleDraft} options={[{ value: 'traveller', label: 'Travelling' }, { value: 'follower', label: 'Following' }]} />
-        <p className="t-body-small t-secondary">{ROLE_HELP[role]}</p>
+      <Sheet open={adding} title="Add people" subtitle={`How will they join ${trip.name}?`} onClose={() => setAdding(false)}
+        onSubmit={share} submitLabel="Share link" submitDisabled={busy}>
+        {(['traveller', 'follower'] as const).map((r) => (
+          <OptionCard key={r} icon={r === 'traveller' ? 'plane' : 'home'} label={ROLE_NAME[r]} description={ROLE_HELP[r]}
+            selected={as === r} onClick={() => { haptic('light'); setAs(r); }} />
+        ))}
       </Sheet>
     </>
   );

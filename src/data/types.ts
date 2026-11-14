@@ -200,9 +200,11 @@ export type Album = {
 };
 
 /** An invite link: to a trip (the default), or to someone's collection (`kind: 'collection'`, with the role it gives). */
+/** A link to join a trip (its `role`: travelling or following; older links have none and mean travelling) or a shared
+ *  collection (its `role`: Can edit / Can view). */
 export type Invite = {
   code: string; tripId: string; tripName: string; createdBy: string; expiresAt: number;
-  kind?: 'trip' | 'collection'; shareId?: string; countryCode?: string; role?: CollectionRole;
+  kind?: 'trip' | 'collection'; shareId?: string; countryCode?: string; role?: CollectionRole | Role;
 };
 
 /** In a shared collection: a Member adds, moves and favourites places; a Viewer looks, favourites and opens Maps. */

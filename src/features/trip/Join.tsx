@@ -69,7 +69,7 @@ export function Join() {
             actions={<Button size="large" onClick={join} disabled={busy}>Join collection</Button>} />
         ) : (
           <Card layout="centre" media={<Illustration name="suitcase" size={120} />} title={from[invite.createdBy] ? `${personName(from, invite.createdBy).split(' ')[0]} wants you to join ${invite.tripName}` : `Join ${invite.tripName}`}
-            body="Plan the days, ideas and places together."
+            body={invite.role === 'follower' ? 'Follow the plan and chat as it comes together. You won’t see prices or bookings.' : 'Plan the days, ideas and places together.'}
             actions={<Button size="large" onClick={join} disabled={busy}>Join trip</Button>} />
         )}
         {error && <p className="t-label-small t-danger" style={{ textAlign: 'center' }}>{error}</p>}

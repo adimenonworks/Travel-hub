@@ -67,7 +67,8 @@ service cloud.firestore {
           && validCover(request.resource.data);
       }
 
-      // Someone not on the trip joins with a valid, unexpired invite for it, as a traveller ('member' from older app versions).
+      // Someone not on the trip joins with a valid, unexpired link for it, in the role the link carries (travelling or
+      // following). Older links carry none and mean travelling; older app versions wrote 'member' for those.
       function joining() {
         let invite = get(/databases/$(database)/documents/invites/$(request.resource.data.joinedVia));
         return !(uid() in resource.data.memberIds)
@@ -76,7 +77,8 @@ service cloud.firestore {
           && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['memberIds', 'roles', 'joinedVia'])
           && request.resource.data.memberIds.toSet() == resource.data.memberIds.toSet().union([uid()].toSet())
           && request.resource.data.roles.diff(resource.data.roles).affectedKeys().hasOnly([uid()])
-          && request.resource.data.roles[uid()] in ['traveller', 'member'];
+          && (request.resource.data.roles[uid()] == invite.data.get('role', 'traveller')
+              || (!('role' in invite.data) && request.resource.data.roles[uid()] == 'member'));
       }
 
       // Anyone on the trip (traveller or follower) removes only themselves.
@@ -190,12 +192,12 @@ service cloud.firestore {
     match /invites/{code} {
       allow get: if signedIn();
       allow list: if false;
-      // A trip invite by any traveller; a collection invite by the collection's owner, as Member or Viewer
+      // A trip invite by any traveller, as Travelling or Following; a collection invite by the collection's owner, as Member or Viewer
       allow create: if signedIn()
         && request.resource.data.createdBy == uid()
         && (request.resource.data.get('kind', 'trip') == 'collection'
             ? (shareRole(request.resource.data.shareId) == 'owner' && request.resource.data.role in ['member', 'viewer'])
-            : isTraveller(request.resource.data.tripId));
+            : (isTraveller(request.resource.data.tripId) && request.resource.data.get('role', 'traveller') in ['traveller', 'follower']));
       allow delete: if signedIn() && resource.data.createdBy == uid();
     }
   }

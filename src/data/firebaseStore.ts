@@ -412,11 +412,12 @@ export function createFirebaseStore(config: FirebaseOptions): Store {
       if (role) await updateDoc(ref, { memberIds: arrayUnion(uid), [`roles.${uid}`]: role });
       else await updateDoc(ref, { memberIds: arrayRemove(uid), [`roles.${uid}`]: deleteField() });
     },
-    async createInvite(trip) {
+    async createInvite(trip, role) {
       const code = randomCode();
       await setDoc(doc(db, 'invites', code), {
         tripId: trip.id,
         tripName: trip.name,
+        role,
         createdBy: auth.currentUser!.uid,
         expiresAt: Timestamp.fromMillis(Date.now() + INVITE_DAYS * 86400_000),
       });
@@ -427,7 +428,7 @@ export function createFirebaseStore(config: FirebaseOptions): Store {
       if (!s.exists()) return null;
       const d = s.data();
       return { code, tripId: d.tripId ?? '', tripName: d.tripName, createdBy: d.createdBy, expiresAt: (d.expiresAt as Timestamp).toMillis(),
-        ...(d.kind === 'collection' ? { kind: 'collection' as const, shareId: d.shareId, countryCode: d.countryCode, role: d.role } : {}) } satisfies Invite;
+        ...(d.kind === 'collection' ? { kind: 'collection' as const, shareId: d.shareId, countryCode: d.countryCode, role: d.role } : { role: d.role ?? 'traveller' }) } satisfies Invite;
     },
     async redeemInvite(invite) {
       const uid = auth.currentUser!.uid;
@@ -437,7 +438,7 @@ export function createFirebaseStore(config: FirebaseOptions): Store {
       }
       await updateDoc(doc(db, 'trips', invite.tripId), {
         memberIds: arrayUnion(uid),
-        [`roles.${uid}`]: 'traveller',
+        [`roles.${uid}`]: invite.role === 'follower' ? 'follower' : 'traveller',
         joinedVia: invite.code,
       });
     },
