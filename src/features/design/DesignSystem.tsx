@@ -379,7 +379,7 @@ export function DesignSystem() {
           <div className={s.tiles}>
             <Tile media={<img src={flagUrl('jp')} alt="" />} title="Japan" meta="24 saves · 3 cities" />
             <Tile icon="plane" title="Flights" meta="3 flights" to="/design" />
-            <Tile add icon="plus" title="New place to go" />
+            <Tile layout="add" icon="plus" title="New place to go" />
           </div>
           <div className={s.quickRow}>
           </div>

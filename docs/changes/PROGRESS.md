@@ -84,7 +84,7 @@ Read this first when starting a session. If it disagrees with the code or Figma,
 - ⚠️ Every value in every Figma component is linked (checked by script), except the listed exceptions: Illustration artwork, Logo colours, Hero card photo layers (5:2 cover), Map card map height, Budget card sample bar, Event card's hidden Extras row. Code: no raw hex, px or ms outside tokens, except `0`, `calc(Nrem / 17)` (approved), one media query, component props.
 - ✅ Motion collection in Figma; the code uses its names (`motion.css`); every computed transition and animation matched Main when it landed.
 - ✅ Sizes are Small / Large (Medium where there are three) in Figma and code; Icon button has `size`.
-- ⚠️ Full names (Information, Document, Sign out, plus Coach, Campervan, Bottom navigation, `.Navigation item`); sentence case; "Show <Component>" booleans; layer names capitalised; `.Stat` (all checked by script). Caveat: Tile's variant property `Add` (True / False) is outside the glossary's property names; it predates this prompt and wasn't renamed.
+- ✅ Full names (Information, Document, Sign out, plus Coach, Campervan, Bottom navigation, `.Navigation item`); sentence case; "Show <Component>" booleans; layer names capitalised; `.Stat` (all checked by script). Tile's variant property `Add` (True / False) was outside the glossary; renamed afterwards (owner's yes, 14 Nov 2026) to **Layout: Default / Add** in Figma and code (`Tile layout="add"`).
 - ✅ No orphaned icons inside library components (script: 0).
 - ✅ No single-choice variant options (script: 0).
 - ✅ Card's extra props resolved and explained (B5); Message is a real component (B6); Text field, Text area and Dropdown are three components (B7).

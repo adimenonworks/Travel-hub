@@ -566,7 +566,7 @@ The same text sits on the Figma Foundations page ("Glossary", beside the Compone
 | `Tone` | Colour role, not event type | Default · Accent · Neutral · Success · Warning · Danger. Buttons use their own roles: Primary · Destructive · Inverse · Neutral · Tertiary · Ghost; Icon button: Secondary · Ghost · On feature · Primary; `.Category icon`, by the surface it sits on: Secondary · Primary · On feature |
 | `Size` | Size | Small · Large; Small · Medium · Large when there are three |
 | `State` | Interaction or status | Default · Pressed · Disabled · Selected · Focus · Filled · Next · Done · Suggested; plus a component's own statuses (Accordion: Collapsed · Expanded; `.Calendar day`: Range · Start · End · Empty; Step progress: Step 1–4) |
-| `Layout` | Structural variant | Per component (Event card: Standard · Journey · Note; Card: Start · Centre; Option card: Plain · Category; Journey card: Journey · Span; Avatar: Initials · More; Message: Theirs · Mine; Skeleton: Text · Block · Circle) |
+| `Layout` | Structural variant | Per component (Event card: Standard · Journey · Note; Card: Start · Centre; Option card: Plain · Category; Journey card: Journey · Span; Tile: Default · Add; Avatar: Initials · More; Message: Theirs · Mine; Skeleton: Text · Block · Circle) |
 | `Show <thing>` | Something is visible or not | On / off |
 
 Decisions recorded (13 Nov 2026):

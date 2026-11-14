@@ -70,7 +70,7 @@ export function Trips() {
               <div className={s.list}>
                 {upcoming.map((t) => <TripHero key={t.id} trip={t} list />)}
                 {/* Figma Tile Tone=Add, like Saved's "New place to go" */}
-                <Tile add icon="plus" title="Plan a new trip" onClick={() => newTrip()} />
+                <Tile layout="add" icon="plus" title="Plan a new trip" onClick={() => newTrip()} />
               </div>
             </>
           ))}
@@ -84,7 +84,7 @@ export function Trips() {
                 <Tile key={x.id} to={`/saved/${x.countryCode}/${x.id}`} title={`${countryName(x.countryCode)} · ${personName(owners, x.ownerId).split(' ')[0]}'s`}
                   media={<img src={flagUrl(x.countryCode)} alt="" />} meta={`Shared with you · ${x.roles[me.uid] === 'member' ? 'Can edit' : 'Can view'}`} />
               ))}
-              <Tile add icon="plus" title="New place to go" onClick={() => openSave({ mode: 'link' })} />
+              <Tile layout="add" icon="plus" title="New place to go" onClick={() => openSave({ mode: 'link' })} />
             </div>
           ))}
           {seg === 'past' && (past.length === 0 ? (
