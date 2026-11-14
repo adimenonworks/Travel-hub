@@ -97,7 +97,7 @@ firestore.rules the database security rules (tests in tests/rules/)
 ```
 
 **Design system in three layers:**
-- **Primitives:** raw values, e.g. `--color-emerald-300`.
+- **Base:** raw values, e.g. `--base-color-emerald-300` (Figma collection Base, `base/color/emerald/300`). Only other tokens use them.
 - **Semantic tokens:** named by the surface they sit on, e.g. `--on-light-text-primary`. They switch automatically
   for dark mode.
 - **Components:** built only from semantic tokens. They mirror Figma 1:1, and the `/#/design` page shows them all.

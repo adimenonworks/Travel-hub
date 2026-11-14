@@ -1,6 +1,6 @@
 # Token migration (library v2, A1)
 
-**Status: waiting for the owner's review (design gate A1). Nothing has been changed yet.**
+**Status: approved by the owner on 14 Nov 2026, with the answers below.** The tables show the approved names. The original questions are kept under "Decisions" for the record.
 
 This is the record of every token's old name and new name for `docs/changes/rove-change-library-v2.md` (A2–A7). It was made on 14 Nov 2026 from Main (`185d1fa`) and the Figma file `cXoK1GzmzgqY0cmcgJw66W`.
 
@@ -23,7 +23,26 @@ The exact final counts go in the A2–A7 PRs once the decisions at the end are m
 
 ---
 
-## Decisions for the owner (read these first)
+## The owner's answers (14 Nov 2026)
+
+1. The Next card's Tag is the plain white Tag, as Figma draws it (no new Tag tokens). Add `feature/icon-secondary`, `feature/border-subtle` and `feature/status-warning`.
+2. Yes: one scoped focus-ring rule on a `feature` class.
+3. Keep `surface/brand`.
+4. Don't create `surface/raised`.
+5. Selected Chips become emerald-700 like the rest: one `control/selected`, no `selected-strong`. Keep `selected-ghost` and `unselected-ghost`.
+6. "Mine" bubbles use `feature/*`.
+7. The New trip close button: Icon button tone **On feature**, `feature/surface-sunken` + `feature/icon`. The map pin: new `map/pin` and `map/pin-icon` (today's Primary button values), not `button/primary/*`.
+8. The Event card star: `icon/brand`.
+9. Noted.
+10. Keep every Motion value as proposed, and the code-only `--motion-*` shorthands built only from Motion variables. The polish prompt's B7 gets a note to consolidate the durations to a tighter scale.
+11. Both use `feature/surface-secondary`.
+
+Also:
+- Delete `feature/text-brand`, `overlay/image` and `illustration/warm` (unused).
+- Merge `space/550` into `space/700`, delete `radius/800`, don't add `size/heading-4`, and rename Layout's mode to "Value".
+- Sizes (A7): no one-off component size tokens. Role tokens only where a meaning is shared (`tap`, `icon-*`, `control-*`, `avatar-*`, `category-icon-*`, `tab-bar`, `content-max`), plus a numbered size scale (`base/size/{px}` in Base, `size/{step}` in Layout, like spacing) for everything else.
+
+## Decisions (the questions as asked, 14 Nov 2026)
 
 The standing rule says to challenge the prompt where something looks wrong. These came out of the audit. Each one has my recommendation; nothing is built until you answer.
 
@@ -49,11 +68,11 @@ The standing rule says to challenge the prompt where something looks wrong. Thes
 
 | Figma now | Figma after | Code now | Code after |
 |---|---|---|---|
-| Primitives (129) | **Base** | `primitives.css` `primitives.css`, variables renamed `--base-…` (the file keeps its name, since `src/design/base.css` already exists) |
+| Primitives (129) | **Base** (115 after A2) | `primitives.css` | `primitives.css`, variables renamed `--base-…` (the file keeps its name, since `src/design/base.css` already exists) |
 | Color [Light, Dark] (228) | **Color** [Light, Dark] | `semantic.css` | `semantic.css` |
-| Layout [Regular] (27) | **Layout** (one mode; rename the mode "Regular" → "Value"? It's the only mode) | `semantic.css` | `semantic.css` |
+| Layout [Regular] (27) | **Layout**, its one mode renamed "Value" (owner; done in A2) | `semantic.css` | `semantic.css` |
 | Typography [Small] (15) | **Typography** | `typography.css` | `typography.css` |
-| — | **Motion** (new) | `primitives.css` (code-only) | `motion.css` (new file) |
+| — | **Motion** (new; created in A6 with its values) | `primitives.css` (code-only) | `motion.css` (new file, A6) |
 | Effect styles: Shadow/Raised, Shadow/Overlay, Shadow/Subtle, Blur/Overlay, Elevation/Floating bar | Shadow/Subtle **deleted** (unused in both) | `--shadow-*`, `--blur-overlay`, `--elevation-floating-bar` | `--shadow-subtle` deleted |
 
 ## A2. Base (was Primitives)
@@ -71,7 +90,7 @@ Every colour palette and step is kept (owner). Names gain `base/` in Figma and `
 | `radius/2, 4, 8, 12, 16, 24, 32, 48, 64, 999` | `base/radius/{px}` | via Layout | kept |
 | `radius/20, 40, 80, 96` | **deleted** | – | nothing refers to them |
 | `--font-manrope`, `--font-poppins` (code) | moved to Typography (`--font-body`, `--font-display` hold the stacks directly) | C | |
-| `--font-mono` (code) | **deleted** | – | unused |
+| `--font-mono` (code) | kept, code only (moves to `typography.css` in A5) | C 1 | **correction:** A1 said unused; /#/design uses it for token names |
 | `--duration-*`, `--ease-*` (code) | moved to Motion (A6) | C | |
 
 ## A3. Color
@@ -124,21 +143,21 @@ One set; no `on-*` prefixes. Light / Dark values are unchanged unless a decision
 | `on-dark/surface/sunken` | `feature/surface-sunken` | white 10% | Stat tiles, `.Category icon` On feature, Next card |
 | `on-dark/text/primary` | `feature/text` | white / emerald-50 | everywhere above |
 | `on-dark/text/secondary` | `feature/text-secondary` | emerald-100 | |
-| `on-dark/text/brand` | `feature/text-brand` | emerald-200 | via re-point only today; kept because the prompt lists it — **flag: no direct use; delete unless a feature surface needs brand text** |
+| `on-dark/text/brand` | **deleted** (owner) | | only reached through the re-pointing |
 | `on-dark/icon/primary` | `feature/icon` | white / emerald-50 | Step progress, Next card |
 | `on-dark/icon/secondary` | `feature/icon-secondary` ✱1 | emerald-100 | Next card's time/place icons, journey mode icon |
 | `on-dark/border/subtle` | `feature/border-subtle` ✱1 | white 20% | Next journey card's line |
 | `on-dark/divider/default` | `feature/divider` | white 15% | Step progress, Next card route |
 | `on-dark/border/focus` | `feature/border-focus` ✱2 | emerald-200 / emerald-300 | focus ring on deep green |
 | `on-dark/status/warning` | `feature/status-warning` ✱1 | orange-200 / orange-300 | "Check-in open" on the Next card |
-| `on-dark/surface/primary`, `link/*`, `icon/brand`, `border/bold`, `border/brand`, `status/success*`, `status/warning-subtle`, `status/error*` | **deleted** | | only reached through the re-pointing; nothing inside a feature surface uses them |
+| `on-dark/surface/primary`, `text/brand`, `link/*`, `icon/brand`, `border/bold`, `border/brand`, `status/success*`, `status/warning-subtle`, `status/error*` | **deleted** | | only reached through the re-pointing; nothing inside a feature surface uses them |
 
 ### on-mid/, on-accent/ (deleted)
 
 | Now | After | Why |
 |---|---|---|
-| `on-mid/surface/primary` (C 3: map home pin, MapView accent, /#/design sample · F 2: Map card) | `button/primary/background` ✱7 | the bright emerald |
-| `on-mid/icon/primary` (C 3 · F 4: Icon button) | `button/primary/icon` (pin) / `feature/icon` (close button) ✱7 | |
+| `on-mid/surface/primary` (C 3: map home pin, MapView accent, /#/design sample · F 2: Map card) | `map/pin` (new; emerald-300 / emerald-300, today's Primary button values) | owner ✱7 |
+| `on-mid/icon/primary` (C 3 · F 4: Icon button) | `map/pin-icon` (new; emerald-800, the pin) / `feature/icon` (the close button) | owner ✱7 |
 | `on-mid/surface/sunken` (C 1 · F 4: Icon button On brand) | `feature/surface-sunken` ✱7 | |
 | every other `on-mid/*` (21) | **deleted** | unused in both |
 | `on-accent/surface/{yellow, orange, green, pink}` (C 4: confetti; F 14: Event card star) | **deleted** | confetti removed (A3.2); star ✱8 |
@@ -158,24 +177,21 @@ Each tone keeps `background`, `background-hover`, `background-pressed`, `text`, 
 | `interactive/button/ghost/text-inverse`, `icon-inverse` | **deleted** | unused in both |
 | `interactive/button/destructive/*` (7) | `button/destructive/*` | all used |
 
-### control/ (was `interactive/selected/*`, `interactive/unselected/*`) ✱5
+### control/ (was `interactive/selected/*`, `interactive/unselected/*`)
 
-Shown with the recommendation (three selected looks kept). Hover tokens kept (owner).
+Owner ✱5: selected Chips become emerald-700 (a one-step colour change), so one `control/selected` covers them. Hover tokens kept (owner).
 
 | Now | After | Used by |
 |---|---|---|
-| `interactive/selected/primary/background`, `-hover`, `-pressed`, `text` | `control/selected/background`, `-hover`, `-pressed`, `text` | Day card, Segment pill, Calendar day |
-| `interactive/selected/primary/icon` | **deleted** | unused |
-| `interactive/selected/secondary/background`, `text` | `control/selected-strong/background`, `text` | Chip (selected) |
-| `interactive/selected/secondary/background-hover`, `-pressed`, `icon` | **deleted** | unused (a selected Chip has no hover look) |
+| `interactive/selected/primary/background`, `-hover`, `-pressed`, `text` | `control/selected/background`, `-hover`, `-pressed`, `text` | Day card, Segment pill, Calendar day, **Chip (selected)** |
+| `interactive/selected/primary/icon` | `control/selected/icon` | Chip's icon when selected (was secondary/icon) |
+| `interactive/selected/secondary/*` (all 6) | **deleted** | Chip moves to `control/selected` |
 | `interactive/selected/ghost/text`, `border`, `background-hover`, `-pressed` | `control/selected-ghost/text`, `border`, `background-hover`, `-pressed` | Tab, Segment labels |
 | `interactive/selected/ghost/background`, `icon` | **deleted** | unused |
 | `interactive/unselected/primary/background`, `-hover`, `-pressed`, `text`, `border` | `control/unselected/background`, `-hover`, `-pressed`, `text`, `border` | Chip |
 | `interactive/unselected/primary/icon`, `text-subtle` | **deleted** | unused |
 | `interactive/unselected/ghost/background`, `-hover`, `-pressed`, `text`, `border` | `control/unselected-ghost/background`, `-hover`, `-pressed`, `text`, `border` | Tab, Day card, List group rows, Event card, Icon button Secondary, Segment border |
 | `interactive/unselected/ghost/icon` | `control/unselected-ghost/icon` | F 18 (Tab icons) |
-
-If Chips become emerald-700 instead, `selected-strong` disappears and `selected` covers them.
 
 ### input/ (was `input/field/*`)
 
@@ -215,8 +231,9 @@ All 20 used in both. Code's `categoryTone()` / `TYPE_TONE` write `food` as the C
 | Now | After | Used |
 |---|---|---|
 | `overlay/scrim`, `overlay/bar` | same | C 5 / C 1 · F 2 |
-| `overlay/image` | **flag: unused in both** → delete unless you want it kept for photo captions | – |
-| `illustration/*` (8) | same | `illustration/warm` is unused in code (C 0, F 0) — **flag:** keep, as the prompt says "the existing 8" |
+| `overlay/image` | **deleted** (owner) | – |
+| `illustration/*` (8) | same, except `illustration/warm` **deleted** (owner; unused in both) → 7 | |
+| — | `map/pin`, `map/pin-icon` (new, owner ✱7) | the map's home pin and accent |
 
 ## A4. Layout
 
@@ -224,7 +241,8 @@ All 20 used in both. Code's `categoryTone()` / `TYPE_TONE` write `food` as the C
 |---|---|---|
 | `space/default/0` / `--space-default-0` | `space/0` | C 1 · F 1,391 (auto layout gaps of 0) |
 | `space/default/{100…1000}` | `space/{100…1000}` | all used except `800` F 0 (C 3), `1000` F 0 (C 2) |
-| `space/default/450` (18), `550` (24) | `space/450`, `space/550` | C 2 each · F 0. **Flag:** `550` = 24 = `700`. Merge `550` into `700` (no change on screen) |
+| `space/default/450` (18) | `space/450` | C 2 |
+| `space/default/550` (24) | **merged into `space/700`** (owner; same value) | C 2 |
 | `space/negative/200` | `space/negative/200` | C 1 · F 2 |
 | `--space-gutter` (code only) | `space/page/gutter` (24) | C 30 |
 | `--space-stack` (code only) | `space/page/section` (40) | C 9 |
@@ -233,7 +251,8 @@ All 20 used in both. Code's `categoryTone()` / `TYPE_TONE` write `food` as the C
 | `--space-inset` (code only, 20) | **deleted** → `space/600` | C 2 |
 | `--strip-room` (code only) | stays a local `calc()` in `trip.module.css` (not a token) | C 2 |
 | `radius/0` (Layout) | **deleted** | unused |
-| `radius/{100…900}` | same | `400` F 0 (C 1), `800` and `900`: C 0; `900` F 4, `800` F 0. **Flag:** `radius/800` (48) is unused in both → delete |
+| `radius/{100…700}`, `radius/900` | same | `400` F 0 (C 1); `900` C 0, F 4 |
+| `radius/800` (48) | **deleted** (owner; unused in both); then `base/radius/48` is unused too and goes | – |
 | `radius/1000` | `radius/full` | C 40 · F 592 |
 | — | `size/tap` (44) | was `--size-tap`, C 13 |
 | — | `size/icon-small` (16), `size/icon-large` (24) | from `Icon.tsx` sizes |
@@ -242,7 +261,7 @@ All 20 used in both. Code's `categoryTone()` / `TYPE_TONE` write `food` as the C
 | — | `size/category-icon-small` (32), `-medium` (40), `-large` (48) | `.Category icon` CSS |
 | — | `size/tab-bar` (60, rem) | was `--size-tab-bar` |
 | — | `size/content-max` (480) | was `--size-content-max` |
-| — | more `size/*` from the A7 sweep (see A7) | |
+| — | `size/{step}` (numbered scale aliasing `base/size/{px}`, like spacing) for every other fixed size (owner) | |
 | — | `border-width/thin` (1), `medium` (1.5), `thick` (2), `focus` (3) | 1px ×52, 1.5px ×3, 2px ×14, 3px ×6 in code today |
 
 ## A5. Typography
@@ -256,7 +275,7 @@ All 20 used in both. Code's `categoryTone()` / `TYPE_TONE` write `food` as the C
 | `size/display tiny` | `size/display-small` | |
 | `size/display secondary` | **deleted** | unused in both |
 | `size/heading 1` … `heading 3` | `size/heading-1` … `heading-3` | |
-| — | `size/heading-4` | **flag:** Heading 4 uses `size/heading 3` (16) today. A separate `heading-4` would be a second 16. Recommend: don't add it; Heading 4 keeps pointing at `heading-3`'s size |
+| — | ~~`size/heading-4`~~ not added (owner) | Heading 4 keeps `size/heading-3` (16) |
 | `size/body`, `size/body small` | `size/body`, `size/body-small` | |
 | line heights (1, 1.25, 1.5) | `line-height/tight` (100%), `heading` (125%), `body` (150%) | so the text styles bind them |
 | Text style "Display tiny" / `.t-display-tiny`, `--type-display-tiny` | "Display small" / `.t-display-small`, `--type-display-small` | |
@@ -292,7 +311,9 @@ Code values today and what they become. Every animation keeps its exact value.
 
 ## A7. Every value from a variable
 
-Code sweep (outside `primitives.css`): no raw hex colours; `rgba()` only in the two shadows; raw lengths: `1px` ×35 (borders → `border-width/thin`), `2px` ×14, `3px` ×6 (focus → `border-width/focus`), `1.5px` ×3, and fixed sizes 16–176px (×~90). These become `size/*` tokens or `calc()` of them in the A7 PR. New `size/*` the sweep will need beyond A4's list (all real values from the code): `size/day-card` (64) and `size/day-card-selected` (88), `size/tile-min` (120rem/17), `size/row-min` (64), `size/badge` (176, the celebration), `size/grabber` (4 × 36), `size/skeleton-line` (32). The A7 PR lists every one; anything that's really layout (a `calc()`) stays a `calc()`.
+Code sweep (outside `primitives.css`): no raw hex colours; `rgba()` only in the two shadows; raw lengths: `1px` ×35 (borders → `border-width/thin`), `2px` ×14, `3px` ×6 (focus → `border-width/focus`), `1.5px` ×3, and fixed sizes 16–176px (about 90).
+
+Owner's rule for sizes: **no one-off component size tokens** (no `size/day-card`, `size/badge`, `size/grabber`, `size/skeleton-line` …). Role tokens only where a meaning is shared: `size/tap`, `size/icon-*`, `size/control-*`, `size/avatar-*`, `size/category-icon-*`, `size/tab-bar`, `size/content-max`. Every other fixed size uses a **numbered size scale**: raw values `base/size/{px}` in Base, and `size/{step}` in Layout aliasing them (the same pattern as spacing). The A7 PR lists the steps from the values the code actually uses; anything that's really layout stays a `calc()` of tokens.
 
 Figma: the audit found unlinked values in Toast, Event card, Tile, Option card, Message, Map card, Budget card, `.Category icon` (radius), `.Context menu item`, Context menu, Accordion and Journey card. A7 links them and checks by script.
 
@@ -304,13 +325,13 @@ Every component changes token names (a rename, same look). These also change str
 |---|---|---|
 | Card (Tone Accent) | stops using `.surface-dark`; uses `feature/*` directly; `surface-dark` class removed from `Card.tsx` | A3.1 |
 | Event card (State Next) | same; time/place icons, route line, status, Tag ✱1 | A3.1 |
-| Tag | a feature look for the Next card ✱1 | A3.1 |
+| Tag | the plain white Tag on the Next card too, as Figma draws it (today it turns dark grey there) | A3.1 |
 | `.Category icon` (Tone On dark → **On feature**) | tokens `-on-feature` | A3 |
 | Stat strip, `.Stat`, Avatar (initials), Hero card, Now line, Step progress, Map card | `on-dark/*` → `feature/*` | A3.1 |
 | Message (mine) | `interactive/selected/primary` → `feature/*` ✱6 | A3.1, B6 |
 | Icon button (Tone On brand → On feature) | `on-mid/*` → `feature/*` ✱7 | A3.2 |
-| Map card / map pin | `on-mid/surface/primary` → `button/primary/*` ✱7 | A3.2 |
-| Chip, Day card, `.Tab`, `.Segment`, Calendar | `interactive/*` → `control/*` ✱5 | A3 |
+| Map card / map pin | `on-mid/surface/primary` → `map/pin`, `map/pin-icon` ✱7 | A3.2 |
+| Chip, Day card, `.Tab`, `.Segment`, Calendar | `interactive/*` → `control/*`; a selected Chip becomes emerald-700 ✱5 | A3 |
 | Text field (and Text area, Dropdown) | `input/field/*` → `input/*`; Label size from `size/body` | A3, A5 |
 | Button, Icon button | `interactive/button/*` → `button/*` | A3 |
 | Event card (Figma) | star colour ✱8 | A3.2 |
