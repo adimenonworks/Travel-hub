@@ -12,7 +12,7 @@ Read this first when starting a session. If it disagrees with the code or Figma,
 
 `docs/changes/rove-change-new-trip-stops.md` is **finished** (14 Nov 2026; results below).
 
-**Now: `docs/changes/rove-change-people-and-sharing.md`** (started 14 Nov 2026), then `rove-change-polish-and-library.md` (which also has G8: Dropdown's size and Text area's height, the two Figma mismatches library v2 left; G9: Your travels counts every city; G10: Small buttons 36px, minimum heights as tokens; and G11: Page header meta sits in the title's column).
+**Now: `docs/changes/rove-change-people-and-sharing.md`** (started 14 Nov 2026), then `rove-change-sign-in-and-invites.md` (owner, 14 Nov 2026), then `rove-change-polish-and-library.md` (which also has G8: Dropdown's size and Text area's height, the two Figma mismatches library v2 left; G9: Your travels counts every city; G10: Small buttons 36px, minimum heights as tokens; and G11: Page header meta sits in the title's column).
 
 ### People and sharing status (14 Nov 2026)
 
@@ -53,6 +53,8 @@ Read this first when starting a session. If it disagrees with the code or Figma,
   - **Not in this item:** hiding events you're out of (item 5), the Notification centre entry (item 4), guests (item 9), I'm out as a swipe (conflicts with day swipes; see DECISIONS).
 
 **Next: item 4, Notification centre.**
+
+**Changed on Main while item 4 was running (14 Nov 2026, PR 168):** the owner's rule that on events you're not in you see only the title, date and time, place and who's in, added to items 2, 5 and 8 and the Check everything list. Re-read those before item 5.
 
 **Waiting on the owner:** publish `firestore.rules` (the new app needs the new rules: publish them before rebuilding the app in Xcode; the old app keeps working with the new rules).
 
