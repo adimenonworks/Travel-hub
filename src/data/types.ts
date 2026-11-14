@@ -67,6 +67,8 @@ export type Trip = {
   memberIds: string[];
   roles: Record<string, StoredRole>;
   joinedVia?: string;
+  /** Who shared the link each person joined with (uid → their uid). A follower's Itinerary starts on that person. */
+  addedBy?: Record<string, string>;
   createdAt: number;
 };
 

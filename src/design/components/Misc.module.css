@@ -66,6 +66,13 @@
 .whosIn { display: flex; flex-direction: column; gap: var(--space-300); }
 .whosInLabel { font: var(--type-body-small); color: var(--text-secondary); margin: 0; }
 .whosInChips { display: flex; flex-wrap: wrap; gap: var(--space-300); }
+.switcher { /* Person switcher: one row that scrolls sideways, edge to edge, with room for the chips' 44px tap areas */
+  display: flex; gap: var(--space-300); overflow-x: auto; scrollbar-width: none;
+  margin: calc(-1 * var(--space-200)) calc(-1 * var(--space-page-gutter)); padding: var(--space-200) var(--space-page-gutter);
+  scroll-padding-inline: var(--space-page-gutter);
+}
+.switcher::-webkit-scrollbar { display: none; }
+.switcher > * { flex: none; }
 .chipFlag { width: var(--size-icon-small); height: var(--size-icon-small); border-radius: 50%; flex: none; }
 .chipButton { position: relative; z-index: 2; cursor: pointer; transition: background var(--motion-fast), transform var(--motion-release); }
 .chipButton::after { content: ''; position: absolute; inset: calc((var(--size-650) - var(--size-tap)) / 2) calc(-1 * var(--space-100)); } /* 44px tap area */

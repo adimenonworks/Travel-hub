@@ -59,7 +59,9 @@ export function TripForm({ open, trip, onClose, onSaved, onDeleted }: { open: bo
         // New dates: everyone else on the trip hears about it (Notification centre)
         if (data.startDate !== trip.startDate || data.endDate !== trip.endDate)
           store.addNotices(trip.id, [{ kind: 'dates', to: trip.memberIds.filter((m) => m !== me.uid).slice(0, 50), startDate: data.startDate, endDate: data.endDate }]).catch(() => {});
-        toast({ icon: 'check', label: 'Changes saved' });
+        // Undo puts back the name, dates and cover as they were
+        const was = { name: trip.name, startDate: trip.startDate, endDate: trip.endDate, currency: trip.currency, coverPhoto: trip.coverPhoto ?? null, coverPosition: trip.coverPosition ?? null, budget: trip.budget ?? null };
+        toast({ icon: 'check', label: 'Changes saved', action: { label: 'Undo', onClick: () => { store.updateTrip(trip.id, was).catch(() => {}); } } });
         onSaved?.(trip.id);
       } else {
         const id = await store.createTrip({ ...data, destination: null });

@@ -502,6 +502,8 @@ export function createFirebaseStore(config: FirebaseOptions): Store {
         memberIds: arrayUnion(uid),
         [`roles.${uid}`]: invite.role === 'follower' ? 'follower' : 'traveller',
         joinedVia: invite.code,
+        // Who shared the link (a follower's Itinerary starts on them)
+        ...(invite.createdBy ? { [`addedBy.${uid}`]: invite.createdBy } : {}),
       });
       // Everyone already on it hears "Jo joined Portugal & Spain" (best effort: joining has worked either way)
       try {

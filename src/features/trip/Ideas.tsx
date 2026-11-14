@@ -9,7 +9,7 @@ import { countryName } from '../../lib/countries';
 import { PLACE_TYPES, cityOf, eventCategoryOf, groupBy, placeCategory, placeTypeOf, sortPlaces, tripCountryCodes } from '../../lib/places';
 import { PlaceMarks, PlaceRow } from '../saves/Collections';
 import { usePlaceMarks } from '../saves/placeMarks';
-import { haptic, confirmAction } from '../../lib/native';
+import { haptic } from '../../lib/native';
 import { EVENT_TYPES, categoryInfo, categoryTone, eventKind, isEveryday } from '../../lib/categories';
 import { priceOf, priceText } from '../../lib/currency';
 import { recordView } from '../../lib/recent';
@@ -20,6 +20,7 @@ import { ActivityForm } from './ActivityForm';
 import type { TripCtx } from './TripPage';
 import s from './trip.module.css';
 import { isMapsLink } from '../../lib/links';
+import { deleteLater } from '../../lib/deleteLater';
 
 type Filter = 'open' | 'approved' | 'rejected';
 
@@ -204,7 +205,12 @@ function IdeaSheet({ idea, place, ctx, onClose, onEdit, onSchedule }: { idea: Id
   const cat = categoryInfo(idea.category);
   const canEdit = ctx.isTraveller;
   const setStatus = async (status: Idea['status'], label: string) => {
-    try { await store.updateSub(ctx.trip.id, 'ideas', idea.id, { status }); toast({ icon: 'check', label }); onClose(); }
+    const was = idea.status;
+    try {
+      await store.updateSub(ctx.trip.id, 'ideas', idea.id, { status });
+      toast({ icon: 'check', label, action: { label: 'Undo', onClick: () => { store.updateSub(ctx.trip.id, 'ideas', idea.id, { status: was }).catch(() => {}); } } });
+      onClose();
+    }
     catch { toast({ tone: 'danger', label: "Couldn't save. Check your connection" }); }
   };
   return (
@@ -246,16 +252,23 @@ function IdeaForm({ open, tripId, currency, idea, onClose }: { open: boolean; tr
   const submit = async () => {
     const data = { title: f.title.trim(), category: f.category, notes: f.notes.trim(), price: fromPriceDraft(f.price), cost: 0, links: cleanLinks(f.links) };
     try {
-      if (idea) await store.updateSub(tripId, 'ideas', idea.id, data);
-      else await store.addSub(tripId, 'ideas', { ...data, votes: {}, status: 'open' });
-      toast({ icon: 'check', label: idea ? 'Idea saved' : 'Idea added' });
+      if (idea) {
+        await store.updateSub(tripId, 'ideas', idea.id, data);
+        const was = { title: idea.title, category: idea.category, notes: idea.notes, price: idea.price ?? null, cost: idea.cost ?? 0, links: idea.links };
+        toast({ icon: 'check', label: 'Idea saved', action: { label: 'Undo', onClick: () => { store.updateSub(tripId, 'ideas', idea.id, was).catch(() => {}); } } });
+      } else {
+        await store.addSub(tripId, 'ideas', { ...data, votes: {}, status: 'open' });
+        toast({ icon: 'check', label: 'Idea added' });
+      }
       onClose();
     } catch { toast({ tone: 'danger', label: "Couldn't save. Check your connection" }); }
   };
   const remove = async () => {
-    if (!idea || !confirmAction(`Delete "${idea.title}"?`)) return;
-    try { await store.deleteSub(tripId, 'ideas', idea.id); toast({ icon: 'trash', label: 'Idea deleted' }); onClose(); }
-    catch { toast({ tone: 'danger', label: "Couldn't delete. Check your connection" }); }
+    if (!idea) return;
+    // Gone at once, deleted for good once Undo has had its time
+    const undo = deleteLater(idea.id, () => store.deleteSub(tripId, 'ideas', idea.id));
+    toast({ icon: 'trash', label: 'Idea deleted', action: { label: 'Undo', onClick: undo } });
+    onClose();
   };
 
   return (

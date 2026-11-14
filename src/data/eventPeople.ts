@@ -49,3 +49,14 @@ export function addedAfter(a: Pick<Activity, 'added'>, before: string[], after: 
   delete out[me];
   return out;
 }
+
+/**
+ * Whose itinerary to show first (item 5): yours if you're travelling. A follower has no itinerary of their own, so
+ * theirs opens on whoever shared the link they joined with, else whoever started the trip, else the first traveller.
+ */
+export function startingPerson(trip: Trip, me: string): string {
+  const all = travellersOf(trip);
+  if (all.includes(me)) return me;
+  const by = trip.addedBy?.[me], starter = trip.createdBy ?? trip.ownerId;
+  return by && all.includes(by) ? by : starter && all.includes(starter) ? starter : all[0] ?? me;
+}

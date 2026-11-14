@@ -1,7 +1,7 @@
 import { hasStep, stepTab, useSwipeTabs } from '../../app/useSwipeTabs';
 import { Fragment, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { Button, ContextMenu, DayCard, EventCard, SectionHeader, NowLine, TravelConnector, type ContextMenuItem, type EventState, Card, Illustration } from '../../design/components';
+import { Button, ContextMenu, DayCard, EventCard, PersonSwitcher, SectionHeader, NowLine, TravelConnector, type ContextMenuItem, type EventState, Card, Illustration } from '../../design/components';
 import { useMe, usePlacesById } from '../../data/hooks';
 import type { Activity } from '../../data/types';
 import { dayWord, formatDay, formatTime, parseDay, today, tripDays } from '../../lib/dates';
@@ -15,7 +15,8 @@ import { behaviourOf, categoryInfo, isEveryday } from '../../lib/categories';
 import { priceOf, priceText } from '../../lib/currency';
 import { crossesDateLine, localNow, zoneOfDay } from '../../lib/timezone';
 import type { TripCtx } from './TripPage';
-import { peopleOf, travellersOf } from '../../data/eventPeople';
+import { peopleOf, startingPerson, travellersOf } from '../../data/eventPeople';
+import { getItineraryPerson, setItineraryPerson } from '../../lib/prefs';
 import { goingText, useWhosIn } from './whosIn';
 import { personName } from '../../data/hooks';
 import s from './trip.module.css';
@@ -23,7 +24,19 @@ import s from './trip.module.css';
 export const byTime = (a: Activity, b: Activity) => (a.startTime || '99').localeCompare(b.startTime || '99') || a.createdAt - b.createdAt;
 
 export function Itinerary(ctx: TripCtx) {
-  const { trip, activities } = ctx;
+  const { trip } = ctx;
+  const me = useMe();
+  // Whose itinerary (item 5): yours by default, or one other traveller's; never everyone's at once. Remembered per trip.
+  const travellers = travellersOf(trip);
+  const [chosen, setChosen] = useState(() => getItineraryPerson(trip.id));
+  const person = chosen && travellers.includes(chosen) ? chosen : startingPerson(trip, me.uid);
+  const choose = (id: string) => { haptic('selection'); setChosen(id); setItineraryPerson(trip.id, id); };
+  // Only the events that person is in (the day's plan, its count, arrivals and the time zone all follow them)
+  const activities = useMemo(() => ctx.activities.filter((a) => peopleOf(a, trip).includes(person)), [ctx.activities, trip, person]);
+  const choices = [
+    ...(travellers.includes(me.uid) ? [{ id: me.uid, name: 'Me', fullName: personName(ctx.profiles, me.uid), photo: ctx.profiles[me.uid]?.photo }] : []),
+    ...travellers.filter((id) => id !== me.uid).map((id) => ({ id, name: personName(ctx.profiles, id).split(' ')[0], fullName: personName(ctx.profiles, id), photo: ctx.profiles[id]?.photo })),
+  ];
   const days = tripDays(trip.startDate, trip.endDate);
   // Month markers in the Day strip: when the trip runs over two months, or isn't in this month
   const showMonths = trip.startDate.slice(0, 7) !== trip.endDate.slice(0, 7) || trip.startDate.slice(0, 7) !== today().slice(0, 7);
@@ -62,6 +75,10 @@ export function Itinerary(ctx: TripCtx) {
 
   // What's on each day (a Stay counts on its check-in and check-out days).
   const byDay = useMemo(() => Object.fromEntries(days.map((d) => [d, eventsOn(activities, d)])), [activities, trip.startDate, trip.endDate]); // eslint-disable-line react-hooks/exhaustive-deps
+  // Changing person slides the plan in the switcher's order; changing day, in the days' order
+  const personRank = Math.max(0, choices.findIndex((c) => c.id === person));
+  // What the sliding panel shows (kept as one value so the outgoing view keeps its own person's events)
+  const view = useMemo(() => ({ d: day, byDay }), [day, byDay]);
   // "Now" is the local time where you are that day (the day's stay or last arrival), so the now-line, Next and Done
   // are right in any time zone; without stored zones it's the phone's time, as before.
   const tick = useTick();
@@ -69,7 +86,6 @@ export function Itinerary(ctx: TripCtx) {
   const { day: localToday, time: now } = localNow(zone, tick);
   const word = (d: string) => dayWord(d, trip.startDate, t);
   const list: DayEntry[] = byDay[day] ?? [];
-  const me = useMe();
   const reads = useReads(me.uid);
   const places = usePlacesById(activities.flatMap((x) => (x.placeId ? [x.placeId] : [])));
   const nowLine = <NowLine time={formatTime(now)} />;
@@ -83,6 +99,8 @@ export function Itinerary(ctx: TripCtx) {
 
   return (
     <div className={s.itinLayout}>
+      <div className={s.whoAndDay}>
+      {choices.length > 1 && <PersonSwitcher value={person} onChange={choose} people={choices} />}
       <div ref={stripRef} className={s.days} role="group" aria-label="Trip days">
         {days.map((d, i) => (
           <Fragment key={d}>
@@ -96,6 +114,7 @@ export function Itinerary(ctx: TripCtx) {
           </Fragment>
         ))}
       </div>
+      </div>
 
       <section className={s.timeline} aria-label={word(day)}>
         <SectionHeader title={word(day)}
@@ -104,7 +123,7 @@ export function Itinerary(ctx: TripCtx) {
 
         {/* Changing day slides only the plan, from the side of the day you picked */}
         <div ref={planBox}>
-        <SlideSwap value={day} id={day} rank={days.indexOf(day)}>{(d) => {
+        <SlideSwap value={view} id={`${person}:${day}`} rank={personRank * 1000 + days.indexOf(day)}>{({ d, byDay }) => {
           const list: DayEntry[] = byDay[d] ?? [];
           // On today's plan, the "now" line (Figma Now line) sits before the next plan. The page doesn't scroll to it.
           const showNow = d === localToday && list.length > 1;
@@ -119,8 +138,9 @@ export function Itinerary(ctx: TripCtx) {
           });
           const dateLine = list.some((e) => legsOf(e.a, activities).some(crossesDateLine));
           return list.length === 0 ? (
-            <Card layout="centre" media={<Illustration name="calendar" size={120} />} title="Nothing planned yet" body="Add something to do, or schedule an idea from the Ideas board."
-              actions={ctx.isTraveller ? <Button tone="neutral" icon="plus" onClick={() => setAdding(true)}>Add event</Button> : undefined} />
+            <Card layout="centre" media={<Illustration name="calendar" size={120} />} title={person === me.uid ? 'Nothing planned yet' : `Nothing on ${personName(ctx.profiles, person).split(' ')[0]}’s day`}
+              body={person === me.uid ? 'Add something to do, or schedule an idea from the Ideas board.' : undefined}
+              actions={ctx.isTraveller && person === me.uid ? <Button tone="neutral" icon="plus" onClick={() => setAdding(true)}>Add event</Button> : undefined} />
           ) : (
             <div className={s.eventList}>
               {arrivals.map(({ a, last }) => <TravelConnector key={`arr-${a.id}`} icon={categoryInfo(a.category).icon} label={`Arrives ${formatTime(last.endTime)} from ${(a.fromText ?? '').split(',')[0].replace(/\s*\([^)]*\)/, '')}`} />)}
@@ -138,20 +158,23 @@ export function Itinerary(ctx: TripCtx) {
                       // and I'm out while it's new to you (someone else put you in it)
                       const people = peopleOf(a, trip);
                       const mine = people.includes(me.uid);
+                      // Someone else's itinerary: "You're in" on the ones you're in too
                       const addedBy = mine ? a.added?.[me.uid] : undefined;
                       const action = !ctx.isTraveller ? undefined
                         : !mine ? { label: 'I’m in', onClick: () => whosIn.imIn(a) }
                           : addedBy && people.length > 1 ? { label: 'I’m out', onClick: () => whosIn.imOut(a) } : undefined;
                       const showPeople = travellerCount > 1 && (people.length < travellerCount || !!action);
                       const card = (
-                        <EventCard {...eventCardProps(e, ctx)} amount={amountOf(e)} state={state} favourite={!!(a.placeId && places[a.placeId]?.starredBy?.includes(me.uid))}
+                        <EventCard {...eventCardProps(e, ctx)} amount={mine ? amountOf(e) : undefined} state={state} favourite={!!(a.placeId && places[a.placeId]?.starredBy?.includes(me.uid))}
                           people={showPeople ? people.map((id) => ({ id, name: personName(ctx.profiles, id), photo: ctx.profiles[id]?.photo })) : undefined}
                           going={showPeople ? (people.length ? goingText(people, travellerCount, me.uid) : 'Nobody yet') : undefined}
                           action={action}
                           extras={[
                             ...(addedBy ? [{ icon: 'user-add' as const, label: `New · added by ${personName(ctx.profiles, addedBy).split(' ')[0]}` }] : []),
+                            ...(mine && person !== me.uid ? [{ icon: 'check' as const, label: 'You’re in' }] : []),
                             ...(state === 'next' ? [{ icon: 'information' as const, label: `Next · ${startsIn(e)}` }] : []),
-                            ...unreadTag(unreadCount(reads, me.uid, a.id, ctx.comments)),
+                            // An event's comments are for the people in it
+                            ...(mine ? unreadTag(unreadCount(reads, me.uid, a.id, ctx.comments)) : []),
                           ]} />
                       );
                       // Press and hold for Edit, I'm out and Delete (the travellers in it), or I'm in; sideways swipes change day

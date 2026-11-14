@@ -74,7 +74,11 @@ service cloud.firestore {
         return !(uid() in resource.data.memberIds)
           && invite.data.tripId == tripId
           && invite.data.expiresAt > request.time
-          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['memberIds', 'roles', 'joinedVia'])
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['memberIds', 'roles', 'joinedVia', 'addedBy'])
+          // Who shared the link: only your own entry, and only the link's maker
+          && (!('addedBy' in request.resource.data) || (
+                request.resource.data.addedBy.diff(resource.data.get('addedBy', {})).affectedKeys().hasOnly([uid()])
+                && request.resource.data.addedBy.get(uid(), invite.data.createdBy) == invite.data.createdBy))
           && request.resource.data.memberIds.toSet() == resource.data.memberIds.toSet().union([uid()].toSet())
           && request.resource.data.roles.diff(resource.data.roles).affectedKeys().hasOnly([uid()])
           && (request.resource.data.roles[uid()] == invite.data.get('role', 'traveller')

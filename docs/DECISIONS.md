@@ -24,6 +24,18 @@
 
 ## 14 Nov 2026
 
+### Itinerary: yours, or one person's: built (people and sharing, item 5)
+- **Decision:** the Itinerary shows one person's events at a time, yours by default, with a Person switcher (new component: avatar Chips, Me then each traveller) above the day strip. The choice is remembered per trip on the device. On events you're not in, cards and the event page show only the title, date and time, place and who's in, with I'm in.
+- **A follower starts on whoever shared their link:** joining now records it (`trip.addedBy`, only your own entry, only the link's maker; the rules check both). Older joins fall back to whoever started the trip. **Turned down:** reading the invite back later (`joinedVia` is one field for the whole trip, overwritten by each joiner).
+- **"The day strip follows the chosen person"** is read as: the day's plan, its count and arrivals follow them; the strip itself has no per-person marks (the prompt rules out a busy indicator).
+- **Not yet enforced by the database:** event documents still carry notes, links, prices and the rest, so the rule "only the people going get the details" is on screen only until item 8 moves them into documents only those people can read.
+- **Bookings lists** (Overview → Flights, Stays…) still list everyone's bookings, opening the basics-only page for ones you're not in: seeing when others arrive helps a group plan. Item 7 revisits them with Your booking.
+
+### Undo for ideas, albums and trip edits (people and sharing, item 2, finished)
+- **Decision:** deleting an idea or removing an album hides it at once and deletes it for good only when its Undo toast has gone (about 6 seconds; straight away if the app is closed or hidden first). Saving an edit to the trip, an idea or an album, and passing an idea or moving it back, show Undo.
+- **Why:** item 2 says every edit and delete can be undone; only events had it. **Turned down:** re-creating a deleted idea on Undo (the rules only let you create things as yourself, so someone else's idea would come back as yours) and a Recently deleted for ideas (too much for something this small).
+- **Still without Undo:** removing someone from the trip (putting them back would mean adding them without a link) and comments (deleting your own message is deliberate).
+
 ### Notification centre: built (people and sharing, item 4)
 - **Decision (owner):** the Bell sits only in Home's Page header, and the same count shows on **Home in the Bottom navigation**, so it's visible from every screen. **Turned down:** a second Bell in the Trip header (the prompt's idea): that header already holds Back, the name and Edit, and one place to look is how most iPhone apps do it.
 - **Decision (owner):** **opening the Notification centre clears the count**, like the iOS app badge; what was new stays marked "New" while you're there. **Turned down:** per-entry read state, like email (the count lingers and you clear entries one by one).
