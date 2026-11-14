@@ -19,6 +19,19 @@
 - **Settled while building:** there's always at least one traveller: the last one can't make themselves Following (a Toast says to make someone else Travelling first), since only travellers can change anything. The rules check the role against the link: a Following link can only make you a follower; links from older app versions carry no role and still mean travelling.
 - **Split:** item 2's Undo-on-everything and per-event change history come next as their own pull request; "only people in an event edit it" and "Just me / Remove for everyone" need item 3's who's in, so they're built with item 3.
 
+### Page header: the meta line sits with the title (owner)
+- **Decision:** the meta (a trip's dates) moves into the title's column, after the subtitle, 12px apart; with no subtitle it sits where the subtitle would. Polish prompt G11.
+- **Why:** it was placed under the whole title row, so the edit button or the category icon pushed it far from the title. The owner spotted the real cause.
+- **Replaces:** the same day's plan to shrink the gap to 8px (the gap was never the problem).
+
+### Control heights: minimum height plus padding, Small buttons 36px (owner)
+- **Decision:**
+  - Buttons, Chips and Tags are built with a minimum height and padding (as Button already was), so icons never change their shape and they grow with larger text.
+  - Small buttons (and Icon button Small) go from 32 to 36px, padding 8 / 16. Large stays 48.
+  - Chip and Tag share a new role token, `size/pill` (28). Every minimum height in Figma is linked to a variable.
+  - Polish prompt G10.
+- **Why:** 32px felt tight on a phone; 36 is a bit roomier while staying clearly smaller than Large (40 was considered, but would blur Small and Large and make section headers taller). Figma's Chip was 30px unselected and 28px selected, and Button's minimum heights were typed-in numbers.
+
 ### One trip, everyone equal: built (people and sharing, item 1)
 - **Decision:** no owner anywhere. Two roles, **Travelling** (`traveller`) and **Following** (`follower`). Any traveller edits the trip, adds people, changes roles, removes someone and deletes the trip; anyone can leave. Who started the trip is kept as `createdBy`, a record only.
 - **Details settled while building:** deleting goes to Recently deleted for everyone, and any traveller restores it or (after 30 days) clears it for good; the rules only allow deleting for good from Recently deleted. The last traveller leaving deletes the trip into Recently deleted, and they stay on it so they can restore it. Deleting your account leaves every trip; a trip with no other traveller is deleted. Older trips are migrated by the first traveller who opens them (owner, editor, member → traveller; viewer → follower; `ownerId` → `createdBy`), since there's no server; until then the app and the rules read the old names the same way.
