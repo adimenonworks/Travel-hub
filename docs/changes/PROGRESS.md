@@ -12,6 +12,10 @@ Read this first when starting a session. If it disagrees with the code or Figma,
 
 **Next: `docs/changes/rove-change-new-trip-stops.md`** (owner, 14 Nov 2026: Home's Primary button, several stops in New trip, Bring your saves matched to the trip), then `rove-change-people-and-sharing.md`, then `rove-change-polish-and-library.md` (which also has G8: Dropdown's size and Text area's height, the two Figma mismatches library v2 left).
 
+### New trip stops status (14 Nov 2026)
+
+- **1, Home's main button:** Plan a trip is Primary on the left (calendar icon), Save a place Neutral on the right (plus icon), in Figma Screens (both Home frames, `500:535` and `545:2219`, instances only) and `Home.tsx`; APP-SPEC's Home line updated.
+
 ### Transparency setup status (14 Nov 2026)
 
 - **1, documents hold together** (pull request 147). Read `CLAUDE.md`, `DECISIONS.md`, `ROADMAP.md`, `DESIGN-SYSTEM.md`, `APP-SPEC.md`, `FEEL-AND-NATIVE.md` and this file, and checked them against the code. Fixed: DECISIONS said every session starts by pulling (it checks and asks); DESIGN-SYSTEM said screens aren't redrawn (the eight core screens are); APP-SPEC's New trip flow skipped its budget step, called the country picker "Where should it go?" (it's "Choose a country"), and counted 43 categories (`EVENT_KINDS` has 46, also in ROADMAP); ROADMAP said places can be saved from a search (only Share → Rove or a link); FEEL-AND-NATIVE's Home description was stale; the "Set up Rove's small server" Next card was done (`/cover` answers with Unsplash photos), so it went. README rewritten where stale (roles, design system, manual deploy) and points to ROADMAP and DECISIONS; PR template has the docs line. No judgement calls came up.
