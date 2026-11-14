@@ -59,10 +59,10 @@ This **replaces** the people change's straight join (item 1's "Join trip" button
 
 **The travellers' side:**
 - **Only travellers can approve or decline** (owner's rule, 14 Nov 2026). Followers never see requests.
-- Every traveller gets a Notification centre entry: "<Name> wants to join <trip> as a traveller" (or "as a follower"), with **Approve** and **Decline**.
-- The People tab shows a **"Waiting to join"** group at the top for travellers, with the same two buttons on each row.
+- Every traveller gets a Notification centre entry: "<Name> wants to join <trip> as a traveller" (or "as a follower"). It has no buttons (notifications never do, owner's rule, 15 Nov 2026); tapping it opens the People tab.
+- The People tab shows a **"Waiting to join"** group at the top for travellers, with **Approve** and **Decline** on each row.
 - **The first answer counts.**
-  - The entry turns into "<Traveller> approved <Name>" (or declined) for everyone else, and its buttons go.
+  - The entry turns into "<Traveller> approved <Name>" (or declined) for everyone else, and the row leaves Waiting to join.
   - Approving adds the person with the link's role. It also gives the usual "<Name> joined <trip>" entry.
 - Approve and Decline both get the Undo toast (about 6 seconds). Undoing an approval removes the person and puts the request back.
 
@@ -187,7 +187,7 @@ Report ✅, ❌ (with the reason) or ⚠️ (done, with a caveat) on every line.
 
 - [ ] A trip link opens the join screen in the app, with the role from the link; the joiner can't choose a role
 - [ ] Ask to join → waiting state and a Home row; Cancel request removes it
-- [ ] Every traveller gets the request in the Notification centre and in People's Waiting to join; followers never see it (rules emulator)
+- [ ] Every traveller gets the request in the Notification centre (no buttons; it opens People) and in People's Waiting to join with Approve and Decline; followers never see it (rules emulator)
 - [ ] The first Approve adds the person with the link's role; the others see who answered; Undo works
 - [ ] Decline removes the request; the joiner gets the gentle entry, with no name
 - [ ] Before approval, the requester can read nothing on the trip but their own request (rules emulator)

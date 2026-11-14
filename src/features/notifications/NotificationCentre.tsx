@@ -6,7 +6,6 @@ import type { Profile, Trip } from '../../data/types';
 import { timeAgo } from '../../lib/dates';
 import { Content } from '../../app/Shell';
 import { useWhosIn } from '../trip/whosIn';
-import { awaitsAnswer, useSuggestions } from '../trip/suggestions';
 import { useNotifications, type Entry } from './notifications';
 import s from './NotificationCentre.module.css';
 
@@ -46,8 +45,7 @@ export function NotificationCentre() {
 
 function TripGroup({ trip, list, before, profiles }: { trip: Trip; list: Entry[]; before: number; profiles: Record<string, Profile> }) {
   const me = useMe();
-  const { imIn, imOut, sheet } = useWhosIn(trip, profiles);
-  const { passEvent } = useSuggestions(trip, []);
+  const { imOut, sheet } = useWhosIn(trip, profiles);
   return (
     <PageSection title={trip.name}>
       <ListGroup label={`${trip.name} notifications`}>
@@ -68,17 +66,6 @@ function TripGroup({ trip, list, before, profiles }: { trip: Trip; list: Entry[]
                 </span>} />
             );
           }
-          // "Sam and Priya are going to Fado night": I'm in and Pass, until you answer
-          if (e.notice?.kind === 'going' && e.event && awaitsAnswer(e.event, trip, me.uid)) {
-            const event = e.event;
-            return (
-              <ListItem key={e.id} media={media} round title={e.text} meta={meta}
-                action={<span className={s.actions}>
-                  <Button size="small" tone="ghost" onClick={() => imIn(event)}>I’m in</Button>
-                  <Button size="small" tone="ghost" onClick={() => passEvent(event)}>Pass</Button>
-                </span>} />
-            );
-          }
           return <ListItem key={e.id} media={media} round icon={e.chat ? 'chat' : undefined} title={e.text} meta={meta} to={to} />;
         })}
       </ListGroup>
@@ -90,6 +77,8 @@ function TripGroup({ trip, list, before, profiles }: { trip: Trip; list: Entry[]
 /** Where an entry leads: its event while it exists, the People tab for joins and roles, else the trip. */
 function targetOf(e: Entry) {
   const base = `/trip/${e.trip.id}`;
+  // "Sam and Priya are going to Fado night": its day, with the suggestion highlighted (you answer it there)
+  if (e.notice?.kind === 'going' && e.event && !e.event.deletedAt) return `${base}/itinerary?day=${e.event.date}&focus=event-${e.event.id}`;
   if (e.event && !e.event.deletedAt && e.notice?.kind !== 'deleted') return `${base}/plan/${e.event.id}`;
   if (e.notice?.kind === 'joined' || e.notice?.kind === 'role') return `${base}/people`;
   if (e.notice?.kind === 'dates') return base;
