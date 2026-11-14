@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
+import { createContext, useContext, useEffect, useMemo, useState, type ReactNode, useRef } from 'react';
 import { store } from '../../data';
 import { useMe, useMyTrips, useProfiles, useSubFor } from '../../data/hooks';
 import { peopleOf } from '../../data/eventPeople';
@@ -31,7 +31,8 @@ export type Entry = {
 
 export const NOTICES_KEY = 'notices';
 /** Entries older than this aren't shown (the trip's own history keeps the rest). */
-const SHOW_DAYS = 60;
+/** Entries are kept 30 days (R2); older ones are deleted by whoever they're addressed to. */
+const KEEP_DAYS = 30;
 
 type State = {
   entries: Entry[]; unread: number; seen: number; profiles: Record<string, Profile>;
@@ -64,9 +65,20 @@ export function NotificationsProvider({ children }: { children: ReactNode }) {
   const people = [...new Set([...trips.flatMap((t) => t.memberIds), ...Object.values(notices).flat().map((n) => n.by)])];
   const profiles = useProfiles(people);
   const seen = reads.at[NOTICES_KEY] ?? reads.since;
+  // Delete your entries older than 30 days, once per trip per session (best effort: offline it waits for next time)
+  const cleaned = useRef(new Set<string>());
+  useEffect(() => {
+    const cutoff = Date.now() - KEEP_DAYS * 86400_000;
+    for (const [tripId, list] of Object.entries(notices)) {
+      if (cleaned.current.has(tripId)) continue;
+      const old = list.filter((n) => n.at < cutoff).map((n) => n.id);
+      cleaned.current.add(tripId);
+      if (old.length) store.deleteNotices(tripId, old).catch(() => { cleaned.current.delete(tripId); });
+    }
+  }, [notices]);
 
   const entries = useMemo(() => {
-    const since = Date.now() - SHOW_DAYS * 86400_000;
+    const since = Date.now() - KEEP_DAYS * 86400_000;
     const out: Entry[] = [];
     for (const trip of trips) {
       const events = activities[trip.id] ?? [];

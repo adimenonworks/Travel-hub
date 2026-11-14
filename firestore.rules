@@ -123,6 +123,8 @@ service cloud.firestore {
       match /notices/{noticeId} {
         function n() { return request.resource.data; }
         allow read: if signedIn() && (uid() in resource.data.to || (isTraveller(tripId) && 'deletedAt' in tripData(tripId)));
+        // Kept 30 days (R2): the people an entry is for delete it (the app clears ones older than 30 days)
+        allow delete: if signedIn() && uid() in resource.data.to;
         allow create: if isMember(tripId)
           && n().by == uid()
           && n().at is number

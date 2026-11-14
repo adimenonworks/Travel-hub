@@ -1,18 +1,14 @@
 import { useEffect, useState } from 'react';
-import { Avatar, Button, Card, Illustration, LinkButton, ListGroup, ListItem, PageHeader, PageSection } from '../../design/components';
-import { useMe } from '../../data/hooks';
-import { peopleOf } from '../../data/eventPeople';
+import { Avatar, Card, Illustration, ListGroup, ListItem, PageHeader, PageSection } from '../../design/components';
 import type { Profile, Trip } from '../../data/types';
 import { timeAgo } from '../../lib/dates';
 import { Content } from '../../app/Shell';
-import { useWhosIn } from '../trip/whosIn';
 import { useNotifications, type Entry } from './notifications';
-import s from './NotificationCentre.module.css';
 
 /**
  * Notification centre (people and sharing, item 4): opened from the Bell on Home. Newest first, grouped by trip (the trip
- * with the newest entry first). Opening it clears the Bell's count; the entries that were new stay marked "New" until
- * you leave. Tapping an entry opens what it's about. "Sam added you to Dinner" also offers I'm out and View.
+ * with the newest entry first). Opening it clears the Bell's count; the entries that were new stay unread (a dot and a
+ * bold title) until you leave. No entry has a button (R2): tapping one opens what it's about. Entries are kept 30 days.
  * Only in-app for now: a lock-screen push needs the Apple Developer Program (ROADMAP, Later).
  */
 export function NotificationCentre() {
@@ -44,32 +40,16 @@ export function NotificationCentre() {
 }
 
 function TripGroup({ trip, list, before, profiles }: { trip: Trip; list: Entry[]; before: number; profiles: Record<string, Profile> }) {
-  const me = useMe();
-  const { imOut, sheet } = useWhosIn(trip, profiles);
   return (
     <PageSection title={trip.name}>
       <ListGroup label={`${trip.name} notifications`}>
         {list.map((e) => {
-          const meta = `${e.at > before ? 'New · ' : ''}${timeAgo(e.at)}`;
-          const media = e.by
-            ? <Avatar name={profiles[e.by]?.name ?? 'Someone'} photo={profiles[e.by]?.photo} size="large" />
-            : undefined;
-          const to = targetOf(e);
-          // "Sam added you to Dinner": I'm out and View, while you're still in it
-          if (e.notice?.kind === 'added' && e.event && peopleOf(e.event, trip).includes(me.uid)) {
-            const event = e.event;
-            return (
-              <ListItem key={e.id} media={media} round title={e.text} meta={meta}
-                action={<span className={s.actions}>
-                  <Button size="small" tone="ghost" onClick={() => imOut(event)}>I’m out</Button>
-                  <LinkButton size="small" tone="ghost" to={to}>View</LinkButton>
-                </span>} />
-            );
-          }
-          return <ListItem key={e.id} media={media} round icon={e.chat ? 'chat' : undefined} title={e.text} meta={meta} to={to} />;
+          // No buttons on any entry (owner's rule, R2): tapping one opens what it's about
+          const media = e.by ? <Avatar name={profiles[e.by]?.name ?? 'Someone'} photo={profiles[e.by]?.photo} size="large" /> : undefined;
+          return <ListItem key={e.id} media={media} round icon={e.chat ? 'chat' : undefined} title={e.text} meta={timeAgo(e.at)}
+            state={e.at > before ? 'unread' : 'read'} to={targetOf(e)} />;
         })}
       </ListGroup>
-      {sheet}
     </PageSection>
   );
 }

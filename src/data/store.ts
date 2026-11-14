@@ -34,6 +34,8 @@ export interface Store {
   /** Tell people about a change you made (Notification centre). Entries with nobody to tell are dropped. Adding,
    *  editing (`updateEvent`) and I'm in / I'm out write their own entries; this is for everything else. */
   addNotices(tripId: string, notices: NewNotice[]): Promise<void>;
+  /** Delete entries addressed to you (R2: entries are kept 30 days; whoever they're for clears the old ones). */
+  deleteNotices(tripId: string, ids: string[]): Promise<void>;
 
   watchMyTrips(uid: string, cb: (trips: Trip[]) => void): Unsubscribe;
   watchTrip(id: string, cb: (trip: Trip | null) => void, onError?: (e: Error) => void): Unsubscribe;

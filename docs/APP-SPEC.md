@@ -45,13 +45,15 @@
 
 - **Where:** a Bell Icon button (Secondary, Show Badge) in Home's Page header, and the same count as a `.Badge` on Home in the Bottom navigation, so it's seen from any screen (owner, 14 Nov 2026: not in the Trip header). The Bell opens **Notifications** (`/notifications`, `src/features/notifications/`): newest first, grouped by trip.
 - **Entries** (`trips/{id}/notices`, written by whoever made the change, for the people it concerns; never to themselves; text in `src/lib/notices.ts`):
-  - **"Sam added you to Dinner at Ramiro · Sat 12 Dec"** (someone put you in an event, adding or editing it), with **I'm out** and **View** on a line under it while you're still in it;
+  - **"Sam added you to Dinner at Ramiro · Sat 12 Dec"** (someone put you in an event, adding or editing it);
   - "Sam took you out of Dinner at Ramiro"; "Jo is out of Fado night" (to the people still in it); "Priya moved Tram 28 to 14:00" (date or time changed; to the people in it); "Sam removed Fado night for everyone";
   - trip-wide: "Jo joined Portugal & Spain" (to everyone already on it), "Sam made you Following" (to that person), "Priya changed the dates to 12 – 20 Dec" (to everyone else).
   - **Suggestions:** "Sam and Priya are going to Fado night · Thu 12 Dec" (to travellers who haven't answered; it opens that day with the suggestion highlighted, where they answer), and "Priya is going to Fado night" (to the suggester).
   - **Unread chat**, one row per event you're in: "3 new messages on Fado night" (gone once you open the event). The slide-down chat alert while the app is open stays too.
-- **Scope:** events you're in, plus trip-wide changes. Entries older than 60 days aren't shown. Undo and Restore are changes too, so they can send entries.
-- **Read state:** opening the Notification centre clears the count (owner, 14 Nov 2026); what was new stays marked "New · 2m" while you're there. Kept with the chat read state (`users/{uid}/private/reads`, key `notices`), so it syncs across devices; the centre waits for it to load before marking anything seen.
+- **No entry has a button** (owner's rule, R2, 15 Nov 2026): tapping one opens what it's about: an event on its event page, a suggestion on its day with the card highlighted, a join or role change on the People tab, new dates on the trip.
+- **Unread and read:** entries that arrived since you last opened the centre are **unread**: List item State Unread, a small `icon/brand` dot in the List group's side padding (labelled "Unread" for VoiceOver) and the bold title. The rest are **read**: State Read, the title in Body, `text/secondary`. Never colour alone: the weight changes too.
+- **Scope:** events you're in, plus trip-wide changes. **Entries are kept 30 days:** older ones aren't shown, and the app deletes yours once a session (`store.deleteNotices`; the rules let the people an entry is for delete it). Undo and Restore are changes too, so they can send entries.
+- **Read state:** opening the Notification centre clears the count (owner, 14 Nov 2026); what was new stays unread (dot, bold) while you're there. Kept with the chat read state (`users/{uid}/private/reads`, key `notices`), so it syncs across devices; the centre waits for it to load before marking anything seen.
 - **Shaped for push:** an entry holds everything its line needs (kind, who, to whom, the event's title, day and time), so the same entry can later be sent to the lock screen (ROADMAP, Later).
 
 ## Recently deleted

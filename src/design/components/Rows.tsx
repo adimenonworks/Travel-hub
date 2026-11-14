@@ -25,16 +25,20 @@ function Thumb({ media, round }: { media: ReactNode; round?: boolean }) {
  * Figma "List item" (Size Large / Small): a 48px thumb (Small: 32), the title (Heading 3; Small: Body),
  * a meta line (Body small) and optional trailing text. Used inside a List group.
  */
-export function ListItem({ title, meta, trailing, action, icon, media, size = 'large', round, type, ...press }: Press & {
+export function ListItem({ title, meta, trailing, action, icon, media, size = 'large', round, type, state = 'default', ...press }: Press & {
   title: ReactNode; meta?: ReactNode; trailing?: ReactNode; icon?: IconName; media?: ReactNode; size?: 'large' | 'small'; round?: boolean;
   /** The nested `.Category icon`'s Type: the icon tile in an event type's colour (a place or an event). */
   type?: CategoryTone;
   /** Figma "Show Icon button" (a small Ghost Icon button, e.g. Copy for a booking reference) or "Show Button" (a small
    *  Ghost Button, e.g. People's role dropdown) at the end. Not inside a pressable row. */
   action?: ReactNode;
+  /** Figma "State" (R2): Unread (a Notification centre entry you haven't seen: a dot in the margin, labelled "Unread", and
+   *  the bold title) or Read (the title in Body, secondary). Never colour alone: the weight changes too. */
+  state?: 'default' | 'unread' | 'read';
 }) {
   return (
-    <Pressable {...press} role="listitem" className={[s.item, size === 'small' && s.compact, action && s.hasAction].filter(Boolean).join(' ')}>
+    <Pressable {...press} role="listitem" className={[s.item, size === 'small' && s.compact, action && s.hasAction, state !== 'default' && s[`item-${state}`]].filter(Boolean).join(' ')}>
+      {state === 'unread' && <span className={s.unreadDot} role="img" aria-label="Unread" />}
       {media ? <Thumb media={media} round={round} /> : icon && <CategoryIcon icon={icon} type={type} size={size === 'small' ? 'small' : 'large'} tone="primary" />}
       <span className={s.itemText}>
         <span className={s.itemTitle}>{title}</span>

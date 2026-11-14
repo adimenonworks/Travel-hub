@@ -165,6 +165,10 @@ export function createLocalStore(): Store {
       notify(tripId, list);
       save();
     },
+    async deleteNotices(tripId, ids) {
+      if (db.notices?.[tripId]) db.notices[tripId] = db.notices[tripId].filter((n) => !ids.includes(n.id));
+      save();
+    },
     async deleteTrip(id) {
       delete db.trips[id];
       if (db.notices) delete db.notices[id];
