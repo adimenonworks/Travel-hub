@@ -126,11 +126,11 @@ function CoverPhotoField({ value, position, onChange, onMove }: {
       <div className="t-body-small t-bold">Cover photo</div>
       {value && <CoverPositioner src={value} position={position ?? { x: 50, y: 50 }} onMove={onMove} />}
       <div className={s.coverButtons}>
-        <Button tone="neutral" size="regular" icon="photo" onClick={() => input.current?.click()} disabled={busy}>
+        <Button tone="neutral" size="small" icon="photo" onClick={() => input.current?.click()} disabled={busy}>
           {busy ? 'Preparing photo…' : value ? 'Change photo' : 'Choose photo'}
         </Button>
-        {value && position && <Button tone="ghost" size="regular" onClick={() => onMove(null)}>Re-centre</Button>}
-        {value && <Button tone="ghost" size="regular" onClick={() => onChange(null)}>Remove photo</Button>}
+        {value && position && <Button tone="ghost" size="small" onClick={() => onMove(null)}>Re-centre</Button>}
+        {value && <Button tone="ghost" size="small" onClick={() => onChange(null)}>Remove photo</Button>}
       </div>
       <input ref={input} type="file" accept="image/*" className="visually-hidden" tabIndex={-1} aria-hidden="true"
         onChange={(e) => pick(e.target.files?.[0])} />

@@ -61,8 +61,8 @@ export function Home() {
     <Content>
       <PageHeader title={`Hi, ${name.split(' ')[0]}`} fit />
       <nav className={s.quickActions} aria-label="Quick actions">
-        <Button size="regular" icon="plus" onClick={() => openSave({ mode: 'link' })}>Save a place</Button>
-        <Button size="regular" tone="neutral" icon="calendar" onClick={() => newTrip()}>Plan a trip</Button>
+        <Button size="small" icon="plus" onClick={() => openSave({ mode: 'link' })}>Save a place</Button>
+        <Button size="small" tone="neutral" icon="calendar" onClick={() => newTrip()}>Plan a trip</Button>
       </nav>
       {trips === null ? <PageSkeleton bare /> : happening || upcoming.length > 0 ? (
         <>
@@ -89,7 +89,7 @@ export function Home() {
           actions={<Button block onClick={() => openSave({ mode: 'link' })}>Save a place</Button>} />
       ) : (
         <PageSection title="Collections" meta={`${countries.length} place${countries.length === 1 ? '' : 's'} · ${places.length} save${places.length === 1 ? '' : 's'}`}
-          action={<LinkButton to="/trips?show=saved" tone="ghost" size="regular" iconEnd="chevron-right">See all</LinkButton>}>
+          action={<LinkButton to="/trips?show=saved" tone="ghost" size="small" iconEnd="chevron-right">See all</LinkButton>}>
           <div className={ss.tileRow}>
             {countries.map((c) => <CountryTile key={c.code} country={c} />)}
           </div>
@@ -98,7 +98,7 @@ export function Home() {
 
       {recent.length > 0 && (
         <PageSection title="Recently saved"
-          action={<LinkButton to="/trips?show=saved" tone="ghost" size="regular" iconEnd="chevron-right">See all</LinkButton>}>
+          action={<LinkButton to="/trips?show=saved" tone="ghost" size="small" iconEnd="chevron-right">See all</LinkButton>}>
           <ListGroup label="Recently saved">
             {recent.map((p) => (
               <PlaceRow key={p.id} place={p} visited={visited.has(p.id)} starred={starred(p)} onClick={() => setOpen(p.id)} trailing={timeAgo(p.createdAt)}

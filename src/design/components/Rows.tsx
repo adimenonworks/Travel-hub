@@ -21,11 +21,11 @@ function Thumb({ media, round }: { media: ReactNode; round?: boolean }) {
 }
 
 /**
- * Figma "List item" (Size Regular / Small): a 48px thumb (Small: 32), the title (Heading 3; Small: Body),
+ * Figma "List item" (Size Large / Small): a 48px thumb (Small: 32), the title (Heading 3; Small: Body),
  * a meta line (Body small) and optional trailing text. Used inside a List group.
  */
-export function ListItem({ title, meta, trailing, action, icon, media, size = 'regular', round, type, ...press }: Press & {
-  title: ReactNode; meta?: ReactNode; trailing?: ReactNode; icon?: IconName; media?: ReactNode; size?: 'regular' | 'small'; round?: boolean;
+export function ListItem({ title, meta, trailing, action, icon, media, size = 'large', round, type, ...press }: Press & {
+  title: ReactNode; meta?: ReactNode; trailing?: ReactNode; icon?: IconName; media?: ReactNode; size?: 'large' | 'small'; round?: boolean;
   /** The nested `.Category icon`'s Type: the icon tile in an event type's colour (a place or an event). */
   type?: CategoryTone;
   /** Figma "Show action": a small Ghost Icon button at the end, e.g. Copy for a booking reference. Not inside a pressable row. */
@@ -89,14 +89,14 @@ export type CategoryTone = 'neutral' | 'travel' | 'stays' | 'food' | 'activities
  * Figma `.Category icon`: the one place an event type's colour lives. A round tile with the category's icon, solid in
  * its type's colour with a white icon (Neutral: a plain tile). Nested in Event card, List item, Idea row, Option card
  * (Layout Category) and the Page header's leading icon, so none of them multiply by type.
- * - Size: Small 32 (16px icon), Regular 40, Large 48.
+ * - Size: Small 32 (16px icon), Medium 40, Large 48.
  * - Tone, the surface it sits on, which only changes the Neutral tile: Secondary (grey tile, on white), Primary (white
  *   tile, on a grey card), On dark (on the deep-green Next card, where the type colours take their 300 step).
  */
-export function CategoryIcon({ icon, type = 'neutral', size = 'regular', tone = 'secondary', className }: {
-  icon: IconName; type?: CategoryTone; size?: 'small' | 'regular' | 'large'; tone?: 'secondary' | 'primary' | 'on-feature'; className?: string;
+export function CategoryIcon({ icon, type = 'neutral', size = 'medium', tone = 'secondary', className }: {
+  icon: IconName; type?: CategoryTone; size?: 'small' | 'medium' | 'large'; tone?: 'secondary' | 'primary' | 'on-feature'; className?: string;
 }) {
-  const cls = [s.catIcon, size !== 'regular' && s[`catIcon-${size}`], tone !== 'secondary' && s[`catIcon-${tone}`], type !== 'neutral' && s[`tone-${type}`], className];
+  const cls = [s.catIcon, size !== 'medium' && s[`catIcon-${size}`], tone !== 'secondary' && s[`catIcon-${tone}`], type !== 'neutral' && s[`tone-${type}`], className];
   return <span className={cls.filter(Boolean).join(' ')} aria-hidden="true"><Icon name={icon} size={size === 'small' ? 16 : 24} /></span>;
 }
 
@@ -246,7 +246,7 @@ export function ProfileCard({ name, email, photo, avatar, ...press }: Press & { 
 
 /** Figma "Option card" (Selected No / Yes): a big tappable choice with an icon, a Heading 3 label and, with "Show
  *  description", a Body small line under it. Leave `selected` out when it's a one-tap choice (e.g. the add-event picker). */
-/** Figma "Option card" (Layout Plain / Category). `type` gives Layout Category: the icon in a `.Category icon` (Regular,
+/** Figma "Option card" (Layout Plain / Category). `type` gives Layout Category: the icon in a `.Category icon` (Medium,
  *  Secondary) 16px above the text, in the type's colour: the "Add to itinerary" type picker. */
 export function OptionCard({ icon, label, description, selected, type, onClick }: { icon: IconName; label: string; description?: string; selected?: boolean; type?: CategoryTone; onClick: () => void }) {
   return (

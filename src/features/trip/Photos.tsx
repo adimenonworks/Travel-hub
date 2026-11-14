@@ -23,7 +23,7 @@ export function Photos(ctx: TripCtx) {
   return (
     <>
       <SectionHeader title="Shared albums" meta="Anyone on the trip can add one"
-        action={ctx.canContribute ? <Button size="regular" icon="camera" onClick={() => setEditing("new")}>Add photos</Button> : undefined} />
+        action={ctx.canContribute ? <Button size="small" icon="camera" onClick={() => setEditing("new")}>Add photos</Button> : undefined} />
       {sorted.length === 0 ? (
         <Card layout="centre" media={<Illustration name="memories" size={120} />} title="No albums yet"
           body="Make a shared album in Google Photos or Apple Photos, then add its link here so everyone can find the pictures." />

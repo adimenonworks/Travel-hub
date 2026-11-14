@@ -81,7 +81,7 @@ export function PageHeader({ title, subtitle, meta, back, action, fit, size = 'l
   }, [fit, title, size]);
   return (
     <header className={s.header}>
-      {back && <div className={s.back}><LinkButton to={back.to} tone="ghost" size="regular" icon="chevron-left" onClick={(e) => { e.preventDefault(); goBack(navigate, back.to); }}>{back.label}</LinkButton></div>}
+      {back && <div className={s.back}><LinkButton to={back.to} tone="ghost" size="small" icon="chevron-left" onClick={(e) => { e.preventDefault(); goBack(navigate, back.to); }}>{back.label}</LinkButton></div>}
       <div className={[s.titleRow, size === 'small' && s.titleRowSmall].filter(Boolean).join(' ')}>
         {icon && <span className={s.leadIcon}><CategoryIcon icon={icon} type={type} /></span>}
         <div className={s.titleText}>

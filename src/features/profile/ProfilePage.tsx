@@ -85,7 +85,7 @@ export function ProfilePage() {
       </PageSection>
 
       <PageSection title="Favourite places" meta="Starred from your trips"
-        action={favourites.length > 0 ? <LinkButton to="/profile/favourites" tone="ghost" size="regular" iconEnd="chevron-right">See more</LinkButton> : undefined}>
+        action={favourites.length > 0 ? <LinkButton to="/profile/favourites" tone="ghost" size="small" iconEnd="chevron-right">See more</LinkButton> : undefined}>
         {favourites.length === 0
           ? <ListGroup><ListItem icon="star" title="No favourites yet" meta="Star a saved place, or an idea or event on a trip, and it shows here." /></ListGroup>
           : (

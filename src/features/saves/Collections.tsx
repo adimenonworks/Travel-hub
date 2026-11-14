@@ -118,7 +118,7 @@ export function PlaceSheet({ place, onClose, role = 'owner', cities = [] }: {
               <span className="t-heading-4">{cat.one}</span>
               <span className="t-body-small t-secondary">{[`Saved ${savedOn}`, place.source ? `from ${place.source}` : null, visited.has(place.id) ? 'Visited ✓' : null].filter(Boolean).join(' · ')}</span>
             </div>
-            {canEdit && <Button tone="ghost" size="regular" aria-expanded={editing} onClick={() => { haptic('selection'); setEditing((x) => !x); }}>{editing ? 'Done' : 'Edit'}</Button>}
+            {canEdit && <Button tone="ghost" size="small" aria-expanded={editing} onClick={() => { haptic('selection'); setEditing((x) => !x); }}>{editing ? 'Done' : 'Edit'}</Button>}
             <IconButton icon="star" tone="ghost" state={isStar ? 'filled' : 'default'} aria-pressed={isStar} label={isStar ? 'Remove from favourites' : 'Add to favourites'} onClick={star} />
           </div>
           {editing && canEdit && (
@@ -250,7 +250,7 @@ export function CountryCollection() {
     ...(places.some((p) => visited.has(p.id)) ? [{ value: 'visited' as Filter, label: 'Visited', n: places.filter((p) => visited.has(p.id)).length }] : []),
   ];
   const seeAll = (key: string, n: number) => n > SHOW && !expanded.includes(key)
-    ? <Button tone="ghost" size="regular" iconEnd="chevron-right" onClick={() => setExpanded((x) => [...x, key])}>{`See all ${n}`}</Button> : undefined;
+    ? <Button tone="ghost" size="small" iconEnd="chevron-right" onClick={() => setExpanded((x) => [...x, key])}>{`See all ${n}`}</Button> : undefined;
   const row = (p: SavedPlace) => <PlaceRow key={p.id} place={p} visited={visited.has(p.id)} starred={starred(p)} onClick={() => setOpen(p.id)}
     meta={[p.kind || placeCategory(p.category).one, p.source ? `from ${p.source}` : null].filter(Boolean).join(' · ')} />;
 

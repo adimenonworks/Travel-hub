@@ -171,7 +171,7 @@ export function DesignSystem() {
           </Card>
         </Section>
 
-        <Section title="Buttons" footer="Figma Button: Tone × Size (Regular 48px, Small 40px with a 44px tap area). Icons can lead or trail.">
+        <Section title="Buttons" footer="Figma Button: Tone × Size (Small 32px with a 44px tap area, the default; Large 48px, for full-width buttons). Icons can lead or trail.">
           <Card className={s.row}>
             <Button>Primary</Button>
             <Button tone="neutral">Secondary</Button>
@@ -179,7 +179,7 @@ export function DesignSystem() {
             <Button tone="destructive">Destructive</Button>
             <Button icon="plus">Leading icon</Button>
             <Button tone="neutral" iconEnd="arrow-up-right">Trailing icon</Button>
-            <Button size="regular" icon="plus">Small</Button>
+            <Button size="small" icon="plus">Small</Button>
             <Button disabled>Disabled</Button>
             <LinkButton to="/" tone="neutral">Link button</LinkButton>
             <IconButton icon="x" label="Close (Ghost)" />
@@ -286,9 +286,9 @@ export function DesignSystem() {
           </div>
         </Section>
 
-        <Section title="Category icon, event page header and Context menu" footer=".Category icon is the one place an event type's colour lives (Event card, List item, Idea row, Option card and the Page header nest it): Size Small 32 / Regular 40 / Large 48; Tone Secondary (grey Neutral tile, on white), Primary (white, on a grey card), On feature (on the Next card). Page header Title small with Show leading icon and Show subtitle (the time). Context menu: what a long press on your own comment opens (Edit, Delete in red); tap the bubble to see it.">
+        <Section title="Category icon, event page header and Context menu" footer=".Category icon is the one place an event type's colour lives (Event card, List item, Idea row, Option card and the Page header nest it): Size Small 32 / Medium 40 / Large 48; Tone Secondary (grey Neutral tile, on white), Primary (white, on a grey card), On feature (on the Next card). Page header Title small with Show leading icon and Show subtitle (the time). Context menu: what a long press on your own comment opens (Edit, Delete in red); tap the bubble to see it.">
           {/* Figma `.Category icon`: Type × Size × Tone, the rows as on Foundations */}
-          {([['regular', 'secondary'], ['regular', 'primary'], ['regular', 'on-feature'], ['large', 'primary'], ['small', 'primary']] as const).map(([size, tone]) => (
+          {([['medium', 'secondary'], ['medium', 'primary'], ['medium', 'on-feature'], ['large', 'primary'], ['small', 'primary']] as const).map(([size, tone]) => (
             <div key={size + tone} className={[s.chipRow, tone === 'on-feature' && 'feature'].filter(Boolean).join(' ')} style={tone === 'primary' ? { background: 'var(--surface-secondary)', borderRadius: 'var(--radius-600)', padding: 'var(--space-300)' } : tone === 'on-feature' ? { background: 'var(--feature-surface)', borderRadius: 'var(--radius-600)', padding: 'var(--space-300)' } : undefined}>
               {(['neutral', 'travel', 'stays', 'food', 'activities', 'notes'] as const).map((t) => <CategoryIcon key={t} icon={t === 'food' ? 'grape' : 'plane'} type={t} size={size} tone={tone} />)}
             </div>
@@ -312,7 +312,7 @@ export function DesignSystem() {
             <JourneyLeg number="EK 405" status={{ label: 'On time', tone: 'success' }} duration="13h 25m"
               from={{ city: 'Melbourne', time: '21:45', date: 'Wed 11 Nov', terminal: 'MEL · Terminal 2' }} to={{ city: 'Dubai', time: '05:10 +1', date: 'Thu 12 Nov', terminal: 'DXB · Terminal 3' }}
               gate="" belt="" footer="Operated by Emirates · updated 2 min ago" />
-            <JourneyStop title="2h 35m in Dubai" meta="Change at DXB" warning="Tight connection" action={<Button tone="ghost" size="regular" icon="plus">Add a stay</Button>} />
+            <JourneyStop title="2h 35m in Dubai" meta="Change at DXB" warning="Tight connection" action={<Button tone="ghost" size="small" icon="plus">Add a stay</Button>} />
             <JourneyLeg number="EK 191" duration="7h 55m" from={{ city: 'Dubai', time: '07:45', date: 'Thu 12 Nov', terminal: 'DXB · Terminal 3' }} to={{ city: 'Lisbon', time: '12:40', date: 'Thu 12 Nov', terminal: 'LIS · Terminal 1' }} footer="Operated by Emirates" />
           </JourneyCard>
           <JourneyCard layout="span" start={{ label: 'Check-in', date: 'Thu 12 Nov', time: '15:00' }} end={{ label: 'Check-out', date: 'Sat 14 Nov', time: '11:00' }} footer="2 nights" />
@@ -329,8 +329,8 @@ export function DesignSystem() {
           </Accordion>
         </Section>
 
-        <Section title="Rows, groups and tiles" footer="Section header, List group of List items (Regular / Small), Idea rows with Vote buttons, Tiles, Map card, Stat strip, Profile card.">
-          <SectionHeader title="Collections" meta="4 places · 61 saves" action={<LinkButton to="/design" tone="ghost" size="regular" iconEnd="chevron-right">See all</LinkButton>} />
+        <Section title="Rows, groups and tiles" footer="Section header, List group of List items (Large / Small), Idea rows with Vote buttons, Tiles, Map card, Stat strip, Profile card.">
+          <SectionHeader title="Collections" meta="4 places · 61 saves" action={<LinkButton to="/design" tone="ghost" size="small" iconEnd="chevron-right">See all</LinkButton>} />
           <ListGroup>
             <ListItem icon="utensils" title="Ichiran Shibuya" meta="Ramen · Tokyo · from TikTok" trailing="2h" onClick={() => {}} />
             <ListItem icon="link" title="10 things to do in Cusco" meta="Article · Peru · cntraveler.com" trailing="Yesterday" />
@@ -338,7 +338,7 @@ export function DesignSystem() {
             <BudgetCard label="Left to spend" amount="A$1,800" caption="of A$5,000 per person · A$3,200 planned" ratio={0.64}
               rows={[{ icon: 'plane', label: 'Flights', amount: 'A$1,900' }, { icon: 'bed', label: 'Stays', amount: 'A$900' }, { icon: 'key', label: 'Car rental', amount: 'A$180' }]} />
             <OptionCard icon="wallet" label="Yes" description="Add costs to your bookings to see what the trip adds up to" onClick={() => {}} />
-            <ListItem icon="ticket" title="TP-7XK2LQ" meta="Booking reference" action={<IconButton small icon="copy" label="Copy booking reference" onClick={() => {}} />} />
+            <ListItem icon="ticket" title="TP-7XK2LQ" meta="Booking reference" action={<IconButton size="small" icon="copy" label="Copy booking reference" onClick={() => {}} />} />
           </ListGroup>
           <ListGroup>
             <IdeaRow icon="star" title="Fado night in Alfama" meta="Show · Clube de Fado · €30 · Sam" tag={{ icon: 'star', label: 'Most votes' }} vote={{ count: 4, selected: true, onClick: () => {} }} />
@@ -386,7 +386,7 @@ export function DesignSystem() {
               <Avatar name="Alex Kim" size="small" />
             </div>
             <div className={s.row}>
-              <Avatar name="Alex Kim" size="large" /><Avatar name="Jo" size="regular" />
+              <Avatar name="Alex Kim" size="large" /><Avatar name="Jo" size="medium" />
               <AvatarStack people={['Ana', 'Ben', 'Cy', 'Dee', 'Eli', 'Fay'].map((n) => ({ id: n, name: n }))} />
             </div>
             {(['accent', 'neutral', 'success', 'warning', 'danger'] as const).map((st) => <Banner key={st} tone={st}>Banner, state {st}.</Banner>)}

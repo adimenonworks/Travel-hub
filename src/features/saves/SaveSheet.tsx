@@ -281,7 +281,7 @@ export function SaveSheet({ request, onClose }: { request: SaveRequest | null; o
           <span className={s.previewTitle}>{code ? countryName(code) : 'Choose a country'}</span>
           <span className={s.previewMeta}>{code ? (chosen ? 'You chose' : 'Found in the link') : 'Rove couldn’t find a place in the link'}</span>
         </span>
-        <Button tone="ghost" size="regular" onClick={() => { setStep('where'); setWhereQuery(''); }}>{code ? 'Change' : 'Choose'}</Button>
+        <Button tone="ghost" size="small" onClick={() => { setStep('where'); setWhereQuery(''); }}>{code ? 'Change' : 'Choose'}</Button>
       </div>
       {code && (
         <>

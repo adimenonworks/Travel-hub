@@ -117,9 +117,9 @@ export function ActivityPage(ctx: TripCtx) {
   const booking = [
     a.operator && !journey && <ListItem key="op" icon={kindInfo(a.category).icon} title={a.operator} meta="Company" />,
     a.ref && <ListItem key="num" icon="plane" title={<span className={s.selectable}>{a.ref}</span>} meta="Flight number"
-      action={<IconButton small icon="copy" label="Copy flight number" onClick={() => copy(a.ref!, 'Flight number')} />} />,
+      action={<IconButton size="small" icon="copy" label="Copy flight number" onClick={() => copy(a.ref!, 'Flight number')} />} />,
     a.bookingRef && <ListItem key="ref" icon="ticket" title={<span className={s.selectable}>{a.bookingRef}</span>} meta={kind === 'restaurant' ? 'Reservation reference' : 'Booking reference'}
-      action={<IconButton small icon="copy" label="Copy booking reference" onClick={() => copy(a.bookingRef!, kind === 'restaurant' ? 'Reservation reference' : 'Booking reference')} />} />,
+      action={<IconButton size="small" icon="copy" label="Copy booking reference" onClick={() => copy(a.bookingRef!, kind === 'restaurant' ? 'Reservation reference' : 'Booking reference')} />} />,
     a.seats && <ListItem key="seats" icon="user-add" title="Seats" meta={a.seats} />,
     a.bags && <ListItem key="bags" icon="info" title="Bags" meta={a.bags} />,
   ].filter(Boolean);
@@ -156,7 +156,7 @@ export function ActivityPage(ctx: TripCtx) {
                   <JourneyStop title={`${durationLabel(stops[i - 1].ms) || 'Layover'} in ${stops[i - 1].at}`}
                     meta={stops[i - 1].code ? `Change at ${stops[i - 1].code}` : undefined}
                     warning={stops[i - 1].overnight ? `Overnight in ${stops[i - 1].at}` : stops[i - 1].tight ? 'Tight connection' : undefined}
-                    action={stops[i - 1].overnight ? <Button tone="ghost" size="regular" icon="plus" onClick={() => setStayAt(stops[i - 1])}>Add a stay</Button> : undefined} />
+                    action={stops[i - 1].overnight ? <Button tone="ghost" size="small" icon="plus" onClick={() => setStayAt(stops[i - 1])}>Add a stay</Button> : undefined} />
                 )}
                 <JourneyLeg mode={kindInfo(leg.category).icon} number={leg.ref || undefined} status={leg.id === a.id ? tag : undefined}
                   from={{ city: city(leg.fromText), time: own?.departure?.revised ? own.departure.revised.slice(11, 16) : leg.startTime ? formatTime(leg.startTime) : '—', date: formatDay(leg.date),
@@ -181,7 +181,7 @@ export function ActivityPage(ctx: TripCtx) {
       {/* Route: where a journey (not a flight) or a car's rental starts and ends, each opening in the maps app, and directions */}
       {/* (a car shows a Route only when it's dropped off somewhere else: its pick-up is already the Location card) */}
       {routeFrom && (!vehicle || routeTo) && (
-        <PageSection title="Route" action={routeTo ? <LinkButton href={directionsUrl({ q: routeFrom, p: a.location }, { q: routeTo, p: a.to })} tone="ghost" size="regular" icon="map" label={`Directions from ${routeFrom} to ${routeTo}`}>Directions</LinkButton> : undefined}>
+        <PageSection title="Route" action={routeTo ? <LinkButton href={directionsUrl({ q: routeFrom, p: a.location }, { q: routeTo, p: a.to })} tone="ghost" size="small" icon="map" label={`Directions from ${routeFrom} to ${routeTo}`}>Directions</LinkButton> : undefined}>
           <ListGroup label="Route">
             <ListItem icon="pin" title={routeFrom.split(',')[0]} meta={[vehicle ? startWord : 'From', routeFrom.split(',').slice(1).join(',').trim()].filter(Boolean).join(' · ')}
               href={mapsUrl(routeFrom, a.location, app)} label={`${routeFrom} in ${mapsAppLabel(app)}`} trailing={mapsAppLabel(app)} />
@@ -227,7 +227,7 @@ export function ActivityPage(ctx: TripCtx) {
         </PageSection>
       )}
 
-      <PageSection title="Files & links" action={ctx.canContribute ? <Button tone="ghost" size="regular" iconEnd="chevron-right" onClick={() => setAddingDoc(true)}>Add</Button> : undefined}>
+      <PageSection title="Files & links" action={ctx.canContribute ? <Button tone="ghost" size="small" iconEnd="chevron-right" onClick={() => setAddingDoc(true)}>Add</Button> : undefined}>
         {a.links.length > 0 || a.manageUrl ? (
           <ListGroup label="Files and links">
             {a.links.map((l, i) => {
@@ -237,7 +237,7 @@ export function ActivityPage(ctx: TripCtx) {
                   <ListItem icon={isPdf(l.url) ? 'doc' : 'link'} title={name} meta={`${isPdf(l.url) ? 'PDF' : hostOf(l.url)}${l.emailUrl ? ' · from email' : ''}`}
                     trailing={isPdf(l.url) ? 'PDF' : undefined} href={l.url} label={`${name} (opens in a new tab)`}
                     onClick={() => recordView(trip.id, { url: l.url, kind: isPdf(l.url) ? 'PDF' : 'Link', label: name, meta: a.title })} />
-                  {l.emailUrl && <LinkButton href={l.emailUrl} size="regular" tone="ghost" icon="mail" label={`Open the email for ${name}`} />}
+                  {l.emailUrl && <LinkButton href={l.emailUrl} size="small" tone="ghost" icon="mail" label={`Open the email for ${name}`} />}
                   {ctx.canContribute && <IconButton icon="trash" label={`Remove ${name}`} onClick={() => removeDoc(i)} />}
                 </div>
               );
