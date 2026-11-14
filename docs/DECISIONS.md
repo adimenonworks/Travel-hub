@@ -29,6 +29,7 @@
   - `DECISIONS.md` only takes decisions someone might question or undo (rules, real choices, reversals, things not built), and holds the current month; older months move to `docs/decisions/`.
   - `PROGRESS.md` only holds the prompt being worked on; finished prompts and their results move to `docs/changes/done/`.
   - Sessions read the roadmap only when planning, and only the part of a reference file that touches the work.
+  - Screenshot checks are compared by a pixel-diff script; Claude only opens the ones that differ.
 - **Why:** every session reads these first. After two days they were about 30,000 words a session (DECISIONS 4,600, PROGRESS 8,400), which makes every session slower and costlier. Nothing is deleted; it's just not all read every time.
 
 ### Travelling and Following: built (people and sharing, item 2, first part)
