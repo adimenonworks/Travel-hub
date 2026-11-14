@@ -14,6 +14,10 @@
 
 ## 14 Nov 2026
 
+### Your travels counts every city (owner)
+- **Decision:** a past trip's cities are its first stop plus every city its events were in, worked out like its countries. Older events get their city from their map position, once. Polish prompt G9.
+- **Why:** after New trip stops, countries counted every country visited but cities only the first stop ("2 countries, 1 city" for Tokyo → Kyoto → Seoul).
+
 ### Home: Plan a trip is the main button (owner)
 - **Decision:** Plan a trip is Primary and on the left; Save a place is Neutral. Never two Primary buttons side by side.
 - **Why:** most saves arrive through the iPhone share sheet, but a trip can only be started in the app. Two emerald buttons would compete; Wise and iOS keep one main action.
