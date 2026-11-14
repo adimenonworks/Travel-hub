@@ -376,13 +376,15 @@ Buttons are built with a **minimum height plus padding**: the text sits in the m
 - **Figma first** (Foundations: the tokens, Button, Icon button, Chip, Tag; then the Screens frames that use them), then code. Update `/#/design`, `docs/DESIGN-SYSTEM.md` (Button sizes, Icon button Small, Chip, Tag) and the 44px tap-area maths that uses `size/control-small`.
 - **Check** every screen at 320 and 390px, text 17 and 33, light and dark: nothing clipped, section headers and rows still line up, and a button and an Icon button side by side are level. Show the owner a before and after of Home and a section header before merging.
 
-### G11. Page header: meta closer to its title (owner, 14 Nov 2026)
-The line under a page title (a trip's dates, "Show meta", and the subtitle under the title) sits **12px** below it (`space/400`), the same gap as between separate things. It belongs to the title, so it should sit closer.
+### G11. Page header: the meta line sits with the title (owner, 14 Nov 2026)
+**The problem:** the meta line (a trip's dates, "Show meta") is placed **under the whole title row**, not under the title. The row is as tall as its tallest part (the edit button, the event page's category icon), so with no subtitle the dates end up far below the title. The subtitle doesn't have this problem: it sits inside the title's own column, 12px under it.
 
-- **The gap becomes 8px** (`space/300`), for both the meta line and the subtitle, in Size Large and Small.
-- **Only that gap changes.** In code, `.header`'s gap also sets the space between the back button and the title row: keep that at 12 and give the meta its own spacing, so nothing else moves. (The CSS comments in `Bars.module.css` say "12" for gaps that are now 12px; check each one is still right afterwards.)
-- **Figma first:** Page header on Foundations (`160:1684`), both sizes, linked to `space/300`; then code.
-- **Check** that descenders (g, p, y) on a wrapped or shrunk title never touch the meta, at text 17, 23 and 33, at 320 and 390px. Show the owner the trip header and the event page before and after; if 8 still looks loose, try 4 (`space/200`) and show both.
+**The change:** the meta goes into the title's column too.
+- **Order:** title, then the subtitle (if shown), then the meta (if shown), **12px apart** (`space/400`, as now). With no subtitle, the meta sits exactly where the subtitle would.
+- The gap value doesn't change: it stays 12px.
+- Nothing else moves: the back button's spacing, the edit button and the leading icon stay where they are. Next to a leading icon, the meta lines up with the title, like the subtitle does.
+- **Figma first:** Page header on Foundations (`160:1684`), both sizes: move the Meta layer from under the title row into the title's text frame (keep "Show meta"); then the trip screens on Screens that use it; then code (`PageHeader` in `Bars.tsx`: render `meta` inside `.titleText` after the subtitle).
+- **Check** with and without a subtitle, with and without the edit button, at text 17, 23 and 33, at 320 and 390px. Show the owner a trip's header and the event page before and after.
 
 ## Part H — Trip edit
 
@@ -469,7 +471,7 @@ Report ✅, ❌ (with the reason) or ⚠️ (done, with a caveat) on every line.
 - [ ] Dropdown has Size Small / Large in Figma and code (no `compact`); Text area drawn at its real height in Figma; both compared side by side
 - [ ] Your travels counts cities from every past trip's events (city + country, never a postcode); older events get their city once, in the background
 - [ ] Small buttons and Icon button Small are 36px (8 / 16 padding); Chip and Tag use `size/pill` (28) as a minimum height; every minimum height in Figma is linked to a variable; before and after shown
-- [ ] Page header: meta and subtitle 8px under the title (Figma and code); back button spacing unchanged; before and after shown
+- [ ] Page header: the meta sits in the title's column (12px under the title, or under the subtitle), Figma and code; nothing else moves; before and after shown
 
 **Trip edit**
 - [ ] The cover only moves in Edit photo mode, with the overlay; Save locks it again; Change and Edit on the left, Remove as a Ghost button on the right; no swipe-to-close while editing

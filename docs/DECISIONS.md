@@ -14,9 +14,10 @@
 
 ## 14 Nov 2026
 
-### Page header: meta closer to its title (owner)
-- **Decision:** the meta line and subtitle sit 8px under a page title (was 12). Polish prompt G11.
-- **Why:** they describe the title, so they should read as one group; 12px is the gap used between separate things.
+### Page header: the meta line sits with the title (owner)
+- **Decision:** the meta (a trip's dates) moves into the title's column, after the subtitle, 12px apart; with no subtitle it sits where the subtitle would. Polish prompt G11.
+- **Why:** it was placed under the whole title row, so the edit button or the category icon pushed it far from the title. The owner spotted the real cause.
+- **Replaces:** the same day's plan to shrink the gap to 8px (the gap was never the problem).
 
 ### Control heights: minimum height plus padding, Small buttons 36px (owner)
 - **Decision:**
