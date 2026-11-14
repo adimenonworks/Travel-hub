@@ -19,7 +19,7 @@
   /* Rides up with the keyboard, using the keyboard's own duration and curve (iOS: 250ms ease-out) */
   translate: 0 calc(-1 * var(--keyboard-height, 0px));
   padding-bottom: env(safe-area-inset-bottom);
-  --keyboard-motion: 250ms cubic-bezier(0.17, 0.59, 0.4, 0.77);
+  --keyboard-motion: var(--motion-keyboard);
 }
 :global(.keyboard-open) .sheet { padding-bottom: 0; }
 .form { display: flex; flex-direction: column; min-height: 0; flex: 1; }

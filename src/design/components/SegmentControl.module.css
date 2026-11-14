@@ -45,7 +45,7 @@
   transform: translateX(calc(var(--i) * (100% + var(--space-200))));
   border-radius: var(--radius-full);
   background: var(--control-selected-background);
-  transition: transform var(--duration-slow) var(--ease-spring), background var(--motion-fast);
+  transition: transform var(--duration-gentle) var(--easing-spring), background var(--motion-fast);
   will-change: transform;
 }
 @media (prefers-reduced-motion: reduce) { .thumb { transition: background var(--motion-fast); } }

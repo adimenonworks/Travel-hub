@@ -31,7 +31,7 @@
   width: calc((100% - 2 * var(--space-200)) / var(--n));
   transform: translateX(calc(100% * var(--i)));
   border-radius: var(--radius-full); background: var(--surface-sunken);
-  transition: transform var(--duration-slow) var(--ease-spring);
+  transition: transform var(--duration-gentle) var(--easing-spring);
 }
 /* While dragging, the pill follows the finger exactly (no easing) and grows a touch, like iOS */
 .dragging .indicator { transition: none; }

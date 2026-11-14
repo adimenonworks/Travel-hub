@@ -11,7 +11,7 @@
 .day:disabled { color: var(--button-ghost-disabled-text); cursor: default; }
 .day-range { background: var(--surface-brand); color: var(--text-brand); }
 /* Picking dates: the range sweeps in from the start, one day every 20ms (Figma motion spec) */
-.day-range, .day-end { animation: sweep var(--duration-fast) var(--ease-standard) both; animation-delay: calc(var(--i, 0) * 20ms); }
+.day-range, .day-end { animation: sweep var(--duration-quick) var(--easing-standard) both; animation-delay: calc(var(--i, 0) * var(--duration-stagger)); }
 @keyframes sweep { from { clip-path: inset(0 100% 0 0); } }
 /* Start / End: the control/selected pair (Figma uses text/brand + feature text, which is under 4.5:1 in dark mode) */
 .day-start, .day-end, .day-single { color: var(--control-selected-text); }

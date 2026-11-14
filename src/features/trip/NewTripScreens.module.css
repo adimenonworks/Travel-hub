@@ -2,7 +2,7 @@
 .flow {
   position: fixed; inset: 0; z-index: 150; overflow-y: auto; overscroll-behavior: contain;
   background: var(--feature-surface-secondary); color: var(--feature-text);
-  animation: expand var(--duration-slow) var(--ease-fluid); /* the "Plan a new trip" button expands into the flow */
+  animation: expand var(--duration-gentle) var(--easing-fluid); /* the "Plan a new trip" button expands into the flow */
 }
 .inner {
   min-height: 100%; max-width: calc(var(--size-content-max) + 2 * var(--space-page-gutter)); margin: 0 auto;
@@ -10,7 +10,7 @@
   padding: calc(env(safe-area-inset-top) + var(--space-500)) var(--space-page-gutter) calc(env(safe-area-inset-bottom) + var(--space-900));
 }
 .bar { display: flex; align-items: center; gap: var(--space-500); }
-.step { flex: 1; display: flex; flex-direction: column; gap: var(--space-700); animation: stepIn var(--duration-base) var(--ease-fluid); }
+.step { flex: 1; display: flex; flex-direction: column; gap: var(--space-700); animation: stepIn var(--duration-regular) var(--easing-fluid); }
 .heading { display: flex; flex-direction: column; gap: var(--space-300); }
 .title { margin: 0; font: var(--type-display-small); letter-spacing: -0.01em; color: var(--feature-text); }
 .subtitle { margin: 0; font: var(--type-body); color: var(--feature-text-secondary); }
@@ -21,7 +21,7 @@
 @keyframes stepIn { from { opacity: 0; transform: translateX(24px); } }
 
 /* Figma "Celebration screen": deep emerald, centred, 96 top */
-.celebrate { position: fixed; inset: 0; z-index: 160; overflow-y: auto; background: var(--feature-surface); color: var(--feature-text); animation: flood calc(var(--duration-base) * 2) var(--ease-standard); } /* 500ms: dark green floods the screen */
+.celebrate { position: fixed; inset: 0; z-index: 160; overflow-y: auto; background: var(--feature-surface); color: var(--feature-text); animation: flood var(--duration-celebrate) var(--easing-standard); } /* dark green floods the screen */
 .celebrateInner {
   position: relative; min-height: 100%; max-width: calc(var(--size-content-max) + 2 * var(--space-page-gutter)); margin: 0 auto;
   display: flex; flex-direction: column; align-items: center; text-align: center; gap: var(--space-700);
@@ -29,7 +29,7 @@
 }
 /* Figma paints the circle and the number on-mid/surface/primary, which in dark mode is the same deep emerald as this screen;
    the primary button's emerald (the same in both modes) keeps them visible. */
-.badge { display: grid; place-items: center; width: 176px; height: 176px; border-radius: var(--radius-full); background: var(--button-primary-background); animation: pop 500ms var(--ease-bounce) 150ms both; }
+.badge { display: grid; place-items: center; width: 176px; height: 176px; border-radius: var(--radius-full); background: var(--button-primary-background); animation: pop var(--duration-celebrate) var(--easing-bounce) var(--duration-quick) both; }
 .celebrateTitle { margin: 0; font: var(--type-display-small); letter-spacing: -0.01em; color: var(--feature-text); }
 .celebrateSubtitle { margin: 0; font: var(--type-body); color: var(--feature-text-secondary); }
 .count { display: flex; flex-direction: column; align-items: center; gap: var(--space-100); }
@@ -41,7 +41,7 @@
 @keyframes pop { from { transform: scale(0.4); opacity: 0; } }
 @keyframes flood { from { opacity: 0; } }
 @media (prefers-reduced-motion: reduce) {
-  .flow { animation: flood var(--duration-base) var(--ease-standard); }
-  .step { animation: flood var(--duration-base) var(--ease-standard); }
-  .badge { animation: flood var(--duration-base) var(--ease-standard); }
+  .flow { animation: flood var(--duration-regular) var(--easing-standard); }
+  .step { animation: flood var(--duration-regular) var(--easing-standard); }
+  .badge { animation: flood var(--duration-regular) var(--easing-standard); }
 }

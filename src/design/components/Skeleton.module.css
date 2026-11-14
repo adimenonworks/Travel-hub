@@ -3,7 +3,7 @@
   display: block; flex: none;
   background: var(--surface-sunken) linear-gradient(90deg, transparent 0, color-mix(in srgb, var(--surface-primary) 50%, transparent) 50%, transparent 100%) no-repeat;
   background-size: 50% 100%; background-position: -100% 0;
-  animation: shimmer 1.4s var(--ease-standard) infinite;
+  animation: shimmer var(--duration-shimmer) var(--easing-standard) infinite;
 }
 .text { width: 100%; height: calc(14rem / 17); border-radius: var(--radius-full); } /* a pill line */
 .block { width: 100%; height: 120px; border-radius: var(--radius-600); }
