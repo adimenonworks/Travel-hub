@@ -4,7 +4,7 @@
 
 **What this changes:** how people share a trip. That covers roles, who's in each event, personal booking details, prices and budgets, undo and history, an in-app inbox, and guests on a single event.
 
-**This reverses three earlier decisions.** Update the Planning board to match:
+**This reverses three earlier decisions.** They're already recorded in `docs/DECISIONS.md` (13 Nov) and `docs/ROADMAP.md` (Now). When each is built, move it to *Built* in `ROADMAP.md` and redraw the Figma Planning board from it:
 - per-event "who's going" moves from *Decided not to build* to *Built*;
 - "activity history" moves from *Others / not to build* into this work, as per-event change history;
 - "Notifications" moves from *Needs a design first* into this work, as an **in-app** inbox only. Lock-screen push stays in *Later*.
@@ -374,5 +374,5 @@ Report ✅, ❌ (with the reason) or ⚠️ (done, with a caveat) on every line.
 - [ ] Any traveller can edit the trip's name, dates and cover; the location is read-only after creation; a trip covers its starting location plus every place on its events
 - [ ] A guest sees one event and their share, counts in the split, and can be added to the trip
 - [ ] The migration runs on an existing trip without losing events, people, prices or bookings
-- [ ] Planning board updated (the three reversals at the top)
+- [ ] `docs/ROADMAP.md` updated (built items moved to Built) and the Figma Planning board redrawn from it; any new decisions added to `docs/DECISIONS.md`
 - [ ] Report: what changed per item, anything not done and why, and every conflict found between the code, Figma and this file

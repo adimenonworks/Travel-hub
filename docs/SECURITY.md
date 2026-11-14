@@ -77,10 +77,10 @@ The rules have their own automated tests (`tests/rules/`). Run them whenever the
    problem, limit updates to the author and organisers, except votes and "who's going".
 4. **Skipped for now (10 Nov): the Worker can be called by anyone who knows its address.** That can't leak data, but it
    can use up the Unsplash and flight quotas. *Fix later:* a Cloudflare rate-limiting rule, and optionally require a
-   Firebase sign-in token. On the Planning page under Later.
+   Firebase sign-in token. In `docs/ROADMAP.md` under Later.
 5. **Skipped for now (10 Nov): no App Check.** [Firebase's way to prove a request comes from the real Rove app.] The
    rules still protect the data, but App Check stops scripts from hammering the database. *Fix later:* App Check with
-   App Attest for iOS, before launch. On the Planning page under Later.
+   App Attest for iOS, before launch. In `docs/ROADMAP.md` under Later.
 6. **Done (10 Nov): account deletion.** You → Delete account, after an "are you sure?" sheet. Trips you own go to the
    next member (or are deleted if you're alone); you leave the others and your messages are deleted; saved places a
    trip uses go to someone on that trip, the rest are deleted; then your profile, private settings and the sign-in

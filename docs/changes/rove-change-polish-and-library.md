@@ -382,13 +382,13 @@ This is built ("Layovers & time zones"); confirm it:
    - use these skills for every Firebase task.
 2. **Write and validate the rules** against the model after the people-and-sharing prompt (**[People prompt]**, Rules section):
    - every rule has a test in `tests/rules`, run with the Firestore emulator;
-   - include the open items from the Planning board's Security list: author-only comments, size limits on events, ideas and comments, and handing a trip over.
+   - include the open security items in `docs/SECURITY.md` and `docs/ROADMAP.md`: author-only comments, size limits on events, ideas and comments, and handing a trip over.
 3. **Deploy:**
    - with `firebase deploy --only firestore:rules`, only after every rules test passes;
    - show me the rules diff first, and wait for my go-ahead;
    - if the Firebase CLI isn't signed in, stop and tell me exactly what to run (e.g. `firebase login`) or what to click in the Firebase console;
    - deploy once now with today's tested rules, then again after the people-and-sharing changes.
-4. **Update `docs/SECURITY.md`** and the Planning board.
+4. **Update `docs/SECURITY.md`** and `docs/ROADMAP.md` (then redraw the Figma Planning board from it).
 
 ---
 
