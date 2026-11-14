@@ -11,7 +11,7 @@
 .edited { flex: none; font: var(--type-body-small); color: var(--text-secondary); }
 .bubble {
   margin: 0; min-width: 0; overflow-wrap: anywhere; white-space: pre-wrap;
-  padding: var(--space-300) var(--space-500); border-radius: var(--radius-600);
+  padding: var(--space-400) var(--space-500); border-radius: var(--radius-600); /* 12 / 16 (owner, 14 Nov 2026) */
   font: var(--type-body); background: var(--surface-primary); color: var(--text-primary); /* white on the grey section */
 }
 .theirs .bubble { border-top-left-radius: var(--radius-200); } /* the corner by the avatar, like a speech tail */
