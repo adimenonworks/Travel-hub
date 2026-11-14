@@ -19,13 +19,13 @@ export function valueOf(a: Partial<Activity>, field: TrackedField): TrackedValue
     case 'time': return { startTime: a.startTime ?? '', endTime: a.endTime ?? '' };
     case 'place': return { location: place(a.location), locationText: a.locationText ?? '' };
     case 'price': return price(a.price);
-    case 'people': return [...(a.attendeeIds ?? [])].sort();
+    case 'people': return [...(a.people ?? a.attendeeIds ?? [])].sort();
   }
 }
 
 /** The event fields that hold one tracked part. */
 const KEYS: Record<TrackedField, (keyof Activity)[]> = {
-  title: ['title'], date: ['date'], time: ['startTime', 'endTime'], place: ['location', 'locationText'], price: ['price'], people: ['attendeeIds'],
+  title: ['title'], date: ['date'], time: ['startTime', 'endTime'], place: ['location', 'locationText'], price: ['price'], people: ['people'],
 };
 
 /** The patch that sets one tracked part back to a stored value. */
@@ -36,7 +36,7 @@ export function patchFor(field: TrackedField, value: TrackedValue): Partial<Acti
     case 'time': { const v = value as { startTime: string; endTime: string }; return { startTime: v.startTime, endTime: v.endTime }; }
     case 'place': { const v = value as { location: Place | null; locationText: string }; return { location: v.location, locationText: v.locationText }; }
     case 'price': return { price: value as Price | null };
-    case 'people': return { attendeeIds: value as string[] };
+    case 'people': return { people: value as string[] };
   }
 }
 

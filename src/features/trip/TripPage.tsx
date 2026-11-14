@@ -8,6 +8,7 @@ import { useStarMigration } from '../saves/starEvent';
 import type { Activity, Album, Comment, Idea, Profile, Trip } from '../../data/types';
 import { useBudgetCleanup } from './budgetCleanup';
 import { useRoleMigration } from './roleMigration';
+import { useEventPeopleMigration } from './eventMigration';
 import { tripDatesLabel } from '../../lib/trips';
 import { Content } from '../../app/Shell';
 import { ActivityPage } from './ActivityPage';
@@ -63,6 +64,7 @@ function TripLoaded({ trip }: { trip: Trip }) {
   useStarMigration(trip.id, activities ?? [], me.uid);
   useBudgetCleanup(trip, isTraveller);
   useRoleMigration(trip, isTraveller);
+  useEventPeopleMigration(trip, activities ?? undefined, isTraveller);
   if (!activities || !ideas || !comments || !albums) return <PageSkeleton />;
   const ctx: TripCtx = { trip, activities, ideas, comments, albums, profiles, isTraveller };
 

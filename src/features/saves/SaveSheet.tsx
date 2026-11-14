@@ -1,3 +1,4 @@
+import { addedAfter, defaultPeople } from '../../data/eventPeople';
 import { isTravelling } from '../../data/roles';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Accordion, Chip, Icon, ListGroup, ListItem, OptionCard, SegmentControl, Sheet, Skeleton, TextArea, TextField, Button, useToast } from '../../design/components';
@@ -177,10 +178,12 @@ export function SaveSheet({ request, onClose }: { request: SaveRequest | null; o
         const info = kindInfo(category);
         const location: Place | null = Number.isFinite(place.lat) ? { name: place.name, lat: place.lat, lng: place.lng, country: place.country, countryCode: place.countryCode } : null;
         const tz = location ? await Promise.race([zoneAt(location).catch(() => undefined), new Promise<undefined>((r) => setTimeout(() => r(undefined), 2500))]) : undefined;
+        // Who's in: everyone for a plan, just you for a stay; anyone else put in it sees "New · added by" you
+        const people = defaultPeople(trip, me.uid, category);
         const ev = store.queueSub(trip.id, 'activities', {
           title, category, type: info.type, behaviour: info.behaviour, date: theDay, startTime: time, endTime: '',
           locationText: [place.name, city || place.city].filter(Boolean).join(', '), location, notes: '', links: preview.url ? [link] : [],
-          attendeeIds: [me.uid], placeId: id, ...(stay ? { endDate: out } : {}), ...(tz ? { tz } : {}),
+          people, added: addedAfter({}, [], people, me.uid), placeId: id, ...(stay ? { endDate: out } : {}), ...(tz ? { tz } : {}),
         });
         ev.saved.catch(fail);
         haptic('success');

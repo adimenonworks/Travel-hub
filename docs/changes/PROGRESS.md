@@ -45,7 +45,14 @@ Read this first when starting a session. If it disagrees with the code or Figma,
   - Checked in demo mode: edit time → history + Undo; edit again → Changes rows → Restore (recorded as "(restored)"); link remove → Undo; follower sees no Restore; 320/375/390/430, light/dark, 17/23/33: no horizontal scroll, no page errors.
   - **Not in this part (moved to item 3, needs who's in):** only travellers in an event edit it; the delete sheet "Just me (I'm out) / Remove for everyone"; Undo for I'm in / I'm out. Undo for edits outside events (ideas, albums) isn't built.
 
-**Next: item 3, Who's in per event.**
+- **Item 3: Who's in, per event** (pull request 167):
+  - Figma first: Chip got **Show Avatar** (a Small Avatar instance in every variant); new **Who's in row** (`689:1458`, in Components next to Icon button); **Event card** got **Show footer** (Avatar stack + **Going** text) and **Show Button** (Neutral, Inverse on Next). Screens: Event (`506:1221`) "Who's going" row is now "Who's in" with an I'm out Button; drafts **Delete shared event** (`689:3069`), **Add event · Who's in** (`689:3142`) and **Itinerary · Who's in** (`689:3241`).
+  - Code: `people` and `added` on events (`attendeeIds` migrated by `useEventPeopleMigration`); `src/data/eventPeople.ts` (defaults, `peopleOf`, `addedAfter`); `src/features/trip/whosIn.tsx` (`useWhosIn`: I'm in, I'm out, Delete with the Just me / Remove for everyone sheet, all with Undo); Who's in row in Add/Edit event; cards show who's in, New · added by, I'm in / I'm out; hold menu and event page follow who's in; only people in an event edit it. Saved links and ideas added to a day get their defaults.
+  - Rules: activities change only by people in them (`people`), except putting yourself in or out, clearing your own New mark, and restoring from Recently deleted; new events must include their adder; who's in lists only trip members; history entries only from people in the event. 184 rules tests pass.
+  - Checked in demo mode: migration (plan → everyone, stay → who it named), I'm out + Undo, I'm in, opening clears New, Delete → Just me, history of each, Add event defaults (plan: all; stay: just you), follower sees no buttons; 320/375/390/430, light/dark, 17/23/33: no horizontal scroll, no page errors.
+  - **Not in this item:** hiding events you're out of (item 5), the Notification centre entry (item 4), guests (item 9), I'm out as a swipe (conflicts with day swipes; see DECISIONS).
+
+**Next: item 4, Notification centre.**
 
 **Waiting on the owner:** publish `firestore.rules` (the new app needs the new rules: publish them before rebuilding the app in Xcode; the old app keeps working with the new rules).
 

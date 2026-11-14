@@ -76,8 +76,11 @@ The rules have their own automated tests (`tests/rules/`). Run them whenever the
    albums or files. The rules enforce it (`isTraveller`), covered by tests in `tests/rules`. Since 14 Nov there's no
    owner: every traveller has the same rights (people and sharing, item 1). **Takes effect once the rules are published**
    (Firebase console → Firestore → Rules → paste `firestore.rules` → Publish); until then the app only hides the buttons.
-3. **Members can still edit each other's events and ideas** (on purpose: planning together, voting). If that's ever a
-   problem, limit updates to the author and the people in the event (item 3 of people and sharing), except votes and "who's going".
+3. **Only the travellers in an event edit it** (since 14 Nov, people and sharing item 3): the rules check `people`. Any
+   other traveller may only put themselves in or take themselves out (I'm in / I'm out, clearing their own "New" mark)
+   or bring it back from Recently deleted; its history takes entries only from people in it. Older events without
+   `people` stay open to every traveller until the app migrates them. Ideas and albums are still editable by any
+   traveller (on purpose: planning together, voting).
 4. **Skipped for now (10 Nov): the Worker can be called by anyone who knows its address.** That can't leak data, but it
    can use up the Unsplash and flight quotas. *Fix later:* a Cloudflare rate-limiting rule, and optionally require a
    Firebase sign-in token. In `docs/ROADMAP.md` under Later.

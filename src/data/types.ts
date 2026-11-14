@@ -118,7 +118,14 @@ export type Activity = {
   /** Older events: a per-person cost in the trip's currency, shown as the price when there's no `price`. */
   cost?: number;
   links: LinkItem[];
-  attendeeIds: string[];
+  /** Who's in: the travellers this event is for (people and sharing, item 3). Only they edit it; anyone else on the trip
+   *  sees it with I'm in. Read through peopleOf() (src/data/eventPeople.ts), which also handles older events. */
+  people?: string[];
+  /** Who added whom: `{ [uid]: addedByUid }` for people put in it by someone else, until they open it (the card's
+   *  "New · added by Sam" Tag). */
+  added?: Record<string, string>;
+  /** Older events: who's going (usually just whoever added it). Migrated to `people` by the first traveller to open the trip. */
+  attendeeIds?: string[];
   /** The saved Place this event is at, when it came from Collections or was starred. Starring the event stars the Place. */
   placeId?: string;
   /** Older events: people who starred this event. Moved to the event's Place (see useStarMigration). */

@@ -83,6 +83,15 @@
 .eventAmount { font: var(--type-body-small); color: var(--text-secondary); white-space: nowrap; } /* subtle, level with the title */
 .eventStatus { font: var(--type-body-small); color: var(--status-warning); }
 .eventExtras { display: flex; flex-wrap: wrap; gap: var(--space-300); }
+/* Footer: who's in (Avatar stack, "2 of 4 going") and an optional Button (I'm in / I'm out) */
+.eventFooter { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: var(--space-300); }
+.eventPeople { display: flex; align-items: center; gap: var(--space-300); font: var(--type-body-small); color: var(--text-secondary); min-width: 0; }
+.event-next .eventPeople { color: var(--feature-text-secondary); }
+/* With a Button: the card is a box, an invisible link covers it, and the Button sits above the link */
+.eventWithAction { position: relative; }
+.eventCover { position: absolute; inset: 0; border-radius: inherit; }
+.eventWithAction:has(.eventCover:active) { transform: scale(0.97); transition: transform var(--motion-press); }
+.eventAction { position: relative; z-index: 1; margin-left: auto; }
 .route { display: flex; flex-direction: column; gap: var(--space-400); padding-top: var(--space-400); border-top: var(--border-width-thin) solid var(--border-divider); }
 .routeTimes { display: flex; align-items: center; gap: var(--space-300); }
 .routeEnd { flex: none; display: flex; flex-direction: column; gap: var(--space-100); }

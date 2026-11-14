@@ -114,7 +114,7 @@ export function Ideas(ctx: TripCtx) {
         open={!!scheduling}
         trip={trip}
         date={trip.startDate}
-        draft={scheduling ? { ...scheduling, ...(scheduling.placeId && places[scheduling.placeId] ? placeDraft(places[scheduling.placeId]) : {}) } : undefined}
+        draft={scheduling ? { ...scheduling, voters: Object.keys(scheduling.votes ?? {}), ...(scheduling.placeId && places[scheduling.placeId] ? placeDraft(places[scheduling.placeId]) : {}) } : undefined}
         onClose={() => setScheduling(null)}
         onCreated={(activityId) => scheduling && store.updateSub(trip.id, 'ideas', scheduling.id, { status: 'approved', activityId })}
       />

@@ -14,6 +14,8 @@ import { directionsUrl, mapsUrl, uberUrl } from '../../lib/geocode';
 import { MapView } from '../shared/Map';
 import { Comments } from '../shared/Comments';
 import { EventChanges } from './EventChanges';
+import { isIn, peopleOf, travellersOf } from '../../data/eventPeople';
+import { goingText, namesOf, useWhosIn } from './whosIn';
 import { haptic, confirmAction } from '../../lib/native';
 import { recordView } from '../../lib/recent';
 import { markRead } from '../../lib/reads';
@@ -57,6 +59,11 @@ export function ActivityPage(ctx: TripCtx) {
   const [connecting, setConnecting] = useState(false);
   const [stayAt, setStayAt] = useState<Layover | null>(null);
   const toast = useToast();
+  const whosIn = useWhosIn(trip, profiles);
+  // Opening an event you were put in clears its "New · added by" Tag
+  useEffect(() => {
+    if (a?.added?.[me.uid]) { const { [me.uid]: _seen, ...rest } = a.added; store.updateSub(trip.id, 'activities', a.id, { added: rest }).catch(() => {}); }
+  }, [a?.id, a?.added?.[me.uid]]); // eslint-disable-line react-hooks/exhaustive-deps
   const places = usePlacesById(ctx.activities.flatMap((x) => (x.placeId ? [x.placeId] : [])));
   const itinerary = `/trip/${trip.id}/itinerary${a ? `?day=${a.date}` : ''}`;
   // Live status for a flight (24 hours out until it lands), and a Warning haptic when it changes to Delayed or Cancelled
@@ -106,7 +113,11 @@ export function ActivityPage(ctx: TripCtx) {
       toast({ icon: 'star', label: starred ? 'Removed from favourites' : 'Added to favourites' });
     } catch { toast({ tone: 'danger', label: "Couldn't save. Check your connection" }); }
   };
-  const goingNames = a.attendeeIds.map((id) => (id === me.uid ? 'you' : personName(profiles, id).split(' ')[0]));
+  // Who's in. Only the travellers in it change it; any other traveller sees it read-only, with I'm in
+  const people = peopleOf(a, trip);
+  const mine = isIn(a, trip, me.uid);
+  const canEdit = ctx.isTraveller && mine;
+  const travellerCount = travellersOf(trip).length;
 
   const journey = behaviour === 'journey' && (kind === 'flight' || (!!a.fromText && !!a.toText));
   // A flight with connections: every leg, with the layovers between them
@@ -140,7 +151,11 @@ export function ActivityPage(ctx: TripCtx) {
   // A route to open in Maps: a journey other than a flight, or a car rental's pick-up and drop-off
   const routeFrom = (journey && kind !== 'flight') || vehicle ? (a.fromText || '').trim() : '';
   const routeTo = routeFrom ? ((vehicle ? a.toText || '' : a.toText || '').trim() !== routeFrom ? (a.toText || '').trim() : '') : '';
-  const goingRow = a.attendeeIds.length > 0 && <ListItem icon="people" title="Who’s going" meta={`${a.attendeeIds.length} of ${trip.memberIds.length}: ${goingNames.join(', ')}`} />;
+  // I'm out only when someone else is in it too (on your own, it's Delete, in Edit)
+  const whoAction = !ctx.isTraveller ? undefined
+    : !mine ? <Button tone="ghost" size="small" onClick={() => whosIn.imIn(a)}>I’m in</Button>
+      : people.length > 1 ? <Button tone="ghost" size="small" onClick={() => whosIn.imOut(a)}>I’m out</Button> : undefined;
+  const goingRow = travellerCount > 1 && <ListItem icon="people" title="Who’s in" meta={people.length ? `${goingText(people, travellerCount, me.uid)}: ${namesOf(people, profiles, me.uid)}` : 'Nobody yet'} action={whoAction} />;
   const priceRow = price && <ListItem icon="wallet" title={<PriceWithConversion price={price} />} meta="Price per person" />;
 
   return (
@@ -149,7 +164,7 @@ export function ActivityPage(ctx: TripCtx) {
       <PageHeader title={journey ? `${city(legs[0].fromText)} to ${city(lastLeg.toText)}` : a.title} size="small" back={backTo}
         icon={kindInfo(a.category).icon} type={categoryTone(a.category)}
         subtitle={journey ? formatDay(a.date) : spans ? (a.endDate && a.endDate !== a.date ? `${formatDay(a.date)} – ${formatDay(a.endDate)}` : formatDay(a.date)) : eventCardProps(a, ctx, true).time}
-        action={ctx.isTraveller ? { icon: 'pencil', label: 'Edit event', onClick: () => setEditing(true) } : undefined} />
+        action={canEdit ? { icon: 'pencil', label: 'Edit event', onClick: () => setEditing(true) } : undefined} />
 
       {/* Figma "Journey detail" for flights and trains; every other type shows its Event card. No price anywhere. */}
       {journey ? (
@@ -233,7 +248,7 @@ export function ActivityPage(ctx: TripCtx) {
         </PageSection>
       )}
 
-      <PageSection title="Files & links" action={ctx.isTraveller ? <Button tone="ghost" size="small" iconEnd="chevron-right" onClick={() => setAddingDoc(true)}>Add</Button> : undefined}>
+      <PageSection title="Files & links" action={canEdit ? <Button tone="ghost" size="small" iconEnd="chevron-right" onClick={() => setAddingDoc(true)}>Add</Button> : undefined}>
         {a.links.length > 0 || a.manageUrl ? (
           <ListGroup label="Files and links">
             {a.links.map((l, i) => {
@@ -244,7 +259,7 @@ export function ActivityPage(ctx: TripCtx) {
                     trailing={isPdf(l.url) ? 'PDF' : undefined} href={l.url} label={`${name} (opens in a new tab)`}
                     onClick={() => recordView(trip.id, { url: l.url, kind: isPdf(l.url) ? 'PDF' : 'Link', label: name, meta: a.title })} />
                   {l.emailUrl && <LinkButton href={l.emailUrl} size="small" tone="ghost" icon="mail" label={`Open the email for ${name}`} />}
-                  {ctx.isTraveller && <IconButton icon="trash" label={`Remove ${name}`} onClick={() => removeDoc(i)} />}
+                  {canEdit && <IconButton icon="trash" label={`Remove ${name}`} onClick={() => removeDoc(i)} />}
                 </div>
               );
             })}
@@ -253,12 +268,13 @@ export function ActivityPage(ctx: TripCtx) {
         ) : <p className="t-body-small t-secondary">Nothing attached yet. Add a ticket, confirmation or booking link.</p>}
       </PageSection>
 
-      <EventChanges tripId={trip.id} event={a} profiles={profiles} canRestore={ctx.isTraveller} />
+      <EventChanges tripId={trip.id} event={a} profiles={profiles} canRestore={canEdit} />
 
       <PageSection title="Comments">
         <Comments tripId={trip.id} targetId={a.id} comments={ctx.comments} profiles={profiles} />
       </PageSection>
 
+      {whosIn.sheet}
       {/* A connection: the next leg leaves from where this journey lands, and joins this journey */}
       <ConnectionForm open={connecting} trip={trip} activity={a} activities={ctx.activities} onClose={() => setConnecting(false)} />
       <ActivityForm open={!!stayAt} trip={trip} date={stayAt ? stayAt.arrives.endDate || stayAt.arrives.date : a.date}
