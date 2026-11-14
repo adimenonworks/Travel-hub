@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { SlideSwap } from '../shared/SlideSwap';
 import { useSearchParams } from 'react-router-dom';
-import { Button, IdeaRow, LinkButton, ListGroup, ListItem, PageSection, SectionHeader, SegmentControl, Dropdown, Sheet, TextArea, TextField, useToast, Card, Illustration } from '../../design/components';
+import { Accordion, Button, IdeaRow, LinkButton, ListGroup, ListItem, PageSection, SectionHeader, SegmentControl, Dropdown, Sheet, TextArea, TextField, useToast, Card, Illustration } from '../../design/components';
 import { store } from '../../data';
 import { personName, useMe, usePlaces, usePlacesById } from '../../data/hooks';
 import type { Category, Idea, LinkItem, SavedPlace } from '../../data/types';
@@ -127,7 +127,9 @@ const placeDraft = (p: SavedPlace) => ({ title: p.name, placeId: p.id, locationT
 
 /**
  * "Add idea": your saved Places from this trip's countries and cities, by city then category ("Add from saved"),
- * or a new idea. Choosing a Place adds an Idea that points at it.
+ * then "Other saved places": your other saved countries, one collapsed Accordion each (for a country added to the
+ * trip after it was made), or a new idea. Choosing a Place adds an Idea that points at it; ideas don't change the
+ * trip's countries.
  */
 function AddIdeaSheet({ open, ctx, onClose, onNew }: { open: boolean; ctx: TripCtx; onClose: () => void; onNew: () => void }) {
   const me = useMe();
@@ -136,7 +138,10 @@ function AddIdeaSheet({ open, ctx, onClose, onNew }: { open: boolean; ctx: TripC
   const { visited, starred } = usePlaceMarks();
   const codes = tripCountryCodes(ctx.trip, ctx.activities);
   const added = new Set(ctx.ideas.flatMap((i) => (i.placeId ? [i.placeId] : [])));
-  const fits = all.filter((p) => p.ownerId === me.uid && p.countryCode && codes.has(p.countryCode));
+  const mine = all.filter((p) => p.ownerId === me.uid && p.countryCode);
+  const fits = mine.filter((p) => codes.has(p.countryCode));
+  const others = groupBy(sortPlaces(mine.filter((p) => !codes.has(p.countryCode)), visited), (p) => p.countryCode)
+    .sort((a, b) => countryName(a[0]).localeCompare(countryName(b[0])));
   const add = async (p: SavedPlace) => {
     try {
       await store.addSub(ctx.trip.id, 'ideas', { title: p.name, category: eventCategoryOf(p.category), notes: '', links: [], votes: {}, status: 'open', placeId: p.id });
@@ -145,7 +150,7 @@ function AddIdeaSheet({ open, ctx, onClose, onNew }: { open: boolean; ctx: TripC
     } catch { toast({ tone: 'danger', label: "Couldn't save. Check your connection" }); }
   };
   return (
-    <Sheet open={open} title="Add an idea" subtitle={fits.length ? 'From your saved places, or something new' : undefined} onClose={onClose}>
+    <Sheet open={open} title="Add an idea" subtitle={mine.length ? 'From your saved places, or something new' : undefined} onClose={onClose}>
       <Button tone="neutral" icon="plus" block onClick={onNew}>New idea</Button>
       {fits.length === 0 ? (
         <p className="t-body-small t-secondary">Places you save in {[...codes].map(countryName).join(' or ') || 'this trip’s countries'} show up here, ready to add.</p>
@@ -161,6 +166,24 @@ function AddIdeaSheet({ open, ctx, onClose, onNew }: { open: boolean; ctx: TripC
           ))}
         </section>
       ))}
+      {others.length > 0 && (
+        <section className={s.addSection} aria-labelledby="other-saved">
+          <h3 className="t-heading-3" id="other-saved">Other saved places</h3>
+          {others.map(([code, list]) => (
+            <Accordion key={code} title={countryName(code)} meta={`${list.length} saved`}>
+              {/* Rows sit straight on the Accordion, as in the Save sheet's days */}
+              <div role="list" aria-label={`Saved in ${countryName(code)}`}>
+                {list.map((p) => {
+                  const meta = [placeCategory(p.category).one, p.city].filter(Boolean).join(' · ');
+                  return added.has(p.id)
+                    ? <ListItem key={p.id} icon={placeCategory(p.category).icon} type={placeCategory(p.category).tone} title={p.name} meta={meta} trailing="Added" />
+                    : <PlaceRow key={p.id} place={p} meta={meta} visited={visited.has(p.id)} starred={starred(p)} onClick={() => add(p)} />;
+                })}
+              </div>
+            </Accordion>
+          ))}
+        </section>
+      )}
     </Sheet>
   );
 }

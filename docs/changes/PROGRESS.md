@@ -10,7 +10,9 @@ Read this first when starting a session. If it disagrees with the code or Figma,
 
 `docs/changes/rove-change-transparency-setup.md` is **finished** (14 Nov 2026; results below).
 
-**Next: `docs/changes/rove-change-new-trip-stops.md`** (owner, 14 Nov 2026: Home's Primary button, several stops in New trip, Bring your saves matched to the trip), then `rove-change-people-and-sharing.md`, then `rove-change-polish-and-library.md` (which also has G8: Dropdown's size and Text area's height, the two Figma mismatches library v2 left).
+`docs/changes/rove-change-new-trip-stops.md` is **finished** (14 Nov 2026; results below).
+
+**Next: `docs/changes/rove-change-people-and-sharing.md`**, then `rove-change-polish-and-library.md` (which also has G8: Dropdown's size and Text area's height, the two Figma mismatches library v2 left).
 
 ### New trip stops status (14 Nov 2026)
 
@@ -18,6 +20,21 @@ Read this first when starting a session. If it disagrees with the code or Figma,
 - **2, several stops:** step one is "Where are you going?" with a stops list (existing List group, List item with its Show action Icon button, Text field); `trip.stops` saved in order, `destination` = first stop, `tripStops` reads older trips, cap 30 (`MAX_STOPS`). `tripCountries` = stops then event places; `tripCountryCodes` (Collections, Ideas) and the Save sheet's default now go through it (`tripCoversCity` checks every stop). Rules allow the field already (no key allowlist on trips), so no rules change. Edit trip's place picker was removed here rather than in item 4, so the first stop can't drift from `stops[0]`.
 - **3, Bring your saves:** only saves in the stops' countries, in stop order (places, links and notes); skipped with 4 step bars when nothing matches, and the bars update as stops change (tested: Madrid + Lisbon → Spain then Portugal, Japan left out; Paris → skipped; Lisbon + Paris with Lisbon removed → skipped).
 - **4, the trip's countries look after themselves:** Overview's "Good to know" is "Countries you're visiting" (meta line kept: "Emergency numbers and entry rules" still says what a row opens), a stop with no events says "No plans yet"; Figma Screens Trip · Overview updated (Section header Title, second row's Meta shows "No plans yet"). `tripCountries` drops stops with no events once the trip has ended (first stop kept when there are none); You → Your travels counts countries through it. Cities there still count each trip's first stop: the helper gives countries, not cities, so fixing cities would need a separate city helper (left as is). Edit trip's picker went in item 2. No removal prompt.
+- **5, Add from saved:** the trip's countries first as before, then "Other saved places": other saved countries A to Z, one collapsed Accordion each, rows straight on the Accordion as in the Save sheet's days. A pick makes an Idea; ideas don't change the trip's countries.
+- **Write after:** APP-SPEC, ROADMAP (New trip stops moved from Now to Built; Now renumbered) and the Figma Planning board redrawn (Built: Planning a trip and A trip updated, a New trip stops card added, 17 items; People card's Trip edit line; the Now column already showed People then Polish, so it was left).
+
+**Check everything (new trip stops):**
+- ✅ Home: Plan a trip Primary on the left, Save a place Neutral on the right, in Figma Screens (both Home frames) and code.
+- ✅ Step one adds several stops: flag rows with Remove, no duplicates, field clears after each pick, Continue after one, cap of 30 (the cap was read in code, not filled to 30 in a test).
+- ✅ `trip.stops` saved in order; `destination` is the first stop; older trips read through `tripStops`; rules already allow it (no change, nothing to publish).
+- ✅ `tripCountries` = stops plus event places; Overview, the heads-up, Your travels, Bring your saves, Add from saved, the Save sheet's default and Collections' trip row go through it.
+- ✅ Bring your saves: only the trip's countries, in stop order; skipped with the right step count.
+- ✅ Edit trip has no stops list or picker.
+- ✅ Overview's Countries you're visiting updates with events; stops without events say "No plans yet".
+- ✅ Past trips count only countries with events (first stop kept if none); Your travels uses it. ⚠️ Cities in Your travels still count each trip's first stop (the helper is about countries).
+- ✅ Add from saved: trip's countries first, then "Other saved places" as collapsed Accordions.
+- ✅ Demo mode with Playwright: one stop, three stops, a stop removed, no matching saves (skipped), a past trip with an unvisited stop; 320, 375, 390 and 430px; text 17, 23 and 33; light and dark; no horizontal scroll, no page errors.
+- ✅ `APP-SPEC.md`, `ROADMAP.md` and `PROGRESS.md` updated; Planning board redrawn.
 
 ### Transparency setup status (14 Nov 2026)
 
