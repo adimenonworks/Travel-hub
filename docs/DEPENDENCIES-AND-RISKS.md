@@ -49,8 +49,8 @@ free-plan limits as of November 2026. Check each provider's pricing page before 
   dozens of large trips, memory use on older iPhones grows: watch for slowness or reloads.
 - **The offline cache** (Firestore keeps data on the phone) grows with use. It's capped by Firestore (40 MB by
   default), so old data is cleared automatically.
-- **Comments and events have no size limits in the rules.** A very long note or comment is stored as-is, which costs
-  reads for everyone on the trip. A sensible limit (for example 2,000 characters) could be added to the rules.
+- **Text has size limits in the rules** (since 10 Nov): comments 150 characters, titles 200, notes 2,000, a typed
+  location 300. They take effect once the rules are published in the Firebase console.
 - **No backups on the free plan.** Firestore exports need Blaze. If data is deleted by mistake, it can't be restored.
   Turn on point-in-time recovery or scheduled exports once on Blaze.
 - **Deleting a trip doesn't delete its sub-collections** [events, ideas and comments are stored under the trip]. Those
