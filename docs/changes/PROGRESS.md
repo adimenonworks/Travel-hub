@@ -70,7 +70,29 @@ Read this first when starting a session. If it disagrees with the code or Figma,
   - /#/design: Typography specs corrected (they were wrong, e.g. Heading 1 is Poppins Black 125%) and Link small added; "Spacing & shape" is now **Layout** (space, page spaces, every radius, role sizes, the size scale, border widths); **Motion** lists the durations (in ms) and easings from `motion.css` plus the `--motion-*` shorthands; the Colour section was updated in A3.
   - Figma Foundations, Semantics doc (`35:1720`): Button, Control, Input, Tag, Category and Map groups added to the Light and Dark boards (110 swatches each, linked to their variables), `overlay/photo` added, and every swatch's "→ base" line regenerated from the live variables (13 in Light and 15 in Dark were out of date).
 
-**Next: Part E (update everything that names tokens or components; remove CLAUDE.md's stale lines).** Then the Check everything list.
+- **Part E, docs:** CLAUDE.md: removed the stale lines (screens "on the Flows page", weather and news in the intro, the code layout and Open-Meteo lines, `DestinationHeader`, the "Secondary button" on Bookings (it's a full-width Neutral button), country chips on the Hero card (Chips are choice and filter pills)), and updated names (Hero card's Show properties, Coach / Campervan icons, `border/divider`, Page header "Show leading icon", 7 illustration tokens, white canvas `--surface-primary`, token files incl. motion). **Kept:** "a sheet focuses its first field as it opens", now marked "(the polish prompt reverses this)": the app still does it, so deleting the line would make CLAUDE.md wrong. README, HOW-ROVE-IS-BUILT and the polish prompt (Bottom navigation; Search field → Text field with a leading icon) use the new names; the people-and-sharing prompt had none of the old names. `docs/token-migration.md` stays as the record.
+
+**Library v2 is finished (14 Nov 2026).**
+
+### Check everything results (library v2, 14 Nov 2026)
+
+- ✅ `docs/token-migration.md` written and approved before any change (A1, owner's 11 answers).
+- ✅ Collections: Base, Color (Light / Dark), Layout, Typography, Motion, in Figma and code.
+- ✅ No `on-light`, `on-mid`, `on-dark` or `on-accent` tokens anywhere; no `.surface-dark` re-pointing (search: 0 hits in code; Figma Color has none).
+- ✅ `feature/*` used by every deep-green area; confetti gone (code and Figma); celebration otherwise unchanged.
+- ✅ `status/danger` replaces error; `tag/category` replaces tag/brand; `control/*` replaces interactive/selected and unselected; hover tokens kept.
+- ⚠️ Every value in every Figma component is linked (checked by script), except the listed exceptions: Illustration artwork, Logo colours, Hero card photo layers (5:2 cover), Map card map height, Budget card sample bar, Event card's hidden Extras row. Code: no raw hex, px or ms outside tokens, except `0`, `calc(Nrem / 17)` (approved), one media query, component props.
+- ✅ Motion collection in Figma; the code uses its names (`motion.css`); every computed transition and animation matched Main when it landed.
+- ✅ Sizes are Small / Large (Medium where there are three) in Figma and code; Icon button has `size`.
+- ⚠️ Full names (Information, Document, Sign out, plus Coach, Campervan, Bottom navigation, `.Navigation item`); sentence case; "Show <Component>" booleans; layer names capitalised; `.Stat` (all checked by script). Caveat: Tile's variant property `Add` (True / False) is outside the glossary's property names; it predates this prompt and wasn't renamed.
+- ✅ No orphaned icons inside library components (script: 0).
+- ✅ No single-choice variant options (script: 0).
+- ✅ Card's extra props resolved and explained (B5); Message is a real component (B6); Text field, Text area and Dropdown are three components (B7).
+- ✅ Group headers readable when zoomed out; section screenshot in pull request 141.
+- ✅ Every screen looks the same as before: demo mode, the app before library v2 (`185d1fa`) against Main, 8 screens × 320 / 375 / 393 / 430 × text 17 / 23 / 33 × light and dark (192 pairs): 126 pixel-identical; the rest only where approved (selected Chips emerald-700 on Saved · Country, your chat bubbles deep green and 12px padding on the event page, the dark-mode map pin on You) or the known timing noise (the trip's tab strip scroll position, 6 pairs). Confetti and the New trip close button were checked separately.
+- ✅ `CLAUDE.md`, `DESIGN.md`, `/#/design` and the two other change documents updated; stale `CLAUDE.md` lines removed (one kept on purpose, see Part E).
+- ✅ Counts: Figma variables 399 → 390 (Base 129 → 137, Color 228 → 154, Layout 27 → 66, Typography 15 → 14, Motion 0 → 19); code tokens 446 → 416; variants 200 → 200 in 49 → 51 components (Text area and Dropdown split out; Day card lost an option but kept its 2 variants); 328 icon and flag sets.
+- ✅ Conflicts found between code, Figma and the prompt, and how each was settled: Event card star orange in Figma vs emerald in code (code won, owner); Message bubbles in Figma were the old colours and grey (code won); the Now line uses the Time icon, not Clock as the prompt said (code won); the prompt's Motion durations (350) vs the code's (400 and others: kept as used, owner); `--font-mono` was used, not unused as A1 said (kept); Dropdown's `compact` size exists only in code (not changed); Text area is drawn at Input height in Figma (not changed).
 
 **Noticed for later:** the Foundations section "Spacing & radius" (`35:2217`) documents names from long ago (`--space-xxs`, `--radius-button`, "Regular (744–1067px)"). Rebuild it in A4 with the new Layout names.
 

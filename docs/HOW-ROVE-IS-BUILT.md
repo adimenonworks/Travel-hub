@@ -86,7 +86,7 @@ exists in `functions/` but isn't deployed (it needs Firebase's paid Blaze plan; 
 ## 4. How the code is organised
 
 ```
-src/app/        the app shell: routes (which screen for which address), Bottom nav, swipe-back, chat alerts
+src/app/        the app shell: routes (which screen for which address), Bottom navigation, swipe-back, chat alerts
 src/data/       data types, the Store interface, Firebase and demo implementations, hooks
 src/design/     tokens/ (primitives → semantic → typography) and components/ (Button, Sheet, Event card…)
 src/features/   the screens: home, trip (Overview, Itinerary, Ideas, Photos, People, forms), saves, profile, auth
