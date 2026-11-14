@@ -14,6 +14,14 @@
 
 ## 14 Nov 2026
 
+### Control heights: minimum height plus padding, Small buttons 36px (owner)
+- **Decision:**
+  - Buttons, Chips and Tags are built with a minimum height and padding (as Button already was), so icons never change their shape and they grow with larger text.
+  - Small buttons (and Icon button Small) go from 32 to 36px, padding 8 / 16. Large stays 48.
+  - Chip and Tag share a new role token, `size/pill` (28). Every minimum height in Figma is linked to a variable.
+  - Polish prompt G10.
+- **Why:** 32px felt tight on a phone; 36 is a bit roomier while staying clearly smaller than Large (40 was considered, but would blur Small and Large and make section headers taller). Figma's Chip was 30px unselected and 28px selected, and Button's minimum heights were typed-in numbers.
+
 ### One trip, everyone equal: built (people and sharing, item 1)
 - **Decision:** no owner anywhere. Two roles, **Travelling** (`traveller`) and **Following** (`follower`). Any traveller edits the trip, adds people, changes roles, removes someone and deletes the trip; anyone can leave. Who started the trip is kept as `createdBy`, a record only.
 - **Details settled while building:** deleting goes to Recently deleted for everyone, and any traveller restores it or (after 30 days) clears it for good; the rules only allow deleting for good from Recently deleted. The last traveller leaving deletes the trip into Recently deleted, and they stay on it so they can restore it. Deleting your account leaves every trip; a trip with no other traveller is deleted. Older trips are migrated by the first traveller who opens them (owner, editor, member → traveller; viewer → follower; `ownerId` → `createdBy`), since there's no server; until then the app and the rules read the old names the same way.

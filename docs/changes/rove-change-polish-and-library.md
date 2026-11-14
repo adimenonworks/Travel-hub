@@ -367,6 +367,15 @@ Library v2 left two places where the code and Figma disagree. Figma first, then 
 - **Put it in one helper beside `tripCountries`** (for example `tripCities`) and use it in `ProfilePage.tsx`.
 - Check the Stat strip with a demo past trip that crosses several cities and countries.
 
+### G10. Control heights: bigger Small buttons, every minimum height a token (owner, 14 Nov 2026)
+Buttons are built with a **minimum height plus padding**: the text sits in the middle, removing an icon never changes the shape, and the control grows when someone uses larger text. Keep that, make Small buttons a little bigger, and give Chip and Tag the same treatment.
+
+- **Small buttons become 36px** (were 32). `size/control-small` → 36 (`base/size/36`), with padding **8 top and bottom** (`space/200`) and **16 at the sides** (`space/400`); gap and 16px icons stay. Icon button Small shares the token, so it becomes 36 too (16px icon), and still keeps its 44px tap area. Large stays 48.
+- **Chip and Tag get a minimum height:** a new role token **`size/pill`** = 28 (`base/size/28`), shared by Chip and Tag. In code, Chip's `min-height: var(--size-650)` becomes `var(--size-pill)`; Tag gets the same `min-height`. In Figma, both get the minimum height linked to `size/pill`, so every state and every version with or without an icon is the same height. **Found:** Figma's Chip is 30px unselected and 28px selected today; this fixes it.
+- **Every minimum height is linked to its variable in Figma.** Button's 32 and 48 are typed-in numbers today (missed by library v2); link them to `size/control-small` and `size/control-large`. Check every component with a minimum height by script.
+- **Figma first** (Foundations: the tokens, Button, Icon button, Chip, Tag; then the Screens frames that use them), then code. Update `/#/design`, `docs/DESIGN-SYSTEM.md` (Button sizes, Icon button Small, Chip, Tag) and the 44px tap-area maths that uses `size/control-small`.
+- **Check** every screen at 320 and 390px, text 17 and 33, light and dark: nothing clipped, section headers and rows still line up, and a button and an Icon button side by side are level. Show the owner a before and after of Home and a section header before merging.
+
 ## Part H — Trip edit
 
 **[People prompt]** Any traveller can edit the trip. The location is read-only after creation. Budget and currency are removed from Edit trip.
@@ -451,6 +460,7 @@ Report ✅, ❌ (with the reason) or ⚠️ (done, with a caveat) on every line.
 - [ ] Time zone checks reported, and any failures fixed
 - [ ] Dropdown has Size Small / Large in Figma and code (no `compact`); Text area drawn at its real height in Figma; both compared side by side
 - [ ] Your travels counts cities from every past trip's events (city + country, never a postcode); older events get their city once, in the background
+- [ ] Small buttons and Icon button Small are 36px (8 / 16 padding); Chip and Tag use `size/pill` (28) as a minimum height; every minimum height in Figma is linked to a variable; before and after shown
 
 **Trip edit**
 - [ ] The cover only moves in Edit photo mode, with the overlay; Save locks it again; Change and Edit on the left, Remove as a Ghost button on the right; no swipe-to-close while editing
