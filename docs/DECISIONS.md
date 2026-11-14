@@ -24,6 +24,14 @@
 
 ## 14 Nov 2026
 
+### Notification centre: built (people and sharing, item 4)
+- **Decision (owner):** the Bell sits only in Home's Page header, and the same count shows on **Home in the Bottom navigation**, so it's visible from every screen. **Turned down:** a second Bell in the Trip header (the prompt's idea): that header already holds Back, the name and Edit, and one place to look is how most iPhone apps do it.
+- **Decision (owner):** **opening the Notification centre clears the count**, like the iOS app badge; what was new stays marked "New" while you're there. **Turned down:** per-entry read state, like email (the count lingers and you clear entries one by one).
+- **Decision (owner):** the **slide-down chat alert stays** while the app is open; unread chat also gets one row per event in the centre ("3 new messages on Fado night"). **Turned down:** chat only in the centre.
+- **No server, so the writer's device tells people:** each change writes its entries (`trips/{id}/notices`, addressed in `to`) in the same save as the change where it can. Only the people addressed read them (the rules check `to`); a lock-screen push later can send the same entries from a Cloud Function. **Turned down:** working entries out on each phone from events and history (every phone would have to watch every event's history, and nothing would be ready for push).
+- **The count is emerald, not red** (Claude, for the owner to confirm): the `.Badge` uses the primary button colours. It's a count of new things, not an error; red is Rove's danger colour. The polish prompt's C2 asked for a red `notification/badge` token; it now says to confirm first.
+- **Where:** `src/features/notifications/`, `src/lib/notices.ts`, `firestore.rules` (`notices`).
+
 ### Who's in, per event: built (people and sharing, item 3)
 - **Decision:** every event has `people` (the travellers in it). Plans start with everyone, flights and stays with just you, an idea added to a day with its voters plus you; you're always in what you add. Only the people in an event edit or delete it; anyone else travelling sees it read-only with **I'm in**. Deleting a shared event asks **Just me** (I'm out, the default) or **Remove for everyone** (Recently deleted, where any traveller can bring it back). I'm in, I'm out and edits to who's in have Undo and show in Changes. Someone put in by someone else sees "New · added by Sam" and I'm out on the card until they open it (`added` on the event).
 - **Older events:** `attendeeIds` was nearly always just whoever added it, so copying it would have taken everyone else off every plan. Instead the first traveller to open a trip writes `people`: a plan becomes everyone's (what a plan added by hand is now), a flight or stay keeps who it named. The rules let any traveller edit an event without `people` until then.

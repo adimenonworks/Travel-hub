@@ -65,6 +65,8 @@
 }
 .iconButton::after { content: ''; position: absolute; inset: calc((var(--size-800) - var(--size-tap)) / 2); }
 /* Size=Small: 32px circle, 16px icon, the same 44px tap area */
+/* Figma Icon button "Show Badge": the count sits over the glyph's top-right corner */
+.badge { position: absolute; top: calc(50% - var(--size-650) / 2); left: 50%; }
 .iconSmall { width: var(--size-control-small); height: var(--size-control-small); }
 .iconSmall::after { inset: calc((var(--size-control-small) - var(--size-tap)) / 2); }
 .iconButton:active:not(:disabled) { transform: scale(0.92); transition: background var(--motion-fast), transform var(--motion-press); }

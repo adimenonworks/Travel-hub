@@ -1,4 +1,4 @@
-import type { Activity, EventChange, Role, Deletable, ChatReads, CollectionRole, CollectionShare, Invite, LinkPreview, NewDoc, Profile, SavedPlace, SubCollections, SubName, Trip, User, Vote } from './types';
+import type { Activity, EventChange, NewNotice, Notice, Role, Deletable, ChatReads, CollectionRole, CollectionShare, Invite, LinkPreview, NewDoc, Profile, SavedPlace, SubCollections, SubName, Trip, User, Vote } from './types';
 
 export type Unsubscribe = () => void;
 
@@ -28,6 +28,12 @@ export interface Store {
   watchReads(uid: string, cb: (r: ChatReads | null) => void): Unsubscribe;
   /** You've read an event's chat up to `at` (only that event's time changes, so two devices never clash). */
   markRead(uid: string, targetId: string, at: number, since: number): Promise<void>;
+
+  /** Your Notification centre entries on one trip (only the ones addressed to you), live. */
+  watchNotices(tripId: string, uid: string, cb: (notices: Notice[]) => void): Unsubscribe;
+  /** Tell people about a change you made (Notification centre). Entries with nobody to tell are dropped. Adding,
+   *  editing (`updateEvent`) and I'm in / I'm out write their own entries; this is for everything else. */
+  addNotices(tripId: string, notices: NewNotice[]): Promise<void>;
 
   watchMyTrips(uid: string, cb: (trips: Trip[]) => void): Unsubscribe;
   watchTrip(id: string, cb: (trip: Trip | null) => void, onError?: (e: Error) => void): Unsubscribe;

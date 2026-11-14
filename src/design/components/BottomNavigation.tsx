@@ -2,10 +2,13 @@ import { useRef, useState, type CSSProperties } from 'react';
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { haptic } from '../../lib/native';
 import { Icon, type IconName } from './Icon';
+import { Badge } from './Misc';
 import { nextTransition } from '../../app/navigation';
 import s from './BottomNavigation.module.css';
 
-export type NavTab = { to: string; label: string; icon: IconName; active: (path: string) => boolean };
+export type NavTab = { to: string; label: string; icon: IconName; active: (path: string) => boolean;
+  /** Figma ".Navigation item" "Show Badge": a count on the icon (Home: unread notifications); 0 shows none */
+  badge?: number; /** What the count means, read out with the tab's name ("3 new notifications") */ badgeLabel?: string };
 
 /**
  * Figma "Bottom navigation": the app's tab bar, a frosted pill (Elevation/Floating bar) floating 16px from the sides and bottom,
@@ -71,8 +74,11 @@ export function BottomNavigation({ tabs, inline }: { tabs: NavTab[]; /** In the 
           return (
             <NavLink key={t.label} to={t.to} className={s.item} aria-current={i === current ? 'page' : undefined}
               onClick={(e) => { if (dragged.current) { dragged.current = false; e.preventDefault(); return; } if (on && pathname === t.to) { e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' }); return; } nextTransition('tab'); }}>
-              <Icon name={t.icon} size={24} state={on ? 'filled' : 'default'} />
-              <span>{t.label}</span>
+              <span className={s.icon}>
+                <Icon name={t.icon} size={24} state={on ? 'filled' : 'default'} />
+                {!!t.badge && <Badge count={t.badge} className={s.badge} />}
+              </span>
+              <span>{t.label}{!!t.badge && t.badgeLabel && <span className="visually-hidden">, {t.badgeLabel}</span>}</span>
             </NavLink>
           );
         })}

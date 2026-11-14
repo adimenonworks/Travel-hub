@@ -112,7 +112,27 @@ service cloud.firestore {
           && (!exists(eventDoc()) || 'deletedAt' in get(eventDoc()).data || 'deletedAt' in tripData(tripId));
       }
 
-      // Activities, ideas, albums, comments (and old expenses): people on the trip only.
+      // Notification centre entries (people and sharing, item 4): whoever makes a change writes one for the people it
+      // concerns. Only those people read it (a traveller may also list them all once the trip is in Recently deleted, to
+      // delete them with it). Written by anyone on the trip as themselves, never to themselves, only to people on the
+      // trip; nobody edits one.
+      match /notices/{noticeId} {
+        function n() { return request.resource.data; }
+        allow read: if signedIn() && (uid() in resource.data.to || (isTraveller(tripId) && 'deletedAt' in tripData(tripId)));
+        allow create: if isMember(tripId)
+          && n().by == uid()
+          && n().at is number
+          && n().kind in ['added', 'removed', 'moved', 'out', 'deleted', 'joined', 'role', 'dates']
+          && n().to is list && n().to.size() > 0 && n().to.size() <= 50
+          && n().to.hasOnly(tripData(tripId).memberIds)
+          && !(uid() in n().to)
+          && (!('title' in n()) || (n().title is string && n().title.size() <= 200))
+          && n().keys().hasOnly(['kind', 'by', 'to', 'at', 'eventId', 'title', 'date', 'prevDate', 'startTime', 'role', 'startDate', 'endDate']);
+        allow update: if false;
+        allow delete: if isTraveller(tripId) && 'deletedAt' in tripData(tripId);
+      }
+
+      // Activities, ideas, albums, comments (and old expenses): people on the trip only. (Not notices: see above.)
       // Travellers add and update (votes, ideas, albums); followers can only comment. An event is changed only by the
       // travellers in it (`people`, item 3); any other traveller may only put themselves in or take themselves out
       // (I'm in, I'm out, clearing their own "New" mark) or bring it back from Recently deleted. Older events without
@@ -139,18 +159,18 @@ service cloud.firestore {
         function restoring() { return d().diff(resource.data).affectedKeys().hasOnly(['deletedAt', 'deletedBy']) && !('deletedAt' in d()); }
         function eventWriteOk() { return sub != 'activities' || (peopleOk() && (inEvent() || myPlaceOnly() || restoring())); }
 
-        allow read: if isMember(tripId);
-        allow create: if isMember(tripId) && sizesOk()
+        allow read: if sub != 'notices' && isMember(tripId);
+        allow create: if sub != 'notices' && isMember(tripId) && sizesOk()
           && (sub == 'comments' || isTraveller(tripId))
           && d().get('createdBy', uid()) == uid()
           && (sub != 'activities' || (peopleOk() && (!('people' in d()) || uid() in d().people)))
           && (sub != 'comments' || (d().authorId == uid() && d().text is string && d().text.size() > 0));
-        allow update: if isMember(tripId) && sizesOk()
+        allow update: if sub != 'notices' && isMember(tripId) && sizesOk()
           && (sub == 'comments' || isTraveller(tripId))
           && d().get('createdBy', '') == resource.data.get('createdBy', '')
           && eventWriteOk()
           && (sub != 'comments' || addedByMe());
-        allow delete: if isMember(tripId) && (addedByMe() || noAuthor() || (sub != 'comments' && isTraveller(tripId)));
+        allow delete: if sub != 'notices' && isMember(tripId) && (addedByMe() || noAuthor() || (sub != 'comments' && isTraveller(tripId)));
       }
     }
 

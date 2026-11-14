@@ -73,3 +73,13 @@
 .chipButton:active { transform: scale(0.96); transition: transform var(--motion-press); }
 .chip-inactive.chipButton:active { background: var(--control-unselected-background-pressed); }
 
+
+/* Figma ".Badge": a count on an icon (Icon button, .Navigation item). Sits over the icon's top-right corner. */
+.count {
+  display: inline-grid; place-items: center; box-sizing: border-box;
+  min-width: var(--size-400); min-height: var(--size-400); padding: 0 var(--space-100);
+  border-radius: var(--radius-full); background: var(--button-primary-background); color: var(--button-primary-text);
+  font: var(--type-label-small); font-variant-numeric: tabular-nums; pointer-events: none;
+}
+/* Trimmed to the cap height (on the number itself: a grid's bare text can't be trimmed), so it's 16px tall like Figma */
+@supports (text-box: trim-both cap alphabetic) { .count > span { text-box: trim-both cap alphabetic; } }

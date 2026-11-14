@@ -12,6 +12,10 @@ import type { ChatReads, Comment } from '../data/types';
  */
 const legacyKey = (uid: string) => `rove-reads:${uid}`;
 const latest = new Map<string, ChatReads>(); // the last value seen per person, so screens open with it at once
+const loaded = new Set<string>(); // people whose read state has arrived from their account (or been started there)
+
+/** Whether `uid`'s read state has arrived from their account yet (until then it's this device's guess). */
+export const readsReady = (uid: string) => loaded.has(uid);
 
 function legacy(uid: string): ChatReads | null {
   try { const raw = localStorage.getItem(legacyKey(uid)); return raw ? (JSON.parse(raw) as ChatReads) : null; } catch { return null; }
@@ -46,6 +50,7 @@ export function useReads(uid: string) {
     listeners.add(local);
     let moved = false;
     const off = store.watchReads(uid, (remote) => {
+      loaded.add(uid);
       if (remote) {
         // Keep the newest time per event from here and from the account (a write from this device may still be on its way)
         const mine = latest.get(uid);

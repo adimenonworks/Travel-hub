@@ -36,7 +36,10 @@
 /* While dragging, the pill follows the finger exactly (no easing) and grows a touch, like iOS */
 .dragging .indicator { transition: none; }
 @media (prefers-reduced-motion: reduce) { .indicator { transition: none; } }
-.item span { overflow-wrap: anywhere; text-align: center; }
+.item > span:last-child { overflow-wrap: anywhere; text-align: center; }
+/* Figma ".Navigation item" Show Badge: the count over the icon's top-right, starting 4px right of its centre */
+.icon { position: relative; display: grid; }
+.badge { position: absolute; top: calc(-1 * var(--space-100)); left: calc(50% + var(--space-100)); }
 /* Out of the way while typing (the app shrinks above the keyboard) */
 :global(.keyboard-open) .nav { display: none; }
 .inline { position: static; padding: 0; }

@@ -38,6 +38,16 @@ export function AvatarStack({ people, max = 3 }: { people: { id: string; name: s
 }
 
 /**
+ * Figma ".Badge": a count on an icon (unread notifications on the Bell and on Home in the Bottom navigation). An emerald
+ * pill in the primary button colours, Label small, 16px tall; 1–9, then "9+". Hidden from screen readers: the control
+ * it sits on says the count in its name ("Notifications, 3 new").
+ */
+export function Badge({ count, className }: { count: number; className?: string }) {
+  if (count <= 0) return null;
+  return <span className={[s.count, className].filter(Boolean).join(' ')} aria-hidden="true"><span>{count > 9 ? '9+' : count}</span></span>;
+}
+
+/**
  * Figma "Tag" Tone: Neutral, Category, Success, Warning, Danger. Neutral is the default and what the app uses;
  * Success / Warning / Danger only for a real status. (Tint was removed on 13 Nov 2026: brand-tinted tags are banned.)
  */

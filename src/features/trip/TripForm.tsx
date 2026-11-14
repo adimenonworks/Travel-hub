@@ -56,6 +56,9 @@ export function TripForm({ open, trip, onClose, onSaved, onDeleted }: { open: bo
     try {
       if (trip) {
         await store.updateTrip(trip.id, data);
+        // New dates: everyone else on the trip hears about it (Notification centre)
+        if (data.startDate !== trip.startDate || data.endDate !== trip.endDate)
+          store.addNotices(trip.id, [{ kind: 'dates', to: trip.memberIds.filter((m) => m !== me.uid).slice(0, 50), startDate: data.startDate, endDate: data.endDate }]).catch(() => {});
         toast({ icon: 'check', label: 'Changes saved' });
         onSaved?.(trip.id);
       } else {

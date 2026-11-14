@@ -150,6 +150,37 @@ const ch2 = { at: 1, field: 'people', before: ['bob'], after: ['bob', 'hana'] };
 await t('history: someone in it records a change', assertSucceeds(setDoc(doc(B, 'trips/t11/activities/w1/history/x1'), { ...ch2, by: 'bob' })));
 await t('history: a traveller not in it cannot record a change', assertFails(setDoc(doc(H, 'trips/t11/activities/w1/history/x2'), { ...ch2, by: 'hana' })));
 
+// Notification centre (item 4): only the people an entry is for read it; anyone on the trip writes as themselves
+const nt = { kind: 'added', to: ['dan'], at: 1, eventId: 'w1', title: 'Colosseum', date: '2026-11-02', startTime: '10:00' };
+await t('notices: a traveller tells someone they were added', assertSucceeds(setDoc(doc(B, 'trips/t11/notices/n1'), { ...nt, by: 'bob' })));
+await t('notices: a follower writes one too (joined)', assertSucceeds(setDoc(doc(C, 'trips/t11/notices/n2'), { kind: 'joined', to: ['bob', 'dan'], at: 1, by: 'carol' })));
+await t('notices: cannot write as someone else', assertFails(setDoc(doc(B, 'trips/t11/notices/n3'), { ...nt, by: 'hana' })));
+await t('notices: cannot write to yourself', assertFails(setDoc(doc(B, 'trips/t11/notices/n4'), { ...nt, to: ['bob'], by: 'bob' })));
+await t('notices: only to people on the trip', assertFails(setDoc(doc(B, 'trips/t11/notices/n5'), { ...nt, to: ['zoe'], by: 'bob' })));
+await t('notices: needs someone to tell', assertFails(setDoc(doc(B, 'trips/t11/notices/n6'), { ...nt, to: [], by: 'bob' })));
+await t('notices: known kinds only', assertFails(setDoc(doc(B, 'trips/t11/notices/n7'), { ...nt, kind: 'spam', by: 'bob' })));
+await t('notices: no extra keys', assertFails(setDoc(doc(B, 'trips/t11/notices/n8'), { ...nt, by: 'bob', notes: 'secret' })));
+await t('notices: a stranger cannot write one', assertFails(setDoc(doc(db('zoe'), 'trips/t11/notices/n9'), { ...nt, by: 'zoe' })));
+await t('notices: the person it is for reads it', assertSucceeds(getDoc(doc(db('dan'), 'trips/t11/notices/n1'))));
+await t('notices: its writer cannot read it back', assertFails(getDoc(doc(B, 'trips/t11/notices/n1'))));
+await t('notices: someone else on the trip cannot read it', assertFails(getDoc(doc(H, 'trips/t11/notices/n1'))));
+await t('notices: you list the ones addressed to you', assertSucceeds(getDocs(query(collection(db('dan'), 'trips/t11/notices'), where('to', 'array-contains', 'dan')))));
+await t('notices: you cannot list them all', assertFails(getDocs(collection(db('dan'), 'trips/t11/notices'))));
+await t('notices: nobody edits one', assertFails(updateDoc(doc(db('dan'), 'trips/t11/notices/n1'), { title: 'x' })));
+await t('notices: nobody deletes one while the trip is live', assertFails(deleteDoc(doc(B, 'trips/t11/notices/n1'))));
+await t('notices: an event and its notice in one batch', assertSucceeds((async () => {
+  const { writeBatch } = await import('firebase/firestore');
+  const b = writeBatch(H);
+  b.set(doc(H, 'trips/t11/activities/w4'), { title: 'Pizza', createdBy: 'hana', people: ['hana', 'bob'], added: { bob: 'hana' } });
+  b.set(doc(H, 'trips/t11/notices/n10'), { kind: 'added', to: ['bob'], at: 2, by: 'hana', eventId: 'w4', title: 'Pizza' });
+  await b.commit();
+})()));
+await env.withSecurityRulesDisabled(async (c) => updateDoc(doc(c.firestore(), 'trips/t11'), { deletedAt: 1 }));
+await t('notices: a traveller lists them all once the trip is in Recently deleted', assertSucceeds(getDocs(collection(B, 'trips/t11/notices'))));
+await t('notices: a follower cannot', assertFails(getDocs(collection(C, 'trips/t11/notices'))));
+await t('notices: a traveller deletes them with the trip', assertSucceeds(deleteDoc(doc(B, 'trips/t11/notices/n1'))));
+await env.withSecurityRulesDisabled(async (c) => updateDoc(doc(c.firestore(), 'trips/t11'), { deletedAt: deleteField() }));
+
 // Recently deleted: any traveller bins and restores the trip; deleting for good only from there
 await env.withSecurityRulesDisabled(async (c) => setDoc(doc(c.firestore(), 'trips/t8'), { name: 'Oslo', createdBy: 'alice', memberIds: ['alice', 'bob', 'carol'], roles: { alice: 'traveller', bob: 'traveller', carol: 'follower' } }));
 await env.withSecurityRulesDisabled(async (c) => setDoc(doc(c.firestore(), 'trips/t8/activities/e1'), { title: 'Fjord', createdBy: 'alice' }));

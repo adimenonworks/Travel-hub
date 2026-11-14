@@ -228,6 +228,23 @@ export type TrackedValue = string | { startTime: string; endTime: string } | { l
  */
 export type EventChange = { id: string; by: string; at: number; field: TrackedField; before: TrackedValue; after: TrackedValue; restoredFrom?: string };
 
+/**
+ * One entry in someone's Notification centre (people and sharing, item 4): `trips/{tripId}/notices/{id}`, written by the
+ * device of whoever made the change, addressed to the people it concerns (`to`), never to the writer. Only those people
+ * read it. It holds everything its line needs (no lookups but names), so the same entry can later be sent as a
+ * lock-screen push. Append-only; deleted with its trip.
+ *  - added: `by` put the reader in an event; removed: took them out of it; moved: changed its date or time
+ *    (`prevDate` is the day it was on); out: `by` left an event the reader is in; deleted: removed it for everyone
+ *  - joined: `by` joined the trip; role: made the reader Travelling or Following; dates: changed the trip's dates
+ */
+export type NoticeKind = 'added' | 'removed' | 'moved' | 'out' | 'deleted' | 'joined' | 'role' | 'dates';
+export type Notice = {
+  id: string; kind: NoticeKind; by: string; to: string[]; at: number;
+  eventId?: string; title?: string; date?: string; prevDate?: string; startTime?: string;
+  role?: Role; startDate?: string; endDate?: string;
+};
+export type NewNotice = Omit<Notice, 'id' | 'by' | 'at'>;
+
 export type Deletable = { kind: 'trip'; id: string } | { kind: 'event'; tripId: string; id: string } | { kind: 'place'; id: string };
 /** How long Recently deleted keeps things */
 export const KEEP_DELETED_MS = 30 * 86400_000;

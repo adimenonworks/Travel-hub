@@ -1,5 +1,5 @@
 import { useState, type CSSProperties } from 'react';
-import { Avatar, AvatarStack, Message, Tag, Chip, WhosInRow, Banner, Button, Card, FieldRow, HeroCard, Icon, IconButton, LinkButton, PageHeader, PageSection, SegmentControl, Dropdown, Sheet, Tabs, TextArea, TextField, NowLine, Illustration, type IllustrationName, COVER_ILLUSTRATIONS, ICON_NAMES, useToast, BottomNavigation, Skeleton, Logo, ListItem, ListGroup, SectionHeader, EventCard, TravelConnector, IdeaRow, Tile, StatStrip, ProfileCard, OptionCard, BudgetCard, StepProgress, DayCard, CountryModal, CategoryIcon, ContextMenu, Accordion, Calendar, JourneyCard, JourneyLeg, JourneyStop, MapCard } from '../../design/components';
+import { Avatar, AvatarStack, Badge, Message, Tag, Chip, WhosInRow, Banner, Button, Card, FieldRow, HeroCard, Icon, IconButton, LinkButton, PageHeader, PageSection, SegmentControl, Dropdown, Sheet, Tabs, TextArea, TextField, NowLine, Illustration, type IllustrationName, COVER_ILLUSTRATIONS, ICON_NAMES, useToast, BottomNavigation, Skeleton, Logo, ListItem, ListGroup, SectionHeader, EventCard, TravelConnector, IdeaRow, Tile, StatStrip, ProfileCard, OptionCard, BudgetCard, StepProgress, DayCard, CountryModal, CategoryIcon, ContextMenu, Accordion, Calendar, JourneyCard, JourneyLeg, JourneyStop, MapCard } from '../../design/components';
 import { flagUrl } from '../../lib/countries';
 import { EVENT_TYPES, TYPE_TONE } from '../../lib/categories';
 import type { ReactNode } from 'react';
@@ -186,10 +186,10 @@ export function DesignSystem() {
           </Card>
         </Section>
 
-        <Section title="Bottom navigation and Skeleton" footer="Figma Bottom navigation (.Navigation item ×3: Home, Trip, You), floating on the frosted bar; hidden while typing. Figma Skeleton (Text, Block, Circle) replaces spinners while a page loads.">
+        <Section title="Bottom navigation and Skeleton" footer="Figma Bottom navigation (.Navigation item ×3: Home, Trip, You), floating on the frosted bar; hidden while typing. Home shows a .Badge with the unread notifications (Show Badge). Figma Skeleton (Text, Block, Circle) replaces spinners while a page loads.">
           <Card>
             <BottomNavigation inline tabs={[
-              { to: '/design', label: 'Home', icon: 'home', active: () => true },
+              { to: '/design', label: 'Home', icon: 'home', active: () => true, badge: 3, badgeLabel: '3 new notifications' },
               { to: '/design', label: 'Trip', icon: 'plane', active: () => false },
               { to: '/design', label: 'You', icon: 'person', active: () => false },
             ]} />
@@ -218,6 +218,8 @@ export function DesignSystem() {
             <IconButton icon="pencil" label="Edit (Secondary)" tone="secondary" />
             <IconButton icon="send" label="Send (Primary)" tone="primary" />
             <IconButton icon="send" label="Send (Primary, disabled)" tone="primary" disabled />
+            <IconButton icon="bell" label="Notifications, 3 new (Secondary, Show Badge)" tone="secondary" badge={3} />
+            <IconButton icon="bell" label="Notifications, 12 new (Ghost, Show Badge)" badge={12} />
             <Dropdown compact aria-label="Compact select (matches a small button)"><option>Organizer</option><option>Member</option></Dropdown>
           </Card>
           <Card tone="accent" className={s.row}><Button tone="inverse">Inverse</Button><IconButton icon="x" label="Close (On feature)" tone="on-feature" /></Card>
@@ -253,6 +255,7 @@ export function DesignSystem() {
           </div>
           <WhosInRow people={[{ id: 'a', name: 'You', selected: true, locked: true }, { id: 'b', name: 'Priya', selected: true }, { id: 'c', name: 'Sam', selected: true }, { id: 'd', name: 'Leo', selected: false }]} onToggle={() => {}} />
           <div className={s.row}>
+            <Badge count={3} /><Badge count={12} />
             <Tag icon="calendar">In 9 days</Tag><Tag tone="category" icon="camera">Category</Tag><Tag tone="success" icon="check">Success</Tag><Tag tone="warning">Warning</Tag><Tag tone="danger">Danger</Tag>
           </div>
         </Section>
