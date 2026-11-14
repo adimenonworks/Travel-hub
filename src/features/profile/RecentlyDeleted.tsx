@@ -1,3 +1,4 @@
+import { isTravelling } from '../../data/roles';
 import { useEffect, useMemo, useRef } from 'react';
 import { Button, Card, Illustration, ListGroup, ListItem, PageHeader, PageSection, PageSkeleton, useToast } from '../../design/components';
 import { store } from '../../data';
@@ -29,7 +30,7 @@ function useBin() {
 
 /**
  * Clears Recently deleted after 30 days, from whichever device of someone allowed to delete it opens Rove first
- * (there's no server to do it): trips by whoever created them, events by a Planner, places by whoever saved them.
+ * (there's no server to do it): trips and events by any traveller on the trip, places by whoever saved them.
  */
 export function usePurgeDeleted() {
   const { me, trips, acts, places } = useBin();
@@ -38,8 +39,9 @@ export function usePurgeDeleted() {
     const old = (x: { deletedAt?: number }) => !!x.deletedAt && Date.now() - x.deletedAt >= KEEP_DELETED_MS;
     const once = (key: string, run: () => Promise<void>) => { if (!done.current.has(key)) { done.current.add(key); run().catch(() => {}); } };
     for (const t of trips ?? []) {
-      if (old(t) && t.ownerId === me.uid) once(`t:${t.id}`, () => store.deleteTrip(t.id));
-      else if (t.roles[me.uid] && t.roles[me.uid] !== 'viewer') for (const a of acts[t.id] ?? []) if (old(a)) once(`a:${a.id}`, () => store.deleteSub(t.id, 'activities', a.id));
+      if (!isTravelling(t, me.uid)) continue;
+      if (old(t)) once(`t:${t.id}`, () => store.deleteTrip(t.id));
+      else for (const a of acts[t.id] ?? []) if (old(a)) once(`a:${a.id}`, () => store.deleteSub(t.id, 'activities', a.id));
     }
     for (const p of places ?? []) if (old(p) && p.ownerId === me.uid) once(`p:${p.id}`, () => store.deletePlace(p.id));
   }, [trips, acts, places, me.uid]);
@@ -63,7 +65,7 @@ export function RecentlyDeleted() {
   const by = (uid?: string) => (!uid ? '' : uid === me.uid ? ' by you' : ` by ${personName(profiles, uid).split(' ')[0]}`);
   const meta = (x: { deletedAt?: number; deletedBy?: string }, before?: string) =>
     [before, `Deleted ${when(x.deletedAt!)}${by(x.deletedBy)}`, `${daysLeft(x.deletedAt!)} day${daysLeft(x.deletedAt!) === 1 ? '' : 's'} left`].filter(Boolean).join(' · ');
-  const planner = (t: Trip) => !!t.roles[me.uid] && t.roles[me.uid] !== 'viewer';
+  const planner = (t: Trip) => isTravelling(t, me.uid);
   const fail = () => toast({ tone: 'danger', label: "Couldn't restore it. Check your connection" });
 
   const restoreTrip = async (t: Trip) => {

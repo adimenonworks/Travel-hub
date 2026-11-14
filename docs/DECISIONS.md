@@ -14,6 +14,16 @@
 
 ## 14 Nov 2026
 
+### One trip, everyone equal: built (people and sharing, item 1)
+- **Decision:** no owner anywhere. Two roles, **Travelling** (`traveller`) and **Following** (`follower`). Any traveller edits the trip, adds people, changes roles, removes someone and deletes the trip; anyone can leave. Who started the trip is kept as `createdBy`, a record only.
+- **Details settled while building:** deleting goes to Recently deleted for everyone, and any traveller restores it or (after 30 days) clears it for good; the rules only allow deleting for good from Recently deleted. The last traveller leaving deletes the trip into Recently deleted, and they stay on it so they can restore it. Deleting your account leaves every trip; a trip with no other traveller is deleted. Older trips are migrated by the first traveller who opens them (owner, editor, member → traveller; viewer → follower; `ownerId` → `createdBy`), since there's no server; until then the app and the rules read the old names the same way.
+- **Copy:** "Join us on <trip> in Rove"; the join screen reads "<Name> wants you to join <trip>" with **Join trip**; "invite" is gone from what people read.
+- **Replaces:** "Delete account hands trips to the next member" (10 Nov) and the creator-only delete.
+
+### Edit trip keeps Budget and Local currency until item 8 (owner)
+- **Decision:** removing Budget per person and Local currency from Edit trip and New trip moves from item 1 to item 8 of the people and sharing prompt, where personal budgets and per-price currencies replace them.
+- **Why:** removing them first would leave the Budget card with nothing to show until item 8.
+
 ### Your travels counts every city (owner)
 - **Decision:** a past trip's cities are its first stop plus every city its events were in, worked out like its countries. Older events get their city from their map position, once. Polish prompt G9.
 - **Why:** after New trip stops, countries counted every country visited but cities only the first stop ("2 countries, 1 city" for Tokyo → Kyoto → Seoul).
@@ -350,7 +360,7 @@ From the repo's history and `CLAUDE.md`. Fewer reasons were recorded then.
 | 10 Nov | **No Secondary (light emerald) button:** too weak on grey surfaces |
 | 10 Nov | **Event types, categories and behaviours; layovers as one journey; each event keeps its place's time zone** |
 | 10 Nov | **Event chat** messages are up to 150 characters |
-| 10 Nov | **Delete account** hands trips to the next member; plus a privacy policy |
+| 10 Nov | **Delete account** hands trips to the next member; plus a privacy policy *(reversed 14 Nov: there's no owner; you leave, and a trip with no other traveller is deleted)* |
 | 10 Nov | **Per-event "who's going" not to build** *(reversed 13 Nov)* |
 | 9 Nov | **The website no longer deploys on every merge** |
 | 8 Nov | **Ideas use "Add to a day",** not dragging |

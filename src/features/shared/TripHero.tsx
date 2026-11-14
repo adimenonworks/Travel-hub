@@ -1,3 +1,4 @@
+import { isTravelling } from '../../data/roles';
 import { toInstant } from '../../lib/timezone';
 import { useEffect } from 'react';
 import { HeroCard } from '../../design/components';
@@ -48,9 +49,9 @@ export function TripHero({ trip, cover = true, list }: { trip: Trip; cover?: boo
     : phase === 'upcoming' && daysBetween(t, trip.startDate) <= 14 && abroad.length > 0
       ? { icon: 'document' as const, title: 'Check the entry requirements', meta: abroad.map(countryName).join(', '), to: base }
       : undefined;
-  // Unsplash cover: an organizer's Rove fetches one the first time the trip shows without a photo of its own.
+  // Unsplash cover: a traveller's Rove fetches one the first time the trip shows without a photo of its own.
   const me = useMe();
-  const canSet = ['owner', 'editor', 'member'].includes(trip.roles[me.uid] ?? '');
+  const canSet = isTravelling(trip, me.uid);
   useEffect(() => {
     if (!hasApi || !canSet || trip.coverPhoto || trip.cover !== undefined || asked.has(trip.id)) return;
     asked.add(trip.id);

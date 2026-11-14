@@ -1,3 +1,4 @@
+import { isTravelling, migratedRoles } from './roles';
 import type { Store } from './store';
 import type { ChatReads, CollectionShare, Invite, Profile, SavedPlace, SubName, Trip, User } from './types';
 import { randomCode } from './util';
@@ -93,8 +94,7 @@ export function createLocalStore(): Store {
         const others = t.memberIds.filter((m) => m !== uid);
         const comments = db.subs[t.id]?.comments ?? {};
         for (const [id, c] of Object.entries(comments)) if ((c as { authorId?: string }).authorId === uid) delete comments[id];
-        if (t.ownerId === uid && others.length) { delete t.roles[uid]; t.roles[others[0]] = 'owner'; t.ownerId = others[0]; t.memberIds = others; }
-        else if (t.ownerId === uid) { delete db.trips[t.id]; delete db.subs[t.id]; }
+        if (isTravelling(t, uid) && !others.some((m) => isTravelling(t, m))) { delete db.trips[t.id]; delete db.subs[t.id]; }
         else { t.memberIds = others; delete t.roles[uid]; }
       }
       for (const p of Object.values(db.places ?? {})) {
@@ -140,7 +140,7 @@ export function createLocalStore(): Store {
     async createTrip(data) {
       const id = randomCode(16);
       const uid = me();
-      db.trips[id] = { ...data, id, ownerId: uid, memberIds: [uid], roles: { [uid]: 'owner' }, createdAt: Date.now() };
+      db.trips[id] = { ...data, id, createdBy: uid, memberIds: [uid], roles: { [uid]: 'traveller' }, createdAt: Date.now() };
       save();
       return id;
     },
@@ -162,10 +162,8 @@ export function createLocalStore(): Store {
     async leaveTrip(id, uid) {
       const t = db.trips[id];
       const others = t.memberIds.filter((m) => m !== uid);
-      if (t.ownerId === uid && others.length) {
-        const to = others.find((m) => t.roles[m] !== 'viewer') ?? others[0];
-        t.ownerId = to; t.roles[to] = 'owner';
-      }
+      // The last traveller leaving deletes the trip (into Recently deleted); they stay on it so they can restore it
+      if (isTravelling(t, uid) && !others.some((m) => isTravelling(t, m))) { await this.setDeleted({ kind: 'trip', id }, true); return; }
       t.memberIds = others;
       delete t.roles[uid];
       save();
@@ -175,6 +173,15 @@ export function createLocalStore(): Store {
     },
     async setRole(trip, uid, role) {
       db.trips[trip.id].roles[uid] = role;
+      save();
+    },
+    async migrateRoles(trip) {
+      const t = db.trips[trip.id];
+      if (!t) return;
+      t.roles = migratedRoles(t);
+      const by = t.createdBy ?? t.ownerId;
+      if (by) t.createdBy = by;
+      delete t.ownerId;
       save();
     },
 
@@ -190,7 +197,7 @@ export function createLocalStore(): Store {
     queueTrip(data) {
       const id = randomCode(16);
       const uid = me();
-      db.trips[id] = { ...data, id, ownerId: uid, memberIds: [uid], roles: { [uid]: 'owner' }, createdAt: Date.now() };
+      db.trips[id] = { ...data, id, createdBy: uid, memberIds: [uid], roles: { [uid]: 'traveller' }, createdAt: Date.now() };
       save();
       return { id, saved: Promise.resolve() };
     },
@@ -312,7 +319,7 @@ export function createLocalStore(): Store {
       const uid = me();
       if (!t.memberIds.includes(uid)) {
         t.memberIds.push(uid);
-        t.roles[uid] = 'member';
+        t.roles[uid] = 'traveller';
       }
       save();
     },

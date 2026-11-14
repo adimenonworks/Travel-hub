@@ -3,13 +3,13 @@
 A shared vacation planner. Create trips, invite friends, and plan together:
 
 - **Itinerary**: day by day, with timed plans in 6 colour-coded types (getting around, stays, food & drink, activities, free time, notes), locations, booking references and links. Connections show as one journey, and every event keeps its place's time zone. Flights show live status (check-in open, on time, delayed, cancelled) once Rove's small server is set up.
-- **Ideas board**: Planners add ideas (with an optional price) and vote, then add the winners to a day.
+- **Ideas board**: travellers add ideas (with an optional price) and vote, then add the winners to a day.
 - **Saved places**: save a place from a link (or Share → Rove from any app) into your Collections (country → city → category), star favourites, share a country's collection, and bring places into a trip's ideas.
 - **Budgets**: an optional budget per person; bookings take a price per person and Overview shows what's left (rates by ExchangeRate-API). Ideas can have a price too.
 - **Good to know**: emergency numbers, entry requirements, local time and currency per country, and maps of your plans.
 - **Cover photos**: a photo of the place from Unsplash (credited to the photographer), or your own photo, shrunk on your device and saved with the trip.
 - **Photos**: links to shared Google Photos or iCloud albums for the trip (those services don't allow embedding, so each album opens in its own app or tab).
-- **People**: invite links, two roles (Planner and Viewer), leave or remove people.
+- **People**: links to join, two roles (Travelling and Following), everyone equal (no owner); leave or remove people.
 - **Event chat**: Messages-style comments on every event.
 - **Home**: what's happening now, your upcoming trips, your saves by country and what you saved recently. **You** has your travel stats, a map of places you've been, favourites, settings and Recently deleted (30 days).
 

@@ -29,8 +29,8 @@ personal data.
 ### The database rules (`firestore.rules`)
 | Data | Who can read | Who can change |
 |---|---|---|
-| A trip | Its members only | Planners (everyone but Viewers; they can't remove the trip's creator or change ownership; only the creator deletes the trip, and leaving or deleting their account hands it to another member) |
-| A trip's events, ideas, albums | Members | Planners add, update and delete; Viewers only comment |
+| A trip | Its members only | Any traveller (there's no owner): details, cover, people and roles, Recently deleted. Nobody can change `createdBy` (who started it, a record only). Deleting for good only from Recently deleted. Anyone can leave. Followers change nothing. Older trips' `owner`/`editor`/`member` count as traveller and `viewer` as follower until migrated |
+| A trip's events, ideas, albums | Members | Travellers add, update and delete; followers only comment |
 | A trip's comments | Members | Only the author edits or deletes; at most 150 characters |
 | Joining a trip | – | Someone with a valid, unexpired invite. They can only add themselves, as a member |
 | Leaving a trip | – | A member (not the owner) removes only themselves |
@@ -39,7 +39,7 @@ personal data.
 | Private profile (home, visited, currency, reads) | You only | You only |
 | Saved places | You, people you've added the place to a trip with (read by ID), and the people in a collection you shared (your places in that country, and places they added to it). Lists only return your own, ones you starred, and ones in a collection shared with you | You (deleting your account hands one a trip uses to someone on that trip). In a shared collection its owner and Members may also change a place's city or category; only whoever saved a place deletes it. Others can only add or remove their own star |
 | Shared collections (`collectionShares/{owner}_{country}`) | Its owner and the people in it | The owner adds roles (Member / Viewer) or removes people; you join only with a valid collection invite, as its role; anyone can leave |
-| Recently deleted (`deletedAt`, `deletedBy` on a trip, event or place) | Same as the thing itself | A trip: only its creator moves it there, any Planner brings it back. Events: Planners. Places: whoever saved them. Cleared for good after 30 days by the first allowed person's device to open Rove (`usePurgeDeleted`; there's no server) |
+| Recently deleted (`deletedAt`, `deletedBy` on a trip, event or place) | Same as the thing itself | A trip: any traveller moves it there and brings it back. Events: travellers. Places: whoever saved them. Cleared for good after 30 days by the first allowed person's device to open Rove (`usePurgeDeleted`; there's no server) |
 | Invites | Anyone signed in, by code (no listing) | Trip invites by its Planners; collection invites by the collection's owner (Can edit or Can view); deleted by whoever made it |
 
 The rules have their own automated tests (`tests/rules/`). Run them whenever the rules change.
@@ -67,14 +67,15 @@ The rules have their own automated tests (`tests/rules/`). Run them whenever the
 ## 3. Things to watch, and what to do (in priority order)
 
 1. **Done (10 Nov): trip content rules.** Comments can only be edited or deleted by their author (max 150 characters);
-   events, ideas and albums can only be deleted by whoever added them or an organiser; titles ≤ 200, notes ≤ 2,000
+   events, ideas and albums can only be deleted by whoever added them or any traveller; titles ≤ 200, notes ≤ 2,000
    characters. Covered by tests in `tests/rules`. Takes effect once the rules are published in the Firebase console.
-2. **Done (11 Nov): Viewer role.** An owner can make someone a Viewer in People: they see the whole trip and can
-   comment (and edit or delete their own comments), but can't add, edit or vote on events, ideas, albums or files. The
-   rules enforce it (`isContributor`), covered by tests in `tests/rules`. **Takes effect once the rules are published**
+2. **Done (11 Nov, renamed 14 Nov): Following role.** Any traveller can make someone a follower in People: they see the
+   whole trip and can comment (and edit or delete their own comments), but can't add, edit or vote on events, ideas,
+   albums or files. The rules enforce it (`isTraveller`), covered by tests in `tests/rules`. Since 14 Nov there's no
+   owner: every traveller has the same rights (people and sharing, item 1). **Takes effect once the rules are published**
    (Firebase console → Firestore → Rules → paste `firestore.rules` → Publish); until then the app only hides the buttons.
 3. **Members can still edit each other's events and ideas** (on purpose: planning together, voting). If that's ever a
-   problem, limit updates to the author and organisers, except votes and "who's going".
+   problem, limit updates to the author and the people in the event (item 3 of people and sharing), except votes and "who's going".
 4. **Skipped for now (10 Nov): the Worker can be called by anyone who knows its address.** That can't leak data, but it
    can use up the Unsplash and flight quotas. *Fix later:* a Cloudflare rate-limiting rule, and optionally require a
    Firebase sign-in token. In `docs/ROADMAP.md` under Later.

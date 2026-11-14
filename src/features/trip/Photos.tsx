@@ -16,14 +16,13 @@ import s from './trip.module.css';
  */
 export function Photos(ctx: TripCtx) {
   const { trip, albums } = ctx;
-  const me = useMe();
   const [editing, setEditing] = useState<Album | 'new' | null>(null);
   const sorted = albums.slice().sort((a, b) => b.createdAt - a.createdAt);
 
   return (
     <>
       <SectionHeader title="Shared albums" meta="Anyone on the trip can add one"
-        action={ctx.canContribute ? <Button size="small" icon="camera" onClick={() => setEditing("new")}>Add photos</Button> : undefined} />
+        action={ctx.isTraveller ? <Button size="small" icon="camera" onClick={() => setEditing("new")}>Add photos</Button> : undefined} />
       {sorted.length === 0 ? (
         <Card layout="centre" media={<Illustration name="memories" size={120} />} title="No albums yet"
           body="Make a shared album in Google Photos or Apple Photos, then add its link here so everyone can find the pictures." />
@@ -33,7 +32,7 @@ export function Photos(ctx: TripCtx) {
         </div>
       )}
       <AlbumForm open={!!editing} tripId={trip.id} album={editing === 'new' ? undefined : editing ?? undefined}
-        canDelete={!!editing && editing !== 'new' && (ctx.canManage || editing.createdBy === me.uid)} onClose={() => setEditing(null)} />
+        canDelete={!!editing && editing !== 'new' && ctx.isTraveller} onClose={() => setEditing(null)} />
     </>
   );
 }
@@ -42,7 +41,7 @@ export function Photos(ctx: TripCtx) {
 function AlbumCard({ album, ctx, index, onEdit }: { album: Album; ctx: TripCtx; index: number; onEdit: () => void }) {
   const me = useMe();
   const provider = albumProvider(album.url);
-  const canEdit = ctx.canManage || album.createdBy === me.uid;
+  const canEdit = ctx.isTraveller;
   return (
     <article className={s.album}>
       <div className={s.albumCover} aria-hidden="true"><Illustration name={COVER_ILLUSTRATIONS[index % COVER_ILLUSTRATIONS.length]} /></div>

@@ -26,8 +26,8 @@ function Routed() {
   const joining = pathname.startsWith('/join/');
   // Collection invite links end in ?to=collection, so the message is right before anyone has signed in
   const invited = new URLSearchParams(search).get('to') === 'collection'
-    ? "You've been invited to a collection of saved places. Sign in to join it."
-    : "You've been invited to a trip. Sign in to join.";
+    ? 'Sign in to join this collection of saved places.'
+    : 'Sign in to join the trip.';
   // The website is join-only: sign in, accept the invite, then get the app
   if (joinOnly()) {
     return (

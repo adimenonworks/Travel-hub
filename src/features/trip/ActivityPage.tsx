@@ -143,7 +143,7 @@ export function ActivityPage(ctx: TripCtx) {
       <PageHeader title={journey ? `${city(legs[0].fromText)} to ${city(lastLeg.toText)}` : a.title} size="small" back={backTo}
         icon={kindInfo(a.category).icon} type={categoryTone(a.category)}
         subtitle={journey ? formatDay(a.date) : spans ? (a.endDate && a.endDate !== a.date ? `${formatDay(a.date)} – ${formatDay(a.endDate)}` : formatDay(a.date)) : eventCardProps(a, ctx, true).time}
-        action={ctx.canContribute ? { icon: 'pencil', label: 'Edit event', onClick: () => setEditing(true) } : undefined} />
+        action={ctx.isTraveller ? { icon: 'pencil', label: 'Edit event', onClick: () => setEditing(true) } : undefined} />
 
       {/* Figma "Journey detail" for flights and trains; every other type shows its Event card. No price anywhere. */}
       {journey ? (
@@ -227,7 +227,7 @@ export function ActivityPage(ctx: TripCtx) {
         </PageSection>
       )}
 
-      <PageSection title="Files & links" action={ctx.canContribute ? <Button tone="ghost" size="small" iconEnd="chevron-right" onClick={() => setAddingDoc(true)}>Add</Button> : undefined}>
+      <PageSection title="Files & links" action={ctx.isTraveller ? <Button tone="ghost" size="small" iconEnd="chevron-right" onClick={() => setAddingDoc(true)}>Add</Button> : undefined}>
         {a.links.length > 0 || a.manageUrl ? (
           <ListGroup label="Files and links">
             {a.links.map((l, i) => {
@@ -238,7 +238,7 @@ export function ActivityPage(ctx: TripCtx) {
                     trailing={isPdf(l.url) ? 'PDF' : undefined} href={l.url} label={`${name} (opens in a new tab)`}
                     onClick={() => recordView(trip.id, { url: l.url, kind: isPdf(l.url) ? 'PDF' : 'Link', label: name, meta: a.title })} />
                   {l.emailUrl && <LinkButton href={l.emailUrl} size="small" tone="ghost" icon="mail" label={`Open the email for ${name}`} />}
-                  {ctx.canContribute && <IconButton icon="trash" label={`Remove ${name}`} onClick={() => removeDoc(i)} />}
+                  {ctx.isTraveller && <IconButton icon="trash" label={`Remove ${name}`} onClick={() => removeDoc(i)} />}
                 </div>
               );
             })}

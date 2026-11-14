@@ -1,4 +1,4 @@
-import type { Deletable, ChatReads, CollectionRole, CollectionShare, Invite, LinkPreview, NewDoc, Profile, SavedPlace, SubCollections, SubName, Trip, User, Vote } from './types';
+import type { Role, Deletable, ChatReads, CollectionRole, CollectionShare, Invite, LinkPreview, NewDoc, Profile, SavedPlace, SubCollections, SubName, Trip, User, Vote } from './types';
 
 export type Unsubscribe = () => void;
 
@@ -13,8 +13,7 @@ export interface Store {
   signIn(demoName?: string): Promise<void>;
   signOut(): Promise<void>;
   /**
-   * Delete your account (You → Delete account). Trips you own go to another member (the first one listed); trips with
-   * nobody else are deleted. You leave the other trips and your messages are deleted. Saved places a trip still uses go
+   * Delete your account (You → Delete account). You leave every trip; a trip with no other traveller is deleted. You leave the other trips and your messages are deleted. Saved places a trip still uses go
    * to that trip's next member; the rest are deleted, as are your stars, profile and private settings. Last, the
    * sign-in itself is deleted (on Firebase this may ask you to sign in with Google again to confirm it's you).
    */
@@ -32,14 +31,17 @@ export interface Store {
 
   watchMyTrips(uid: string, cb: (trips: Trip[]) => void): Unsubscribe;
   watchTrip(id: string, cb: (trip: Trip | null) => void, onError?: (e: Error) => void): Unsubscribe;
-  createTrip(data: Omit<Trip, 'id' | 'ownerId' | 'memberIds' | 'roles' | 'createdAt'>): Promise<string>;
+  createTrip(data: Omit<Trip, 'id' | 'createdBy' | 'ownerId' | 'memberIds' | 'roles' | 'createdAt'>): Promise<string>;
   updateTrip(id: string, patch: Partial<Trip>): Promise<void>;
   deleteTrip(id: string): Promise<void>;
   /** Move a trip, event or place to Recently deleted (on) or bring it back (off). It's deleted for good after 30 days. */
   setDeleted(item: Deletable, on: boolean): Promise<void>;
+  /** Leave a trip. If you're the last traveller, it goes to Recently deleted instead (you stay on it so you can restore it). */
   leaveTrip(id: string, uid: string): Promise<void>;
   removeMember(trip: Trip, uid: string): Promise<void>;
-  setRole(trip: Trip, uid: string, role: 'editor' | 'member' | 'viewer'): Promise<void>;
+  setRole(trip: Trip, uid: string, role: Role): Promise<void>;
+  /** Older trips: owner/editor/member → traveller, viewer → follower, `ownerId` → `createdBy` (any traveller, once). */
+  migrateRoles(trip: Trip): Promise<void>;
 
   watchSub<K extends SubName>(tripId: string, name: K, cb: (items: SubCollections[K][]) => void): Unsubscribe;
   addSub<K extends SubName>(tripId: string, name: K, data: NewDoc<SubCollections[K]>): Promise<string>;
@@ -55,8 +57,8 @@ export interface Store {
    * Offline, the write waits in the on-device queue and syncs later (saves still confirm straight away).
    */
   queueSub<K extends SubName>(tripId: string, name: K, data: NewDoc<SubCollections[K]>): { id: string; saved: Promise<void> };
-  queueTrip(data: Omit<Trip, 'id' | 'ownerId' | 'memberIds' | 'roles' | 'createdAt'>): { id: string; saved: Promise<void> };
-  /** Budgeting was removed: delete a trip's stored budget fields and logged costs (organizers only; expenses by anyone). */
+  queueTrip(data: Omit<Trip, 'id' | 'createdBy' | 'ownerId' | 'memberIds' | 'roles' | 'createdAt'>): { id: string; saved: Promise<void> };
+  /** Budgeting was removed: delete a trip's stored budget fields and logged costs (travellers only; expenses by anyone). */
   deleteBudgetData(trip: Trip): Promise<void>;
   /** Collections: your saved Places and the ones you've starred (others' Places added to your trips), live. */
   watchPlaces(uid: string, cb: (places: SavedPlace[]) => void): Unsubscribe;

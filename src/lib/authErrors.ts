@@ -16,7 +16,7 @@ export function describeAuthError(e: unknown): string | null {
     case 'auth/user-cancelled':
       return null; // they closed it themselves; nothing to explain
     case 'auth/unauthorized-domain':
-      return "This website address isn't approved for sign-in yet. The trip organizer needs to add it under Firebase → Authentication → Settings → Authorized domains.";
+      return "This website address isn't approved for sign-in yet. Whoever runs Rove needs to add it under Firebase → Authentication → Settings → Authorized domains.";
     case 'auth/network-request-failed':
       return 'No connection to Google. Check your internet and try again.';
     case 'auth/web-storage-unsupported':

@@ -9,96 +9,105 @@ let pass = 0, fail = 0;
 const t = async (name, p) => { try { await p; pass++; console.log('ok  ', name); } catch (e) { fail++; console.log('FAIL', name, e.message); } };
 
 const A = db('alice'), B = db('bob'), C = db('carol');
-const trip = { name: 'Lisbon', ownerId: 'alice', memberIds: ['alice'], roles: { alice: 'owner' }, startDate: '2026-11-01', endDate: '2026-11-05' };
+const trip = { name: 'Lisbon', createdBy: 'alice', memberIds: ['alice'], roles: { alice: 'traveller' }, startDate: '2026-11-01', endDate: '2026-11-05' };
 
-await t('owner creates trip', assertSucceeds(setDoc(doc(A, 'trips/t1'), trip)));
-await t('cannot create trip owned by someone else', assertFails(setDoc(doc(B, 'trips/t2'), trip)));
-await t('owner creates trip with a cover photo', assertSucceeds(setDoc(doc(A, 'trips/t4'), { ...trip, coverPhoto: 'data:image/jpeg;base64,AAAA' })));
+await t('traveller creates trip', assertSucceeds(setDoc(doc(A, 'trips/t1'), trip)));
+await t('cannot create a trip started by someone else', assertFails(setDoc(doc(B, 'trips/t2'), trip)));
+await t('cannot create a trip as a follower', assertFails(setDoc(doc(A, 'trips/t6'), { ...trip, roles: { alice: 'follower' } })));
+await t('older app still creates a trip (ownerId, owner)', assertSucceeds(setDoc(doc(A, 'trips/t7'), { name: 'Old', ownerId: 'alice', memberIds: ['alice'], roles: { alice: 'owner' } })));
+await t('traveller creates trip with a cover photo', assertSucceeds(setDoc(doc(A, 'trips/t4'), { ...trip, coverPhoto: 'data:image/jpeg;base64,AAAA' })));
 await t('cannot create with a non-image cover', assertFails(setDoc(doc(A, 'trips/t5'), { ...trip, coverPhoto: 'hello' })));
-await t('cannot create with extra members', assertFails(setDoc(doc(B, 'trips/t3'), { ...trip, ownerId: 'bob', memberIds: ['bob', 'carol'], roles: { bob: 'owner' } })));
+await t('cannot create with extra members', assertFails(setDoc(doc(B, 'trips/t3'), { ...trip, createdBy: 'bob', memberIds: ['bob', 'carol'], roles: { bob: 'traveller' } })));
 await t('non-member cannot read trip', assertFails(getDoc(doc(B, 'trips/t1'))));
 await t('anon cannot read trip', assertFails(getDoc(doc(anon, 'trips/t1'))));
 await t('member list query works', assertSucceeds(getDocs(query(collection(A, 'trips'), where('memberIds', 'array-contains', 'alice')))));
 await t('unfiltered trip list denied', assertFails(getDocs(collection(B, 'trips'))));
 await t('non-member cannot write activity', assertFails(addDoc(collection(B, 'trips/t1/activities'), { title: 'x' })));
-await t('owner writes activity', assertSucceeds(setDoc(doc(A, 'trips/t1/activities/a1'), { title: 'Tram' })));
+await t('traveller writes activity', assertSucceeds(setDoc(doc(A, 'trips/t1/activities/a1'), { title: 'Tram' })));
 await t('non-member cannot read activities', assertFails(getDocs(collection(B, 'trips/t1/activities'))));
 
-await t('non-member cannot join without invite', assertFails(updateDoc(doc(B, 'trips/t1'), { memberIds: arrayUnion('bob'), 'roles.bob': 'member', joinedVia: 'nope' })));
-await t('non-manager cannot create invite', assertFails(setDoc(doc(B, 'invites/bad'), { tripId: 't1', tripName: 'x', createdBy: 'bob', expiresAt: Timestamp.fromMillis(Date.now() + 1e9) })));
-await t('owner creates invite', assertSucceeds(setDoc(doc(A, 'invites/good'), { tripId: 't1', tripName: 'Lisbon', createdBy: 'alice', expiresAt: Timestamp.fromMillis(Date.now() + 1e9) })));
+await t('non-member cannot join without invite', assertFails(updateDoc(doc(B, 'trips/t1'), { memberIds: arrayUnion('bob'), 'roles.bob': 'traveller', joinedVia: 'nope' })));
+await t('non-member cannot create invite', assertFails(setDoc(doc(B, 'invites/bad'), { tripId: 't1', tripName: 'x', createdBy: 'bob', expiresAt: Timestamp.fromMillis(Date.now() + 1e9) })));
+await t('traveller creates invite', assertSucceeds(setDoc(doc(A, 'invites/good'), { tripId: 't1', tripName: 'Lisbon', createdBy: 'alice', expiresAt: Timestamp.fromMillis(Date.now() + 1e9) })));
 await t('anyone signed in reads invite', assertSucceeds(getDoc(doc(B, 'invites/good'))));
 await t('cannot list invites', assertFails(getDocs(collection(B, 'invites'))));
-await t('join cannot grant self editor', assertFails(updateDoc(doc(B, 'trips/t1'), { memberIds: arrayUnion('bob'), 'roles.bob': 'editor', joinedVia: 'good' })));
-await t('join cannot change other fields', assertFails(updateDoc(doc(B, 'trips/t1'), { memberIds: arrayUnion('bob'), 'roles.bob': 'member', joinedVia: 'good', name: 'hacked' })));
-await t('join cannot add a friend too', assertFails(updateDoc(doc(B, 'trips/t1'), { memberIds: arrayUnion('bob', 'carol'), 'roles.bob': 'member', joinedVia: 'good' })));
-await t('bob joins with invite', assertSucceeds(updateDoc(doc(B, 'trips/t1'), { memberIds: arrayUnion('bob'), 'roles.bob': 'member', joinedVia: 'good' })));
+await t('join cannot grant an unknown role', assertFails(updateDoc(doc(B, 'trips/t1'), { memberIds: arrayUnion('bob'), 'roles.bob': 'owner', joinedVia: 'good' })));
+await t('join cannot change other fields', assertFails(updateDoc(doc(B, 'trips/t1'), { memberIds: arrayUnion('bob'), 'roles.bob': 'traveller', joinedVia: 'good', name: 'hacked' })));
+await t('join cannot add a friend too', assertFails(updateDoc(doc(B, 'trips/t1'), { memberIds: arrayUnion('bob', 'carol'), 'roles.bob': 'traveller', joinedVia: 'good' })));
+await t('bob joins with invite as a traveller', assertSucceeds(updateDoc(doc(B, 'trips/t1'), { memberIds: arrayUnion('bob'), 'roles.bob': 'traveller', joinedVia: 'good' })));
 await t('member reads trip', assertSucceeds(getDoc(doc(B, 'trips/t1'))));
-await t('member writes activity', assertSucceeds(updateDoc(doc(B, 'trips/t1/activities/a1'), { attendeeIds: arrayUnion('bob') })));
-await t('member adds photo album', assertSucceeds(setDoc(doc(B, 'trips/t1/albums/p1'), { title: 'Lisbon', url: 'https://photos.app.goo.gl/x', createdBy: 'bob' })));
+await t('traveller writes activity', assertSucceeds(updateDoc(doc(B, 'trips/t1/activities/a1'), { attendeeIds: arrayUnion('bob') })));
+await t('traveller adds photo album', assertSucceeds(setDoc(doc(B, 'trips/t1/albums/p1'), { title: 'Lisbon', url: 'https://photos.app.goo.gl/x', createdBy: 'bob' })));
 await t('non-member cannot add photo album', assertFails(setDoc(doc(C, 'trips/t1/albums/p2'), { title: 'x', url: 'https://x', createdBy: 'carol' })));
 await t('non-member cannot read photo albums', assertFails(getDocs(collection(C, 'trips/t1/albums'))));
-// Trip content: authors, organisers and size limits
+// Trip content: authors and size limits
 await t('member adds a comment as themselves', assertSucceeds(setDoc(doc(B, 'trips/t1/comments/c1'), { targetId: 'a1', text: 'Meet at the stop?', authorId: 'bob', createdBy: 'bob', createdAt: 1 })));
 await t('cannot post a comment as someone else', assertFails(setDoc(doc(B, 'trips/t1/comments/c2'), { targetId: 'a1', text: 'hi', authorId: 'alice', createdBy: 'bob', createdAt: 1 })));
 await t('comment over 150 characters refused', assertFails(setDoc(doc(B, 'trips/t1/comments/c3'), { targetId: 'a1', text: 'x'.repeat(151), authorId: 'bob', createdBy: 'bob', createdAt: 1 })));
 await t('comment of exactly 150 characters allowed', assertSucceeds(setDoc(doc(B, 'trips/t1/comments/c4'), { targetId: 'a1', text: 'x'.repeat(150), authorId: 'bob', createdBy: 'bob', createdAt: 1 })));
-await t('owner cannot delete someone else\'s comment', assertFails(deleteDoc(doc(A, 'trips/t1/comments/c1'))));
-await t('owner cannot edit someone else\'s comment', assertFails(updateDoc(doc(A, 'trips/t1/comments/c1'), { text: 'changed' })));
+await t('a traveller cannot delete someone else\'s comment', assertFails(deleteDoc(doc(A, 'trips/t1/comments/c1'))));
+await t('a traveller cannot edit someone else\'s comment', assertFails(updateDoc(doc(A, 'trips/t1/comments/c1'), { text: 'changed' })));
 await t('author deletes own comment', assertSucceeds(deleteDoc(doc(B, 'trips/t1/comments/c1'))));
 await t('notes over 2,000 characters refused', assertFails(setDoc(doc(B, 'trips/t1/activities/a9'), { title: 'x', notes: 'x'.repeat(2001), createdBy: 'bob' })));
-await t('member adds an event', assertSucceeds(setDoc(doc(B, 'trips/t1/activities/a2'), { title: 'Fado', createdBy: 'bob' })));
+await t('traveller adds an event', assertSucceeds(setDoc(doc(B, 'trips/t1/activities/a2'), { title: 'Fado', createdBy: 'bob' })));
 await t('cannot add an event as someone else', assertFails(setDoc(doc(B, 'trips/t1/activities/a3'), { title: 'Fado', createdBy: 'alice' })));
 await t('cannot change who added an event', assertFails(updateDoc(doc(B, 'trips/t1/activities/a2'), { createdBy: 'alice' })));
 await setDoc(doc(A, 'trips/t1/ideas/i1'), { title: 'Belém', createdBy: 'alice', votes: {} });
-await t('member votes on someone else\'s idea', assertSucceeds(updateDoc(doc(B, 'trips/t1/ideas/i1'), { 'votes.bob': true })));
+await t('traveller votes on someone else\'s idea', assertSucceeds(updateDoc(doc(B, 'trips/t1/ideas/i1'), { 'votes.bob': true })));
 await setDoc(doc(A, 'trips/t1/ideas/i9'), { title: 'Sintra', createdBy: 'alice', votes: {} });
-await t('member (a Planner) deletes someone else\'s idea', assertSucceeds(deleteDoc(doc(B, 'trips/t1/ideas/i9'))));
-await t('owner deletes a member\'s event', assertSucceeds(deleteDoc(doc(A, 'trips/t1/activities/a2'))));
-await t('member (a Planner) renames trip', assertSucceeds(updateDoc(doc(B, 'trips/t1'), { name: 'Lisbon' })));
-await t('member cannot take ownership', assertFails(updateDoc(doc(B, 'trips/t1'), { ownerId: 'bob', 'roles.bob': 'owner' })));
-await t('member cannot delete trip', assertFails(deleteDoc(doc(B, 'trips/t1'))));
-// Viewers: see the trip and chat, but add, edit and vote on nothing
-await t('owner makes carol a viewer', assertSucceeds(updateDoc(doc(A, 'trips/t1'), { memberIds: arrayUnion('carol'), 'roles.carol': 'viewer' })));
-await t('viewer reads trip and events', assertSucceeds(getDocs(collection(C, 'trips/t1/activities'))));
-await t('viewer comments', assertSucceeds(setDoc(doc(C, 'trips/t1/comments/v1'), { targetId: 'a1', text: 'Looks fun', authorId: 'carol', createdBy: 'carol', createdAt: 1 })));
-await t('viewer edits own comment', assertSucceeds(updateDoc(doc(C, 'trips/t1/comments/v1'), { text: 'Looks great', editedAt: 2 })));
-await t('viewer cannot add an event', assertFails(setDoc(doc(C, 'trips/t1/activities/v2'), { title: 'x', createdBy: 'carol' })));
-await t('viewer cannot edit an event', assertFails(updateDoc(doc(C, 'trips/t1/activities/a1'), { title: 'changed' })));
-await t('viewer cannot vote', assertFails(updateDoc(doc(C, 'trips/t1/ideas/i1'), { 'votes.carol': true })));
-await t('viewer cannot add an idea', assertFails(setDoc(doc(C, 'trips/t1/ideas/v3'), { title: 'x', createdBy: 'carol' })));
-await t('viewer cannot add a photo album', assertFails(setDoc(doc(C, 'trips/t1/albums/v4'), { title: 'x', url: 'https://x', createdBy: 'carol' })));
-await t('viewer cannot rename trip', assertFails(updateDoc(doc(C, 'trips/t1'), { name: 'x' })));
+await t('traveller deletes someone else\'s idea', assertSucceeds(deleteDoc(doc(B, 'trips/t1/ideas/i9'))));
+await t('traveller deletes someone else\'s event', assertSucceeds(deleteDoc(doc(A, 'trips/t1/activities/a2'))));
+// Everyone equal: any traveller edits the trip; nobody can rewrite who started it
+await t('any traveller renames trip', assertSucceeds(updateDoc(doc(B, 'trips/t1'), { name: 'Lisbon' })));
+await t('nobody can change who started the trip', assertFails(updateDoc(doc(B, 'trips/t1'), { createdBy: 'bob' })));
+await t('cannot slip in an ownerId either', assertFails(updateDoc(doc(B, 'trips/t1'), { ownerId: 'bob' })));
+await t('cannot store an unknown role', assertFails(updateDoc(doc(B, 'trips/t1'), { 'roles.alice': 'boss' })));
+// Followers: see the trip and chat, but add, edit and vote on nothing
+await t('a traveller adds carol as a follower', assertSucceeds(updateDoc(doc(A, 'trips/t1'), { memberIds: arrayUnion('carol'), 'roles.carol': 'follower' })));
+await t('follower reads trip and events', assertSucceeds(getDocs(collection(C, 'trips/t1/activities'))));
+await t('follower comments', assertSucceeds(setDoc(doc(C, 'trips/t1/comments/v1'), { targetId: 'a1', text: 'Looks fun', authorId: 'carol', createdBy: 'carol', createdAt: 1 })));
+await t('follower edits own comment', assertSucceeds(updateDoc(doc(C, 'trips/t1/comments/v1'), { text: 'Looks great', editedAt: 2 })));
+await t('follower cannot add an event', assertFails(setDoc(doc(C, 'trips/t1/activities/v2'), { title: 'x', createdBy: 'carol' })));
+await t('follower cannot edit an event', assertFails(updateDoc(doc(C, 'trips/t1/activities/a1'), { title: 'changed' })));
+await t('follower cannot vote', assertFails(updateDoc(doc(C, 'trips/t1/ideas/i1'), { 'votes.carol': true })));
+await t('follower cannot add an idea', assertFails(setDoc(doc(C, 'trips/t1/ideas/v3'), { title: 'x', createdBy: 'carol' })));
+await t('follower cannot add a photo album', assertFails(setDoc(doc(C, 'trips/t1/albums/v4'), { title: 'x', url: 'https://x', createdBy: 'carol' })));
+await t('follower cannot rename trip', assertFails(updateDoc(doc(C, 'trips/t1'), { name: 'x' })));
+await t('follower cannot make an invite', assertFails(setDoc(doc(C, 'invites/fbad'), { tripId: 't1', tripName: 'x', createdBy: 'carol', expiresAt: Timestamp.fromMillis(Date.now() + 1e9) })));
+await t('follower cannot make themselves a traveller', assertFails(updateDoc(doc(C, 'trips/t1'), { 'roles.carol': 'traveller' })));
+await t('follower cannot bin the trip', assertFails(updateDoc(doc(C, 'trips/t1'), { deletedAt: 1, deletedBy: 'carol' })));
 
 await env.withSecurityRulesDisabled(async (c) => setDoc(doc(c.firestore(), 'invites/old'), { tripId: 't1', tripName: 'x', createdBy: 'alice', expiresAt: Timestamp.fromMillis(Date.now() - 1000) }));
-await t('expired invite rejected', assertFails(updateDoc(doc(C, 'trips/t1'), { memberIds: arrayUnion('carol'), 'roles.carol': 'member', joinedVia: 'old' })));
+await t('expired invite rejected', assertFails(updateDoc(doc(db('dan'), 'trips/t1'), { memberIds: arrayUnion('dan'), 'roles.dan': 'traveller', joinedVia: 'old' })));
 
-await t('owner promotes bob', assertSucceeds(updateDoc(doc(A, 'trips/t1'), { 'roles.bob': 'editor' })));
+await t('a traveller makes carol a traveller', assertSucceeds(updateDoc(doc(B, 'trips/t1'), { 'roles.carol': 'traveller' })));
+await t('a traveller makes alice a follower', assertSucceeds(updateDoc(doc(B, 'trips/t1'), { 'roles.alice': 'follower' })));
+await t('a traveller makes alice a traveller again', assertSucceeds(updateDoc(doc(C, 'trips/t1'), { 'roles.alice': 'traveller' })));
 const jpeg = 'data:image/jpeg;base64,' + 'A'.repeat(1000);
-await t('editor sets a cover photo', assertSucceeds(updateDoc(doc(B, 'trips/t1'), { coverPhoto: jpeg })));
+await t('traveller sets a cover photo', assertSucceeds(updateDoc(doc(B, 'trips/t1'), { coverPhoto: jpeg })));
 await t('a full-size (300 KB) cover photo is accepted', assertSucceeds(updateDoc(doc(B, 'trips/t1'), { coverPhoto: 'data:image/jpeg;base64,' + 'A'.repeat(299000) })));
-await t('editor removes the cover photo', assertSucceeds(updateDoc(doc(B, 'trips/t1'), { coverPhoto: null })));
+await t('traveller removes the cover photo', assertSucceeds(updateDoc(doc(B, 'trips/t1'), { coverPhoto: null })));
 await t('cover photo must be an image', assertFails(updateDoc(doc(B, 'trips/t1'), { coverPhoto: 'https://evil.example/x.js' })));
 await t('cover photo cannot be huge', assertFails(updateDoc(doc(B, 'trips/t1'), { coverPhoto: 'data:image/jpeg;base64,' + 'A'.repeat(600000) })));
-await t('editor renames trip', assertSucceeds(updateDoc(doc(B, 'trips/t1'), { name: 'Lisbon 2026' })));
-await t('editor cannot remove owner', assertFails(updateDoc(doc(B, 'trips/t1'), { memberIds: arrayRemove('alice'), 'roles.alice': deleteField() })));
-await t('editor cannot take ownership', assertFails(updateDoc(doc(B, 'trips/t1'), { ownerId: 'bob' })));
+await t('a traveller removes whoever started the trip', assertSucceeds(updateDoc(doc(B, 'trips/t1'), { memberIds: arrayRemove('alice'), 'roles.alice': deleteField() })));
 await t('bob leaves', assertSucceeds(updateDoc(doc(B, 'trips/t1'), { memberIds: arrayRemove('bob'), 'roles.bob': deleteField() })));
 await t('ex-member cannot read', assertFails(getDoc(doc(B, 'trips/t1'))));
-await t('owner cannot just leave (hands it over instead)', assertFails(updateDoc(doc(A, 'trips/t1'), { memberIds: arrayRemove('alice'), 'roles.alice': deleteField() })));
-// Planners: any of them removes another; the trip's creator leaves by handing it on
-await env.withSecurityRulesDisabled(async (c) => setDoc(doc(c.firestore(), 'trips/t9'), { name: 'Rome', ownerId: 'alice', memberIds: ['alice', 'bob', 'carol'], roles: { alice: 'owner', bob: 'member', carol: 'member' } }));
-await t('a Planner removes another Planner', assertSucceeds(updateDoc(doc(B, 'trips/t9'), { memberIds: arrayRemove('carol'), 'roles.carol': deleteField() })));
-await t('a Planner cannot delete the trip', assertFails(deleteDoc(doc(B, 'trips/t9'))));
-// Recently deleted: the creator bins the trip, any Planner restores it; Planners bin events
-await env.withSecurityRulesDisabled(async (c) => setDoc(doc(c.firestore(), 'trips/t8'), { name: 'Oslo', ownerId: 'alice', memberIds: ['alice', 'bob'], roles: { alice: 'owner', bob: 'member' } }));
+// Older trips: owner / member / viewer count as traveller / follower, and any traveller migrates them
+await env.withSecurityRulesDisabled(async (c) => setDoc(doc(c.firestore(), 'trips/t9'), { name: 'Rome', ownerId: 'alice', memberIds: ['alice', 'bob', 'carol'], roles: { alice: 'owner', bob: 'member', carol: 'viewer' } }));
+await t('an old member edits like a traveller', assertSucceeds(updateDoc(doc(B, 'trips/t9'), { name: 'Roma' })));
+await t('an old viewer is a follower', assertFails(updateDoc(doc(C, 'trips/t9'), { name: 'x' })));
+await t('migration cannot hand the record to someone else', assertFails(updateDoc(doc(B, 'trips/t9'), { createdBy: 'bob', ownerId: deleteField() })));
+await t('any traveller migrates an older trip', assertSucceeds(updateDoc(doc(B, 'trips/t9'), { createdBy: 'alice', ownerId: deleteField(), roles: { alice: 'traveller', bob: 'traveller', carol: 'follower' } })));
+await t('the person who started it can leave like anyone', assertSucceeds(updateDoc(doc(A, 'trips/t9'), { memberIds: arrayRemove('alice'), 'roles.alice': deleteField() })));
+await t('a follower can leave', assertSucceeds(updateDoc(doc(C, 'trips/t9'), { memberIds: arrayRemove('carol'), 'roles.carol': deleteField() })));
+// Recently deleted: any traveller bins and restores the trip; deleting for good only from there
+await env.withSecurityRulesDisabled(async (c) => setDoc(doc(c.firestore(), 'trips/t8'), { name: 'Oslo', createdBy: 'alice', memberIds: ['alice', 'bob', 'carol'], roles: { alice: 'traveller', bob: 'traveller', carol: 'follower' } }));
 await env.withSecurityRulesDisabled(async (c) => setDoc(doc(c.firestore(), 'trips/t8/activities/e1'), { title: 'Fjord', createdBy: 'alice' }));
-await t('a Planner cannot bin the trip', assertFails(updateDoc(doc(B, 'trips/t8'), { deletedAt: 1, deletedBy: 'bob' })));
-await t('the creator bins the trip', assertSucceeds(updateDoc(doc(A, 'trips/t8'), { deletedAt: 1, deletedBy: 'alice' })));
-await t('a Planner restores the trip', assertSucceeds(updateDoc(doc(B, 'trips/t8'), { deletedAt: deleteField(), deletedBy: deleteField() })));
-await t('a Planner bins someone else\'s event', assertSucceeds(updateDoc(doc(B, 'trips/t8/activities/e1'), { deletedAt: 1, deletedBy: 'bob' })));
-await t('a Planner restores it', assertSucceeds(updateDoc(doc(B, 'trips/t8/activities/e1'), { deletedAt: deleteField(), deletedBy: deleteField() })));
-await t('creator leaves by handing the trip to a Planner', assertSucceeds(updateDoc(doc(A, 'trips/t9'), { ownerId: 'bob', memberIds: ['bob'], roles: { bob: 'owner' } })));
+await t('a traveller cannot delete a trip outright', assertFails(deleteDoc(doc(B, 'trips/t8'))));
+await t('any traveller bins the trip', assertSucceeds(updateDoc(doc(B, 'trips/t8'), { deletedAt: 1, deletedBy: 'bob' })));
+await t('another traveller restores the trip', assertSucceeds(updateDoc(doc(A, 'trips/t8'), { deletedAt: deleteField(), deletedBy: deleteField() })));
+await t('a traveller bins someone else\'s event', assertSucceeds(updateDoc(doc(B, 'trips/t8/activities/e1'), { deletedAt: 1, deletedBy: 'bob' })));
+await t('a traveller restores it', assertSucceeds(updateDoc(doc(B, 'trips/t8/activities/e1'), { deletedAt: deleteField(), deletedBy: deleteField() })));
 
 // Saved Places (Collections)
 const place = { ownerId: 'alice', name: 'Ichiran', category: 'restaurant', city: 'Tokyo', country: 'Japan', countryCode: 'jp', lat: 35.6, lng: 139.7 };
@@ -133,20 +142,16 @@ await t('others cannot read private places', assertFails(getDoc(doc(B, 'users/al
 await t('others cannot write private places', assertFails(setDoc(doc(B, 'users/alice/private/places'), { homeCity: 'x' })));
 await env.withSecurityRulesDisabled(async (c) => setDoc(doc(c.firestore(), 'users/dave'), { name: 'Dave', photo: null, homeCity: 'Paris', visited: [] }));
 await t('old profile can move its places out (migration)', assertSucceeds(updateDoc(doc(db('dave'), 'users/dave'), { homeCity: deleteField(), visited: deleteField() })));
-// Deleting an account: the owner hands the trip (and saved places the trip uses) to another member
-await env.withSecurityRulesDisabled(async (c) => setDoc(doc(c.firestore(), 'trips/t8'), { ...trip, memberIds: ['alice', 'bob'], roles: { alice: 'owner', bob: 'member' } }));
-await t('member cannot take over the trip', assertFails(updateDoc(doc(B, 'trips/t8'), { ownerId: 'bob', memberIds: ['bob'], roles: { bob: 'owner' } })));
-await t('owner cannot hand the trip to a non-member', assertFails(updateDoc(doc(A, 'trips/t8'), { ownerId: 'carol', memberIds: ['bob'], roles: { bob: 'member', carol: 'owner' } })));
-await t('handing over cannot change anything else', assertFails(updateDoc(doc(A, 'trips/t8'), { ownerId: 'bob', memberIds: ['bob'], roles: { bob: 'owner' }, name: 'x' })));
+// Deleting an account: saved places a trip still uses go to someone on it; then you leave
 await setDoc(doc(A, 'places/p5'), place);
-await t('place cannot go to someone off the trip', assertFails(updateDoc(doc(A, 'places/p5'), { ownerId: 'carol', handedVia: 't8' })));
-await t('place cannot be handed via a trip you are not on', assertFails(updateDoc(doc(C, 'places/p5'), { ownerId: 'carol', handedVia: 't8' })));
+await t('place cannot go to someone off the trip', assertFails(updateDoc(doc(A, 'places/p5'), { ownerId: 'dan', handedVia: 't8' })));
+await t('place cannot be handed via a trip you are not on', assertFails(updateDoc(doc(db('dan'), 'places/p5'), { ownerId: 'dan', handedVia: 't8' })));
 await t('owner hands a place to a trip-mate', assertSucceeds(updateDoc(doc(A, 'places/p5'), { ownerId: 'bob', handedVia: 't8' })));
-await t('owner hands the trip to a member and leaves', assertSucceeds(updateDoc(doc(A, 'trips/t8'), { ownerId: 'bob', memberIds: ['bob'], roles: { bob: 'owner' } })));
-await t('old owner can no longer read the trip', assertFails(getDoc(doc(A, 'trips/t8'))));
-await t('owner deletes trip', assertSucceeds(deleteDoc(doc(A, 'trips/t1'))));
+await t('alice leaves the trip', assertSucceeds(updateDoc(doc(A, 'trips/t8'), { memberIds: arrayRemove('alice'), 'roles.alice': deleteField() })));
+await t('ex-member can no longer read the trip', assertFails(getDoc(doc(A, 'trips/t8'))));
 await t('user deletes own profile', assertSucceeds(deleteDoc(doc(A, 'users/alice'))));
-await t('new owner deletes trip', assertSucceeds(deleteDoc(doc(B, 'trips/t8'))));
+await t('a follower cannot delete a binned trip', assertSucceeds(updateDoc(doc(B, 'trips/t8'), { deletedAt: 1, deletedBy: 'bob' })).then(() => assertFails(deleteDoc(doc(C, 'trips/t8')))));
+await t('any traveller deletes a binned trip for good', assertSucceeds(deleteDoc(doc(B, 'trips/t8'))));
 
 // Shared collections: an owner, a Member, a Viewer and a stranger
 const D = db('dave'), E = db('erin'), F = db('frank'), G = db('gina');

@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Button, Card, LinkButton, PageSkeleton, Illustration } from '../../design/components';
 import { store } from '../../data';
-import { useMe, useMyTrips, useShares } from '../../data/hooks';
+import { personName, useMe, useMyTrips, useProfiles, useShares } from '../../data/hooks';
 import type { Invite } from '../../data/types';
 import { Content } from '../../app/Shell';
 import { joinOnly } from '../../lib/site';
@@ -16,6 +16,8 @@ export function Join() {
   const [invite, setInvite] = useState<Invite | null | undefined>(undefined);
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
+  // Whoever made the link: "Sam wants you to join Portugal & Spain" (joining, never being invited into someone's trip)
+  const from = useProfiles(invite?.createdBy ? [invite.createdBy] : []);
 
   useEffect(() => {
     store.getInvite(code).then(setInvite).catch(() => setInvite(null));
@@ -39,7 +41,7 @@ export function Join() {
     return (
       <Content>
         <Card>
-          <Card layout="centre" media={<Illustration name="ticket" size={120} />} title={expired ? 'This invite has expired' : 'Invite not found'} body={invite?.kind === 'collection' ? 'Ask whoever shared it for a new link.' : 'Ask the trip organizer for a new link.'}
+          <Card layout="centre" media={<Illustration name="ticket" size={120} />} title={expired ? 'This link has expired' : 'Link not found'} body={invite?.kind === 'collection' ? 'Ask whoever shared it for a new link.' : 'Ask someone on the trip for a new link.'}
             actions={<LinkButton to="/" tone="neutral">{joinOnly() ? 'Get Rove' : 'Go to my trips'}</LinkButton>} />
         </Card>
       </Content>
@@ -66,7 +68,8 @@ export function Join() {
             body={invite.role === 'member' ? 'You can see every place, add your own, move them and star them.' : 'You can see every place, star them and open them in Maps.'}
             actions={<Button size="large" onClick={join} disabled={busy}>Join collection</Button>} />
         ) : (
-          <Card layout="centre" media={<Illustration name="suitcase" size={120} />} title={`Join “${invite.tripName}”`} body="You've been invited to plan this trip together."
+          <Card layout="centre" media={<Illustration name="suitcase" size={120} />} title={from[invite.createdBy] ? `${personName(from, invite.createdBy).split(' ')[0]} wants you to join ${invite.tripName}` : `Join ${invite.tripName}`}
+            body="Plan the days, ideas and places together."
             actions={<Button size="large" onClick={join} disabled={busy}>Join trip</Button>} />
         )}
         {error && <p className="t-label-small t-danger" style={{ textAlign: 'center' }}>{error}</p>}

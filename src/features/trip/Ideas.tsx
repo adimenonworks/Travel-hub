@@ -28,7 +28,7 @@ const ups = (i: Idea) => Object.keys(i.votes ?? {}).length;
 /**
  * Trip "Ideas" tab (Figma "Trip — Ideas"): things the group might do. A Section header, the To decide · Planned ·
  * Passed segments, then a List group of Idea rows sorted by votes (the leader gets a "Most votes" tag). Tapping a
- * row opens the idea: its notes, links and comments, and (for organizers) "Add to a day" or "Pass".
+ * row opens the idea: its notes, links and comments, and (for travellers) "Add to a day" or "Pass".
  */
 const LINKS = 'Links & notes';
 
@@ -56,7 +56,7 @@ export function Ideas(ctx: TripCtx) {
   // Swipe the list sideways to move between To decide · Planned · Passed (the list slides like the trip's days)
   const FILTERS: Filter[] = ['open', 'approved', 'rejected'];
   const vote = async (i: Idea) => {
-    if (!ctx.canContribute) { toast({ label: 'Viewers can see the votes but not vote' }); return; }
+    if (!ctx.isTraveller) { toast({ label: 'Followers can see the votes but not vote' }); return; }
     const mine = !!i.votes?.[me.uid];
     haptic('light');
     try { await store.setVote(trip.id, i.id, me.uid, mine ? 0 : 1); }
@@ -70,7 +70,7 @@ export function Ideas(ctx: TripCtx) {
   return (
     <>
       <SectionHeader title="Ideas board"
-        action={ctx.canContribute ? <Button size="small" icon="lightbulb" onClick={() => setAdding(true)}>Add idea</Button> : undefined} />
+        action={ctx.isTraveller ? <Button size="small" icon="lightbulb" onClick={() => setAdding(true)}>Add idea</Button> : undefined} />
       <SegmentControl label="Show ideas" block value={filter} onChange={setFilter} options={[
         { value: 'open', label: 'To decide', count: count('open') },
         { value: 'approved', label: 'Planned', count: count('approved') },
@@ -188,7 +188,7 @@ function AddIdeaSheet({ open, ctx, onClose, onNew }: { open: boolean; ctx: TripC
   );
 }
 
-/** One idea opened: what it is (its Place, when it has one), links, who added it, comments; organizers add it to a day or pass on it. */
+/** One idea opened: what it is (its Place, when it has one), links, who added it, comments; travellers add it to a day or pass on it. */
 function IdeaSheet({ idea, place, ctx, onClose, onEdit, onSchedule }: { idea: Idea | null; place?: SavedPlace; ctx: TripCtx; onClose: () => void; onEdit: () => void; onSchedule: () => void }) {
   const me = useMe();
   const toast = useToast();
@@ -202,7 +202,7 @@ function IdeaSheet({ idea, place, ctx, onClose, onEdit, onSchedule }: { idea: Id
     catch { toast({ tone: 'danger', label: "Couldn't save. Check your connection" }); }
   };
   const cat = categoryInfo(idea.category);
-  const canEdit = ctx.canManage || idea.createdBy === me.uid;
+  const canEdit = ctx.isTraveller;
   const setStatus = async (status: Idea['status'], label: string) => {
     try { await store.updateSub(ctx.trip.id, 'ideas', idea.id, { status }); toast({ icon: 'check', label }); onClose(); }
     catch { toast({ tone: 'danger', label: "Couldn't save. Check your connection" }); }
@@ -220,13 +220,13 @@ function IdeaSheet({ idea, place, ctx, onClose, onEdit, onSchedule }: { idea: Id
           <Button tone="neutral" icon="star" onClick={star}>{starred(place) ? 'Favourite' : 'Add to favourites'}</Button>
         </div>
       )}
-      {ctx.canManage && idea.status === 'open' && (
+      {ctx.isTraveller && idea.status === 'open' && (
         <div className={s.ideaButtons}>
           <Button tone="neutral" onClick={() => setStatus('rejected', 'Idea passed')}>Pass</Button>
           <Button icon="calendar" onClick={onSchedule}>Add to a day</Button>
         </div>
       )}
-      {ctx.canManage && idea.status === 'rejected' && <Button tone="neutral" block onClick={() => setStatus('open', 'Idea back to decide')}>Back to “To decide”</Button>}
+      {ctx.isTraveller && idea.status === 'rejected' && <Button tone="neutral" block onClick={() => setStatus('open', 'Idea back to decide')}>Back to “To decide”</Button>}
       {canEdit && <Button tone="ghost" icon="pencil" onClick={onEdit}>Edit idea</Button>}
     </Sheet>
   );

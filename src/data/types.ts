@@ -2,8 +2,14 @@ import type { EventKind } from '../lib/categories';
 /** `countryCode` is the ISO 3166 two-letter code (lowercase), used for flags and the trip's country badges. */
 export type Place = { name: string; lat: number; lng: number; country?: string; countryCode?: string };
 
-/** owner and editor ("Organiser") manage the trip; member adds and edits; viewer only looks and chats. */
-export type Role = 'owner' | 'editor' | 'member' | 'viewer';
+/**
+ * Everyone on a trip is equal (people and sharing, item 1). A traveller is on the trip, even for part of it, and plans
+ * everything; a follower (family at home, a friend who isn't going) sees the plan and chats, and changes nothing.
+ */
+export type Role = 'traveller' | 'follower';
+/** What a trip's `roles` may hold: older trips still store 'owner', 'editor', 'member' (travellers) or 'viewer' (a
+ *  follower) until a traveller opens them and the app migrates them. Read it through `roleOf` (src/data/roles.ts). */
+export type StoredRole = Role | 'owner' | 'editor' | 'member' | 'viewer';
 
 export type User = { uid: string; name: string; photo: string | null; email?: string | null };
 
@@ -55,9 +61,11 @@ export type Trip = {
   cover?: TripPhoto | null;
   /** Which part of the cover photo shows when it's cropped: CSS object-position in % (50/50 = centre). */
   coverPosition?: { x: number; y: number } | null;
-  ownerId: string;
+  /** Who started the trip: a record only, it gives no extra rights. Older trips have `ownerId` instead (migrated). */
+  createdBy?: string;
+  ownerId?: string;
   memberIds: string[];
-  roles: Record<string, Role>;
+  roles: Record<string, StoredRole>;
   joinedVia?: string;
   createdAt: number;
 };

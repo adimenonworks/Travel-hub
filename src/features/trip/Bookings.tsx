@@ -40,7 +40,7 @@ export function Bookings(ctx: TripCtx) {
           </div>
         </PageSection>
       ))}
-      {ctx.canContribute && <Button tone="neutral" block onClick={() => setAdding(true)}>{addLabel}</Button>}
+      {ctx.isTraveller && <Button tone="neutral" block onClick={() => setAdding(true)}>{addLabel}</Button>}
       <ActivityForm open={adding} trip={trip} date={t >= trip.startDate && t <= trip.endDate ? t : trip.startDate} draft={{ category: g.add }} onClose={() => setAdding(false)} />
     </>
   );

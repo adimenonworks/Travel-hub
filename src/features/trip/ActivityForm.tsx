@@ -88,8 +88,8 @@ export function ActivityForm({ open, trip, date, activity, draft, onClose, onCre
   /** After a delete: e.g. the event's own page goes back to its day in the itinerary */ onDeleted?: (a: Activity) => void;
 }) {
   const me = useMe();
-  // Delete only for organizers or whoever added it (the rules refuse anyone else)
-  const { canManage } = useRole(trip);
+  // Delete for any traveller (the rules refuse followers)
+  const { isTraveller } = useRole(trip);
   const toast = useToast();
   const activities = useSub(trip.id, 'activities') ?? [];
   const budgetCurrency = trip.budget?.currency ?? trip.currency;
@@ -308,7 +308,7 @@ export function ActivityForm({ open, trip, date, activity, draft, onClose, onCre
     <Sheet open={open} mode={activity ? 'edit' : 'default'} title={sheetTitle}
       subtitle={!f.type ? 'What are you adding?' : undefined}
       onClose={onClose} onSubmit={kind ? submit : undefined} submitLabel={activity ? 'Save' : `Add to ${formatDay(f.date)}`} submitDisabled={!valid || busy}
-      secondary={activity && kind && (canManage || activity.createdBy === me.uid) ? <Button tone="destructive" size="large" onClick={remove}>Delete</Button> : undefined}>
+      secondary={activity && kind && isTraveller ? <Button tone="destructive" size="large" onClick={remove}>Delete</Button> : undefined}>
       {!f.type ? (
         // Step 1: the 6 types, each with what it covers, in its colour
         <div className={s.typeList} role="group" aria-label="Type">

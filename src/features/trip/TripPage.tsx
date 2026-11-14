@@ -7,6 +7,7 @@ import { useMe, useProfiles, useRole, useSub, useTrip } from '../../data/hooks';
 import { useStarMigration } from '../saves/starEvent';
 import type { Activity, Album, Comment, Idea, Profile, Trip } from '../../data/types';
 import { useBudgetCleanup } from './budgetCleanup';
+import { useRoleMigration } from './roleMigration';
 import { tripDatesLabel } from '../../lib/trips';
 import { Content } from '../../app/Shell';
 import { ActivityPage } from './ActivityPage';
@@ -26,10 +27,9 @@ export type TripCtx = {
   comments: Comment[];
   albums: Album[];
   profiles: Record<string, Profile>;
-  canManage: boolean;
-  isOwner: boolean;
-  /** Everyone but a Viewer adds and edits events, ideas and photos, and votes */
-  canContribute: boolean;
+  /** Every traveller can do everything (there's no owner): edit the trip, add people, events, ideas and photos, vote,
+   *  and delete. A follower only looks and chats. */
+  isTraveller: boolean;
 };
 
 export function TripPage() {
@@ -39,7 +39,7 @@ export function TripPage() {
   if (trip === null)
     return (
       <Content>
-        <Card layout="centre" media={<Illustration name="compass" size={120} />} title="Trip not found" body="It may have been deleted, or you're not a member yet. Ask the organizer for an invite link."
+        <Card layout="centre" media={<Illustration name="compass" size={120} />} title="Trip not found" body="It may have been deleted, or you're not on it yet. Ask someone on the trip for a link."
           actions={<LinkButton to="/trips" tone="neutral">Back to trips</LinkButton>} />
       </Content>
     );
@@ -52,7 +52,7 @@ function TripLoaded({ trip }: { trip: Trip }) {
   const comments = useSub(trip.id, 'comments');
   const albums = useSub(trip.id, 'albums');
   const profiles = useProfiles(trip.memberIds);
-  const { canManage, isOwner, canContribute } = useRole(trip);
+  const { isTraveller } = useRole(trip);
   const me = useMe();
   const [editing, setEditing] = useState(false);
   const navigate = useNavigate();
@@ -61,9 +61,10 @@ function TripLoaded({ trip }: { trip: Trip }) {
   const planPage = useMatch('/trip/:tripId/plan/:activityId');
 
   useStarMigration(trip.id, activities ?? [], me.uid);
-  useBudgetCleanup(trip, canManage);
+  useBudgetCleanup(trip, isTraveller);
+  useRoleMigration(trip, isTraveller);
   if (!activities || !ideas || !comments || !albums) return <PageSkeleton />;
-  const ctx: TripCtx = { trip, activities, ideas, comments, albums, profiles, canManage, isOwner, canContribute };
+  const ctx: TripCtx = { trip, activities, ideas, comments, albums, profiles, isTraveller };
 
   const base = `/trip/${trip.id}`;
   const section = pathname.slice(base.length + 1).split('/')[0];
@@ -94,7 +95,7 @@ function TripLoaded({ trip }: { trip: Trip }) {
         <PageHeader size="small"
           title={trip.name}
           back={{ to: '/trips', label: 'Trips' }}
-          action={canManage ? { icon: 'pencil', label: 'Edit trip', onClick: () => setEditing(true) } : undefined}
+          action={isTraveller ? { icon: 'pencil', label: 'Edit trip', onClick: () => setEditing(true) } : undefined}
           meta={tripDatesLabel(trip)}
         />
         <StickyTabs>
@@ -114,7 +115,7 @@ function TripLoaded({ trip }: { trip: Trip }) {
           )}
         </TabPanels>
       </Content>
-      <TripForm open={editing} trip={trip} onClose={() => setEditing(false)} onDeleted={isOwner ? () => navigate('/trips') : undefined} />
+      <TripForm open={editing} trip={trip} onClose={() => setEditing(false)} onDeleted={isTraveller ? () => navigate('/trips') : undefined} />
     </>
   );
 }
