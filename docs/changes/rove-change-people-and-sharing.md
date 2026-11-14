@@ -276,7 +276,7 @@ One Claude Code account does this work now (owner, 13 Nov 2026), so the old two-
 ## 9. Guests on a single event
 
 - **Adding a guest:** event detail → Who's in → **Add a guest** makes a link to this event only. It's valid for 14 days and requires sign-in.
-- **What a guest sees:** only that event (title, date, time, place, who's in, chat) and **their own share** of the price. They see nothing else on the trip.
+- **What a guest sees** (owner, 14 Nov 2026): that event **in full, like anyone in it**: title, date and time, place, who's in, notes, links, files, comments, the price with **their own share**, and **their own booking** if one covers them (other people's bookings stay private, as for everyone). They see nothing else on the trip. The rules let a guest read the event's private documents (item 8) for that event only.
 - **What a guest counts as:**
   - listed in Who's in with a **Guest** Tag;
   - counted in the price split;
@@ -375,7 +375,7 @@ Report ✅, ❌ (with the reason) or ⚠️ (done, with a caveat) on every line.
 - [ ] Budgets are personal and private, set in your Settings currency with Edit on the Budget card; no budget in Edit trip or the New trip flow; old trip budgets migrated
 - [ ] No trip currency; every price has its own currency (defaulting to the place's local currency); shares and budgets convert to each person's Settings currency
 - [ ] Any traveller can edit the trip's name, dates and cover; the location is read-only after creation; a trip covers its starting location plus every place on its events
-- [ ] A guest sees one event and their share, counts in the split, and can be added to the trip
+- [ ] A guest sees one event in full (notes, links, files, comments, price and their share, their own booking) and nothing else on the trip, counts in the split, and can be added to the trip
 - [ ] The migration runs on an existing trip without losing events, people, prices or bookings
 - [ ] `docs/ROADMAP.md` updated (built items moved to Built) and the Figma Planning board redrawn from it; any new decisions added to `docs/DECISIONS.md`
 - [ ] Report: what changed per item, anything not done and why, and every conflict found between the code, Figma and this file
