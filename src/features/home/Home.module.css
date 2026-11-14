@@ -1,9 +1,9 @@
 /* Home: the two quick actions (Save a place, Plan a trip) side by side, filling the width */
-.quickActions { display: flex; flex-wrap: wrap; justify-content: flex-start; gap: var(--space-default-300); } /* buttons hug their labels, left-aligned (Wise) */
+.quickActions { display: flex; flex-wrap: wrap; justify-content: flex-start; gap: var(--space-300); } /* buttons hug their labels, left-aligned (Wise) */
 
 /* Trips tab: the Segment control, the button, then trips 16 apart */
-.list { display: flex; flex-direction: column; gap: var(--space-default-500); }
-.segments { display: flex; flex-direction: column; gap: var(--space-default-700); }
+.list { display: flex; flex-direction: column; gap: var(--space-500); }
+.segments { display: flex; flex-direction: column; gap: var(--space-700); }
 /* Happening now: "Next up" (a small heading) and the next event, above the trip's card */
-.nextUp { display: flex; flex-direction: column; gap: var(--space-default-300); }
+.nextUp { display: flex; flex-direction: column; gap: var(--space-300); }
 .nextUpTitle { margin: 0; font: var(--type-heading-4); color: var(--text-primary); }

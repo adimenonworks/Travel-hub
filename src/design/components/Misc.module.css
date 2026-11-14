@@ -3,7 +3,7 @@
 .avatar {
   flex: none; display: inline-grid; place-items: center;
   width: var(--avatar-size, 32px); height: var(--avatar-size, 32px);
-  border-radius: var(--radius-1000);
+  border-radius: var(--radius-full);
   background: var(--feature-surface); color: var(--feature-text);
   box-shadow: 0 0 0 2px var(--surface-primary);
   font: var(--type-label-small); line-height: 1;
@@ -17,9 +17,9 @@
 
 /* Figma "Tags": 28 tall, 6 / 12, gap 4, Label small */
 .badge {
-  display: inline-flex; align-items: center; gap: var(--space-default-200);
-  min-height: 28px; padding: var(--space-default-250) var(--space-default-400); /* Figma Tags: 28 tall, 6 / 12 */
-  border-radius: var(--radius-1000);
+  display: inline-flex; align-items: center; gap: var(--space-200);
+  min-height: 28px; padding: var(--space-250) var(--space-400); /* Figma Tags: 28 tall, 6 / 12 */
+  border-radius: var(--radius-full);
   font: var(--type-label-small);
   white-space: nowrap;
 }
@@ -32,9 +32,9 @@
 
 
 /* Notification (Figma): status background, 20px icon, Label + Body small */
-.note { display: flex; gap: var(--space-default-400); align-items: flex-start; padding: var(--space-default-500) var(--space-default-600); border-radius: var(--radius-600); color: var(--text-primary); }
-.note svg { flex: none; margin-top: var(--space-default-100); }
-.noteText { display: flex; flex-direction: column; gap: var(--space-default-200); font: var(--type-body-small); }
+.note { display: flex; gap: var(--space-400); align-items: flex-start; padding: var(--space-500) var(--space-600); border-radius: var(--radius-600); color: var(--text-primary); }
+.note svg { flex: none; margin-top: var(--space-100); }
+.noteText { display: flex; flex-direction: column; gap: var(--space-200); font: var(--type-body-small); }
 .noteLabel { font: var(--type-label); }
 .note-warning { background: var(--status-warning-subtle); }
 .note-warning svg { color: var(--status-warning); }
@@ -50,8 +50,8 @@
 /* Chip (Figma "Chip", Type=Action): 12 radius, 6 / 12, gap 8, a 16px flag or icon, Label small.
    Active is the deep emerald selected look; Inactive is white with a subtle border. */
 .chip {
-  display: inline-flex; align-items: center; gap: var(--space-default-300);
-  min-height: 28px; padding: var(--space-default-250) var(--space-default-400);
+  display: inline-flex; align-items: center; gap: var(--space-300);
+  min-height: 28px; padding: var(--space-250) var(--space-400);
   border-radius: var(--radius-400); font: var(--type-label-small); white-space: nowrap;
   border: 1px solid transparent;
 }

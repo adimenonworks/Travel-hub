@@ -1,18 +1,18 @@
 /* Save to Rove: the item (light grey card, 16 corners), the "Save to" choices, then the note */
-.reading { display: flex; flex-direction: column; gap: var(--space-default-300); }
-.row { display: grid; grid-template-columns: repeat(auto-fit, minmax(calc(120rem / 17), 1fr)); gap: var(--space-default-300); }
-.buttonPair { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-default-300); } /* Paste (Neutral) and Continue (Primary), side by side */
-.preview { display: flex; align-items: center; gap: var(--space-default-400); padding: var(--space-default-500); border-radius: var(--radius-600); background: var(--surface-secondary); }
-.previewThumb { flex: none; display: grid; place-items: center; width: 48px; height: 48px; border-radius: var(--radius-1000); overflow: hidden; background: var(--surface-primary); color: var(--icon-primary); }
+.reading { display: flex; flex-direction: column; gap: var(--space-300); }
+.row { display: grid; grid-template-columns: repeat(auto-fit, minmax(calc(120rem / 17), 1fr)); gap: var(--space-300); }
+.buttonPair { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-300); } /* Paste (Neutral) and Continue (Primary), side by side */
+.preview { display: flex; align-items: center; gap: var(--space-400); padding: var(--space-500); border-radius: var(--radius-600); background: var(--surface-secondary); }
+.previewThumb { flex: none; display: grid; place-items: center; width: 48px; height: 48px; border-radius: var(--radius-full); overflow: hidden; background: var(--surface-primary); color: var(--icon-primary); }
 .previewThumb img { width: 100%; height: 100%; object-fit: cover; }
-.previewText { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: var(--space-default-100); text-align: left; }
+.previewText { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: var(--space-100); text-align: left; }
 .previewTitle { font: var(--type-heading-3); letter-spacing: -0.02em; color: var(--text-primary); overflow-wrap: anywhere; }
 .previewMeta { font: var(--type-body-small); color: var(--text-secondary); }
 .label { margin: 0; font: var(--type-body); color: var(--text-primary); }
 /* A choice: 24 corners, subtle border; picked: brand surface with the focus border and a check */
 .target {
-  display: flex; align-items: center; gap: var(--space-default-400); width: 100%;
-  min-height: 64px; padding: var(--space-default-400) var(--space-default-500);
+  display: flex; align-items: center; gap: var(--space-400); width: 100%;
+  min-height: 64px; padding: var(--space-400) var(--space-500);
   border-radius: var(--radius-600); border: 1px solid var(--border-subtle); background: var(--surface-primary);
   cursor: pointer; transition: transform var(--motion-release), background var(--motion-fast);
 }
@@ -22,36 +22,36 @@
 /* Saved destination */
 /* Filter chips: one row that scrolls sideways under the gutter (Figma "Filters (scroll)"). 8 above and below (taken
    back with negative margins) keeps each chip's 44px tap area inside the scroll box, which would otherwise clip it. */
-.chips { margin: calc(-1 * var(--space-default-300)) calc(-1 * var(--space-gutter)); padding: var(--space-default-300) var(--space-gutter); list-style: none; display: flex; gap: var(--space-default-300); overflow-x: auto; scrollbar-width: none; scroll-padding-inline: var(--space-gutter); }
+.chips { margin: calc(-1 * var(--space-300)) calc(-1 * var(--space-page-gutter)); padding: var(--space-300) var(--space-page-gutter); list-style: none; display: flex; gap: var(--space-300); overflow-x: auto; scrollbar-width: none; scroll-padding-inline: var(--space-page-gutter); }
 .chips::-webkit-scrollbar { display: none; }
 .chips > li { flex: none; }
 .saveImage { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; border-radius: var(--radius-500); }
 .map { border-radius: var(--radius-600); overflow: hidden; }
 /* Saved for later on Home: tiles in a row that scrolls sideways (Figma: 156 wide) */
-.tileRow { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(calc(156rem / 17), 45%); gap: var(--space-default-300); overflow-x: auto; scrollbar-width: none; margin: 0 calc(-1 * var(--space-gutter)); padding: 0 var(--space-gutter); scroll-snap-type: x proximity; scroll-padding-inline: var(--space-gutter); }
+.tileRow { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(calc(156rem / 17), 45%); gap: var(--space-300); overflow-x: auto; scrollbar-width: none; margin: 0 calc(-1 * var(--space-page-gutter)); padding: 0 var(--space-page-gutter); scroll-snap-type: x proximity; scroll-padding-inline: var(--space-page-gutter); }
 .tileRow::-webkit-scrollbar { display: none; }
 .tileRow > * { scroll-snap-align: start; min-height: calc(180rem / 17); }
-.tileGrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(calc(140rem / 17), 1fr)); gap: var(--space-default-300); }
+.tileGrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(calc(140rem / 17), 1fr)); gap: var(--space-300); }
 .tileGrid > * { min-height: calc(180rem / 17); }
-.field { display: flex; flex-direction: column; gap: var(--space-default-500); }
+.field { display: flex; flex-direction: column; gap: var(--space-500); }
 /* Collections */
-.marks { display: inline-flex; align-items: center; gap: var(--space-default-200); color: var(--text-secondary); font: var(--type-body-small); }
+.marks { display: inline-flex; align-items: center; gap: var(--space-200); color: var(--text-secondary); font: var(--type-body-small); }
 .marks svg { color: var(--icon-brand); }
-.category { display: flex; flex-direction: column; gap: var(--space-default-300); }
+.category { display: flex; flex-direction: column; gap: var(--space-300); }
 
 /* Category and city chips in the Save sheet wrap onto more lines */
-.chipsWrap { display: flex; flex-wrap: wrap; gap: var(--space-default-300); }
-.previewRound { border-radius: var(--radius-1000); }
-.flag, .previewThumb img.flag { width: 24px; height: 24px; border-radius: var(--radius-1000); object-fit: cover; }
+.chipsWrap { display: flex; flex-wrap: wrap; gap: var(--space-300); }
+.previewRound { border-radius: var(--radius-full); }
+.flag, .previewThumb img.flag { width: 24px; height: 24px; border-radius: var(--radius-full); object-fit: cover; }
 /* Favourites: inside a city, a small titled group per category (icon + label, Label style) */
-.favCategory { display: flex; flex-direction: column; gap: var(--space-default-300); }
-.favCategoryTitle { display: flex; align-items: center; gap: var(--space-default-200); margin: 0; font: var(--type-label); color: var(--text-secondary); }
-.options { display: flex; flex-direction: column; gap: var(--space-default-300); }
-/* Sections 40 apart (--space-stack), things inside a section 16 apart: the rule on every screen and sheet */
-.sections { display: flex; flex-direction: column; gap: var(--space-stack); }
-.kindGroup { display: flex; flex-direction: column; gap: var(--space-default-300); }
+.favCategory { display: flex; flex-direction: column; gap: var(--space-300); }
+.favCategoryTitle { display: flex; align-items: center; gap: var(--space-200); margin: 0; font: var(--type-label); color: var(--text-secondary); }
+.options { display: flex; flex-direction: column; gap: var(--space-300); }
+/* Sections 40 apart (--space-page-section), things inside a section 16 apart: the rule on every screen and sheet */
+.sections { display: flex; flex-direction: column; gap: var(--space-page-section); }
+.kindGroup { display: flex; flex-direction: column; gap: var(--space-300); }
 .kindGroupTitle { margin: 0; font: var(--type-body-small); color: var(--text-secondary); }
 
 /* A saved place's key info: the category tile, the category and when it was saved, Edit and the Favourite star */
-.placeKey { display: flex; align-items: center; gap: var(--space-default-400); }
-.placeKeyText { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: var(--space-default-100); }
+.placeKey { display: flex; align-items: center; gap: var(--space-400); }
+.placeKeyText { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: var(--space-100); }

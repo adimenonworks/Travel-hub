@@ -26,7 +26,14 @@ Read this first when starting a session. If it disagrees with the code or Figma,
   - Code: every colour token renamed; `.surface-dark` deleted (Card Accent and the Next Event card use `feature/*` directly; one `.feature :focus-visible` rule); confetti removed; selected Chip emerald-700; your chat bubbles `feature/*`; map pin `map/pin` + `map/pin-icon` (its Leaflet ring too); New trip close button `IconButton tone="on-feature"`; `CategoryIcon tone="on-feature"`; /#/design's colour section shows the one set plus Feature.
   - Checked in demo mode at 393, light and dark, against Main with zero tolerance: Home, Trips, Overview, Itinerary (Next card identical), Ideas, You identical. Changed only as approved: selected Chips, your chat bubbles, the map pin in dark mode, the New trip close button, no confetti. One fix on the way: the favourite star on the Next card uses `feature/icon` (`icon/brand` would vanish on deep green).
 
-**Next: A4 (Layout).** Then A5–A7, B, C, D, E.
+- **A4, Layout:**
+  - Figma Layout 27 → **47** variables: `space/default/*` → `space/*` (`space/0`…`space/1000`, `space/450`, `space/negative/200`); `space/default/550` deleted (same as `space/700`); `radius/1000` → `radius/full`; `radius/800` and `base/radius/48` deleted. New: `space/page/gutter, section, top, bottom`; role sizes `size/tap, icon-small, icon-large, control-small, control-large, avatar-small/medium/large, category-icon-small/medium/large, tab-bar, content-max` (aliasing new `base/size/16, 24, 32, 40, 44, 48, 60, 480`); `border-width/thin 1, medium 1.5, thick 2, focus 3`. Base 115 → 123. One stale binding left on an Archive group (`100:285`).
+  - Foundations: the "Spacing & radius" section (`35:2217`) is now **Layout**, rebuilt from the live variables (`644:8966`: Space, Page frame, Corner radius, Size, Border width; every sample bound to its variable, text in the file's text styles).
+  - Code: the same names (`--space-500`, `--space-page-gutter`, `--space-page-section`, `--space-page-bottom`, `--radius-full`, `--size-control-small/large`, the role sizes, `--border-width-*`, `--base-size-*`); `--space-inset` → `--space-600`. `--size-tab-bar` stays `calc(60rem / 17)` so it grows with text (Figma 60). The new size and border-width tokens get used in A7.
+  - Checked: build; every `var()` defined; demo mode at 320 and 393, text 17 and 33, light and dark, zero-tolerance diff against Main: identical apart from timing noise (the map, the blurred Bottom nav).
+  - **Found (not caused by this):** at 320px with the largest text, the page title's shrink-to-fit is flaky: Saved · Country often shows "Aus…" at 67px, sometimes "Australia" fitted at 39px, on Main too.
+
+**Next: A5 (Typography).** Then A6, A7, B, C, D, E.
 
 **Noticed for later:** the Foundations section "Spacing & radius" (`35:2217`) documents names from long ago (`--space-xxs`, `--radius-button`, "Regular (744–1067px)"). Rebuild it in A4 with the new Layout names.
 

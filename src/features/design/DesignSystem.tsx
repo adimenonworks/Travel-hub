@@ -42,9 +42,9 @@ const typeStyles = [
   ['t-link', 'Link', '14 · Medium'],
 ];
 
-const spaces = ['--space-default-200', '--space-default-300', '--space-default-400', '--space-default-500', '--space-default-600', '--space-default-700', '--space-default-800', '--space-default-950', '--space-default-1000'];
-const radii = ['--radius-500', '--radius-600', '--radius-800', '--radius-1000'];
-const controlSizes = ['--size-control-sm', '--size-tap', '--size-control'];
+const spaces = ['--space-200', '--space-300', '--space-400', '--space-500', '--space-600', '--space-700', '--space-800', '--space-950', '--space-1000'];
+const radii = ['--radius-500', '--radius-600', '--radius-700', '--radius-full'];
+const controlSizes = ['--size-control-small', '--size-tap', '--size-control-large'];
 const motions: [string, string][] = [
   ['--motion-fast', 'Colour and background changes (hover, press colours)'],
   ['--motion-fluid', 'Things that move: the tab underline, the segmented pill, day cards pushing and expanding'],
@@ -85,7 +85,7 @@ export function DesignSystem() {
         <Section title="Colour" footer="The Figma Color collection (Light and Dark), from src/design/tokens/semantic.css: one set for every surface, plus feature/* for the deep green. Switch light/dark mode in You → Appearance.">
           {colorGroups.map((g) => (
             <Card key={g.title} tone={g.feature ? 'accent' : 'default'}>
-              <div className="t-heading-4" style={{ marginBottom: 'var(--space-default-400)' }}>{g.title}</div>
+              <div className="t-heading-4" style={{ marginBottom: 'var(--space-400)' }}>{g.title}</div>
               <div className={s.swatches}>
                 {g.tokens.map((t) => (
                   <div key={t} className={s.swatch}>
@@ -138,7 +138,7 @@ export function DesignSystem() {
         </Section>
 
         <Section title="Logo" footer="Figma “Logo”: the walker R, as on the app icon. On the sign-in and Get Rove pages, the launch screen and every icon (app, favicon, home screen). Fixed brand colours in both modes.">
-          <div style={{ display: 'flex', gap: 'var(--space-default-500)', alignItems: 'end' }}><Logo /><Logo size={56} /><Logo size={32} /></div>
+          <div style={{ display: 'flex', gap: 'var(--space-500)', alignItems: 'end' }}><Logo /><Logo size={56} /><Logo size={32} /></div>
         </Section>
         <Section title="Illustrations" footer="One style everywhere: white frames with a bold outline and a slight tilt, emerald land, a warm sun, sparkles. Spots go in empty states; covers fill a trip card when it has no photo.">
           <Card className={s.icons}>
@@ -164,8 +164,8 @@ export function DesignSystem() {
             ]} />
           </Card>
           <Card>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-default-400)' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-default-400)' }}><Skeleton layout="circle" /><Skeleton width="60%" /></div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-400)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-400)' }}><Skeleton layout="circle" /><Skeleton width="60%" /></div>
               <Skeleton width="85%" />
               <Skeleton layout="block" />
             </div>
@@ -290,7 +290,7 @@ export function DesignSystem() {
         <Section title="Category icon, event page header and Context menu" footer=".Category icon is the one place an event type's colour lives (Event card, List item, Idea row, Option card and the Page header nest it): Size Small 32 / Regular 40 / Large 48; Tone Secondary (grey Neutral tile, on white), Primary (white, on a grey card), On feature (on the Next card). Page header Title small with Show leading icon and Show subtitle (the time). Context menu: what a long press on your own comment opens (Edit, Delete in red); tap the bubble to see it.">
           {/* Figma `.Category icon`: Type × Size × Tone, the rows as on Foundations */}
           {([['regular', 'secondary'], ['regular', 'primary'], ['regular', 'on-feature'], ['large', 'primary'], ['small', 'primary']] as const).map(([size, tone]) => (
-            <div key={size + tone} className={[s.chipRow, tone === 'on-feature' && 'feature'].filter(Boolean).join(' ')} style={tone === 'primary' ? { background: 'var(--surface-secondary)', borderRadius: 'var(--radius-600)', padding: 'var(--space-default-300)' } : tone === 'on-feature' ? { background: 'var(--feature-surface)', borderRadius: 'var(--radius-600)', padding: 'var(--space-default-300)' } : undefined}>
+            <div key={size + tone} className={[s.chipRow, tone === 'on-feature' && 'feature'].filter(Boolean).join(' ')} style={tone === 'primary' ? { background: 'var(--surface-secondary)', borderRadius: 'var(--radius-600)', padding: 'var(--space-300)' } : tone === 'on-feature' ? { background: 'var(--feature-surface)', borderRadius: 'var(--radius-600)', padding: 'var(--space-300)' } : undefined}>
               {(['neutral', 'travel', 'stays', 'food', 'activities', 'notes'] as const).map((t) => <CategoryIcon key={t} icon={t === 'food' ? 'grape' : 'plane'} type={t} size={size} tone={tone} />)}
             </div>
           ))}

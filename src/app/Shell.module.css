@@ -38,13 +38,13 @@
    Add the safe area (home indicator), and whatever the bar grows by at larger text sizes. */
 .withNav { padding-bottom: calc(env(safe-area-inset-bottom) + max(0px, var(--size-tab-bar) - 60px)); }
 .content {
-  max-width: calc(var(--size-content-max) + 2 * var(--space-gutter));
+  max-width: calc(var(--size-content-max) + 2 * var(--space-page-gutter));
   margin: 0 auto;
-  padding: 0 var(--space-gutter) var(--space-default-1000); /* 96px below every page */
-  display: flex; flex-direction: column; gap: var(--space-stack);
+  padding: 0 var(--space-page-gutter) var(--space-page-bottom); /* 96px below every page */
+  display: flex; flex-direction: column; gap: var(--space-page-section);
 }
 
-.demo { max-width: calc(var(--size-content-max) + 2 * var(--space-gutter)); margin: var(--space-default-500) auto 0; padding: 0 var(--space-gutter); }
+.demo { max-width: calc(var(--size-content-max) + 2 * var(--space-page-gutter)); margin: var(--space-500) auto 0; padding: 0 var(--space-page-gutter); }
 
 /* Swipe back (SwipeBack.tsx): the current screen slides right with the finger over the previous screen, which sits
    underneath, a little to the left and dimmed, the way iOS does it. */

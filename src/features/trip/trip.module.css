@@ -1,14 +1,14 @@
 /* Cover photo picker (trip form) */
-.coverField { display: flex; flex-direction: column; gap: var(--space-default-400); }
+.coverField { display: flex; flex-direction: column; gap: var(--space-400); }
 .coverPreview { width: 100%; aspect-ratio: 5 / 2; object-fit: cover; border-radius: var(--radius-500); cursor: grab; touch-action: none; user-select: none; }
 .coverPreview:active { cursor: grabbing; }
-.coverButtons { display: flex; gap: var(--space-default-300); flex-wrap: wrap; }
+.coverButtons { display: flex; gap: var(--space-300); flex-wrap: wrap; }
 
 /* Section tabs stay reachable while scrolling */
 .sectionNav {
   position: sticky; top: env(safe-area-inset-top); z-index: 30;
-  margin: calc(-1 * var(--space-default-400)) calc(-1 * var(--space-gutter));
-  padding: var(--space-default-400) var(--space-gutter);
+  margin: calc(-1 * var(--space-400)) calc(-1 * var(--space-page-gutter));
+  padding: var(--space-400) var(--space-page-gutter);
   background: var(--surface-primary);
 }
 /* While stuck, the tabs sit just under the status bar; this fills the status bar strip above them too,
@@ -21,26 +21,26 @@
 .sectionNav[data-stuck]::before { visibility: visible; }
 
 /* The tab's content */
-.tabPanel { display: flex; flex-direction: column; gap: var(--space-stack); }
+.tabPanel { display: flex; flex-direction: column; gap: var(--space-page-section); }
 
 /* Day strip (Figma "Day card" in a sideways-scrolling row) */
 .days {
-  display: flex; align-items: stretch; gap: var(--space-default-300); overflow-x: auto; scroll-snap-type: x proximity; scrollbar-width: none;
+  display: flex; align-items: stretch; gap: var(--space-300); overflow-x: auto; scroll-snap-type: x proximity; scrollbar-width: none;
   /* Room above and below for the selected card's growth and focus rings (the strip scrolls, so it would clip them),
      taken back with negative margins so the cards sit where they would without it. */
-  --strip-room: calc(var(--space-default-200) + 10rem / 17);
-  margin: calc(-1 * var(--strip-room)) calc(-1 * var(--space-gutter)); padding: var(--strip-room) var(--space-gutter);
-  scroll-padding-inline: var(--space-gutter);
+  --strip-room: calc(var(--space-200) + 10rem / 17);
+  margin: calc(-1 * var(--strip-room)) calc(-1 * var(--space-page-gutter)); padding: var(--strip-room) var(--space-page-gutter);
+  scroll-padding-inline: var(--space-page-gutter);
 }
 .days::-webkit-scrollbar { display: none; }
 /* A month marker between Day cards ("Dec"): small secondary text, centred on the cards */
-.monthMark { flex: none; align-self: center; font: var(--type-label-small); color: var(--text-secondary); padding: 0 var(--space-default-100); }
+.monthMark { flex: none; align-self: center; font: var(--type-label-small); color: var(--text-secondary); padding: 0 var(--space-100); }
 
-.itinLayout { display: flex; flex-direction: column; gap: var(--space-stack); } /* 40 from the day cards to the day's plan */
+.itinLayout { display: flex; flex-direction: column; gap: var(--space-page-section); } /* 40 from the day cards to the day's plan */
 
 /* The day's plan */
-.timeline { display: flex; flex-direction: column; gap: var(--space-default-500); }
-.timelineItem { display: flex; flex-direction: column; gap: var(--space-default-300); }
+.timeline { display: flex; flex-direction: column; gap: var(--space-500); }
+.timelineItem { display: flex; flex-direction: column; gap: var(--space-300); }
 
 /* A tab's title with its one action beside it; the text wraps rather than pushing the button underneath. */
 
@@ -54,82 +54,82 @@
 
 /* Photos */
 /* Photos: albums as Figma Cards (24 corners, 16 padding) with a cover scene on top (8 corners: 24 − 16) */
-.albumGrid { display: grid; gap: var(--space-default-500); grid-template-columns: minmax(0, 1fr); }
+.albumGrid { display: grid; gap: var(--space-500); grid-template-columns: minmax(0, 1fr); }
 /* Album: the grey Card (no border), the cover inset with 24 − 16 = 8 corners */
-.album { position: relative; display: flex; flex-direction: column; gap: var(--space-default-500); padding: var(--space-default-500); border-radius: var(--radius-600); background: var(--surface-secondary); }
+.album { position: relative; display: flex; flex-direction: column; gap: var(--space-500); padding: var(--space-500); border-radius: var(--radius-600); background: var(--surface-secondary); }
 .albumCover { aspect-ratio: 2 / 1; border-radius: var(--radius-300); overflow: hidden; }
 .albumCover > * { width: 100%; height: 100%; }
-.albumBody { display: flex; align-items: flex-start; gap: var(--space-default-300); }
-.albumText { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: var(--space-default-100); }
+.albumBody { display: flex; align-items: flex-start; gap: var(--space-300); }
+.albumText { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: var(--space-100); }
 .albumTitle { margin: 0; font: var(--type-heading-2); letter-spacing: -0.01em; color: var(--text-primary); }
 .albumLink { color: inherit; text-decoration: none !important; }
 .albumLink::after { content: ''; position: absolute; inset: 0; border-radius: var(--radius-600); } /* the whole card opens the album */
 .albumEdit { position: relative; z-index: 1; }
-.albumHelp { display: flex; flex-direction: column; gap: var(--space-default-300); padding: var(--space-default-500) var(--space-default-600); border-radius: var(--radius-600); background: var(--surface-sunken); font: var(--type-body-small); color: var(--text-secondary); }
+.albumHelp { display: flex; flex-direction: column; gap: var(--space-300); padding: var(--space-500) var(--space-600); border-radius: var(--radius-600); background: var(--surface-sunken); font: var(--type-body-small); color: var(--text-secondary); }
 .albumHelp b { color: var(--text-primary); font-weight: var(--weight-semibold); }
 
 /* Idea Card buttons (Figma "Buttons"): Deny | Approve, equal halves, 12 apart, 8 below the votes row (24 in all with the card gap) */
-.ideaButtons { display: grid; grid-template-columns: repeat(auto-fit, minmax(calc(120rem / 17), 1fr)); gap: var(--space-default-400); margin-top: var(--space-default-300); }
+.ideaButtons { display: grid; grid-template-columns: repeat(auto-fit, minmax(calc(120rem / 17), 1fr)); gap: var(--space-400); margin-top: var(--space-300); }
 
 /* Overview: sections 32 apart */
-.overview { display: flex; flex-direction: column; gap: var(--space-stack); }
+.overview { display: flex; flex-direction: column; gap: var(--space-page-section); }
 /* Bookings tiles: two columns, 8 apart (one column when text is very large). Tiles in a row stretch to the same
    height; titles keep their size and wrap between words. */
-.tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(calc(130rem / 17), 1fr)); align-items: stretch; gap: var(--space-default-300); }
+.tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(calc(130rem / 17), 1fr)); align-items: stretch; gap: var(--space-300); }
 .flagThumb { width: 32px; height: 32px; border-radius: 50%; }
 /* Event cards and their Travel connectors, 8 apart */
-.eventList { display: flex; flex-direction: column; gap: var(--space-default-300); }
+.eventList { display: flex; flex-direction: column; gap: var(--space-300); }
 
 /* Event detail */
-.docRow { display: flex; align-items: center; gap: var(--space-default-200); }
+.docRow { display: flex; align-items: center; gap: var(--space-200); }
 .docRow > :first-child { flex: 1; min-width: 0; }
 .selectable { -webkit-user-select: text; user-select: text; -webkit-touch-callout: default; white-space: pre-wrap; }
 
 /* New trip flow */
 /* "Add end time": a chip lined up with the time field beside it (the field's label row, then the control) */
-.endChip { align-self: end; display: flex; align-items: center; min-height: var(--size-control); }
-.optionGrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(calc(130rem / 17), 1fr)); gap: var(--space-default-300); }
+.endChip { align-self: end; display: flex; align-items: center; min-height: var(--size-control-large); }
+.optionGrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(calc(130rem / 17), 1fr)); gap: var(--space-300); }
 /* Months (Figma "New trip — 2b. Roughly"): three across, fewer as text grows */
 .monthGrid { grid-template-columns: repeat(auto-fit, minmax(calc(96rem / 17), 1fr)); }
-.flowSummary { display: flex; flex-direction: column; gap: var(--space-default-100); }
+.flowSummary { display: flex; flex-direction: column; gap: var(--space-100); }
 .flowSummaryTitle { font: var(--type-heading-2); letter-spacing: -0.01em; color: var(--feature-text); }
 .flowSummaryMeta { margin: 0; font: var(--type-body-small); color: var(--feature-text-secondary); }
 /* The Ghost button on the deep emerald Celebration screen uses the ghost "inverse" text */
 .onDarkGhost[class] { color: var(--feature-text); }
 
-.flowSection { display: flex; flex-direction: column; gap: var(--space-default-400); padding-top: var(--space-default-300); }
+.flowSection { display: flex; flex-direction: column; gap: var(--space-400); padding-top: var(--space-300); }
 
-.addSection { display: flex; flex-direction: column; gap: var(--space-default-300); }
+.addSection { display: flex; flex-direction: column; gap: var(--space-300); }
 .ideaImage { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; border-radius: var(--radius-500); }
 
 /* New trip flow: a section title on the deep green screen, the date-mode chips, and the Skip link under the footer button */
-.flowSection { display: flex; flex-direction: column; gap: var(--space-default-400); }
+.flowSection { display: flex; flex-direction: column; gap: var(--space-400); }
 .flowSectionTitle { display: flex; align-items: center; margin: 0; font: var(--type-heading-2); letter-spacing: -0.01em; color: var(--feature-text); }
-.flowChips { display: flex; flex-wrap: wrap; gap: var(--space-default-300); }
+.flowChips { display: flex; flex-wrap: wrap; gap: var(--space-300); }
 .flowSkip { color: var(--feature-text); }
 
 /* Event detail, Location: one grey card with the map (inner corners 24 − 8 = 16), the address, then the buttons */
 
 /* New trip step 4: a city's places drop down under it (indented), each ticked to come along */
-.flowDropdown { display: flex; flex-direction: column; padding-left: var(--space-default-700); }
-.flowFlag { width: calc(20rem / 17); height: calc(20rem / 17); border-radius: var(--radius-1000); object-fit: cover; margin-right: var(--space-default-300); flex: none; }
+.flowDropdown { display: flex; flex-direction: column; padding-left: var(--space-700); }
+.flowFlag { width: calc(20rem / 17); height: calc(20rem / 17); border-radius: var(--radius-full); object-fit: cover; margin-right: var(--space-300); flex: none; }
 .flowFootnote { margin: 0; text-align: center; font: var(--type-body-small); color: var(--feature-text-secondary); }
 .flipped { transform: rotate(180deg); }
-.flowBudget { display: flex; flex-direction: column; gap: var(--space-default-300); padding: var(--space-default-500); border-radius: var(--radius-600); background: var(--surface-primary); } /* the amount, on a white card on the deep green screen */
+.flowBudget { display: flex; flex-direction: column; gap: var(--space-300); padding: var(--space-500); border-radius: var(--radius-600); background: var(--surface-primary); } /* the amount, on a white card on the deep green screen */
 /* Add to itinerary: step 1 lists the 7 types (Option cards with what each covers); step 2 wraps the category chips */
-.typeList { display: flex; flex-direction: column; gap: var(--space-default-300); }
-.kindPicker { display: flex; flex-direction: column; gap: var(--space-default-300); }
-.kindChips { display: flex; flex-wrap: wrap; gap: var(--space-default-300); }
+.typeList { display: flex; flex-direction: column; gap: var(--space-300); }
+.kindPicker { display: flex; flex-direction: column; gap: var(--space-300); }
+.kindChips { display: flex; flex-wrap: wrap; gap: var(--space-300); }
 /* The categories sit inside the chosen type: a grey inset panel (inner radius = the sheet's 24 − 0, a card in the sheet) */
-.kindPanel { padding: var(--space-default-500); border-radius: var(--radius-600); background: var(--surface-secondary); }
+.kindPanel { padding: var(--space-500); border-radius: var(--radius-600); background: var(--surface-secondary); }
 .pickerLabel { margin: 0; font: var(--type-body-small); color: var(--text-secondary); }
 /* Event form: Location with Paste beside it (both 48px tall, bottoms lined up), the hint under both */
-.locationField { display: flex; flex-direction: column; gap: var(--space-default-200); }
-.locationRow { display: flex; align-items: flex-end; gap: var(--space-default-300); }
+.locationField { display: flex; flex-direction: column; gap: var(--space-200); }
+.locationRow { display: flex; align-items: flex-end; gap: var(--space-300); }
 .locationRow > :first-child { flex: 1; min-width: 0; }
 /* Ideas: the list under the segments, one view per segment (it slides when you swipe or pick a segment) */
 .swipeArea { min-width: 0; }
-.ideaList { display: flex; flex-direction: column; gap: var(--space-stack); }
+.ideaList { display: flex; flex-direction: column; gap: var(--space-page-section); }
 /* The edit sheet's type row: the category icon, the type and category, and Change type */
-.typeRow { display: flex; align-items: center; gap: var(--space-default-400); }
-.typeRowText { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: var(--space-default-100); }
+.typeRow { display: flex; align-items: center; gap: var(--space-400); }
+.typeRowText { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: var(--space-100); }

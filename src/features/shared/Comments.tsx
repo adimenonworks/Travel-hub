@@ -36,7 +36,7 @@ export function Comments({ tripId, targetId, comments, profiles }: { tripId: str
   const lift = () => {
     const el = box.current?.parentElement; // the grey section
     if (!el || document.activeElement !== input.current) return;
-    const gap = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--space-default-500')) || 16;
+    const gap = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--space-500')) || 16;
     const by = el.getBoundingClientRect().bottom - (window.innerHeight - keyboardHeight() - gap);
     if (Math.abs(by) > 1) window.scrollBy({ top: by, behavior: 'smooth' });
   };

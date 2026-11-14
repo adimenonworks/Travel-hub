@@ -159,20 +159,29 @@
   --category-activities-surface-on-feature: var(--base-color-pink-300); --category-activities-icon-on-feature: var(--base-color-neutral-1000);
   --category-notes-surface-on-feature: var(--base-color-emerald-300); --category-notes-icon-on-feature: var(--base-color-neutral-1000);
 
-  /* Layout (Figma "Layout" collection) */
-  /* Figma Layout collection (space/default/500 → --space-default-500, radius/600 → --radius-600) */
-  --space-default-0: var(--base-space-0); --space-default-100: var(--base-space-2); --space-default-200: var(--base-space-4); --space-default-250: var(--base-space-6);
-  --space-default-300: var(--base-space-8); --space-default-400: var(--base-space-12); --space-default-450: var(--base-space-18); --space-default-550: var(--base-space-24); --space-default-500: var(--base-space-16); --space-default-600: var(--base-space-20);
-  --space-default-700: var(--base-space-24); --space-default-800: var(--base-space-32); --space-default-900: var(--base-space-40); --space-default-950: var(--base-space-48); --space-default-1000: var(--base-space-96);
+  /* Layout (Figma "Layout" collection, its one mode "Value"): space/500 → --space-500, radius/600 → --radius-600 */
+  --space-0: var(--base-space-0); --space-100: var(--base-space-2); --space-200: var(--base-space-4); --space-250: var(--base-space-6);
+  --space-300: var(--base-space-8); --space-400: var(--base-space-12); --space-450: var(--base-space-18); --space-500: var(--base-space-16); --space-600: var(--base-space-20);
+  --space-700: var(--base-space-24); --space-800: var(--base-space-32); --space-900: var(--base-space-40); --space-950: var(--base-space-48); --space-1000: var(--base-space-96);
   --space-negative-200: var(--base-space--6); /* how far each avatar in a stack tucks under the one before */
+  /* Page frame (Figma space/page/*) */
+  --space-page-gutter: var(--space-700);   /* page side margin (24) */
+  --space-page-section: var(--space-900);  /* gap between sections (40); inside a section, 16 */
+  --space-page-top: var(--space-950);      /* space above the page title (48) */
+  --space-page-bottom: var(--space-1000);  /* below every page (96), clearing the Bottom nav */
   --radius-100: var(--base-radius-2); --radius-200: var(--base-radius-4); --radius-300: var(--base-radius-8); --radius-400: var(--base-radius-12); --radius-500: var(--base-radius-16);
-  --radius-600: var(--base-radius-24); --radius-700: var(--base-radius-32); --radius-800: var(--base-radius-48); --radius-900: var(--base-radius-64); --radius-1000: var(--base-radius-999);
-
-  /* Page layout (code only: how the Layout tokens are used for the page frame, by screen width) */
-  --space-gutter: var(--space-default-700);   /* page side margin (24) */
-  --space-inset: var(--space-default-600);    /* padding inside cards and rows */
-  --space-stack: var(--space-default-900);      /* gap between sections (40); inside a section, 16 */
-  --space-page-top: var(--space-default-950);   /* space above the page title */
+  --radius-600: var(--base-radius-24); --radius-700: var(--base-radius-32); --radius-900: var(--base-radius-64); --radius-full: var(--base-radius-999);
+  /* Sizes (Figma size/*): role tokens only where the meaning is shared */
+  --size-tap: var(--base-size-44);              /* the smallest tap area */
+  --size-icon-small: var(--base-size-16); --size-icon-large: var(--base-size-24);
+  --size-control-small: var(--base-size-32);    /* Button Small, Icon button Small */
+  --size-control-large: var(--base-size-48);    /* Button Large, Text field */
+  --size-avatar-small: var(--base-size-24); --size-avatar-medium: var(--base-size-32); --size-avatar-large: var(--base-size-40);
+  --size-category-icon-small: var(--base-size-32); --size-category-icon-medium: var(--base-size-40); --size-category-icon-large: var(--base-size-48);
+  --size-tab-bar: calc(60rem / 17); /* Bottom nav height: Figma size/tab-bar (base/size/60) in rem, so it grows with text size */
+  --size-content-max: var(--base-size-480);     /* phone width: on a computer the test site shows a centred phone column */
+  /* Border widths (Figma border-width/*) */
+  --border-width-thin: 1px; --border-width-medium: 1.5px; --border-width-thick: 2px; --border-width-focus: 3px;
 
   /* Typography (Figma "Typography" collection, its one mode). Sizes follow the iPhone text setting (see base.css).
      Titles and headings grow up to 1.4x their Figma size, like iOS large titles; body and label text keep growing. */
@@ -190,7 +199,6 @@
   --elevation-floating-bar: var(--shadow-raised);
 
   /* Sizing and motion (code only) */
-  --size-tap: 44px; --size-control: 48px; --size-control-sm: 32px; /* Button Regular (Wise's small button) */ --size-tab-bar: calc(60rem / 17); /* Bottom nav height, growing with text size */ --size-content-max: 480px; /* phone width: on a computer the test site shows a centred phone column */
   --motion-fast: var(--duration-fast) var(--ease-standard);
   --motion-base: var(--duration-base) var(--ease-standard);
   --motion-sheet: var(--duration-sheet) var(--ease-spring);
