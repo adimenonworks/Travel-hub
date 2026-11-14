@@ -21,7 +21,7 @@ export function PageHeader({ title, subtitle, meta, back, action, fit, size = 'l
   back?: { to: string; label: string };
   /** Figma "Show trailing": the one optional button, e.g. edit the trip */
   action?: { icon: IconName; label: string; onClick: () => void };
-  /** Keep the title on one line: if it doesn't fit, it steps down to the Heading 1 size */
+  /** Keep the title on one line: if it doesn't fit, it steps down to the Heading 1 size, then as small as it needs */
   fit?: boolean;
   /** Figma "Size": Large (tabs: Display) or Small (pushed pages and a trip's pages: Heading 1) */
   size?: 'large' | 'small';
@@ -30,44 +30,54 @@ export function PageHeader({ title, subtitle, meta, back, action, fit, size = 'l
 }) {
   const navigate = useNavigate();
   const titleRef = useRef<HTMLHeadingElement>(null);
-  const [smaller, setSmaller] = useState(false);
+  // Page titles never cut off or split a word (owner, 13 Nov 2026), like iOS's "shrink to fit".
+  // `fit` (one line): the Display size, else the Heading 1 size, else whatever smaller size fits the line.
+  // Otherwise the title wraps between words, and if its longest word is wider than the line (a long place name at
+  // 320px with the largest text) the whole title shrinks until that word fits.
+  // Measured straight from the page, never through React state, so a measurement can't race a re-render; and it runs
+  // again once the title's font has loaded (it isn't requested until something uses it) and whenever the width or
+  // the text size changes.
   useLayoutEffect(() => {
     const el = titleRef.current;
-    if (!fit || !el || size === 'small') return;
-    const check = () => { setSmaller(false); requestAnimationFrame(() => setSmaller(el.scrollWidth > el.clientWidth)); };
-    check();
-    document.fonts?.ready.then(check); // measure again once the display font has loaded
-    const ro = new ResizeObserver(check);
-    ro.observe(el.parentElement!);
-    return () => ro.disconnect();
-  }, [fit, title, size]);
-  // Words never split (owner, 13 Nov 2026): if the longest word is wider than the line (a long place name at 320px
-  // with the largest text), the whole title shrinks until that word fits, like iOS's "shrink to fit".
-  useLayoutEffect(() => {
-    const el = titleRef.current;
-    if (fit || !el) return;
-    const ctx = document.createElement('canvas').getContext('2d');
-    if (!ctx) return;
-    let seen = '';
+    if (!el) return;
+    const oneLine = fit && size !== 'small';
+    const ctx = oneLine ? null : document.createElement('canvas').getContext('2d');
+    const fitTo = (room: number, width: number) => {
+      el.style.fontSize = `${Math.floor(parseFloat(getComputedStyle(el).fontSize) * (room / width) * 10) / 10}px`;
+    };
     const shrink = () => {
       el.style.removeProperty('font-size');
       const room = el.clientWidth;
       if (!room) return;
+      if (oneLine) {
+        if (el.scrollWidth <= room) return;
+        el.style.fontSize = 'var(--size-heading-1)';
+        if (el.scrollWidth > room) fitTo(room, el.scrollWidth);
+        return;
+      }
+      if (!ctx) return;
       const cs = getComputedStyle(el);
       ctx.font = `${cs.fontStyle} ${cs.fontWeight} ${cs.fontSize} ${cs.fontFamily}`;
       const words = (el.textContent ?? '').split(/\s+/).filter(Boolean);
       const widest = Math.max(0, ...words.map((w) => ctx.measureText(w).width));
-      if (widest > room) el.style.fontSize = `${Math.floor(parseFloat(cs.fontSize) * (room / widest) * 10) / 10}px`;
+      if (widest > room) fitTo(room, widest);
     };
+    let seen = '';
+    const key = () => `${el.clientWidth}|${getComputedStyle(document.documentElement).fontSize}`;
     shrink();
-    // Measure again when the width or the text size changes (not when the shrink itself changes the height)
-    const ro = new ResizeObserver(() => {
-      const key = `${el.clientWidth}|${getComputedStyle(document.documentElement).fontSize}`;
-      if (key !== seen) { seen = key; shrink(); }
-    });
+    seen = key();
+    // The shrink changes the title's height, which also reaches the observer: only a new width or text size counts
+    const ro = new ResizeObserver(() => { const k = key(); if (k !== seen) { seen = k; shrink(); } });
     ro.observe(el);
-    document.fonts?.ready.then(shrink).catch(() => {});
-    return () => ro.disconnect();
+    const fonts = document.fonts;
+    let live = true;
+    const again = () => { if (live) shrink(); };
+    if (fonts) {
+      fonts.addEventListener('loadingdone', again);
+      fonts.load(`${getComputedStyle(el).fontWeight} 1em ${getComputedStyle(el).fontFamily}`, el.textContent ?? undefined).then(again, () => {});
+      fonts.ready.then(again, () => {});
+    }
+    return () => { live = false; ro.disconnect(); fonts?.removeEventListener('loadingdone', again); el.style.removeProperty('font-size'); };
   }, [fit, title, size]);
   return (
     <header className={s.header}>
@@ -75,7 +85,7 @@ export function PageHeader({ title, subtitle, meta, back, action, fit, size = 'l
       <div className={[s.titleRow, size === 'small' && s.titleRowSmall].filter(Boolean).join(' ')}>
         {icon && <span className={s.leadIcon}><CategoryIcon icon={icon} type={type} /></span>}
         <div className={s.titleText}>
-          <h1 ref={titleRef} className={[s.title, size === 'small' && s.titleSmall, fit && s.fit, fit && smaller && s.fitSmaller].filter(Boolean).join(' ')}>{title}</h1>
+          <h1 ref={titleRef} className={[s.title, size === 'small' && s.titleSmall, fit && s.fit].filter(Boolean).join(' ')}>{title}</h1>
           {subtitle && <div className={s.subtitle}>{subtitle}</div>}
         </div>
         {action && (
