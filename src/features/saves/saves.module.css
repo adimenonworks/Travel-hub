@@ -16,7 +16,7 @@
   border-radius: var(--radius-600); border: var(--border-width-thin) solid var(--border-subtle); background: var(--surface-primary);
   cursor: pointer; transition: transform var(--motion-release), background var(--motion-fast);
 }
-.target:active { transform: scale(0.98); transition: transform var(--motion-press); }
+.target[data-pressed] { transform: scale(0.98); transition: transform var(--motion-press); }
 .check { flex: none; color: var(--icon-brand); }
 .flag { width: var(--size-700); height: var(--size-700); border-radius: 50%; }
 /* Saved destination */

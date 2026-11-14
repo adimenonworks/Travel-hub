@@ -2,7 +2,7 @@
 .who { display: flex; gap: var(--space-500); align-items: center; }
 .whoText { min-width: 0; overflow-wrap: anywhere; }
 .avatarButton { flex: none; display: grid; place-items: center; min-width: var(--size-tap); min-height: var(--size-tap); margin: calc(-1 * var(--space-100)); padding: 0; border: 0; background: none; border-radius: 50%; transition: transform var(--motion-release); }
-.avatarButton:active { transform: scale(0.94); transition: transform var(--motion-press); }
+.avatarButton[data-pressed] { transform: scale(0.94); transition: transform var(--motion-press); }
 .nameRow { display: flex; flex-wrap: wrap; gap: var(--space-400); align-items: flex-end; margin-bottom: calc(var(--space-400) * -1); }
 .addField { flex: 1 1 calc(160rem / 17); min-width: 0; }
 .nameRow > button { margin-bottom: var(--space-100); } /* the 40px Icon button centred on the 48px field */

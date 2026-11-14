@@ -77,8 +77,8 @@
 .chipButton { position: relative; z-index: 2; cursor: pointer; transition: background var(--motion-fast), transform var(--motion-release); }
 .chipButton::after { content: ''; position: absolute; inset: calc((var(--size-650) - var(--size-tap)) / 2) calc(-1 * var(--space-100)); } /* 44px tap area */
 .chip-inactive.chipButton:hover { background: var(--control-unselected-background-hover); }
-.chipButton:active { transform: scale(0.96); transition: transform var(--motion-press); }
-.chip-inactive.chipButton:active { background: var(--control-unselected-background-pressed); }
+.chipButton[data-pressed] { transform: scale(0.96); transition: transform var(--motion-press); }
+.chip-inactive.chipButton[data-pressed] { background: var(--control-unselected-background-pressed); }
 
 
 /* Figma ".Badge": a count on an icon (Icon button, .Navigation item). Sits over the icon's top-right corner. */

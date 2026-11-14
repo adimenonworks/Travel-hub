@@ -32,8 +32,8 @@
 .interactive.structured { display: flex; } /* a structured Card that is a link keeps its column layout */
 .interactive::after { content: ''; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; transition: background var(--motion-fast); }
 .interactive:hover::after { background: var(--button-ghost-background-hover); }
-.interactive:active::after { background: var(--button-ghost-background-pressed); }
-.interactive:active { transform: scale(0.98); transition: transform var(--motion-press); }
+.interactive[data-pressed]::after { background: var(--button-ghost-background-pressed); }
+.interactive[data-pressed] { transform: scale(0.98); transition: transform var(--motion-press); }
 
 .section { display: flex; flex-direction: column; gap: var(--space-400); }
 .sectionHeader { display: flex; align-items: center; justify-content: space-between; gap: var(--space-400); min-height: var(--size-tap); flex-wrap: wrap; }
