@@ -22,7 +22,7 @@ Read this first when starting a session. If it disagrees with the code or Figma,
 - Rules tests: Java isn't installed on the owner's Mac; a portable Temurin 21 JRE in the session's scratch folder runs them (`JAVA_HOME=<it> PATH=$JAVA_HOME/bin:$PATH npm test`). Playwright isn't in the project either: install `playwright@1.49.1` in a scratch folder and launch with `channel: 'chrome'` (the cached Chromium is broken).
 
 **Items done:**
-- **Item 1, one trip, everyone equal** (pull request after 157):
+- **Item 1, one trip, everyone equal** (pull request 158):
   - Model: `Role` = `'traveller' | 'follower'`; `StoredRole` keeps the old names for reading; `src/data/roles.ts` (`roleOf`, `isTravelling`, `peopleInOrder`, `needsRoleMigration`, `migratedRoles`). Trip has `createdBy` (a record only; older trips `ownerId`). `useRole()` gives `role` and `isTraveller`; `TripCtx` lost `canManage`, `isOwner`, `canContribute` (now `isTraveller`).
   - Any traveller: edits the trip, adds people, changes roles, removes someone, deletes the trip (confirm names everyone else; Recently deleted for everyone; any traveller restores or, after 30 days, clears it). Anyone leaves; the last traveller leaving bins the trip and stays on it. Delete account: leave every trip, delete ones with no other traveller.
   - Migration: `useRoleMigration` (first traveller to open an older trip; `store.migrateRoles`). Checked in demo mode: owner/editor/member → traveller, viewer → follower, `ownerId` → `createdBy`.
