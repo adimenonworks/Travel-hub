@@ -26,14 +26,15 @@ export function TextField({ label, hint, id, icon, ...rest }: Wrap & InputHTMLAt
   );
 }
 
+/** Figma "Text area" (State Default / Focus / Filled): a multi-line field. */
 export function TextArea({ label, hint, id, ...rest }: Wrap & TextareaHTMLAttributes<HTMLTextAreaElement>) {
   const auto = useId();
   const fid = id ?? auto;
   return <Wrapper id={fid} label={label} hint={hint}><textarea id={fid} className={s.input} {...rest} /></Wrapper>;
 }
 
-/** `compact` is 44px tall with smaller text, to match a medium button beside it (e.g. in a list row). */
-export function Select({ label, hint, id, compact, children, ...rest }: Wrap & SelectHTMLAttributes<HTMLSelectElement> & { compact?: boolean }) {
+/** Figma "Dropdown" (State Default / Focus / Filled), was Select. `compact` (code only, not in Figma yet) is 44px tall with smaller text, to match a medium button beside it (e.g. in a list row). */
+export function Dropdown({ label, hint, id, compact, children, ...rest }: Wrap & SelectHTMLAttributes<HTMLSelectElement> & { compact?: boolean }) {
   const auto = useId();
   const fid = id ?? auto;
   return <Wrapper id={fid} label={label} hint={hint}><select id={fid} className={[s.input, compact && s.compact].filter(Boolean).join(' ')} {...rest}>{children}</select></Wrapper>;

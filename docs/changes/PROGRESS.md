@@ -54,7 +54,9 @@ Read this first when starting a session. If it disagrees with the code or Figma,
 
 - **B6, Message:** Figma Message (`452:3461`) first: it had drifted from the app, so code won: Mine bubble `feature/surface` + `feature/text` (was the old selected emerald-700), Theirs bubble `surface/primary` (white on the grey section; was grey `surface/secondary`), Mine row gap `space/300`; new **Show edited** boolean ("Edited", Body small, `text/secondary`; before the bubble for mine, after it for theirs) because the app shows it. Code: `Message` in `src/design/components/Message.tsx` (+ `.module.css`, moved out of `shared.module.css`): `layout`, `meta`, `avatar`, `edited`, `bubbleProps`, `wrapBubble`; `Comments.tsx` renders each person's run as a stack of Messages (meta on the first, avatar beside the last). On /#/design. Every comment element's position is identical to before (measured to 0.01px).
 
-**Next: B7 (Text field, Text area, Dropdown).** Then B8, C, D, E.
+- **B7, three fields:** Figma Text field (`7:89`) split by its Layout into **Text field** (`7:89`, State Default / Focus / Filled; its unused `Icon` property removed), **Text area** (`661:595`) and **Dropdown** (`661:596`, keeps the chevron `Icon`), stacked together in the Controls row (rows below moved down 208px). Text area had no instances; Dropdown only on Archive (still linked). Code: `Select` → **`Dropdown`** (8 files); `TextField`, `TextArea` unchanged. Glossary updated. **Found, not changed:** code's `Dropdown compact` (44px, to sit beside a small button) has no Figma Size yet; and Text area is still drawn at Input height in Figma (noted in the earlier prompt).
+
+**Next: B8 (keep unused icons).** Then C, D, E.
 
 **Noticed for later:** the Foundations section "Spacing & radius" (`35:2217`) documents names from long ago (`--space-xxs`, `--radius-button`, "Regular (744–1067px)"). Rebuild it in A4 with the new Layout names.
 

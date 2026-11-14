@@ -1,6 +1,6 @@
 export { Icon, ICON_NAMES, type IconName } from './Icon';
 export { Button, IconButton, LinkButton, type ButtonTone, type IconButtonTone } from './Button';
-export { TextField, TextArea, Select, FieldRow } from './Field';
+export { TextField, TextArea, Dropdown, FieldRow } from './Field';
 export { Card } from './Card';
 export { SegmentControl } from './SegmentControl';
 export { Sheet } from './Sheet';

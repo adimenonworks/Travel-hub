@@ -1,4 +1,4 @@
-import { FieldRow, Select, TextField } from '../../design/components';
+import { FieldRow, Dropdown, TextField } from '../../design/components';
 import { useMe, useProfile } from '../../data/hooks';
 import type { Price } from '../../data/types';
 import { defaultHomeCurrency, priceText, useConverted } from '../../lib/currency';
@@ -15,9 +15,9 @@ export function PriceField({ value, onChange, label = 'Price (optional)', hint =
     <FieldRow hint={hint}>
       <TextField label={label} type="number" inputMode="decimal" min={0} step="any" placeholder="—" value={value.amount}
         onChange={(e) => onChange({ ...value, amount: e.target.value })} />
-      <Select label="Currency" value={value.currency} onChange={(e) => onChange({ ...value, currency: e.target.value })}>
+      <Dropdown label="Currency" value={value.currency} onChange={(e) => onChange({ ...value, currency: e.target.value })}>
         {[...new Set([value.currency, ...CURRENCIES])].map((c) => <option key={c} value={c}>{c}</option>)}
-      </Select>
+      </Dropdown>
     </FieldRow>
   );
 }
