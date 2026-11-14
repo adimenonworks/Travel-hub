@@ -37,6 +37,7 @@
 .monthMark { flex: none; align-self: center; font: var(--type-label-small); color: var(--text-secondary); padding: 0 var(--space-100); }
 
 .itinLayout { display: flex; flex-direction: column; gap: var(--space-page-section); } /* 40 from the day cards to the day's plan */
+.whoAndDay { display: flex; flex-direction: column; gap: var(--space-500); } /* Person switcher, then the day strip: one section, 16 apart */
 
 /* The day's plan */
 .timeline { display: flex; flex-direction: column; gap: var(--space-500); }

@@ -10,6 +10,7 @@ import { priceOf, useBudgetTotals } from '../../lib/currency';
 import { money } from '../../lib/format';
 import { emergencyFor } from '../../lib/emergency';
 import { nextEvent } from '../../lib/trips';
+import { isIn } from '../../data/eventPeople';
 import { isInApp, recordView, useRecentViews, type ViewKind } from '../../lib/recent';
 import { eventCardProps } from './events';
 import type { TripCtx } from './TripPage';
@@ -26,16 +27,18 @@ const KIND_ICON: Record<ViewKind, IconName> = { PDF: 'document', Email: 'mail', 
 export function Overview(ctx: TripCtx) {
   const { trip, activities } = ctx;
   const base = `/trip/${trip.id}`;
-  const next = nextEvent(activities);
+  const me = useMe();
+  // Next stop and the Budget card are always yours: the events you're in
+  const mine = activities.filter((a) => isIn(a, trip, me.uid));
+  const next = nextEvent(mine);
   const [country, setCountry] = useState<string | null>(null);
   const recent = useRecentViews(trip.id);
   // Budget (per person): the prices of the events you book ahead, by group. Food, drink and free time are everyday spending.
-  const priced = activities.flatMap((a) => { const g = bookingGroupOf(a.category); const p = isEveryday(a.category) ? null : priceOf(a, trip); return p && p.amount > 0 ? [{ price: p, group: g }] : []; });
+  const priced = mine.flatMap((a) => { const g = bookingGroupOf(a.category); const p = isEveryday(a.category) ? null : priceOf(a, trip); return p && p.amount > 0 ? [{ price: p, group: g }] : []; });
   const totals = useBudgetTotals(trip.budget, priced);
   const left = (trip.budget?.amount ?? 0) - totals.planned;
   const over = left < 0;
   const budgetNote = totals.unconverted ? `${totals.unconverted} price${totals.unconverted === 1 ? '' : 's'} in other currencies will be added once rates load` : 'Per person, from the prices on your bookings';
-  const me = useMe();
   const reads = useReads(me.uid);
   const home = useProfile(me.uid)?.home ?? null;
   // Countries you're visiting: the trip's live list (stops plus every event's place, see tripCountries). It's about where you're going: your home country (a flight out of Melbourne) is left out, unless the whole trip is at home.

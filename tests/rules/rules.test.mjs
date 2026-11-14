@@ -83,6 +83,10 @@ await t('cannot make a link with an unknown role', assertFails(setDoc(doc(B, 'in
 await t('a Following link cannot make you a traveller', assertFails(updateDoc(doc(db('fay'), 'trips/t1'), { memberIds: arrayUnion('fay'), 'roles.fay': 'traveller', joinedVia: 'follow' })));
 await t('nor an old member', assertFails(updateDoc(doc(db('fay'), 'trips/t1'), { memberIds: arrayUnion('fay'), 'roles.fay': 'member', joinedVia: 'follow' })));
 await t('fay joins with a Following link as a follower', assertSucceeds(updateDoc(doc(db('fay'), 'trips/t1'), { memberIds: arrayUnion('fay'), 'roles.fay': 'follower', joinedVia: 'follow' })));
+// Who shared the link is recorded (a follower's Itinerary starts on them): only your own entry, only the link's maker
+await t('joining cannot say someone else shared the link', assertFails(updateDoc(doc(db('ivy'), 'trips/t1'), { memberIds: arrayUnion('ivy'), 'roles.ivy': 'follower', joinedVia: 'follow', 'addedBy.ivy': 'alice' })));
+await t('joining cannot write someone else\'s entry', assertFails(updateDoc(doc(db('ivy'), 'trips/t1'), { memberIds: arrayUnion('ivy'), 'roles.ivy': 'follower', joinedVia: 'follow', 'addedBy.fay': 'bob' })));
+await t('ivy joins, recording that bob shared the link', assertSucceeds(updateDoc(doc(db('ivy'), 'trips/t1'), { memberIds: arrayUnion('ivy'), 'roles.ivy': 'follower', joinedVia: 'follow', 'addedBy.ivy': 'bob' })));
 await t('a follower from a link cannot edit the trip', assertFails(updateDoc(doc(db('fay'), 'trips/t1'), { name: 'x' })));
 await t('a link with no role still lets an older app join as member', assertSucceeds(updateDoc(doc(db('gus'), 'trips/t1'), { memberIds: arrayUnion('gus'), 'roles.gus': 'member', joinedVia: 'good' })));
 await env.withSecurityRulesDisabled(async (c) => setDoc(doc(c.firestore(), 'invites/old'), { tripId: 't1', tripName: 'x', createdBy: 'alice', expiresAt: Timestamp.fromMillis(Date.now() - 1000) }));

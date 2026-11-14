@@ -21,3 +21,12 @@ export function setMapsApp(app: MapsApp) {
 }
 
 export const mapsAppLabel = (app: MapsApp) => MAPS_APPS.find((m) => m.value === app)!.label;
+
+/** Whose itinerary the Itinerary shows, per trip (people and sharing, item 5). Remembered on this device. */
+const personKey = (tripId: string) => `rove:itinerary-person:${tripId}`;
+export function getItineraryPerson(tripId: string): string | null {
+  try { return localStorage.getItem(personKey(tripId)); } catch { return null; }
+}
+export function setItineraryPerson(tripId: string, uid: string) {
+  try { localStorage.setItem(personKey(tripId), uid); } catch { /* storage blocked */ }
+}

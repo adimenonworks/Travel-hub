@@ -5,6 +5,7 @@ import { countryName } from '../../lib/countries';
 import { timeAgo, tripPhase } from '../../lib/dates';
 import { placeCategory } from '../../lib/places';
 import { nextEvent } from '../../lib/trips';
+import { isIn } from '../../data/eventPeople';
 import { eventCardProps } from '../trip/events';
 import type { TripCtx } from '../trip/TripPage';
 import { Content, useNewTrip, useSave } from '../../app/Shell';
@@ -29,8 +30,10 @@ import ss from '../saves/saves.module.css';
 /** "Next up" on Home while a trip is on: the trip's next event as the deep-green Next card, opening the event. */
 function NextUp({ trip }: { trip: Trip }) {
   const activities = useSub(trip.id, 'activities');
+  const me = useMe();
   if (!activities) return null;
-  const next = nextEvent(activities);
+  // Always yours: the next event you're in
+  const next = nextEvent(activities.filter((a) => isIn(a, trip, me.uid)));
   if (!next) return null;
   const ctx = { trip, activities } as unknown as TripCtx; // eventCardProps only reads the trip and its events
   return (

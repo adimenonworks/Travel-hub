@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { confirmAction } from '../../lib/native';
-import { Button, COVER_ILLUSTRATIONS, IconButton, Illustration, SectionHeader, Sheet, TextField, Card } from '../../design/components';
+import { deleteLater } from '../../lib/deleteLater';
+import { Button, COVER_ILLUSTRATIONS, IconButton, Illustration, SectionHeader, Sheet, TextField, Card, useToast } from '../../design/components';
 import { store } from '../../data';
 import { personName, useMe } from '../../data/hooks';
 import type { Album } from '../../data/types';
@@ -61,6 +61,7 @@ const isWebUrl = (u: string) => { try { return /^https?:$/.test(new URL(u).proto
 function AlbumForm({ open, tripId, album, canDelete, onClose }: { open: boolean; tripId: string; album?: Album; canDelete: boolean; onClose: () => void }) {
   const [title, setTitle] = useState('');
   const [url, setUrl] = useState('');
+  const toast = useToast();
   useEffect(() => {
     if (open) { setTitle(album?.title ?? ''); setUrl(album?.url ?? ''); }
   }, [open, album]);
@@ -71,13 +72,20 @@ function AlbumForm({ open, tripId, album, canDelete, onClose }: { open: boolean;
 
   const submit = async () => {
     const data = { title: title.trim(), url: clean };
-    if (album) await store.updateSub(tripId, 'albums', album.id, data);
-    else await store.addSub(tripId, 'albums', data);
-    onClose();
+    try {
+      if (album) {
+        await store.updateSub(tripId, 'albums', album.id, data);
+        const was = { title: album.title, url: album.url };
+        toast({ icon: 'check', label: 'Album saved', action: { label: 'Undo', onClick: () => { store.updateSub(tripId, 'albums', album.id, was).catch(() => {}); } } });
+      } else await store.addSub(tripId, 'albums', data);
+      onClose();
+    } catch { toast({ tone: 'danger', label: "Couldn't save. Check your connection" }); }
   };
   const remove = async () => {
-    if (!album || !confirmAction(`Remove "${album.title}" from this trip? The album itself isn't deleted.`)) return;
-    await store.deleteSub(tripId, 'albums', album.id);
+    if (!album) return;
+    // Gone at once, removed for good once Undo has had its time (the album itself, in Google Photos or iCloud, stays)
+    const undo = deleteLater(album.id, () => store.deleteSub(tripId, 'albums', album.id));
+    toast({ icon: 'trash', label: 'Album removed', action: { label: 'Undo', onClick: undo } });
     onClose();
   };
 

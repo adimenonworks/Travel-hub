@@ -60,9 +60,16 @@ Read this first when starting a session. If it disagrees with the code or Figma,
   - Checked in demo mode: count 3 on the Bell and Home tab, the centre's rows (chat, added with I'm out / View, moved, joined), opening clears the count, Sam's I'm out reaches Alex and Priya, I'm out from the centre (Undo toast, writes "out" for the others), cold start keeps "New"; 320/375/390/430, light/dark, text 17/23/33: no horizontal scroll, no page errors. Badge measured on /#/design: 16 × 16 at (20, 6) on a 40px Icon button, as in Figma.
   - **Not in this item:** guests ("added a guest", item 9); new ideas and suggestions as entries, message previews and the C2 dots (polish prompt, Part C); lock-screen push (Later).
 
-**Next: item 5, Itinerary: yours, or one person's.**
+- **Re-read of items 1–4 (14 Nov 2026, before item 5):** item 2's "every edit and delete has Undo" only covered events. Added in the item 5 pull request: Undo on trip edits, idea edits, Pass / Back to To decide, album edits; deleting an idea or removing an album hides it and deletes it for good after the Undo time (`src/lib/deleteLater.ts`). Still without Undo: removing someone from the trip, comments (DECISIONS). Everything else in items 1–4 matched the prompt or was changed by the owner (Bell only on Home; I'm out swipe not built).
 
-**Changed on Main while item 4 was running (14 Nov 2026, PR 168):** the owner's rule that on events you're not in you see only the title, date and time, place and who's in, added to items 2, 5 and 8 and the Check everything list. Re-read those before item 5.
+- **Item 5: Itinerary, yours or one person's** (pull request: see below):
+  - Figma first: new component **Person switcher** (`695:571`, Foundations, Navigation row: Chips with Show Avatar, Me selected; description set). Screens: **Trip · Itinerary** (`503:872`) has the switcher above the day strip (wrapper "Who and day" `695:2479`, 16 apart, `space/500`); draft **Itinerary · Sam's** (`695:2506`, with a note `695:2663`): "You're in" Tag on a shared event, I'm in on one you're not in. The "You're in" Tag is an Event card extras Tag, so no Event card change. Not drawn: the basics-only event page.
+  - Code: `PersonSwitcher` (Misc.tsx; Chip got `checked` for radio semantics), on /#/design; Itinerary filters to the chosen person (`startingPerson`, `getItineraryPerson` / `setItineraryPerson`); cards: "You're in", I'm in, no price or unread Tag on events you're not in; ActivityPage hides Booking, price, Notes, Files & links, Changes and Comments when you're not in it; Overview Next stop + Budget card and Home Next up count only your events. `trip.addedBy` written on joining (firebase and demo stores).
+  - Rules: joining may add `addedBy.<you>` = the link's maker, nothing else. 207 rules tests pass.
+  - Checked in demo mode: Alex sees only his events; Sam's view shows Surf lesson with I'm in and no price, "You're in" on shared ones; choice remembered after reload; Surf lesson's page hides notes, links, comments, price until I'm in; Jo (follower, added by Sam) has no Me and starts on Sam, basics only; idea delete → Undo → still there; delete → gone for good after 6.5 s; 320/375/390/430, light/dark, text 17/23/33 on Itinerary, event page and /#/design: no horizontal scroll, no page errors.
+  - **Not in this item:** the database still sends notes, prices etc. to everyone on the trip (item 8 moves them); opening on today and the Today chip (item 6).
+
+**Next: item 6, Ideas and the Itinerary.**
 
 **Waiting on the owner:** publish `firestore.rules` (the new app needs the new rules: publish them before rebuilding the app in Xcode; the old app keeps working with the new rules).
 

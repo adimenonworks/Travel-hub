@@ -20,6 +20,7 @@ import { People } from './People';
 import { Photos } from './Photos';
 import { TripForm } from './TripForm';
 import s from './trip.module.css';
+import { useDeleting } from '../../lib/deleteLater';
 
 export type TripCtx = {
   trip: Trip;
@@ -49,9 +50,13 @@ export function TripPage() {
 
 function TripLoaded({ trip }: { trip: Trip }) {
   const activities = useSub(trip.id, 'activities');
-  const ideas = useSub(trip.id, 'ideas');
+  const allIdeas = useSub(trip.id, 'ideas');
   const comments = useSub(trip.id, 'comments');
-  const albums = useSub(trip.id, 'albums');
+  const allAlbums = useSub(trip.id, 'albums');
+  // Ideas and albums being deleted (their Undo toast is still up) are already gone from view
+  const deleting = useDeleting();
+  const ideas = allIdeas?.filter((x) => !deleting.has(x.id));
+  const albums = allAlbums?.filter((x) => !deleting.has(x.id));
   const profiles = useProfiles(trip.memberIds);
   const { isTraveller } = useRole(trip);
   const me = useMe();

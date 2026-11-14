@@ -360,6 +360,7 @@ export function createLocalStore(): Store {
       if (!t.memberIds.includes(uid)) {
         t.memberIds.push(uid);
         t.roles[uid] = invite.role === 'follower' ? 'follower' : 'traveller';
+        if (invite.createdBy) t.addedBy = { ...t.addedBy, [uid]: invite.createdBy };
         // Everyone already on it hears "Jo joined Portugal & Spain"
         notify(t.id, [{ kind: 'joined', to: t.memberIds.filter((m) => m !== uid) }]);
       }

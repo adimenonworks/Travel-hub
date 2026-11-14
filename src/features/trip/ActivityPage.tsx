@@ -156,7 +156,10 @@ export function ActivityPage(ctx: TripCtx) {
     : !mine ? <Button tone="ghost" size="small" onClick={() => whosIn.imIn(a)}>I’m in</Button>
       : people.length > 1 ? <Button tone="ghost" size="small" onClick={() => whosIn.imOut(a)}>I’m out</Button> : undefined;
   const goingRow = travellerCount > 1 && <ListItem icon="people" title="Who’s in" meta={people.length ? `${goingText(people, travellerCount, me.uid)}: ${namesOf(people, profiles, me.uid)}` : 'Nobody yet'} action={whoAction} />;
-  const priceRow = price && <ListItem icon="wallet" title={<PriceWithConversion price={price} />} meta="Price per person" />;
+  // Not in it (someone else's event, or a follower): only the title, date and time, place and who's in (owner's rule,
+  // 14 Nov 2026). Notes, links, files, comments, the price, booking details and its Changes stay with the people going.
+  const details = mine;
+  const priceRow = details && price && <ListItem icon="wallet" title={<PriceWithConversion price={price} />} meta="Price per person" />;
 
   return (
     <>
@@ -227,7 +230,7 @@ export function ActivityPage(ctx: TripCtx) {
       )}
 
       {/* Booking: who it's with and the references, together */}
-      {booking.length > 0 && (
+      {details && booking.length > 0 && (
         <PageSection title="Booking">
           <ListGroup label="Booking">{booking}</ListGroup>
         </PageSection>
@@ -240,7 +243,9 @@ export function ActivityPage(ctx: TripCtx) {
         </PageSection>
       )}
 
-      {a.notes && (
+      {!details && ctx.isTraveller && <p className="t-body-small t-secondary">Notes, files, comments and the price are for the people going. Tap I’m in to see them.</p>}
+
+      {details && a.notes && (
         <PageSection title="Notes">
           <ListGroup label="Notes">
             <ListItem icon="notebook" title={<span className={s.selectable}>{a.notes}</span>} meta={`Added by ${adder}`} />
@@ -248,7 +253,7 @@ export function ActivityPage(ctx: TripCtx) {
         </PageSection>
       )}
 
-      <PageSection title="Files & links" action={canEdit ? <Button tone="ghost" size="small" iconEnd="chevron-right" onClick={() => setAddingDoc(true)}>Add</Button> : undefined}>
+      {details && <PageSection title="Files & links" action={canEdit ? <Button tone="ghost" size="small" iconEnd="chevron-right" onClick={() => setAddingDoc(true)}>Add</Button> : undefined}>
         {a.links.length > 0 || a.manageUrl ? (
           <ListGroup label="Files and links">
             {a.links.map((l, i) => {
@@ -266,13 +271,15 @@ export function ActivityPage(ctx: TripCtx) {
             {a.manageUrl && <ListItem icon="arrow-up-right" title="Manage booking" meta="Link from your confirmation email" href={a.manageUrl} label="Manage booking (opens in a new tab)" />}
           </ListGroup>
         ) : <p className="t-body-small t-secondary">Nothing attached yet. Add a ticket, confirmation or booking link.</p>}
-      </PageSection>
+      </PageSection>}
 
-      <EventChanges tripId={trip.id} event={a} profiles={profiles} canRestore={canEdit} />
+      {details && <EventChanges tripId={trip.id} event={a} profiles={profiles} canRestore={canEdit} />}
 
-      <PageSection title="Comments">
-        <Comments tripId={trip.id} targetId={a.id} comments={ctx.comments} profiles={profiles} />
-      </PageSection>
+      {details && (
+        <PageSection title="Comments">
+          <Comments tripId={trip.id} targetId={a.id} comments={ctx.comments} profiles={profiles} />
+        </PageSection>
+      )}
 
       {whosIn.sheet}
       {/* A connection: the next leg leaves from where this journey lands, and joins this journey */}

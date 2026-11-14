@@ -1,5 +1,5 @@
 import { useState, type CSSProperties } from 'react';
-import { Avatar, AvatarStack, Badge, Message, Tag, Chip, WhosInRow, Banner, Button, Card, FieldRow, HeroCard, Icon, IconButton, LinkButton, PageHeader, PageSection, SegmentControl, Dropdown, Sheet, Tabs, TextArea, TextField, NowLine, Illustration, type IllustrationName, COVER_ILLUSTRATIONS, ICON_NAMES, useToast, BottomNavigation, Skeleton, Logo, ListItem, ListGroup, SectionHeader, EventCard, TravelConnector, IdeaRow, Tile, StatStrip, ProfileCard, OptionCard, BudgetCard, StepProgress, DayCard, CountryModal, CategoryIcon, ContextMenu, Accordion, Calendar, JourneyCard, JourneyLeg, JourneyStop, MapCard } from '../../design/components';
+import { Avatar, AvatarStack, Badge, Message, Tag, Chip, WhosInRow, PersonSwitcher, Banner, Button, Card, FieldRow, HeroCard, Icon, IconButton, LinkButton, PageHeader, PageSection, SegmentControl, Dropdown, Sheet, Tabs, TextArea, TextField, NowLine, Illustration, type IllustrationName, COVER_ILLUSTRATIONS, ICON_NAMES, useToast, BottomNavigation, Skeleton, Logo, ListItem, ListGroup, SectionHeader, EventCard, TravelConnector, IdeaRow, Tile, StatStrip, ProfileCard, OptionCard, BudgetCard, StepProgress, DayCard, CountryModal, CategoryIcon, ContextMenu, Accordion, Calendar, JourneyCard, JourneyLeg, JourneyStop, MapCard } from '../../design/components';
 import { flagUrl } from '../../lib/countries';
 import { EVENT_TYPES, TYPE_TONE } from '../../lib/categories';
 import type { ReactNode } from 'react';
@@ -70,6 +70,7 @@ const icons = ICON_NAMES;
 /** Living reference for tokens and components, at /#/design. */
 export function DesignSystem() {
   const [seg, setSeg] = useState<'a' | 'b' | 'c'>('a');
+  const [person, setPerson] = useState('me');
   const [range, setRange] = useState<[string, string]>(['2026-11-14', '2026-11-21']);
   const [sheet, setSheet] = useState(false);
   const [menu, setMenu] = useState(false);
@@ -246,7 +247,7 @@ export function DesignSystem() {
           </div>
         </Section>
 
-        <Section title="Chips and tags" footer="Chip (country pills: tap opens the Country sheet; Default / Selected) and Tag (Neutral, Category, Success, Warning, Danger).">
+        <Section title="Chips and tags" footer="Chip (country pills: tap opens the Country sheet; Default / Selected), Who's in row, Person switcher (the Itinerary's whose-itinerary row) and Tag (Neutral, Category, Success, Warning, Danger).">
           <div className={s.row}>
             <Chip flag={flagUrl('pt')} onClick={() => setCountry('pt')} label="About Portugal">Portugal</Chip>
             <Chip selected flag={flagUrl('es')}>Spain</Chip>
@@ -254,6 +255,7 @@ export function DesignSystem() {
             <Chip selected avatar={<Avatar name="Priya Shah" size="small" />} onClick={() => {}} pressed>Priya</Chip>
           </div>
           <WhosInRow people={[{ id: 'a', name: 'You', selected: true, locked: true }, { id: 'b', name: 'Priya', selected: true }, { id: 'c', name: 'Sam', selected: true }, { id: 'd', name: 'Leo', selected: false }]} onToggle={() => {}} />
+          <PersonSwitcher value={person} onChange={setPerson} people={[{ id: 'me', name: 'Me', fullName: 'Alex Morgan' }, { id: 'sam', name: 'Sam' }, { id: 'priya', name: 'Priya' }, { id: 'jo', name: 'Jo' }, { id: 'leo', name: 'Leo' }]} />
           <div className={s.row}>
             <Badge count={3} /><Badge count={12} />
             <Tag icon="calendar">In 9 days</Tag><Tag tone="category" icon="camera">Category</Tag><Tag tone="success" icon="check">Success</Tag><Tag tone="warning">Warning</Tag><Tag tone="danger">Danger</Tag>

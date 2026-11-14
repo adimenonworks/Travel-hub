@@ -1,4 +1,4 @@
-import type { CSSProperties, ReactNode } from 'react';
+import { useEffect, useRef, type CSSProperties, type ReactNode } from 'react';
 import { Icon, type IconName } from './Icon';
 import s from './Misc.module.css';
 import type { CategoryTone } from './Rows';
@@ -67,19 +67,21 @@ export function Tag({ tone = 'neutral', icon, iconState, flag, children }: {
 }
 
 /** Figma Chip: a country or filter with a flag or icon. State=Selected is filled deep emerald. */
-export function Chip({ selected, icon, flag, avatar, onClick, label, pressed, type, children }: {
+export function Chip({ selected, icon, flag, avatar, onClick, label, pressed, checked, type, children }: {
   selected?: boolean; icon?: IconName; /** Image URL of a country flag */ flag?: string;
   /** Figma "Show Avatar": a Small Avatar before the label (Who's in row) */ avatar?: ReactNode;
   /** Figma "Type": when selected, the chip takes an event type's colour (the category chips when adding an event or saving a place). */
   type?: CategoryTone;
   /** Makes the chip a button (e.g. a country chip opens its quick-info modal) */ onClick?: () => void; /** Fuller name for screen readers */ label?: string;
   /** A toggle (Who's in): announced as on or off */ pressed?: boolean;
+  /** One choice of several (Person switcher): announced as a radio button, checked or not */ checked?: boolean;
   children: ReactNode;
 }) {
   const cls = [s.chip, selected ? s['chip-active'] : s['chip-inactive'], selected && type && type !== 'neutral' && s[`chip-${type}`], onClick && s.chipButton].filter(Boolean).join(' ');
   const body = <>{avatar ? <span className={s.chipAvatarBox} aria-hidden="true">{avatar}</span> : flag ? <img src={flag} alt="" className={s.chipFlag} /> : icon && <Icon name={icon} size={16} />}{children}</>;
   return onClick
-    ? <button type="button" className={cls} onClick={onClick} aria-label={label} aria-pressed={pressed}>{body}</button>
+    ? <button type="button" className={cls} onClick={onClick} aria-label={label} aria-pressed={checked === undefined ? pressed : undefined}
+        role={checked === undefined ? undefined : 'radio'} aria-checked={checked}>{body}</button>
     : <span className={cls}>{body}</span>;
 }
 
@@ -99,6 +101,27 @@ export function WhosInRow({ label = 'Who’s in', people, onToggle }: {
             label={`${p.name}${p.locked ? ', always in' : ''}`} onClick={p.locked ? undefined : () => onToggle(p.id)}>{p.name}</Chip>
         ))}
       </div>
+    </div>
+  );
+}
+
+/**
+ * Figma "Person switcher": at the top of the Itinerary, whose itinerary it shows. A row of avatar Chips (Me, then each
+ * traveller by first name), one selected at a time; it scrolls sideways, edge to edge, when it doesn't fit.
+ */
+export function PersonSwitcher({ label = 'Whose itinerary', people, value, onChange }: {
+  label?: string; people: { id: string; name: string; fullName?: string; photo?: string | null }[]; value: string; onChange: (id: string) => void;
+}) {
+  const row = useRef<HTMLDivElement>(null);
+  // Start with the chosen person in view (a long list scrolls sideways)
+  useEffect(() => { row.current?.querySelector('[aria-checked="true"]')?.scrollIntoView({ block: 'nearest', inline: 'nearest' }); }, []);
+  return (
+    <div ref={row} className={s.switcher} role="radiogroup" aria-label={label}>
+      {people.map((p) => (
+        <Chip key={p.id} selected={p.id === value} checked={p.id === value} avatar={<Avatar name={p.fullName ?? p.name} photo={p.photo} size="small" />}
+          label={p.fullName && p.fullName !== p.name ? `${p.name} (${p.fullName})` : p.name}
+          onClick={() => { if (p.id !== value) onChange(p.id); }}>{p.name}</Chip>
+      ))}
     </div>
   );
 }
