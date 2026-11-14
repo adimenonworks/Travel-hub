@@ -24,7 +24,15 @@ Every card in Now, Next and Later has a **How we'd build it** line: the approach
 
 Built in this order. Progress is in `docs/changes/PROGRESS.md`.
 
-### 1. People, sharing and money
+### 1. New trip stops and Home's main button
+`docs/changes/rove-change-new-trip-stops.md`
+- **Home:** Plan a trip is the Primary button, Save a place Neutral.
+- **New trip takes several places** ("Add every stop, or just the first"); a trip covers its stops plus every place on its events. No stops list in Edit trip.
+- **Bring your saves** only shows the trip's countries, and is skipped when nothing matches. Add from saved also offers other countries.
+
+**How we'd build it:** the change prompt, run by Claude Code. A new `trip.stops` field (older trips read as their one place), possibly a rules update. Small to medium. Nothing for the owner beyond reviewing.
+
+### 2. People, sharing and money
 `docs/changes/rove-change-people-and-sharing.md`
 - **One shared trip, everyone equal.** "Join", never "invited into my trip"; any traveller can edit or delete it (Recently deleted keeps it 30 days).
 - **Travelling and Following** replace Planner and Viewer. Followers see the plan and chat, never prices or bookings.
@@ -35,11 +43,11 @@ Built in this order. Progress is in `docs/changes/PROGRESS.md`.
 - **Ideas:** To decide · Passed. A dated idea shows on its day as a suggestion with I'm in and Pass.
 - **Bookings:** one shared event, with each person's own "Your booking" (reference, seat, bags, files).
 - **Prices** are a total split by who's in (or "Each"), each in its own currency. **Budgets are personal and private,** in your Settings currency.
-- **Trip edit:** location locked after creation; a trip covers its start plus every place on its events.
+- **Trip edit:** the trip's places aren't edited after creation (see 1).
 
 **How we'd build it:** the change prompt, run by Claude Code. Firestore rules and tests change with the model (prices, bookings and budgets in documents only their people can read). Large. The owner reviews the Collections storage plan and publishes the rules.
 
-### 2. Trip polish, notifications, saving and Collections
+### 3. Trip polish, notifications, saving and Collections
 `docs/changes/rove-change-polish-and-library.md`
 - **Itinerary:** swiping between days follows your finger; no month markers.
 - **Edit sheets:** sectioned and calmer; no automatic keyboard; no jumping. Type is changed with Change type.
