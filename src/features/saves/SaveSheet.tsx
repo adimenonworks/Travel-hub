@@ -13,7 +13,7 @@ import { addDays, formatDay, formatTime, today, tripDays } from '../../lib/dates
 import { zoneAt } from '../../lib/timezone';
 import { findUrl, readLink } from '../../lib/links';
 import { haptic, readClipboard } from '../../lib/native';
-import { detectCategory, eventCategoryOf, placeCategory, tripCoversCity } from '../../lib/places';
+import { detectCategory, eventCategoryOf, placeCategory, tripCountryCodes, tripCoversCity } from '../../lib/places';
 import { PlaceKindPicker } from './PlaceKindPicker';
 import s from './saves.module.css';
 
@@ -104,7 +104,9 @@ export function SaveSheet({ request, onClose }: { request: SaveRequest | null; o
   const city = target.city;
   // A place when Rove found one or you chose a city; otherwise a link filed under its country ("Links & notes")
   const kind: 'place' | 'link' = place || city ? 'place' : 'link';
-  const covering = city ? upcoming.find((t) => tripCoversCity(t, acts[t.id] ?? [], city)) : undefined;
+  // The trip that covers this city, else one whose countries include the place's (see tripCountries)
+  const covering = (city ? upcoming.find((t) => tripCoversCity(t, acts[t.id] ?? [], city)) : undefined)
+    ?? (code ? upcoming.find((t) => tripCountryCodes(t, acts[t.id] ?? []).has(code)) : undefined);
   // The Trip side: only with an upcoming trip and a place Rove found.
   const canTrip = kind === 'place' && upcoming.length > 0;
   useEffect(() => {

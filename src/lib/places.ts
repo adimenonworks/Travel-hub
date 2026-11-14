@@ -1,7 +1,7 @@
 import { EVENT_TYPES, TYPE_TONE, eventKind, eventType, kindInfo, type EventKind } from './categories';
 import type { CategoryTone, IconName } from '../design/components';
 import type { Activity, Category, LinkPreview, PlaceCategory, SavedPlace, Trip } from '../data/types';
-import { countryCodeOf } from './countries';
+import { tripCountries, tripStops } from './countries';
 import { today } from './dates';
 
 /**
@@ -88,19 +88,15 @@ export function groupBy<T>(list: T[], key: (t: T) => string): [string, T[]][] {
   return [...m.entries()];
 }
 
-/** The countries a trip covers: its destination's and every event's (a trip can span several). */
+/** The countries a trip covers, as a set (see `tripCountries`). */
 export function tripCountryCodes(trip: Trip, activities: Activity[]) {
-  const out = new Set<string>();
-  const add = (c?: string) => c && out.add(c);
-  add(countryCodeOf(trip.destination));
-  for (const a of activities) { add(countryCodeOf(a.location)); add(countryCodeOf(a.to)); }
-  return out;
+  return new Set(tripCountries(trip, activities));
 }
 
-/** Does an upcoming trip cover this city? Its destination city, or any of its events, is there. */
+/** Does an upcoming trip cover this city? One of its stops, or any of its events, is there. */
 export function tripCoversCity(trip: Trip, activities: Activity[], city: string) {
   if (!city) return false;
   const c = city.toLowerCase();
   const hit = (name?: string | null) => !!name && name.split(',')[0].trim().toLowerCase() === c;
-  return hit(trip.destination?.name) || activities.some((a) => hit(a.location?.name) || hit(a.locationText) || hit(a.to?.name));
+  return tripStops(trip).some((p) => hit(p.name)) || activities.some((a) => hit(a.location?.name) || hit(a.locationText) || hit(a.to?.name));
 }

@@ -30,7 +30,10 @@ export type Trip = {
   /** In Recently deleted since then (ms), by whom; gone for good after 30 days */
   deletedAt?: number; deletedBy?: string;
   name: string;
+  /** The first stop: names the trip and finds its cover photo. Always `stops[0]` when there are stops. */
   destination: Place | null;
+  /** Every place picked in New trip, in order (at most 30). Older trips have none: read them through `tripStops`. */
+  stops?: Place[];
   startDate: string; // YYYY-MM-DD
   endDate: string;
   /** 'month': the dates are only roughly known — the whole month from startDate (shown as "March 2027"). Missing means exact. */

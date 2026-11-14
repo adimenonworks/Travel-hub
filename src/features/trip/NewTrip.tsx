@@ -1,5 +1,5 @@
 import { Fragment, useEffect, useState } from 'react';
-import { Button, Calendar, Chip, Icon, Illustration, ListGroup, ListItem, OptionCard, TextField, useToast } from '../../design/components';
+import { Button, Calendar, Chip, Icon, IconButton, Illustration, ListGroup, ListItem, OptionCard, TextField, useToast } from '../../design/components';
 import { CelebrationScreen, FlowScreen } from './NewTripScreens';
 import { useCountries, placeCounts } from '../saves/Collections';
 import { store } from '../../data';
@@ -8,7 +8,7 @@ import { useMe, usePlaces } from '../../data/hooks';
 import { PLACE_TYPES, placeTypeOf, cityOf, eventCategoryOf, groupBy, placeCategory } from '../../lib/places';
 import { TYPE_TONE } from '../../lib/categories';
 import { addDays, daysBetween, formatDay, today } from '../../lib/dates';
-import { countryCodeOf, countryName, flagUrl } from '../../lib/countries';
+import { MAX_STOPS, countryCodeOf, countryName, flagUrl, samePlace } from '../../lib/countries';
 import { searchCities } from '../../lib/geocode';
 import { haptic, isNativeApp, PUBLIC_SITE, shareLink } from '../../lib/native';
 import { PriceField, fromPriceDraft, useHomeCurrency, type PriceDraft } from '../shared/Price';
@@ -20,7 +20,8 @@ type Step = 1 | 2 | 3 | 4;
 const defaultCurrency = () => (Intl.NumberFormat().resolvedOptions().locale.startsWith('en-GB') ? 'GBP' : 'USD');
 
 /**
- * New trip (Figma "New trip — 1…5"): a full-screen, brand-coloured flow, never a sheet. Where to next? (search a city)
+ * New trip (Figma "New trip — 1…5"): a full-screen, brand-coloured flow, never a sheet. Where are you going? (add every
+ * stop, or just the first: saved as `stops`, the first is also `destination`, which names the trip and finds its cover)
  * → When are you going? (a date range on the Calendar) → Who's coming? (Option cards) → Create my trip → the
  * Celebration screen with a days-to-go count-up. A trip is never made from a collection: when you have saved Places
  * in the destination's country, step 4 "Bring your saves?" lets you pick cities, and their Places become the new trip's
@@ -28,7 +29,9 @@ const defaultCurrency = () => (Intl.NumberFormat().resolvedOptions().locale.star
  */
 export function NewTrip({ open, onClose, onOpenTrip }: { open: boolean; onClose: () => void; onOpenTrip: (id: string) => void }) {
   const [step, setStep] = useState<Step>(1);
-  const [place, setPlace] = useState<Place | null>(null);
+  /** Step 1: every stop picked, in order. The first names the trip. */
+  const [stops, setStops] = useState<Place[]>([]);
+  const place = stops[0] ?? null;
   const [start, setStart] = useState('');
   const [end, setEnd] = useState('');
   const [company, setCompany] = useState<'me' | 'others' | null>(null);
@@ -64,7 +67,7 @@ export function NewTrip({ open, onClose, onOpenTrip }: { open: boolean; onClose:
 
   useEffect(() => {
     if (!open) return;
-    setStep(1); setPlace(null); setStart(''); setEnd(''); setCompany(null); setBusy(false); setCreated(null); setPicked([]); setOpenGroup(null); setDateMode('exact');
+    setStep(1); setStops([]); setStart(''); setEnd(''); setCompany(null); setBusy(false); setCreated(null); setPicked([]); setOpenGroup(null); setDateMode('exact');
     setAskBudget(false); setBudgetOn(null); setBudget({ amount: '', currency: '' });
   }, [open]);
   if (!open) return null;
@@ -77,7 +80,7 @@ export function NewTrip({ open, onClose, onOpenTrip }: { open: boolean; onClose:
     setBusy(true);
     try {
       const id = await store.createTrip({
-        name: city, destination: place, startDate: start, endDate: end, currency: defaultCurrency(), ...(dateMode === 'month' ? { dateMode } : {}),
+        name: city, destination: place, stops, startDate: start, endDate: end, currency: defaultCurrency(), ...(dateMode === 'month' ? { dateMode } : {}),
         budget: budgetOn ? fromPriceDraft({ ...budget, currency: budget.currency || home }) : null,
         coverPhoto: null, coverPosition: null,
       });
@@ -144,22 +147,43 @@ export function NewTrip({ open, onClose, onOpenTrip }: { open: boolean; onClose:
       </FlowScreen>
     );
 
+  const full = stops.length >= MAX_STOPS;
+  const addStop = (p: Place) => { if (full || stops.some((x) => samePlace(x, p))) return; haptic('selection'); setStops((x) => [...x, p]); };
+  const removeStop = (p: Place) => { haptic('light'); setStops((x) => x.filter((y) => !samePlace(y, p))); };
   if (step === 1)
     return (
-      <FlowScreen step={1} of={steps} stepKey={1} title="Where to next?" subtitle="Pick a place you’ve saved, or search anywhere." onClose={onClose}
-        footer={<Button size="large" iconEnd="chevron-right" disabled={!place} onClick={() => setAskBudget(true)}>{place ? `Plan ${city}` : 'Pick a place'}</Button>}>
-        <DestinationSearch value={place} onPick={(p) => { haptic('selection'); setPlace(p); }} />
+      <FlowScreen step={1} of={steps} stepKey={1} title="Where are you going?" subtitle="Add every stop, or just the first. You can add more later." onClose={onClose}
+        footer={<Button size="large" iconEnd="chevron-right" disabled={!place} onClick={() => setAskBudget(true)}>
+          {!place ? 'Add a place' : stops.length > 1 ? `Continue · ${stops.length} stops` : 'Continue'}
+        </Button>}>
+        <StopSearch stops={stops} full={full} onPick={addStop} />
+        {stops.length > 0 && (
+          <section className={s.flowSection} aria-labelledby="stops">
+            <h2 className={s.flowSectionTitle} id="stops">Your stops</h2>
+            <ListGroup label="Your stops">
+              {stops.map((p) => {
+                const code = countryCodeOf(p), name = p.name.split(',')[0].trim();
+                return (
+                  <ListItem key={`${name}|${code}`} round media={code && flagUrl(code) ? <img src={flagUrl(code)} alt="" className={s.flagThumb} /> : undefined}
+                    icon={code && flagUrl(code) ? undefined : 'pin'} title={name} meta={p.name.split(',').slice(1).join(',').trim() || (code && countryName(code) !== name ? countryName(code) : undefined)}
+                    action={<IconButton icon="x" size="small" label={`Remove ${name}`} onClick={() => removeStop(p)} />} />
+                );
+              })}
+            </ListGroup>
+          </section>
+        )}
         {savedCountries.length > 0 && (
           <section className={s.flowSection} aria-labelledby="from-saved">
             <h2 className={s.flowSectionTitle} id="from-saved">From your saved places</h2>
-                        <ListGroup label="From your saved places">
+            <ListGroup label="From your saved places">
               {savedCountries.map((c) => {
                 const at = c.places.find((p) => p.lat != null && p.lng != null);
-                const picked = countryCodeOf(place) === c.code && place?.name === c.name;
+                const country: Place = { name: c.name, lat: at?.lat ?? 0, lng: at?.lng ?? 0, country: c.name, countryCode: c.code };
+                const on = stops.some((x) => samePlace(x, country));
                 return (
                   <ListItem key={c.code} round media={<img src={c.flag} alt="" className={s.flagThumb} />} title={c.name} meta={placeCounts(c.places)}
-                    trailing={picked ? 'Selected' : undefined} label={`${c.name}${picked ? ', selected' : ''}`}
-                    onClick={() => { haptic('selection'); setPlace({ name: c.name, lat: at?.lat ?? 0, lng: at?.lng ?? 0, country: c.name, countryCode: c.code }); }} />
+                    trailing={on ? 'Selected' : undefined} label={`${c.name}${on ? ', selected. Tap to remove' : ''}`}
+                    onClick={() => (on ? removeStop(country) : addStop(country))} />
                 );
               })}
             </ListGroup>
@@ -312,34 +336,36 @@ export function NewTrip({ open, onClose, onOpenTrip }: { open: boolean; onClose:
   );
 }
 
-/** Step 1: the Figma Search field, and matching cities as a List group with their flags. */
-function DestinationSearch({ value, onPick }: { value: Place | null; onPick: (p: Place) => void }) {
-  const [text, setText] = useState(value?.name ?? '');
+/** Step 1: the Figma Search field, and matching places as a List group with their flags. A pick adds a stop and clears
+ *  the field so the next one can be typed straight away; places already added say so and can't be added twice. */
+function StopSearch({ stops, full, onPick }: { stops: Place[]; full: boolean; onPick: (p: Place) => void }) {
+  const [text, setText] = useState('');
   const [results, setResults] = useState<Place[]>([]);
   const [error, setError] = useState(false);
   useEffect(() => {
-    if (text.trim().length < 2 || text === value?.name) { setResults([]); return; }
+    if (text.trim().length < 2) { setResults([]); return; }
     const ctrl = new AbortController();
     const t = setTimeout(() => {
       searchCities(text, ctrl.signal).then((r) => { setResults(r); setError(false); }).catch((e) => { if (e.name !== 'AbortError') setError(true); });
     }, 250);
     return () => { clearTimeout(t); ctrl.abort(); };
-  }, [text, value?.name]);
-  const shown = value && text === value.name ? [value] : results;
+  }, [text]);
   return (
     <>
-      <TextField icon="pin" type="search" enterKeyHint="search" autoComplete="off" aria-label="Search a country or city" placeholder="Search a country or city" value={text} onChange={(e) => setText(e.target.value)} autoFocus />
+      <TextField icon="pin" type="search" enterKeyHint="search" autoComplete="off" aria-label="Search a country or city" placeholder={stops.length ? 'Add another stop' : 'Search a country or city'}
+        value={text} onChange={(e) => setText(e.target.value)} disabled={full} autoFocus />
+      {full && <p className={s.flowSummaryMeta} role="status">That’s {MAX_STOPS} stops, the most one trip can have.</p>}
       {error && <p className={s.flowSummaryMeta} role="alert">City search isn’t working right now. Check your connection and try again.</p>}
-      {shown.length > 0 && (
-                <ListGroup label="Places">
-          {shown.map((p) => {
+      {!full && results.length > 0 && (
+        <ListGroup label="Places">
+          {results.map((p) => {
             const code = countryCodeOf(p);
-            const picked = value?.name === p.name && value.lat === p.lat;
+            const added = stops.some((x) => samePlace(x, p));
             return (
               <ListItem key={`${p.lat},${p.lng}`} round media={code && flagUrl(code) ? <img src={flagUrl(code)} alt="" className={s.flagThumb} /> : undefined}
                 icon={code ? undefined : 'pin'} title={p.name.split(',')[0]} meta={p.name.split(',').slice(1).join(',').trim() || undefined}
-                trailing={picked ? 'Selected' : undefined} onClick={() => { setText(p.name); onPick(p); }}
-                label={`${p.name}${picked ? ', selected' : ''}`} />
+                trailing={added ? 'Added' : undefined} label={`${p.name}${added ? ', already a stop' : ''}`}
+                onClick={added ? undefined : () => { onPick(p); setText(''); setResults([]); }} />
             );
           })}
         </ListGroup>
