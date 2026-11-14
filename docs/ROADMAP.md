@@ -29,7 +29,7 @@ Built in this order. Progress is in `docs/changes/PROGRESS.md`.
 - **One shared trip, everyone equal.** "Join", never "invited into my trip"; any traveller can edit or delete it (Recently deleted keeps it 30 days). *(built 14 Nov, with the Travelling / Following roles; the Add people role choice comes with the next item)*
 - **Travelling and Following** replace Planner and Viewer. Followers see the plan and chat, never prices or bookings. *(built 14 Nov: Add people asks which, the link carries it, People rows have a role dropdown; hiding prices and bookings from followers comes with items 7 and 8)*
 - **Who's in, per event.** Being added means you're in; I'm out removes it from your itinerary only. Guests can join a single event.
-- **Undo and per-event change history** with Restore.
+- **Undo and per-event change history** with Restore. *(built 14 Nov: Undo on event edits and deletes, Changes on the event page; Undo for I'm in / I'm out comes with who's in)*
 - **In-app Notification centre** (lock-screen push stays in Later).
 - **Itinerary shows only your events,** with a switch to see one other traveller's. It opens on today, with a Today chip.
 - **Ideas:** To decide · Passed. A dated idea shows on its day as a suggestion with I'm in and Pass.

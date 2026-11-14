@@ -13,6 +13,7 @@ import { hostOf, isPdf, normalizeUrl } from '../../lib/format';
 import { directionsUrl, mapsUrl, uberUrl } from '../../lib/geocode';
 import { MapView } from '../shared/Map';
 import { Comments } from '../shared/Comments';
+import { EventChanges } from './EventChanges';
 import { haptic, confirmAction } from '../../lib/native';
 import { recordView } from '../../lib/recent';
 import { markRead } from '../../lib/reads';
@@ -42,7 +43,8 @@ function journeyDuration(a: Activity) {
  * An event's own page, in sections (rows with nothing are hidden). The header: its category icon, title and when (just
  * the dates for something with two ends). Flights and trains (with a from and to): the Journey details cards. Stays,
  * cars, cruises, parking and luggage: the Span card (Check-in / Check-out, Pick-up / Drop-off… with times, and a car's
- * places). Then Location; Booking (company, references, seats, bags); Price & people; Notes; Files & links; Comments.
+ * places). Then Location; Booking (company, references, seats, bags); Price & people; Notes; Files & links; Changes (the
+ * event's history, collapsed); Comments.
  */
 export function ActivityPage(ctx: TripCtx) {
   const { activityId = '' } = useParams();
@@ -88,7 +90,11 @@ export function ActivityPage(ctx: TripCtx) {
   const removeDoc = async (i: number) => {
     const doc = a.links[i];
     if (!confirmAction(`Remove "${doc.label || hostOf(doc.url)}"?`)) return;
-    try { await store.updateSub(trip.id, 'activities', a.id, { links: a.links.filter((_, j) => j !== i) }); toast({ icon: 'trash', label: 'Removed' }); }
+    const was = a.links;
+    try {
+      await store.updateSub(trip.id, 'activities', a.id, { links: was.filter((_, j) => j !== i) });
+      toast({ icon: 'trash', label: 'Removed', action: { label: 'Undo', onClick: () => { store.updateSub(trip.id, 'activities', a.id, { links: was }).catch(() => {}); } } });
+    }
     catch { toast({ tone: 'danger', label: "Couldn't delete. Check your connection" }); }
   };
   // Starring the event stars its Place (made in your Collections first if the event doesn't have one).
@@ -246,6 +252,8 @@ export function ActivityPage(ctx: TripCtx) {
           </ListGroup>
         ) : <p className="t-body-small t-secondary">Nothing attached yet. Add a ticket, confirmation or booking link.</p>}
       </PageSection>
+
+      <EventChanges tripId={trip.id} event={a} profiles={profiles} canRestore={ctx.isTraveller} />
 
       <PageSection title="Comments">
         <Comments tripId={trip.id} targetId={a.id} comments={ctx.comments} profiles={profiles} />

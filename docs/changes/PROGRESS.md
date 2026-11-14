@@ -38,7 +38,14 @@ Read this first when starting a session. If it disagrees with the code or Figma,
   - Rules: trip links may carry `role` (`traveller` / `follower`); joining must take exactly the link's role (old role-less links: traveller, or `member` from old apps). 156 rules tests pass.
   - Checked in demo mode: Following link → Jo joins as follower and sees plain roles + Leave trip; role menu items for others and for yourself; Mum → Travelling → Undo; last-traveller guard; 320/375/390/430, light/dark, text 17/23/33: no horizontal scroll, menu inside the margins, no page errors.
 
-**Item in progress: item 2, second part (Undo and history):** an Undo Toast for every event edit and delete (I'm in / I'm out come with item 3); per-event history in `trips/{id}/activities/{eventId}/history` (append-only, written in the same batch as the change; rules: travellers append (item 3 narrows it to people in the event), nobody edits or deletes), a collapsed **Changes** section at the bottom of event detail with the last 20 and Restore; Figma first: List item variant for Changes entries, the Changes list component, the Event screen updated. **Moved to item 3:** "only travellers in an event edit it" (needs `people`) and the delete sheet "Just me (I'm out) / Remove for everyone".
+- **Item 2, second part: Undo and history** (pull request after 162):
+  - Figma first: Event screen (`506:1221`) has a collapsed **Changes** Accordion (`687:2014`) before Comments; draft **Event · Changes open** (`687:2021`) shows the rows (List item Large + Show Button "Restore"). No new component: the Changes list is Accordion + List group + List items. Found: Figma's Accordion content isn't a slot, and List item Small lays title and meta side by side (code stacks them); not changed.
+  - Code: `EventChange` / `TrackedField` types; `src/lib/eventHistory.ts` (`changesOf`, `patchFor`, `undoPatch`, `describe`); `store.updateEvent` (edit + history in one batch) and `store.watchHistory`; history goes with its event/trip when deleted for good. Edit event → "Changes saved" with Undo; removing a file or link has Undo; `EventChanges.tsx` on the event page (followers see it without Restore). Toasts with an action stay 6 s.
+  - Rules: `activities/{eventId}/history/{id}`: members read; travellers create as themselves with known fields only; no updates; delete only when the event or trip is in Recently deleted. 166 rules tests pass.
+  - Checked in demo mode: edit time → history + Undo; edit again → Changes rows → Restore (recorded as "(restored)"); link remove → Undo; follower sees no Restore; 320/375/390/430, light/dark, 17/23/33: no horizontal scroll, no page errors.
+  - **Not in this part (moved to item 3, needs who's in):** only travellers in an event edit it; the delete sheet "Just me (I'm out) / Remove for everyone"; Undo for I'm in / I'm out. Undo for edits outside events (ideas, albums) isn't built.
+
+**Next: item 3, Who's in per event.**
 
 **Waiting on the owner:** publish `firestore.rules` (the new app needs the new rules: publish them before rebuilding the app in Xcode; the old app keeps working with the new rules).
 

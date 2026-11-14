@@ -1,4 +1,4 @@
-import type { Role, Deletable, ChatReads, CollectionRole, CollectionShare, Invite, LinkPreview, NewDoc, Profile, SavedPlace, SubCollections, SubName, Trip, User, Vote } from './types';
+import type { Activity, EventChange, Role, Deletable, ChatReads, CollectionRole, CollectionShare, Invite, LinkPreview, NewDoc, Profile, SavedPlace, SubCollections, SubName, Trip, User, Vote } from './types';
 
 export type Unsubscribe = () => void;
 
@@ -47,6 +47,11 @@ export interface Store {
   addSub<K extends SubName>(tripId: string, name: K, data: NewDoc<SubCollections[K]>): Promise<string>;
   updateSub<K extends SubName>(tripId: string, name: K, id: string, patch: Partial<SubCollections[K]>): Promise<void>;
   deleteSub(tripId: string, name: SubName, id: string): Promise<void>;
+  /** Edit an event and record each changed part (title, date, time, place, price, who's in) in its history, in one
+   *  batch. `restoredFrom` marks a Restore. Returns nothing; the history listener shows the new entries. */
+  updateEvent(tripId: string, before: Activity, patch: Partial<Activity>, restoredFrom?: string): Promise<void>;
+  /** An event's change history, newest first, at most `limit` entries. */
+  watchHistory(tripId: string, eventId: string, limit: number, cb: (changes: EventChange[]) => void): Unsubscribe;
   /** Atomically add or remove `uid` from an array field / map field on a sub-document. */
   toggleInArray(tripId: string, name: SubName, id: string, field: string, uid: string, on: boolean): Promise<void>;
   /** Set one person's vote on an idea: up, down, or none. A person has at most one of the two. */

@@ -5,14 +5,25 @@ import {
 } from 'firebase/auth';
 import {
   Timestamp, addDoc, arrayRemove, arrayUnion, collection, deleteDoc, deleteField, doc, getDoc, getDocFromCache, getDocs,
-  initializeFirestore, onSnapshot, persistentLocalCache, persistentMultipleTabManager, query, setDoc, updateDoc, where, writeBatch, type DocumentData,
+  initializeFirestore, limit, onSnapshot, orderBy, persistentLocalCache, persistentMultipleTabManager, query, setDoc, updateDoc, where, writeBatch, type DocumentData,
 } from 'firebase/firestore';
 import type { Store } from './store';
 import { isTravelling, migratedRoles } from './roles';
-import type { ChatReads, CollectionShare, Invite, LinkPreview, Profile, SavedPlace, SubName, Trip } from './types';
+import type { ChatReads, CollectionShare, EventChange, Invite, LinkPreview, Profile, SavedPlace, SubName, Trip } from './types';
+import { changesOf } from '../lib/eventHistory';
 import { getFunctions, httpsCallable } from 'firebase/functions';
 import { randomCode } from './util';
 import { googleIosClientId, isNativeApp } from '../lib/native';
+
+/** Delete every document in a collection, 400 to a batch. */
+async function deleteAll(ref: ReturnType<typeof collection>) {
+  const snap = await getDocs(ref);
+  for (let i = 0; i < snap.docs.length; i += 400) {
+    const batch = writeBatch(ref.firestore);
+    snap.docs.slice(i, i + 400).forEach((d) => batch.delete(d.ref));
+    await batch.commit();
+  }
+}
 
 const SUBS: SubName[] = ['activities', 'ideas', 'expenses', 'comments', 'albums'];
 // Profile fields only their owner may read; they live in users/{uid}/private/places.
@@ -257,6 +268,8 @@ export function createFirebaseStore(config: FirebaseOptions): Store {
       await updateDoc(ref, on ? { deletedAt: Date.now(), deletedBy: auth.currentUser!.uid } : { deletedAt: deleteField(), deletedBy: deleteField() });
     },
     async deleteTrip(id) {
+      // Each event's history first (a subcollection isn't deleted with its document)
+      for (const a of (await getDocs(collection(db, 'trips', id, 'activities'))).docs) await deleteAll(collection(db, 'trips', id, 'activities', a.id, 'history'));
       for (const name of SUBS) {
         const snap = await getDocs(collection(db, 'trips', id, name));
         for (let i = 0; i < snap.docs.length; i += 400) {
@@ -355,7 +368,22 @@ export function createFirebaseStore(config: FirebaseOptions): Store {
       await updateDoc(doc(db, 'trips', tripId, name, id), rest);
     },
     async deleteSub(tripId, name, id) {
+      // An event's history goes with it (the rules allow that only once the event is in Recently deleted)
+      if (name === 'activities') await deleteAll(collection(db, 'trips', tripId, 'activities', id, 'history'));
       await deleteDoc(doc(db, 'trips', tripId, name, id));
+    },
+    async updateEvent(tripId, before, patch, restoredFrom) {
+      const { id: _id, ...rest } = patch;
+      const batch = writeBatch(db);
+      batch.update(doc(db, 'trips', tripId, 'activities', before.id), rest);
+      const by = auth.currentUser!.uid, at = Date.now();
+      for (const c of changesOf(before, patch))
+        batch.set(doc(collection(db, 'trips', tripId, 'activities', before.id, 'history')), { ...c, by, at, ...(restoredFrom ? { restoredFrom } : {}) });
+      await batch.commit();
+    },
+    watchHistory(tripId, eventId, max, cb) {
+      const q = query(collection(db, 'trips', tripId, 'activities', eventId, 'history'), orderBy('at', 'desc'), limit(max));
+      return onSnapshot(q, (s) => cb(s.docs.map((d) => withId<EventChange>(d.id, d.data()))), () => cb([]));
     },
     async toggleInArray(tripId, name, id, field, uid, on) {
       await updateDoc(doc(db, 'trips', tripId, name, id), { [field]: on ? arrayUnion(uid) : arrayRemove(uid) });

@@ -35,7 +35,8 @@ export function ToastProvider({ children }: { children: ReactNode }) {
     setLeaving(false);
     setMsg({ ...t, id: Date.now() });
     if (t.tone === 'danger') haptic('error'); // Figma Haptics map: Error when a save fails
-    const ms = t.size === 'large' ? LARGE_MS : t.action ? SHOW_MS + 2000 : SHOW_MS;
+    // With an action (Undo) it stays as long as a Large one, about 6 seconds, so there's time to reach it
+    const ms = t.size === 'large' || t.action ? LARGE_MS : SHOW_MS;
     timers.current.push(
       window.setTimeout(() => setLeaving(true), ms),
       window.setTimeout(() => setMsg(null), ms + LEAVE_MS),

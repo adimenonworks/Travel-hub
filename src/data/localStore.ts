@@ -1,6 +1,7 @@
 import { isTravelling, migratedRoles } from './roles';
 import type { Store } from './store';
-import type { ChatReads, CollectionRole, CollectionShare, Invite, Profile, SavedPlace, SubName, Trip, User } from './types';
+import { changesOf } from '../lib/eventHistory';
+import type { EventChange, ChatReads, CollectionRole, CollectionShare, Invite, Profile, SavedPlace, SubName, Trip, User } from './types';
 import { randomCode } from './util';
 
 /**
@@ -16,6 +17,8 @@ type DB = {
   trips: Record<string, Trip>;
   subs: Record<string, Record<string, Record<string, Record<string, unknown>>>>; // tripId -> sub -> id -> doc
   invites: Record<string, Invite>;
+  /** Event change history: tripId -> eventId -> changes */
+  history?: Record<string, Record<string, EventChange[]>>;
   shares?: Record<string, CollectionShare>;
 };
 
@@ -151,6 +154,7 @@ export function createLocalStore(): Store {
     async deleteTrip(id) {
       delete db.trips[id];
       delete db.subs[id];
+      if (db.history) delete db.history[id];
       save();
     },
     async setDeleted(item, on) {
@@ -249,7 +253,20 @@ export function createLocalStore(): Store {
     },
     async deleteSub(tripId, name, id) {
       delete sub(tripId, name)[id];
+      if (name === 'activities' && db.history?.[tripId]) delete db.history[tripId][id];
       save();
+    },
+    async updateEvent(tripId, before, patch, restoredFrom) {
+      const a = sub(tripId, 'activities')[before.id];
+      if (!a) return;
+      Object.assign(a, patch, { id: before.id });
+      const list = (((db.history ??= {})[tripId] ??= {})[before.id] ??= []);
+      const at = Date.now();
+      for (const c of changesOf(before, patch)) list.push({ ...structuredClone(c), id: randomCode(16), by: me(), at, ...(restoredFrom ? { restoredFrom } : {}) });
+      save();
+    },
+    watchHistory(tripId, eventId, max, cb) {
+      return watch(() => [...(db.history?.[tripId]?.[eventId] ?? [])].sort((x, y) => y.at - x.at).slice(0, max), cb);
     },
     async toggleInArray(tripId, name, id, field, uid, on) {
       const d = sub(tripId, name)[id];

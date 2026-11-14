@@ -1,3 +1,4 @@
+import { undoPatch } from '../../lib/eventHistory';
 import { useEffect, useState } from 'react';
 import { Button, CategoryIcon, Chip, FieldRow, OptionCard, Dropdown, Sheet, TextArea, TextField, useToast } from '../../design/components';
 import { store } from '../../data';
@@ -230,12 +231,16 @@ export function ActivityForm({ open, trip, date, activity, draft, onClose, onCre
         ...(toTz ? { toTz } : {}),
         ...(!activity && draft?.journeyId ? { journeyId: draft.journeyId } : {}),
       };
-      if (activity) await store.updateSub(trip.id, 'activities', activity.id, data);
+      // Edits are recorded in the event's history (Changes) and can be undone from the toast
+      if (activity) await store.updateEvent(trip.id, activity, data);
       else {
         const id = await store.addSub(trip.id, 'activities', { ...(data as Omit<Activity, 'id' | 'createdBy' | 'createdAt' | 'attendeeIds'>), ...(draft?.placeId ? { placeId: draft.placeId } : {}), attendeeIds: [me.uid] });
         onCreated?.(id);
       }
-      toast({ icon: 'check', label: activity ? 'Changes saved' : behaviour === 'span' ? `${info.label} added: ${startWord.toLowerCase()} and ${endWord.toLowerCase()}` : 'Event added' });
+      if (activity) {
+        const edited = { ...activity, ...data } as Activity;
+        toast({ icon: 'check', label: 'Changes saved', action: { label: 'Undo', onClick: () => { store.updateEvent(trip.id, edited, undoPatch(activity, data)).catch(() => {}); } } });
+      } else toast({ icon: 'check', label: behaviour === 'span' ? `${info.label} added: ${startWord.toLowerCase()} and ${endWord.toLowerCase()}` : 'Event added' });
       onClose();
     } catch {
       toast({ tone: 'danger', label: "Couldn't save. Check your connection" });

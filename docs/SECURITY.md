@@ -31,6 +31,7 @@ personal data.
 |---|---|---|
 | A trip | Its members only | Any traveller (there's no owner): details, cover, people and roles, Recently deleted. Nobody can change `createdBy` (who started it, a record only). Deleting for good only from Recently deleted. Anyone can leave. Followers change nothing. Older trips' `owner`/`editor`/`member` count as traveller and `viewer` as follower until migrated |
 | Links to join (`invites`) | Anyone signed in, by code | Any traveller makes one, Travelling or Following (`role`); joining gives exactly the link's role (older links have none and mean travelling) |
+| An event's change history (`activities/{id}/history`) | Members | Travellers append as themselves (known fields only); nobody edits; deleted only with the event or trip once it's in Recently deleted |
 | A trip's events, ideas, albums | Members | Travellers add, update and delete; followers only comment |
 | A trip's comments | Members | Only the author edits or deletes; at most 150 characters |
 | Joining a trip | – | Someone with a valid, unexpired invite. They can only add themselves, as a member |

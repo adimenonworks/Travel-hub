@@ -211,6 +211,16 @@ export type Invite = {
 export type CollectionRole = 'member' | 'viewer';
 
 /** Something that can go to Recently deleted (and come back) */
+/** The parts of an event its change history covers (people and sharing, item 2): each change records one of them. */
+export type TrackedField = 'title' | 'date' | 'time' | 'place' | 'price' | 'people';
+export type TrackedValue = string | { startTime: string; endTime: string } | { location: Place | null; locationText: string } | Price | null | string[];
+/**
+ * One change to an event (`trips/{tripId}/activities/{eventId}/history/{id}`): who changed which part, when, from what to
+ * what. Written in the same batch as the change itself; append-only (nobody edits or deletes one). A Restore is a change
+ * too, with `restoredFrom` pointing at the change it undid.
+ */
+export type EventChange = { id: string; by: string; at: number; field: TrackedField; before: TrackedValue; after: TrackedValue; restoredFrom?: string };
+
 export type Deletable = { kind: 'trip'; id: string } | { kind: 'event'; tripId: string; id: string } | { kind: 'place'; id: string };
 /** How long Recently deleted keeps things */
 export const KEEP_DELETED_MS = 30 * 86400_000;

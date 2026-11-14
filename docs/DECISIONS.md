@@ -24,6 +24,11 @@
 
 ## 14 Nov 2026
 
+### Event change history: one entry per changed part (people and sharing, item 2)
+- **Decision:** each edit records one history entry per part it changed (title, date, time, place, price, who's in), so each row says one thing and Restore puts back just that part. A place counts as changed only when the name people see changes. Undo after an edit reverts the whole edit. Entries are append-only and are deleted only with their event or trip, once that's in Recently deleted. Toasts with an action (Undo) stay 6 seconds instead of 5.
+- **Why:** one entry per save would make Restore either too blunt (undo everything) or need a picker; Rove looking up the map position for an unchanged place isn't a change anyone made, and showing it as one ("changed the place to Ramiro, was Ramiro") confused.
+- **Also:** Figma's Accordion content isn't a slot, so the open Changes list is drawn as a draft under it; the Changes "list" is the Accordion plus List items with Show Button (Restore), not a new component.
+
 ### Keep the docs every session reads short (owner)
 - **Decision:**
   - `DECISIONS.md` only takes decisions someone might question or undo (rules, real choices, reversals, things not built), and holds the current month; older months move to `docs/decisions/`.
