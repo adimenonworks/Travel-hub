@@ -14,8 +14,8 @@
 /* Size=Large: 48px, padding 12 / 20, gap 4, Label, 24px icons. For the big moments: full-width actions (sheet and flow footers). */
 .large { min-height: var(--size-control-large); padding: var(--space-400) var(--space-600); gap: var(--space-200); font: var(--type-label); }
 /* Size=Regular (Wise's small button): 32px, padding 6 / 12, gap 4, Label, 16px icons; still a 44px tap area. The default. */
-.regular { min-height: var(--size-control-small); padding: var(--space-250) var(--space-400); gap: var(--space-200); font: var(--type-label); }
-.regular::after { content: ''; position: absolute; inset: calc((var(--size-control-small) - var(--size-tap)) / 2) 0; }
+.small { min-height: var(--size-control-small); padding: var(--space-250) var(--space-400); gap: var(--space-200); font: var(--type-label); }
+.small::after { content: ''; position: absolute; inset: calc((var(--size-control-small) - var(--size-tap)) / 2) 0; }
 
 .primary { background: var(--button-primary-background); color: var(--button-primary-text); }
 @media (hover: hover) { .primary:hover:not(:disabled) { background: var(--button-primary-background-hover); } }

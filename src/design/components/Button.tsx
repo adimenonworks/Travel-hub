@@ -6,18 +6,18 @@ import s from './Button.module.css';
 
 /** Figma Button "Tone". Inverse is the deep emerald button for brand surfaces; Neutral the dark grey one; Tertiary is outlined. */
 export type ButtonTone = 'primary' | 'destructive' | 'inverse' | 'neutral' | 'tertiary' | 'ghost';
-/** Figma Button "Size": Regular is 32px (Label, 16px icons, still a 44px tap area) and the default; Large is 48px (Label, 24px icons), the default for full-width (block) buttons. */
-export type ButtonSize = 'regular' | 'large';
+/** Figma Button "Size": Small is 32px (Label, 16px icons, still a 44px tap area) and the default; Large is 48px (Label, 24px icons), the default for full-width (block) buttons. */
+export type ButtonSize = 'small' | 'large';
 
 type Look = { tone?: ButtonTone; size?: ButtonSize; block?: boolean; /** Leading icon */ icon?: IconName; /** Trailing icon */ iconEnd?: IconName;
   /** Working on it: the trailing icon becomes a small spinner (e.g. Create my trip, then the screen floods green) */ loading?: boolean };
 
-const sizeOf = (size: ButtonSize | undefined, block?: boolean): ButtonSize => size ?? (block ? 'large' : 'regular');
+const sizeOf = (size: ButtonSize | undefined, block?: boolean): ButtonSize => size ?? (block ? 'large' : 'small');
 const cls = ({ tone = 'primary', size, block }: Look, iconOnly: boolean, extra?: string) =>
   [s.button, s[tone], s[sizeOf(size, block)], block && s.block, iconOnly && s.iconOnly, extra].filter(Boolean).join(' ');
 
 function Body({ icon, iconEnd, size, block, loading, children }: Look & { children?: ReactNode }) {
-  const px = sizeOf(size, block) === 'regular' ? 16 : 24;
+  const px = sizeOf(size, block) === 'small' ? 16 : 24;
   return (
     <>
       {icon && <Icon name={icon} size={px} className={s.glyph} />}
@@ -59,17 +59,16 @@ export type IconButtonTone = 'secondary' | 'ghost' | 'on-feature' | 'primary';
  * emerald, for the one main action in a row (Send a comment).
  * `label` is required: it's what screen readers announce.
  */
-export function IconButton({ icon, label, tone, state, small, className, type = 'button', ...rest }: Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'size'> & {
+export function IconButton({ icon, label, tone, state, size = 'large', className, type = 'button', ...rest }: Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'size'> & {
   icon: IconName; label: string; tone?: IconButtonTone;
-  /** Figma Icon button Size=Small: a 32px circle with a 16px icon (still a 44px tap area), e.g. deleting a comment */ small?: boolean;
-  /** @deprecated Figma has one size (40px); ignored */ size?: ButtonSize;
+  /** Figma Icon button Size: Large (default) a 40px circle with a 24px icon; Small a 32px circle with a 16px icon
+   *  (still a 44px tap area), e.g. deleting a comment */ size?: 'small' | 'large';
   /** Show the filled icon (e.g. a starred event) */ state?: 'default' | 'filled';
 }) {
   const t = tone ?? 'ghost';
-  delete (rest as { size?: unknown }).size;
   return (
-    <button type={type} className={[s.iconButton, small && s.iconSmall, s[`icon-${t}`], className].filter(Boolean).join(' ')} aria-label={label} title={label} {...rest}>
-      <Icon name={icon} size={small ? 16 : 24} state={state} className={s.glyph} />
+    <button type={type} className={[s.iconButton, size === 'small' && s.iconSmall, s[`icon-${t}`], className].filter(Boolean).join(' ')} aria-label={label} title={label} {...rest}>
+      <Icon name={icon} size={size === 'small' ? 16 : 24} state={state} className={s.glyph} />
     </button>
   );
 }

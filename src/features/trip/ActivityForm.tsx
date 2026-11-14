@@ -324,7 +324,7 @@ export function ActivityForm({ open, trip, date, activity, draft, onClose, onCre
                 <span className="t-heading-4">{typeInfo.label}</span>
                 {info && <span className="t-body-small t-secondary">{info.label}</span>}
               </div>
-              <Button tone="ghost" size="regular" aria-expanded={changingType} onClick={() => { haptic('selection'); setChangingType((v) => !v); }}>{changingType ? 'Done' : 'Change type'}</Button>
+              <Button tone="ghost" size="small" aria-expanded={changingType} onClick={() => { haptic('selection'); setChangingType((v) => !v); }}>{changingType ? 'Done' : 'Change type'}</Button>
             </div>
           )}
           {changingType && (
@@ -376,7 +376,7 @@ export function ActivityForm({ open, trip, date, activity, draft, onClose, onCre
                 {!['taxi', 'driver', 'transfer'].includes(kind) && text('Seat (optional)', 'seats', kind === 'flight' ? '23A' : 'Coach 4, seat 32')}
               </FieldRow>
               {activity && onAddConnection && (
-                <div><Button tone="ghost" size="regular" icon="plus" onClick={() => { onClose(); onAddConnection(); }}>Add a connection</Button></div>
+                <div><Button tone="ghost" size="small" icon="plus" onClick={() => { onClose(); onAddConnection(); }}>Add a connection</Button></div>
               )}
             </>
           )}

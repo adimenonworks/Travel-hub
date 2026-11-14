@@ -112,7 +112,7 @@ export function Comments({ tripId, targetId, comments, profiles }: { tripId: str
                   );
                   return (
                     <div key={c.id} className={s.messageRow}>
-                      {!mine && (lastOne ? <Avatar name={name} photo={profiles[c.authorId]?.photo} seed={c.authorId} size="regular" /> : <span className={s.avatarSpace} aria-hidden="true" />)}
+                      {!mine && (lastOne ? <Avatar name={name} photo={profiles[c.authorId]?.photo} seed={c.authorId} size="medium" /> : <span className={s.avatarSpace} aria-hidden="true" />)}
                       {c.editedAt && mine && <span className={s.edited}>Edited</span>}
                       {menu === c.id
                         ? <ContextMenu label="Message" align="end" onClose={() => setMenu(null)} items={[

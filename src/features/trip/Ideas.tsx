@@ -70,7 +70,7 @@ export function Ideas(ctx: TripCtx) {
   return (
     <>
       <SectionHeader title="Ideas board"
-        action={ctx.canContribute ? <Button size="regular" icon="lightbulb" onClick={() => setAdding(true)}>Add idea</Button> : undefined} />
+        action={ctx.canContribute ? <Button size="small" icon="lightbulb" onClick={() => setAdding(true)}>Add idea</Button> : undefined} />
       <SegmentControl label="Show ideas" block value={filter} onChange={setFilter} options={[
         { value: 'open', label: 'To decide', count: count('open') },
         { value: 'approved', label: 'Planned', count: count('approved') },
