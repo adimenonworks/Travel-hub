@@ -1,9 +1,9 @@
 .swap { display: grid; }
 .swap > * { grid-area: 1 / 1; min-width: 0; }
-.inRight { animation: inRight var(--duration-base) var(--ease-spring); }
-.inLeft { animation: inLeft var(--duration-base) var(--ease-spring); }
-.outLeft { animation: outLeft var(--duration-base) var(--ease-spring) forwards; pointer-events: none; }
-.outRight { animation: outRight var(--duration-base) var(--ease-spring) forwards; pointer-events: none; }
+.inRight { animation: inRight var(--duration-regular) var(--easing-spring); }
+.inLeft { animation: inLeft var(--duration-regular) var(--easing-spring); }
+.outLeft { animation: outLeft var(--duration-regular) var(--easing-spring) forwards; pointer-events: none; }
+.outRight { animation: outRight var(--duration-regular) var(--easing-spring) forwards; pointer-events: none; }
 /* A full width plus the page gutter, so a view leaves the screen completely */
 /* --from: where a swipe let go (the swipe pager), so both views carry on from there instead of jumping */
 @keyframes inRight { from { transform: translateX(calc(100% + var(--space-page-gutter) + var(--from, 0px))); } }
@@ -11,8 +11,8 @@
 @keyframes outLeft { from { transform: translateX(var(--from, 0px)); } to { transform: translateX(calc(-100% - var(--space-page-gutter))); } }
 @keyframes outRight { from { transform: translateX(var(--from, 0px)); } to { transform: translateX(calc(100% + var(--space-page-gutter))); } }
 @media (prefers-reduced-motion: reduce) {
-  .inRight, .inLeft { animation: fadeIn var(--duration-fast) var(--ease-standard); }
-  .outLeft, .outRight { animation: fadeOut var(--duration-fast) var(--ease-standard) forwards; }
+  .inRight, .inLeft { animation: fadeIn var(--duration-quick) var(--easing-standard); }
+  .outLeft, .outRight { animation: fadeOut var(--duration-quick) var(--easing-standard) forwards; }
 }
 @keyframes fadeIn { from { opacity: 0; } }
 @keyframes fadeOut { to { opacity: 0; } }

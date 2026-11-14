@@ -46,7 +46,7 @@
   background: var(--control-unselected-ghost-background); color: var(--control-unselected-ghost-text);
   border: 1px solid var(--control-unselected-ghost-border);
   cursor: pointer; scroll-snap-align: start;
-  transition: background var(--motion-fast), color var(--motion-fast), border-color var(--motion-fast), width var(--duration-slow) var(--ease-fluid), transform var(--motion-release);
+  transition: background var(--motion-fast), color var(--motion-fast), border-color var(--motion-fast), width var(--duration-gentle) var(--easing-fluid), transform var(--motion-release);
 }
 .day:hover { background: var(--control-unselected-ghost-background-hover); }
 .daySelected {

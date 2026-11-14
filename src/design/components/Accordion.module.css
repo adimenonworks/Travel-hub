@@ -11,10 +11,10 @@
 .text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: var(--space-100); }
 .title { font: var(--type-heading-4); }
 .meta { font: var(--type-body-small); color: var(--text-secondary); }
-.chevron { flex: none; display: grid; place-items: center; color: var(--icon-primary); transition: transform var(--duration-base) var(--ease-spring); }
+.chevron { flex: none; display: grid; place-items: center; color: var(--icon-primary); transition: transform var(--duration-regular) var(--easing-spring); }
 .open .chevron { transform: rotate(180deg); }
 /* The panel eases open from nothing to its own height */
-.panel { display: grid; grid-template-rows: 0fr; transition: grid-template-rows var(--duration-base) var(--ease-spring); }
+.panel { display: grid; grid-template-rows: 0fr; transition: grid-template-rows var(--duration-regular) var(--easing-spring); }
 .open .panel { grid-template-rows: 1fr; }
 .inner { min-height: 0; overflow: hidden; display: flex; flex-direction: column; padding: 0 var(--space-600); }
 .inner > :last-child { margin-bottom: var(--space-300); }

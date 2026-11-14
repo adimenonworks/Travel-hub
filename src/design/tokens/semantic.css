@@ -200,15 +200,6 @@
   /* Elevation/Floating bar: the Raised shadow plus the background blur (the Bottom nav) */
   --elevation-floating-bar: var(--shadow-raised);
 
-  /* Sizing and motion (code only) */
-  --motion-fast: var(--duration-fast) var(--ease-standard);
-  --motion-base: var(--duration-base) var(--ease-standard);
-  --motion-sheet: var(--duration-sheet) var(--ease-spring);
-  --motion-screen: var(--duration-slow) var(--ease-spring); /* a screen sliding in, like an iPhone push */
-  --motion-sheet-out: var(--duration-base) var(--ease-exit);
-  --motion-fluid: var(--duration-fluid) var(--ease-fluid);
-  --motion-press: var(--duration-fast) var(--ease-standard);
-  --motion-release: var(--duration-slow) var(--ease-bounce);
 }
 
 

@@ -1,0 +1,38 @@
+/*
+ * Motion — named exactly like the Figma "Motion" collection: duration/quick → --duration-quick (Number, ms),
+ * easing/spring → --easing-spring (String, the CSS curve). Values are the ones the app used before library v2
+ * (14 Nov 2026), unchanged; the polish prompt's B7 tightens the scale later.
+ */
+:root {
+  --duration-stagger: 20ms;    /* one calendar day after the next, as a range sweeps in */
+  --duration-quick: 150ms;     /* colour changes, presses, Reduce Motion fades */
+  --duration-fade: 200ms;      /* the old tab fading out over the new one */
+  --duration-settle: 220ms;    /* a swiped view settling back */
+  --duration-regular: 250ms;   /* tab slides, accordions, the keyboard */
+  --duration-gentle: 400ms;    /* springs back, screens sliding in, the nav pill */
+  --duration-fluid: 420ms;     /* the tab underline, the segment pill, day cards */
+  --duration-celebrate: 500ms; /* the deep green flood and the badge pop */
+  --duration-sheet: 520ms;     /* a sheet or toast rising */
+  --duration-spin: 800ms;      /* one turn of the button spinner */
+  --duration-shimmer: 1400ms;  /* one pass of the skeleton shimmer */
+
+  --easing-standard: cubic-bezier(0.25, 0.1, 0.25, 1);
+  --easing-spring: cubic-bezier(0.32, 0.72, 0, 1);
+  --easing-fluid: cubic-bezier(0.22, 1, 0.36, 1);
+  --easing-exit: cubic-bezier(0.4, 0, 0.9, 0.5);
+  --easing-bounce: cubic-bezier(0.34, 1.45, 0.64, 1);
+  --easing-settle: cubic-bezier(0.2, 1.12, 0.3, 1);     /* a flick that settles with a tiny overshoot, like iOS swipe actions */
+  --easing-keyboard: cubic-bezier(0.17, 0.59, 0.4, 0.77); /* the iPhone keyboard's own curve */
+  --easing-linear: linear;
+
+  /* Code-only shorthands (Figma variables can't hold a duration and a curve together); built only from the above */
+  --motion-fast: var(--duration-quick) var(--easing-standard);
+  --motion-press: var(--duration-quick) var(--easing-standard);
+  --motion-base: var(--duration-regular) var(--easing-standard);
+  --motion-sheet: var(--duration-sheet) var(--easing-spring);
+  --motion-sheet-out: var(--duration-regular) var(--easing-exit);
+  --motion-screen: var(--duration-gentle) var(--easing-spring); /* a screen sliding in, like an iPhone push */
+  --motion-fluid: var(--duration-fluid) var(--easing-fluid);
+  --motion-release: var(--duration-gentle) var(--easing-bounce);
+  --motion-keyboard: var(--duration-regular) var(--easing-keyboard);
+}

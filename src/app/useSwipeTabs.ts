@@ -30,7 +30,7 @@ export function useSwipeTabs(box: React.RefObject<HTMLElement | null>, go: (dir:
     };
     const set = (dx: number, animate: boolean) => {
       const v = view(); if (!v) return;
-      v.style.transition = animate ? 'transform var(--duration-base) var(--ease-spring)' : 'none';
+      v.style.transition = animate ? 'transform var(--duration-regular) var(--easing-spring)' : 'none';
       v.style.transform = dx ? `translateX(${dx}px)` : '';
     };
     const down = (e: PointerEvent) => {
