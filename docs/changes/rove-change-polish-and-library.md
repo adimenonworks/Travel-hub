@@ -158,7 +158,7 @@ Design this in Figma first and stop for approval. It replaces the separate "Add 
   - **Trip tabs:** Ideas (a new idea), Itinerary (a new message, an event you were added to, or a suggestion waiting), People (someone joined);
   - **Day cards** in the strip, on days with something unread, so you can find the message;
   - **Event cards** keep the existing "new message" Tag;
-  - **Bottom nav Trips** and the trip's **Hero card**, when anything in that trip is unread;
+  - **Bottom navigation Trips** and the trip's **Hero card**, when anything in that trip is unread;
   - **the bell**, with a count.
 - **"Seen" syncs across devices,** using the same read state as messages.
 
@@ -237,7 +237,7 @@ The Save sheet keeps its **Collections · Trip** segment, and **both tabs now sh
 - **Keep the map behind an adapter** (Leaflet and OpenStreetMap today), so it can switch to **Apple MapKit JS** later without touching screens. MapKit JS needs the Apple Developer Program key, and its tokens would be signed by Rove's Worker.
 
 ### F7. Search
-- A Search field at the top of the Trips tab's **Collections** segment searches every collection: place names, areas, notes and types.
+- A Text field (search, with a leading icon: there is no Search field component) at the top of the Trips tab's **Collections** segment searches every collection: place names, areas, notes and types.
 - Results show the country and area in the meta.
 
 ### F8. Open the source
