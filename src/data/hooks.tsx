@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
 import { store } from './index';
+import { roleOf } from './roles';
 import type { CollectionShare, Profile, Role, SavedPlace, SubCollections, SubName, Trip, User } from './types';
 
 type AuthState = { user: User | null; loading: boolean };
@@ -99,14 +100,13 @@ export function useProfiles(ids: string[]) {
   return profiles;
 }
 
-export function useRole(trip: Trip): { role: Role | undefined; canManage: boolean; isOwner: boolean; canContribute: boolean } {
+/** Your role on a trip. Every traveller can do everything (there's no owner); a follower only looks and chats. */
+export function useRole(trip: Trip): { role: Role | undefined; isTraveller: boolean } {
   const me = useMe();
   return useMemo(() => {
-    const role = trip.roles[me.uid];
-    // Everyone but a Viewer is a Planner (owner, organiser and member are stored, but plan alike); only whoever created the
-    // trip can delete it, and that rank is never shown
-    return { role, canManage: !!role && role !== 'viewer', isOwner: role === 'owner', canContribute: !!role && role !== 'viewer' };
-  }, [trip.roles, me.uid]);
+    const role = roleOf(trip, me.uid);
+    return { role, isTraveller: role === 'traveller' };
+  }, [trip, me.uid]);
 }
 
 export function personName(profiles: Record<string, Profile>, id: string) {

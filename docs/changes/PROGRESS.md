@@ -12,7 +12,28 @@ Read this first when starting a session. If it disagrees with the code or Figma,
 
 `docs/changes/rove-change-new-trip-stops.md` is **finished** (14 Nov 2026; results below).
 
-**Next: `docs/changes/rove-change-people-and-sharing.md`**, then `rove-change-polish-and-library.md` (which also has G8: Dropdown's size and Text area's height, the two Figma mismatches library v2 left; and G9: Your travels counts every city).
+**Now: `docs/changes/rove-change-people-and-sharing.md`** (started 14 Nov 2026), then `rove-change-polish-and-library.md` (which also has G8: Dropdown's size and Text area's height, the two Figma mismatches library v2 left; and G9: Your travels counts every city).
+
+### People and sharing status (14 Nov 2026)
+
+**Owner's answers before starting (14 Nov 2026):**
+- Removing Budget per person and Local currency from Edit trip and New trip (and `trip.budget` / `trip.currency`) moves from item 1 to **item 8**, where personal budgets and per-price currencies replace them.
+- Merge as usual; the owner publishes the rules afterwards (Firebase console → Firestore → Rules → paste `firestore.rules` → Publish).
+- Rules tests: Java isn't installed on the owner's Mac; a portable Temurin 21 JRE in the session's scratch folder runs them (`JAVA_HOME=<it> PATH=$JAVA_HOME/bin:$PATH npm test`). Playwright isn't in the project either: install `playwright@1.49.1` in a scratch folder and launch with `channel: 'chrome'` (the cached Chromium is broken).
+
+**Items done:**
+- **Item 1, one trip, everyone equal** (pull request 158):
+  - Model: `Role` = `'traveller' | 'follower'`; `StoredRole` keeps the old names for reading; `src/data/roles.ts` (`roleOf`, `isTravelling`, `peopleInOrder`, `needsRoleMigration`, `migratedRoles`). Trip has `createdBy` (a record only; older trips `ownerId`). `useRole()` gives `role` and `isTraveller`; `TripCtx` lost `canManage`, `isOwner`, `canContribute` (now `isTraveller`).
+  - Any traveller: edits the trip, adds people, changes roles, removes someone, deletes the trip (confirm names everyone else; Recently deleted for everyone; any traveller restores or, after 30 days, clears it). Anyone leaves; the last traveller leaving bins the trip and stays on it. Delete account: leave every trip, delete ones with no other traveller.
+  - Migration: `useRoleMigration` (first traveller to open an older trip; `store.migrateRoles`). Checked in demo mode: owner/editor/member → traveller, viewer → follower, `ownerId` → `createdBy`.
+  - Copy: "Join us on <trip> in Rove", "Link to join copied", join page "<Name> wants you to join <trip>" + "Plan the days, ideas and places together." + Join trip; "This link has expired" / "Link not found"; sign-in "Sign in to join the trip."; New trip's Who's coming list says "Travelling" and "Share a link to join". People tab: one list (travellers then followers), "Travelling" / "Following", role sheet Travelling · Following with item 2's one-liners, Remove from trip. (Item 2 replaces the sheet with the role dropdown.)
+  - Rules: `travels()`, `isTraveller()`; create as traveller (or old app's owner); `travellerUpdate` (createdBy/ownerId can't change except the migration dropping ownerId; role values checked); joining as traveller (or old `member`); leaving for anyone; delete for good only by a traveller and only from Recently deleted. 149 rules tests pass.
+  - Figma: new section **"People & sharing — draft"** on Screens (`679:1846`) with frame **Join** (`679:1847`: a Card Layout Centre instance `679:1848` with the join copy and a Large Primary "Join trip" Button) and a note. **Half-done:** the Card's Media slot still shows the placeholder plus icon: the plugin API can't edit slot values ("Slot component property values cannot be edited"), so the Spot Suitcase illustration has to be dropped into the slot by hand. Planning board: the Now card's first line and the Built "A trip" card's People line updated to match ROADMAP.
+  - Checked: build; demo mode with Playwright (migration, role change, delete and restore by another traveller, last traveller leaving, joining as Jo); People and Join at 320/375/390/430, light and dark, text 17/23/33: no horizontal scroll, no page errors.
+
+**Item in progress:** none. **Next: item 2, Travelling and Following** (Add people sheet with two Option cards and a role carried in the link; People rows with a role dropdown + Context menu; "Who can edit and delete events" rules (needs `people` from item 3, so the per-event part is built with item 3); Undo toasts and per-event history).
+
+**Waiting on the owner:** publish `firestore.rules` (the new app needs the new rules: publish them before rebuilding the app in Xcode; the old app keeps working with the new rules).
 
 ### New trip stops status (14 Nov 2026)
 

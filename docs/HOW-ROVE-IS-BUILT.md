@@ -78,7 +78,7 @@ exists in `functions/` but isn't deployed (it needs Firebase's paid Blaze plan; 
    a website would be), its title is cleaned, and Photon finds the place, city and country.
 7. **Sharing into Rove:** the share extension (`ios/App/ShareExtension`) opens `rove://save?url=…`, which the app
    turns into the Save a place sheet.
-8. **Invites:** an organiser creates an invite code (12 random characters, valid 14 days). The link opens the old
+8. **Invites:** any traveller creates an invite code (12 random characters, valid 14 days). The link opens the old
    website's join page, which signs you in and adds you to the trip if the code is valid.
 
 ---

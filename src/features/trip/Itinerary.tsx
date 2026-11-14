@@ -104,7 +104,7 @@ export function Itinerary(ctx: TripCtx) {
       <section className={s.timeline} aria-label={word(day)}>
         <SectionHeader title={word(day)}
           meta={[formatDay(day), `${list.length} plan${list.length === 1 ? '' : 's'}`].filter(Boolean).join(' · ')}
-          action={ctx.canContribute ? <Button size="small" icon="plus" onClick={() => setAdding(true)}>Add event</Button> : undefined} />
+          action={ctx.isTraveller ? <Button size="small" icon="plus" onClick={() => setAdding(true)}>Add event</Button> : undefined} />
 
         {/* Changing day slides only the plan, from the side of the day you picked */}
         <div ref={planBox}>
@@ -124,7 +124,7 @@ export function Itinerary(ctx: TripCtx) {
           const dateLine = list.some((e) => legsOf(e.a, activities).some(crossesDateLine));
           return list.length === 0 ? (
             <Card layout="centre" media={<Illustration name="calendar" size={120} />} title="Nothing planned yet" body="Add something to do, or schedule an idea from the Ideas board."
-              actions={ctx.canContribute ? <Button tone="neutral" icon="plus" onClick={() => setAdding(true)}>Add event</Button> : undefined} />
+              actions={ctx.isTraveller ? <Button tone="neutral" icon="plus" onClick={() => setAdding(true)}>Add event</Button> : undefined} />
           ) : (
             <div className={s.eventList}>
               {arrivals.map(({ a, last }) => <TravelConnector key={`arr-${a.id}`} icon={categoryInfo(a.category).icon} label={`Arrives ${formatTime(last.endTime)} from ${(a.fromText ?? '').split(',')[0].replace(/\s*\([^)]*\)/, '')}`} />)}
@@ -148,8 +148,8 @@ export function Itinerary(ctx: TripCtx) {
                             ...unreadTag(unreadCount(reads, me.uid, a.id, ctx.comments)),
                           ]} />
                       );
-                      // Press and hold for Edit and Delete (organizers: they can change the itinerary); sideways swipes change day
-                      return ctx.canManage ? (
+                      // Press and hold for Edit and Delete (travellers: they can change the itinerary); sideways swipes change day
+                      return ctx.isTraveller ? (
                         <HoldMenu label={`${a.title} actions`} items={[
                           { label: 'Edit', icon: 'pencil', onClick: () => setEditing(a) },
                           { label: 'Delete', icon: 'trash', tone: 'danger', onClick: () => remove(a) },

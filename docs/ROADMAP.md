@@ -26,7 +26,7 @@ Built in this order. Progress is in `docs/changes/PROGRESS.md`.
 
 ### 1. People, sharing and money
 `docs/changes/rove-change-people-and-sharing.md`
-- **One shared trip, everyone equal.** "Join", never "invited into my trip"; any traveller can edit or delete it (Recently deleted keeps it 30 days).
+- **One shared trip, everyone equal.** "Join", never "invited into my trip"; any traveller can edit or delete it (Recently deleted keeps it 30 days). *(built 14 Nov, with the Travelling / Following roles; the Add people role choice comes with the next item)*
 - **Travelling and Following** replace Planner and Viewer. Followers see the plan and chat, never prices or bookings.
 - **Who's in, per event.** Being added means you're in; I'm out removes it from your itinerary only. Guests can join a single event.
 - **Undo and per-event change history** with Restore.
@@ -212,7 +212,7 @@ What Rove does today (on Main, in the iPhone app).
   - Itinerary: day cards, travel times, now line, hold for Edit / Delete;
   - Ideas: votes, Add to a day;
   - Photos: shared album links;
-  - People: Planner and Viewer roles, invite links.
+  - People: everyone equal (no owner), Travelling and Following roles, links to join.
 - **Events:** 6 types and 46 categories; the category sets the icon, colour and behaviour (journey, span, at a place, open time, note). **Colour-coded event types** everywhere.
 - **Layovers and time zones:** connections as one Journey card; each event keeps its place's time zone.
 - **Event chat:** Messages-style comments, alerts while the app is open, "new message" tags, read state synced across devices.

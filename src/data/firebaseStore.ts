@@ -8,6 +8,7 @@ import {
   initializeFirestore, onSnapshot, persistentLocalCache, persistentMultipleTabManager, query, setDoc, updateDoc, where, writeBatch, type DocumentData,
 } from 'firebase/firestore';
 import type { Store } from './store';
+import { isTravelling, migratedRoles } from './roles';
 import type { ChatReads, CollectionShare, Invite, LinkPreview, Profile, SavedPlace, SubName, Trip } from './types';
 import { getFunctions, httpsCallable } from 'firebase/functions';
 import { randomCode } from './util';
@@ -113,18 +114,18 @@ export function createFirebaseStore(config: FirebaseOptions): Store {
         }
       }
       for (const p of mine) if (!kept.has(p.id)) await deleteDoc(p.ref);
-      // 2. Trips: your messages go; trips you own go to the next member (or are deleted with nobody else); you leave the rest.
+      // 2. Trips: your messages go and you leave each one; a trip with no other traveller is deleted for good
+      //    (the rules only allow that from Recently deleted, so it goes there first).
       for (const t of trips) {
         const others = t.memberIds.filter((m) => m !== uid);
         if (others.length) {
           const comments = await getDocs(query(collection(db, 'trips', t.id, 'comments'), where('authorId', '==', uid)));
           for (const c of comments.docs) await deleteDoc(c.ref);
         }
-        if (t.ownerId === uid && others.length) {
-          const roles = { ...t.roles }; delete roles[uid]; roles[others[0]] = 'owner';
-          await updateDoc(doc(db, 'trips', t.id), { ownerId: others[0], memberIds: others, roles });
-        } else if (t.ownerId === uid) await this.deleteTrip(t.id);
-        else await this.leaveTrip(t.id, uid);
+        if (isTravelling(t, uid) && !others.some((m) => isTravelling(t, m))) {
+          if (!t.deletedAt) await this.setDeleted({ kind: 'trip', id: t.id }, true);
+          await this.deleteTrip(t.id);
+        } else await updateDoc(doc(db, 'trips', t.id), { memberIds: arrayRemove(uid), [`roles.${uid}`]: deleteField() });
       }
       // 3. Shared collections: yours stop being shared; you leave the ones you were added to.
       for (const sh of (await getDocs(query(collection(db, 'collectionShares'), where('ownerId', '==', uid)))).docs) await deleteDoc(sh.ref);
@@ -243,7 +244,7 @@ export function createFirebaseStore(config: FirebaseOptions): Store {
     async createTrip(data) {
       const uid = auth.currentUser!.uid;
       const ref = await addDoc(collection(db, 'trips'), {
-        ...data, ownerId: uid, memberIds: [uid], roles: { [uid]: 'owner' }, createdAt: Date.now(),
+        ...data, createdBy: uid, memberIds: [uid], roles: { [uid]: 'traveller' }, createdAt: Date.now(),
       });
       return ref.id;
     },
@@ -267,14 +268,11 @@ export function createFirebaseStore(config: FirebaseOptions): Store {
       await deleteDoc(doc(db, 'trips', id));
     },
     async leaveTrip(id, uid) {
-      // Whoever created the trip hands it to the next planner (or anyone left) as they go
+      // Everyone's equal, so nothing is handed on. The last traveller leaving deletes the trip (into Recently deleted).
       const snap = await getDoc(doc(db, 'trips', id));
       const t = snap.exists() ? withId<Trip>(id, snap.data()) : null;
-      const others = t ? t.memberIds.filter((m) => m !== uid) : [];
-      if (t && t.ownerId === uid && others.length) {
-        const to = others.find((m) => t.roles[m] !== 'viewer') ?? others[0];
-        const roles = { ...t.roles }; delete roles[uid]; roles[to] = 'owner';
-        await updateDoc(doc(db, 'trips', id), { ownerId: to, memberIds: others, roles });
+      if (t && isTravelling(t, uid) && !t.memberIds.some((m) => m !== uid && isTravelling(t, m))) {
+        await this.setDeleted({ kind: 'trip', id }, true);
         return;
       }
       await updateDoc(doc(db, 'trips', id), { memberIds: arrayRemove(uid), [`roles.${uid}`]: deleteField() });
@@ -284,6 +282,9 @@ export function createFirebaseStore(config: FirebaseOptions): Store {
     },
     async setRole(trip, uid, role) {
       await updateDoc(doc(db, 'trips', trip.id), { [`roles.${uid}`]: role });
+    },
+    async migrateRoles(trip) {
+      await updateDoc(doc(db, 'trips', trip.id), { roles: migratedRoles(trip), createdBy: trip.createdBy ?? trip.ownerId ?? deleteField(), ownerId: deleteField() });
     },
 
     watchSub(tripId, name, cb) {
@@ -297,7 +298,7 @@ export function createFirebaseStore(config: FirebaseOptions): Store {
     queueTrip(data) {
       const uid = auth.currentUser!.uid;
       const ref = doc(collection(db, 'trips'));
-      const saved = setDoc(ref, { ...data, ownerId: uid, memberIds: [uid], roles: { [uid]: 'owner' }, createdAt: Date.now() });
+      const saved = setDoc(ref, { ...data, createdBy: uid, memberIds: [uid], roles: { [uid]: 'traveller' }, createdAt: Date.now() });
       return { id: ref.id, saved };
     },
     async deleteBudgetData(trip) {
@@ -436,7 +437,7 @@ export function createFirebaseStore(config: FirebaseOptions): Store {
       }
       await updateDoc(doc(db, 'trips', invite.tripId), {
         memberIds: arrayUnion(uid),
-        [`roles.${uid}`]: 'member',
+        [`roles.${uid}`]: 'traveller',
         joinedVia: invite.code,
       });
     },

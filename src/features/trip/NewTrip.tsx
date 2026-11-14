@@ -103,8 +103,8 @@ export function NewTrip({ open, onClose, onOpenTrip }: { open: boolean; onClose:
     if (!trip) return;
     const code = await store.createInvite(trip);
     const url = `${isNativeApp ? PUBLIC_SITE : location.origin + location.pathname}#/join/${code}`;
-    if (await shareLink({ title: `Join ${name}`, text: `Join our trip "${name}" on Rove`, url })) return;
-    try { await navigator.clipboard.writeText(url); toast({ icon: 'copy', label: 'Invite link copied' }); } catch { /* shown nowhere else; the People tab has it */ }
+    if (await shareLink({ title: `Join ${name}`, text: `Join us on ${name} in Rove`, url })) return;
+    try { await navigator.clipboard.writeText(url); toast({ icon: 'copy', label: 'Link to join copied' }); } catch { /* shown nowhere else; the People tab has it */ }
   };
 
   if (created) {
@@ -114,7 +114,7 @@ export function NewTrip({ open, onClose, onOpenTrip }: { open: boolean; onClose:
         illustration={<Illustration name="suitcase" size={144} />}
         title={`${created.name}, here you come`}
         subtitle={[created.brought ? `Trip created. ${created.brought} idea${created.brought === 1 ? '' : 's'} came with you.` : 'Trip created.',
-          company === 'others' ? 'Share the invite link so everyone can plan with you.' : 'Add your plans, ideas and bookings as they come.'].join(' ')}
+          company === 'others' ? 'Share a link so everyone can join and plan with you.' : 'Add your plans, ideas and bookings as they come.'].join(' ')}
         number={until} numberLabel={until === 1 ? 'day to go' : 'days to go'}
         primary={<Button size="large" iconEnd="chevron-right" onClick={() => { onClose(); onOpenTrip(created.id); }}>Open my trip</Button>}
         secondary={<Button size="large" tone="ghost" className={s.onDarkGhost} onClick={() => invite(created.id, created.name)}>Share with friends</Button>} />
@@ -252,9 +252,9 @@ export function NewTrip({ open, onClose, onOpenTrip }: { open: boolean; onClose:
           <OptionCard icon="people" label="With others" selected={company === 'others'} onClick={() => { haptic('light'); setCompany('others'); }} />
         </div>
         {company === 'others' && (
-                    <ListGroup label="Invited">
-            <ListItem icon="person" title="You" meta="Owner" />
-            <ListItem icon="link" title="Share an invite link" meta="Next, once your trip is made. Anyone with it can join for 14 days." />
+          <ListGroup label="People">
+            <ListItem icon="person" title="You" meta="Travelling" />
+            <ListItem icon="link" title="Share a link to join" meta="Next, once your trip is made. Anyone with it can join for 14 days." />
           </ListGroup>
         )}
       </FlowScreen>

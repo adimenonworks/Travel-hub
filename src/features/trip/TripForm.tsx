@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { confirmAction } from '../../lib/native';
 import { Button, FieldRow, Dropdown, Sheet, TextField, useToast } from '../../design/components';
 import { store } from '../../data';
+import { personName, useMe, useProfiles } from '../../data/hooks';
 import type { Trip } from '../../data/types';
 import { addDays, today } from '../../lib/dates';
 import { CURRENCIES } from '../../lib/format';
@@ -11,6 +12,9 @@ import s from './trip.module.css';
 
 type Draft = { name: string; startDate: string; endDate: string; currency: string; coverPhoto: string | null; coverPosition: Pos | null; budget: PriceDraft };
 type Pos = { x: number; y: number };
+
+/** "Sam", "Sam and Priya", "Sam, Priya and Jo" */
+const listNames = (names: string[]) => new Intl.ListFormat('en-GB', { style: 'long', type: 'conjunction' }).format(names);
 
 const fromTrip = (t?: Trip): Draft => ({
   name: t?.name ?? '',
@@ -25,12 +29,14 @@ const fromTrip = (t?: Trip): Draft => ({
 /**
  * Create a trip (no `trip`) or edit one. The trip's places aren't here: they're picked in New trip and grow with its
  * events (a list you can't change doesn't belong in an edit sheet; owner, 14 Nov 2026). Calls onSaved with the trip id.
- * Pass onDeleted to show a Delete trip button (only the owner can delete; the security rules enforce it too).
+ * Pass onDeleted to show a Delete trip button (any traveller can delete; it goes to Recently deleted for everyone).
  */
 export function TripForm({ open, trip, onClose, onSaved, onDeleted }: { open: boolean; trip?: Trip; onClose: () => void; onSaved?: (id: string) => void; onDeleted?: () => void }) {
   const [d, setD] = useState<Draft>(() => fromTrip(trip));
   const [error, setError] = useState('');
   const toast = useToast();
+  const me = useMe();
+  const profiles = useProfiles(trip?.memberIds ?? []);
   useEffect(() => { if (open) { setD(fromTrip(trip)); setError(''); } }, [open, trip]);
   const set = (patch: Partial<Draft>) => setD((x) => ({ ...x, ...patch }));
 
@@ -64,8 +70,11 @@ export function TripForm({ open, trip, onClose, onSaved, onDeleted }: { open: bo
   };
 
   const remove = async () => {
-    const others = trip ? trip.memberIds.length - 1 : 0;
-    if (!trip || !confirmAction(`Delete "${trip.name}"${others ? ` for all ${others + 1} people on it` : ''}? It stays in Recently deleted (You → Recently deleted) for 30 days, then it's gone for good.`)) return;
+    if (!trip) return;
+    // Name everyone else on it, so nobody deletes a shared trip without knowing who else loses it
+    const others = trip.memberIds.filter((id) => id !== me.uid).map((id) => personName(profiles, id).split(' ')[0]);
+    const who = others.length ? ` for you, ${listNames(others)}` : '';
+    if (!confirmAction(`Delete "${trip.name}"${who}? Anyone travelling can bring it back from Recently deleted (You → Recently deleted) for 30 days, then it's gone for good.`)) return;
     try {
       await store.setDeleted({ kind: 'trip', id: trip.id }, true);
       toast({ icon: 'trash', label: 'Trip deleted', action: { label: 'Undo', onClick: () => { store.setDeleted({ kind: 'trip', id: trip.id }, false).catch(() => {}); } } });

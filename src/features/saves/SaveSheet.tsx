@@ -1,3 +1,4 @@
+import { isTravelling } from '../../data/roles';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Accordion, Chip, Icon, ListGroup, ListItem, OptionCard, SegmentControl, Sheet, Skeleton, TextArea, TextField, Button, useToast } from '../../design/components';
 import type { Activity, LinkItem, Place } from '../../data/types';
@@ -94,7 +95,7 @@ export function SaveSheet({ request, onClose }: { request: SaveRequest | null; o
   }, [whereQuery, step]);
 
   // An upcoming trip that covers this city gets the "Also add to … ideas" switch.
-  const upcoming = useMemo(() => (trips ?? []).filter((t) => t.endDate >= today() && t.roles[me.uid] !== 'viewer').sort((a, b) => a.startDate.localeCompare(b.startDate)), [trips, me.uid]);
+  const upcoming = useMemo(() => (trips ?? []).filter((t) => t.endDate >= today() && isTravelling(t, me.uid)).sort((a, b) => a.startDate.localeCompare(b.startDate)), [trips, me.uid]);
   const acts = useActivitiesFor(upcoming.map((t) => t.id));
   const place = preview?.place && !preview.place.isArea ? preview.place : null;
   // Rove's pick: the place's country and city (an area the link is about counts too); the person can change it.

@@ -4,19 +4,22 @@ import { Avatar, Button, Card, Illustration, ListGroup, ListItem, SectionHeader,
 import { store } from '../../data';
 import { personName, useMe } from '../../data/hooks';
 import type { TripCtx } from './TripPage';
+import type { Role } from '../../data/types';
+import { isTravelling, peopleInOrder, roleOf } from '../../data/roles';
 import { isNativeApp, PUBLIC_SITE, shareLink, confirmAction } from '../../lib/native';
 
 /**
- * Trip "People" tab (Figma "Trip — People"): the travellers as a List group, then the invite card. There are two roles,
- * Planner and Viewer; any Planner taps someone to change their role or remove them. Whoever created the trip is a
- * Planner like everyone else (no rank shown); they're just the one who can delete it, and leaving hands it on.
+ * Trip "People" tab (Figma "Trip — People"): everyone on the trip as one List group (travellers first, then followers),
+ * then the invite card. Everyone is equal: there's no owner. Two roles, Travelling and Following; any traveller taps
+ * someone to change their role or remove them, and anyone can leave (the last traveller leaving deletes the trip).
  */
-const ROLE_HELP = {
-  viewer: 'Sees the whole trip and can chat, but can’t add or change anything.',
-  planner: 'Plans everything: edits the trip and its events, ideas and photos, invites people and changes their roles.',
-} as const;
+const ROLE_HELP: Record<Role, string> = {
+  traveller: 'On the trip. Plans with everyone and has their own bookings and budget.',
+  follower: 'Not on the trip, like family at home. Sees the plan and chats, but never prices or bookings, and can’t change anything.',
+};
+const ROLE_NAME: Record<Role, string> = { traveller: 'Travelling', follower: 'Following' };
 
-export function People({ trip, profiles, canManage, isOwner }: TripCtx) {
+export function People({ trip, profiles, isTraveller }: TripCtx) {
   const me = useMe();
   const navigate = useNavigate();
   const toast = useToast();
@@ -37,24 +40,23 @@ export function People({ trip, profiles, canManage, isOwner }: TripCtx) {
     }
   };
   const share = async (url: string) => {
-    if (await shareLink({ title: `Join ${trip.name}`, text: `Join our trip "${trip.name}" on Rove`, url })) return;
-    try { await navigator.clipboard.writeText(url); toast({ icon: 'copy', label: 'Invite link copied' }); } catch { toast({ tone: 'danger', label: "Couldn't share the link. Try again" }); }
+    if (await shareLink({ title: `Join ${trip.name}`, text: `Join us on ${trip.name} in Rove`, url })) return;
+    try { await navigator.clipboard.writeText(url); toast({ icon: 'copy', label: 'Link to join copied' }); } catch { toast({ tone: 'danger', label: "Couldn't share the link. Try again" }); }
   };
   const invite = async () => {
     const url = await makeLink();
     await share(url);
   };
 
-  const members = trip.memberIds.slice().sort((a, b) => (trip.roles[a] === 'owner' ? -1 : trip.roles[b] === 'owner' ? 1 : 0));
-  const roleName = (id: string) => (trip.roles[id] === 'viewer' ? 'Viewer' : 'Planner');
+  const members = peopleInOrder(trip);
+  const roleName = (id: string) => ROLE_NAME[roleOf(trip, id) ?? 'follower'];
   const [person, setPerson] = useState<string | null>(null);
-  const [role, setRoleDraft] = useState<'planner' | 'viewer'>('planner');
-  const open = (id: string) => { setRoleDraft(trip.roles[id] === 'viewer' ? 'viewer' : 'planner'); setPerson(id); };
+  const [role, setRoleDraft] = useState<Role>('traveller');
+  const open = (id: string) => { setRoleDraft(roleOf(trip, id) ?? 'follower'); setPerson(id); };
   const saveRole = async () => {
     if (!person) return;
-    const was = trip.roles[person] === 'viewer' ? 'viewer' : 'planner';
-    if (was === role) { setPerson(null); return; }
-    try { await store.setRole(trip, person, role === 'viewer' ? 'viewer' : 'editor'); toast({ icon: 'check', label: 'Role updated' }); setPerson(null); }
+    if (roleOf(trip, person) === role) { setPerson(null); return; }
+    try { await store.setRole(trip, person, role); toast({ icon: 'check', label: 'Role updated' }); setPerson(null); }
     catch { toast({ tone: 'danger', label: "Couldn't save. Check your connection" }); }
   };
 
@@ -68,13 +70,13 @@ export function People({ trip, profiles, canManage, isOwner }: TripCtx) {
 
   return (
     <>
-      <SectionHeader title="Travellers"
-        action={canManage ? <Button size="small" icon="user-add" onClick={invite} disabled={busy}>Add people</Button> : undefined} />
-      <ListGroup label="Travellers">
+      <SectionHeader title="People"
+        action={isTraveller ? <Button size="small" icon="user-add" onClick={invite} disabled={busy}>Add people</Button> : undefined} />
+      <ListGroup label="People">
         {members.map((id) => {
           const name = personName(profiles, id);
-          // Any Planner changes anyone's role, except their own and the trip creator's (the trip always keeps them)
-          const editable = canManage && id !== me.uid && id !== trip.ownerId;
+          // Any traveller changes anyone else's role or removes them (your own row: Leave trip, below)
+          const editable = isTraveller && id !== me.uid;
           return (
             <ListItem key={id} media={<Avatar name={name} photo={profiles[id]?.photo} size="large" />} round
               title={name} meta={`${roleName(id)}${id === me.uid ? ' · you' : ''}`}
@@ -83,25 +85,26 @@ export function People({ trip, profiles, canManage, isOwner }: TripCtx) {
         })}
       </ListGroup>
 
-      {canManage && (
+      {isTraveller && (
         <Card media={<Illustration name="friends" size={120} />}>
           <h2 className="t-heading-2">The more the merrier</h2>
           <p className="t-body-small t-secondary">Tap Add people to get a link for friends to plan this trip with you. Anyone with the link can join for the next 14 days after signing in.</p>
         </Card>
       )}
 
-      {/* Deleting the trip lives in Edit trip (its creator only); here anyone can leave, while someone else is on it */}
-      {members.length > 1 && (
-        <Button tone="destructive" icon="sign-out" onClick={async () => {
-          if (!confirmAction(isOwner ? `Leave "${trip.name}"? It stays with everyone else.` : `Leave "${trip.name}"?`)) return;
-          await store.leaveTrip(trip.id, me.uid);
-          navigate('/');
-        }}>Leave trip</Button>
-      )}
+      {/* Anyone can leave. The last traveller leaving deletes the trip, into Recently deleted like Delete trip */}
+      <Button tone="destructive" icon="sign-out" onClick={async () => {
+        const last = isTraveller && !members.some((id) => id !== me.uid && isTravelling(trip, id));
+        if (!confirmAction(last
+          ? `You're the only one travelling, so leaving deletes "${trip.name}"${members.length > 1 ? ' for everyone' : ''}. You can bring it back from Recently deleted for 30 days.`
+          : `Leave "${trip.name}"? It stays with everyone else.`)) return;
+        try { await store.leaveTrip(trip.id, me.uid); navigate('/'); }
+        catch { toast({ tone: 'danger', label: "Couldn't leave. Check your connection" }); }
+      }}>Leave trip</Button>
 
-      <Sheet open={!!person} mode="edit" title={person ? personName(profiles, person) : ''} subtitle="What they can do on this trip" onClose={() => setPerson(null)} onSubmit={saveRole} submitLabel="Save"
-        secondary={person ? <Button tone="destructive" size="large" onClick={removePerson}>Remove</Button> : undefined}>
-        <SegmentControl label="Role" block value={role} onChange={setRoleDraft} options={[{ value: 'viewer', label: 'Viewer' }, { value: 'planner', label: 'Planner' }]} />
+      <Sheet open={!!person} mode="edit" title={person ? personName(profiles, person) : ''} subtitle="Their role on this trip" onClose={() => setPerson(null)} onSubmit={saveRole} submitLabel="Save"
+        secondary={person ? <Button tone="destructive" size="large" onClick={removePerson}>Remove from trip</Button> : undefined}>
+        <SegmentControl label="Role" block value={role} onChange={setRoleDraft} options={[{ value: 'traveller', label: 'Travelling' }, { value: 'follower', label: 'Following' }]} />
         <p className="t-body-small t-secondary">{ROLE_HELP[role]}</p>
       </Sheet>
     </>
