@@ -12,7 +12,7 @@ Read this first when starting a session. If it disagrees with the code or Figma,
 
 `docs/changes/rove-change-new-trip-stops.md` is **finished** (14 Nov 2026; results below).
 
-**Now: `docs/changes/rove-change-people-and-sharing.md`** (started 14 Nov 2026), then `rove-change-polish-and-library.md` (which also has G8: Dropdown's size and Text area's height, the two Figma mismatches library v2 left; G9: Your travels counts every city; and G10: Small buttons 36px, minimum heights as tokens).
+**Now: `docs/changes/rove-change-people-and-sharing.md`** (started 14 Nov 2026), then `rove-change-polish-and-library.md` (which also has G8: Dropdown's size and Text area's height, the two Figma mismatches library v2 left; G9: Your travels counts every city; G10: Small buttons 36px, minimum heights as tokens; and G11: Page header meta 8px under the title).
 
 ### People and sharing status (14 Nov 2026)
 

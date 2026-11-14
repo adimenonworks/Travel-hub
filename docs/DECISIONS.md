@@ -14,6 +14,10 @@
 
 ## 14 Nov 2026
 
+### Page header: meta closer to its title (owner)
+- **Decision:** the meta line and subtitle sit 8px under a page title (was 12). Polish prompt G11.
+- **Why:** they describe the title, so they should read as one group; 12px is the gap used between separate things.
+
 ### Control heights: minimum height plus padding, Small buttons 36px (owner)
 - **Decision:**
   - Buttons, Chips and Tags are built with a minimum height and padding (as Button already was), so icons never change their shape and they grow with larger text.
