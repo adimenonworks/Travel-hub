@@ -12,7 +12,7 @@ Read this first when starting a session. If it disagrees with the code or Figma,
 
 `docs/changes/rove-change-new-trip-stops.md` is **finished** (14 Nov 2026; results below).
 
-**Next: `docs/changes/rove-change-people-and-sharing.md`**, then `rove-change-polish-and-library.md` (which also has G8: Dropdown's size and Text area's height, the two Figma mismatches library v2 left).
+**Next: `docs/changes/rove-change-people-and-sharing.md`**, then `rove-change-polish-and-library.md` (which also has G8: Dropdown's size and Text area's height, the two Figma mismatches library v2 left; and G9: Your travels counts every city).
 
 ### New trip stops status (14 Nov 2026)
 

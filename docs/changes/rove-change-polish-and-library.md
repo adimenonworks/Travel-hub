@@ -357,6 +357,16 @@ Library v2 left two places where the code and Figma disagree. Figma first, then 
 - **Text area's height.** Figma draws Text area at the same height as a one-line Text field; in the app it's taller and grows with its text. Redraw Figma's Text area at the app's real minimum height, with its sizes from variables, so the two match. No code change unless the comparison finds one.
 - Compare each side by side (Figma screenshot vs `/#/design`) before the pull request.
 
+### G9. Your travels counts every city (found 14 Nov 2026)
+**Today:** You → Your travels counts countries from every past trip's events (New trip stops, 14 Nov 2026), but **cities only from each trip's first stop**. A trip Tokyo → Kyoto → Seoul shows 2 countries but 1 city.
+
+**The change:** count cities the same way as countries.
+- **A past trip's cities** are its first stop's city plus the city of every place its events were in, start and end of journeys included. Stops never visited don't count, just like countries.
+- **A city is a city and its country together,** so two cities with the same name in different countries both count.
+- **Events don't always store a city.** Work it out from the event's map position, the same way `useFixPostcodeCities` (`src/features/saves/fixCities.ts`) fixes saved places: once, in the background, saved on the event so it's never looked up twice. New events save their city when their place is saved. Never a postcode.
+- **Put it in one helper beside `tripCountries`** (for example `tripCities`) and use it in `ProfilePage.tsx`.
+- Check the Stat strip with a demo past trip that crosses several cities and countries.
+
 ## Part H — Trip edit
 
 **[People prompt]** Any traveller can edit the trip. The location is read-only after creation. Budget and currency are removed from Edit trip.
@@ -440,6 +450,7 @@ Report ✅, ❌ (with the reason) or ⚠️ (done, with a caveat) on every line.
 - [ ] Links show favicons (via the Worker); files show their type icon
 - [ ] Time zone checks reported, and any failures fixed
 - [ ] Dropdown has Size Small / Large in Figma and code (no `compact`); Text area drawn at its real height in Figma; both compared side by side
+- [ ] Your travels counts cities from every past trip's events (city + country, never a postcode); older events get their city once, in the background
 
 **Trip edit**
 - [ ] The cover only moves in Edit photo mode, with the overlay; Save locks it again; Change and Edit on the left, Remove as a Ghost button on the right; no swipe-to-close while editing
