@@ -7,11 +7,12 @@ import './design/base.css';
 import { App } from './app/App';
 import { applyTheme, getTheme } from './lib/theme';
 import { setupNative } from './lib/native';
+import { setupPress } from './lib/press';
 
 applyTheme(getTheme());
 setupNative();
-// iOS only shows :active (pressed) styles once a touch listener exists; this makes presses respond on touch-down.
-document.addEventListener('touchstart', () => {}, { passive: true });
+// The pressed look, like iOS: after a short delay, cancelled by a scroll or a drag, never stuck (src/lib/press.ts)
+setupPress();
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

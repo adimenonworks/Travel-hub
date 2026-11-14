@@ -19,7 +19,7 @@
   background: none; font: var(--type-label); color: var(--text-primary); text-align: left; cursor: pointer;
 }
 .item + .item { box-shadow: inset 0 var(--border-width-thin) 0 var(--border-divider); }
-.item:active { background: var(--button-ghost-background-pressed); }
+.item[data-pressed] { background: var(--button-ghost-background-pressed); }
 .destructive { color: var(--status-danger); }
 @keyframes dimIn { from { opacity: 0; } }
 @keyframes lift { from { transform: scale(0.96); } }

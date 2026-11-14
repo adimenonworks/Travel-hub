@@ -44,7 +44,7 @@
 }
 .animate { transition: transform var(--motion-fluid), width var(--motion-fluid); }
 .tab:hover { background: var(--control-unselected-ghost-background-hover); }
-.tab:active { background: var(--control-unselected-ghost-background-pressed); }
+.tab[data-pressed] { background: var(--control-unselected-ghost-background-pressed); }
 .tab:focus-visible { outline-offset: calc(-1 * var(--border-width-focus)); }
 .tab[aria-current='page'] { color: var(--control-selected-ghost-text); }
 .count { font-variant-numeric: tabular-nums; min-width: var(--size-500); padding: var(--space-100) var(--space-250); border-radius: var(--radius-full); background: var(--surface-sunken); font-size: var(--size-body-small); line-height: 1.2; text-align: center; }
