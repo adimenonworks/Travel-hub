@@ -93,6 +93,22 @@ service cloud.firestore {
       // Deleting for good: any traveller, and only once it's in Recently deleted (after 30 days, or deleting your account).
       allow delete: if signedIn() && travels(resource.data.roles.get(uid(), '')) && 'deletedAt' in resource.data;
 
+      // An event's change history: append-only. Everyone on the trip reads it; a traveller adds entries as themselves (item 3
+      // narrows that to the people in the event); nobody edits one; entries are deleted only with their event or trip, once
+      // that's in Recently deleted (it's then deleted for good).
+      match /activities/{eventId}/history/{changeId} {
+        function eventDoc() { return /databases/$(database)/documents/trips/$(tripId)/activities/$(eventId); }
+        allow read: if isMember(tripId);
+        allow create: if isTraveller(tripId)
+          && request.resource.data.by == uid()
+          && request.resource.data.at is number
+          && request.resource.data.field in ['title', 'date', 'time', 'place', 'price', 'people']
+          && request.resource.data.keys().hasOnly(['by', 'at', 'field', 'before', 'after', 'restoredFrom']);
+        allow update: if false;
+        allow delete: if isTraveller(tripId)
+          && (!exists(eventDoc()) || 'deletedAt' in get(eventDoc()).data || 'deletedAt' in tripData(tripId));
+      }
+
       // Activities, ideas, albums, comments (and old expenses): people on the trip only.
       // Travellers add and update (votes, who's going); followers can only comment. Only the person who added
       // something, or any traveller, can delete it; comments can only be edited or deleted by their author. Text has size limits:
