@@ -88,7 +88,7 @@ One Claude Code account does this work now (owner, 13 Nov 2026), so the old two-
 | Role | Who | Can |
 | --- | --- | --- |
 | **Travelling** | Anyone on the trip, even for part of it | Plans everything, joins events, has their own bookings and budget |
-| **Following** | Family at home, or a friend who isn't on the trip | Sees the plan and chats. Never sees prices, booking details or budgets. Can't add, change, vote or delete |
+| **Following** | Family at home, or a friend who isn't on the trip | Sees the plan (each event's title, date and time, place and who's in) and chats. Never sees notes, links, files, event comments, prices, booking details or budgets. Can't add, change, vote or delete |
 
 - **Add people:**
   - opens a Sheet with two Option cards, **Travelling** and **Following**, each with one line:
@@ -171,7 +171,8 @@ One Claude Code account does this work now (owner, 13 Nov 2026), so the old two-
 - **By default** the Itinerary shows **only your events**, each with who's in.
 - **Person switcher** at the top of the Itinerary:
   - a Chip row with **Me**, then each traveller (avatar and first name);
-  - choosing someone shows **their itinerary only**, as they see it, minus prices and booking details unless you're in that event;
+  - choosing someone shows **their itinerary only**;
+  - **on their events you're not in, you see only the title, date and time, place and who's in** (owner's rule, 14 Nov 2026). No notes, links, files, comments, prices or bookings. The same holds wherever you meet an event you're not in, including its event page: the event's details stay with the people going. Tapping **I'm in** shows the rest;
   - on their events you're also in, a Tag **"You're in"**;
   - on their events you're not in, an **I'm in** button.
 - **There is no combined "everyone" view.**
@@ -269,6 +270,7 @@ One Claude Code account does this work now (owner, 13 Nov 2026), so the old two-
 - **Still not built:** settling up, or tracking who owes whom. A share is what something costs *you*.
 - **Privacy has to be real, not just hidden in the interface.** Firestore sends whole documents, so a price inside the event document can be read by anyone who can read the event.
   - Store prices in documents the rules only let people in the event read.
+  - **The same goes for an event's notes, links, files and comments** (owner's rule, 14 Nov 2026, item 5): keep only the title, date and time, place and who's in in the event document every trip member reads, and move the rest into documents only the people in the event can read. Add it to the migration and the rules tests.
   - Store budgets where only their owner can read them, e.g. `trips/{id}/budgets/{uid}`.
 
 ## 9. Guests on a single event
@@ -353,6 +355,7 @@ Report ✅, ❌ (with the reason) or ⚠️ (done, with a caveat) on every line.
 - [ ] Add people asks Travelling or Following first, and the link carries the role; People is one list with a role dropdown on each row
 - [ ] Followers never receive prices, bookings or budgets from the database, not just on screen (test with the rules emulator)
 - [ ] Only travellers in an event can edit it; others see it read-only with I'm in
+- [ ] On an event you're not in (another person's itinerary, its event page, as a follower), only the title, date and time, place and who's in reach the phone; notes, links, files, comments, prices and bookings don't (test with the rules emulator)
 - [ ] Deleting a shared event offers "Just me" (the default) or "Remove for everyone"
 - [ ] Every edit and delete has an Undo toast; Changes shows history with Restore; Recently deleted shows who deleted
 - [ ] New events default to everyone; bookings default to you; ideas default to their voters
