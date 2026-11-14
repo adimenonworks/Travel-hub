@@ -14,6 +14,15 @@
 
 ## 14 Nov 2026
 
+### Page header keeps its simple back button and trailing button
+- **Decision (owner):** no separate "Back label" property and no free-form trailing slot on the Page header. The back label stays the label of the Button nested inside it, and the trailing spot stays one Icon button, shown or hidden.
+- **Why:** the back label can already be changed in Figma by editing the nested Button, and the app only ever puts the edit button on the right. Both would be settings nothing uses.
+- **Replaces:** the component library prompt's ask for both (13 Nov 2026), which wasn't built.
+
+### Two Figma mismatches go into the polish prompt
+- **Decision (owner):** Dropdown gets Size Small / Large in Figma (replacing code's `compact`), and Figma's Text area is drawn at its real height. Both are G8 in `rove-change-polish-and-library.md`.
+- **Why:** components must always match exactly; library v2 found both and left them.
+
 ### The transparency documents
 - **Decision:**
   - `docs/ROADMAP.md` is the source of truth for the roadmap. The Figma Planning board is a visual copy, redrawn one way only from the file.

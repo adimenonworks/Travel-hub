@@ -351,6 +351,12 @@ This is built ("Layovers & time zones"); confirm it:
 - **Countdowns and the now-line** compare real moments in UTC.
 - **Report any case that breaks, and fix it.**
 
+### G8. Two components that don't match Figma (found 14 Nov 2026)
+Library v2 left two places where the code and Figma disagree. Figma first, then code, as always.
+- **Dropdown's smaller size.** The code has `Dropdown compact` (44px, used beside a small button), but Figma's Dropdown has no such size. Add **Size: Small / Large** to Figma's Dropdown, like Button: Large is today's default height, Small is the compact one, both from the `size/*` variables. In code, replace `compact` with `size="small" | "large"` (default Large) and update every caller. Show both sizes on `/#/design`.
+- **Text area's height.** Figma draws Text area at the same height as a one-line Text field; in the app it's taller and grows with its text. Redraw Figma's Text area at the app's real minimum height, with its sizes from variables, so the two match. No code change unless the comparison finds one.
+- Compare each side by side (Figma screenshot vs `/#/design`) before the pull request.
+
 ## Part H — Trip edit
 
 **[People prompt]** Any traveller can edit the trip. The location is read-only after creation. Budget and currency are removed from Edit trip.
@@ -433,6 +439,7 @@ Report ✅, ❌ (with the reason) or ⚠️ (done, with a caveat) on every line.
 - [ ] Pressed rows fill their container edge to edge, with matching corners and no sliver
 - [ ] Links show favicons (via the Worker); files show their type icon
 - [ ] Time zone checks reported, and any failures fixed
+- [ ] Dropdown has Size Small / Large in Figma and code (no `compact`); Text area drawn at its real height in Figma; both compared side by side
 
 **Trip edit**
 - [ ] The cover only moves in Edit photo mode, with the overlay; Save locks it again; Change and Edit on the left, Remove as a Ghost button on the right; no swipe-to-close while editing
