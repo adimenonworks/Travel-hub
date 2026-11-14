@@ -24,15 +24,7 @@ Every card in Now, Next and Later has a **How we'd build it** line: the approach
 
 Built in this order. Progress is in `docs/changes/PROGRESS.md`.
 
-### 1. New trip stops and Home's main button
-`docs/changes/rove-change-new-trip-stops.md`
-- **Home:** Plan a trip is the Primary button, Save a place Neutral.
-- **New trip takes several places** ("Add every stop, or just the first"); a trip covers its stops plus every place on its events. Overview's "Countries you're visiting" (was Good to know) shows them, with "No plans yet" on unplanned stops; after the trip, only countries with events count. No stops list in Edit trip.
-- **Bring your saves** only shows the trip's countries, and is skipped when nothing matches. Add from saved also offers other countries.
-
-**How we'd build it:** the change prompt, run by Claude Code. A new `trip.stops` field (older trips read as their one place), possibly a rules update. Small to medium. Nothing for the owner beyond reviewing.
-
-### 2. People, sharing and money
+### 1. People, sharing and money
 `docs/changes/rove-change-people-and-sharing.md`
 - **One shared trip, everyone equal.** "Join", never "invited into my trip"; any traveller can edit or delete it (Recently deleted keeps it 30 days).
 - **Travelling and Following** replace Planner and Viewer. Followers see the plan and chat, never prices or bookings.
@@ -43,11 +35,11 @@ Built in this order. Progress is in `docs/changes/PROGRESS.md`.
 - **Ideas:** To decide · Passed. A dated idea shows on its day as a suggestion with I'm in and Pass.
 - **Bookings:** one shared event, with each person's own "Your booking" (reference, seat, bags, files).
 - **Prices** are a total split by who's in (or "Each"), each in its own currency. **Budgets are personal and private,** in your Settings currency.
-- **Trip edit:** the trip's places aren't edited after creation (see 1).
+- **Trip edit:** the trip's places aren't edited after creation (built 14 Nov: New trip stops).
 
 **How we'd build it:** the change prompt, run by Claude Code. Firestore rules and tests change with the model (prices, bookings and budgets in documents only their people can read). Large. The owner reviews the Collections storage plan and publishes the rules.
 
-### 3. Trip polish, notifications, saving and Collections
+### 2. Trip polish, notifications, saving and Collections
 `docs/changes/rove-change-polish-and-library.md`
 - **Itinerary:** swiping between days follows your finger; no month markers.
 - **Edit sheets:** sectioned and calmer; no automatic keyboard; no jumping. Type is changed with Change type.
@@ -212,7 +204,8 @@ What Rove does today (on Main, in the iPhone app).
 - **Saving places:** from any app (Share → Rove) or a pasted link. Rove reads the link and finds the place, city and category; "Saving to · Change", Undo toast, works offline, merges duplicates. Share to Rove can also add to a trip (11 Nov; Now, 2 narrows the Trip tab to ideas).
 - **Collections:** every place filed country → city → category; links & notes per country; Map card; Visited ✓ and favourite ★.
 - **Shared collections** (11 Nov): share a country's collection by link, as Can edit or Can view; "Saved by you and Sam"; enforced by the rules.
-- **Planning a trip:** full-screen New trip (where; exact dates or a rough month; who; bring your saves), then the celebration.
+- **Planning a trip:** Home's Primary "Plan a trip", then full-screen New trip (every stop, or just the first; exact dates or a rough month; who; bring your saves from the trip's countries, skipped when none match), then the celebration.
+- **New trip stops** (14 Nov): a trip covers its stops plus every place on its events; Overview's Countries you're visiting shows them ("No plans yet" on unplanned stops); after the trip only countries with events count, also in Your travels; Ideas → Add from saved offers other saved countries too.
 - **Trips library:** Upcoming · Collections · Past with Hero cards, the remembered segment, empty states.
 - **A trip:**
   - Overview: Next stop, Bookings, Recently viewed, Countries you’re visiting;
