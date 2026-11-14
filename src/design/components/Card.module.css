@@ -1,10 +1,10 @@
 /* Figma "Card": the grey container (on-light/surface/secondary), no border, 24px corners */
 .card {
-  background: var(--on-light-surface-secondary);
+  background: var(--surface-secondary);
   border: 1px solid transparent;
   border-radius: var(--radius-600);
   padding: var(--space-inset);
-  color: var(--on-light-text-primary);
+  color: var(--text-primary);
 }
 .flush { padding: 0; overflow: hidden; }
 
@@ -17,26 +17,28 @@
 /* Layout=Centre (an empty state): everything centred */
 .centre { align-items: center; text-align: center; }
 
-.media { flex: none; display: grid; place-items: center; color: var(--on-light-icon-brand); }
+.media { flex: none; display: grid; place-items: center; color: var(--icon-brand); }
 /* The Media slot's default: an icon on the light emerald tile */
-.mediaTile { display: grid; place-items: center; padding: var(--space-default-300); border-radius: var(--radius-300); background: var(--on-light-surface-brand); color: var(--on-light-icon-brand); }
-.structured .mediaTile { padding: 0; border-radius: var(--radius-200); background: none; color: var(--on-light-icon-primary); } /* Figma Card Media: a plain 16px icon */
+.mediaTile { display: grid; place-items: center; padding: var(--space-default-300); border-radius: var(--radius-300); background: var(--surface-brand); color: var(--icon-brand); }
+.structured .mediaTile { padding: 0; border-radius: var(--radius-200); background: none; color: var(--icon-primary); } /* Figma Card Media: a plain 16px icon */
 .content { min-width: 0; display: flex; flex-direction: column; gap: var(--space-default-300); }
-.title { color: var(--on-light-text-primary); }
-.body { color: var(--on-light-text-secondary); }
+.title { color: var(--text-primary); }
+.body { color: var(--text-secondary); }
 .buttons { display: flex; flex-wrap: wrap; gap: var(--space-default-300); }
 
-/* Tone=Accent: the deep green card (on-dark/surface/brand). The global surface-dark class re-points every on-light
-   token inside it to the on-dark token of the same name, so its text and icons turn light; its button is Primary. */
-.accent { border-color: transparent; background: var(--on-dark-surface-brand); } /* .card's own background would otherwise win over .surface-dark (it reads the re-pointed secondary, a lighter green) */
+/* Tone=Accent: the deep green card (feature/surface): light text and icons; its button is Primary. */
+.accent { border-color: transparent; background: var(--feature-surface); color: var(--feature-text); }
+.accent .title { color: var(--feature-text); }
+.accent .body { color: var(--feature-text-secondary); }
+.accent .media, .accent .structured .mediaTile, .accent.structured .mediaTile { color: var(--feature-icon); }
 
 .interactive { position: relative; isolation: isolate; cursor: pointer; transition: transform var(--motion-release), background var(--motion-fast); text-align: left; width: 100%; color: inherit; display: block; }
 .interactive.structured { display: flex; } /* a structured Card that is a link keeps its column layout */
 .interactive::after { content: ''; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; transition: background var(--motion-fast); }
-.interactive:hover::after { background: var(--interactive-button-ghost-background-hover); }
-.interactive:active::after { background: var(--interactive-button-ghost-background-pressed); }
+.interactive:hover::after { background: var(--button-ghost-background-hover); }
+.interactive:active::after { background: var(--button-ghost-background-pressed); }
 .interactive:active { transform: scale(0.98); transition: transform var(--motion-press); }
 
 .section { display: flex; flex-direction: column; gap: var(--space-default-400); }
 .sectionHeader { display: flex; align-items: center; justify-content: space-between; gap: var(--space-default-400); min-height: var(--size-tap); flex-wrap: wrap; }
-.sectionTitle { font: var(--type-heading-2); letter-spacing: -0.01em; color: var(--on-light-text-primary); }
+.sectionTitle { font: var(--type-heading-2); letter-spacing: -0.01em; color: var(--text-primary); }

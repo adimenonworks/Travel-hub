@@ -31,11 +31,11 @@
 .t-link { font: var(--type-link); }
 .t-link-small { font: var(--type-link-small); }
 
-.t-display, .t-display-tiny { color: var(--on-light-text-brand); }
-.t-heading-1, .t-heading-2, .t-heading-3, .t-heading-4 { color: var(--on-light-text-primary); }
+.t-display, .t-display-tiny { color: var(--text-brand); }
+.t-heading-1, .t-heading-2, .t-heading-3, .t-heading-4 { color: var(--text-primary); }
 
 /* Helpers */
-.t-secondary { color: var(--on-light-text-secondary); }
-.t-danger { color: var(--on-light-status-error); }
+.t-secondary { color: var(--text-secondary); }
+.t-danger { color: var(--status-danger); }
 .t-bold { font-weight: var(--weight-semibold); }
 .t-num { font-variant-numeric: tabular-nums; }

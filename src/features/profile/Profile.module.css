@@ -8,7 +8,7 @@
 .nameRow > button { margin-bottom: var(--space-default-100); } /* the 40px Icon button centred on the 48px field */
 .appearance { display: flex; flex-direction: column; gap: var(--space-default-700); padding: var(--space-default-500); } /* Figma: card padding 16 */
 /* The map of places you've been: a deliberate viewport, 24 corners */
-.map { border-radius: var(--radius-600); overflow: hidden; border: 1px solid var(--on-light-border-subtle); }
+.map { border-radius: var(--radius-600); overflow: hidden; border: 1px solid var(--border-subtle); }
 
 .version { text-align: center; }
 .account { display: flex; flex-direction: column; gap: var(--space-default-400); }
@@ -16,6 +16,6 @@
 .privacy { color: inherit; text-decoration: underline; text-underline-offset: 2px; display: inline-flex; align-items: center; min-height: var(--size-tap); }
 /* Privacy policy: body text, bullet lists */
 .policy { display: flex; flex-direction: column; gap: var(--space-stack); }
-.policyText { display: flex; flex-direction: column; gap: var(--space-default-400); color: var(--on-light-text-primary); }
+.policyText { display: flex; flex-direction: column; gap: var(--space-default-400); color: var(--text-primary); }
 .policyText ul { margin: 0; padding-left: var(--space-default-700); display: flex; flex-direction: column; gap: var(--space-default-300); }
 .policyText p { margin: 0; }

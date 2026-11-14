@@ -51,11 +51,11 @@ export function LinkButton({ to, href, tone, size, block, icon, iconEnd, label, 
 }
 
 /** Figma Icon button tones */
-export type IconButtonTone = 'secondary' | 'ghost' | 'on-brand' | 'primary';
+export type IconButtonTone = 'secondary' | 'ghost' | 'on-feature' | 'primary';
 
 /**
- * Figma "Icon button" (Tone Secondary / Ghost / On brand / Primary): a 40px circle with a 24px icon, inside a 44px tap area.
- * Secondary is the neutral grey circle, Ghost is clear; On brand sits on the bright emerald flow screens; Primary is
+ * Figma "Icon button" (Tone Secondary / Ghost / On feature / Primary): a 40px circle with a 24px icon, inside a 44px tap area.
+ * Secondary is the neutral grey circle, Ghost is clear; On feature sits on the deep green New trip flow (feature/surface-sunken, feature/icon); Primary is
  * emerald, for the one main action in a row (Send a comment).
  * `label` is required: it's what screen readers announce.
  */

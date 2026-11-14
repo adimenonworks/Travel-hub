@@ -17,40 +17,40 @@
 .regular { min-height: var(--size-control-sm); padding: var(--space-default-250) var(--space-default-400); gap: var(--space-default-200); font: var(--type-label); }
 .regular::after { content: ''; position: absolute; inset: calc((var(--size-control-sm) - var(--size-tap)) / 2) 0; }
 
-.primary { background: var(--interactive-button-primary-background); color: var(--interactive-button-primary-text); }
-@media (hover: hover) { .primary:hover:not(:disabled) { background: var(--interactive-button-primary-background-hover); } }
-.primary:active:not(:disabled) { background: var(--interactive-button-primary-background-pressed); }
-.primary:disabled { background: var(--interactive-button-primary-disabled-background); color: var(--interactive-button-primary-disabled-foreground); }
+.primary { background: var(--button-primary-background); color: var(--button-primary-text); }
+@media (hover: hover) { .primary:hover:not(:disabled) { background: var(--button-primary-background-hover); } }
+.primary:active:not(:disabled) { background: var(--button-primary-background-pressed); }
+.primary:disabled { background: var(--button-primary-disabled-background); color: var(--button-primary-disabled-text); }
 
 
-.destructive { background: var(--interactive-button-destructive-background); color: var(--interactive-button-destructive-text); }
-@media (hover: hover) { .destructive:hover:not(:disabled) { background: var(--interactive-button-destructive-background-hover); } }
-.destructive:active:not(:disabled) { background: var(--interactive-button-destructive-background-pressed); }
-.destructive:disabled { background: var(--interactive-button-destructive-disabled-background); color: var(--interactive-button-destructive-disabled-foreground); }
+.destructive { background: var(--button-destructive-background); color: var(--button-destructive-text); }
+@media (hover: hover) { .destructive:hover:not(:disabled) { background: var(--button-destructive-background-hover); } }
+.destructive:active:not(:disabled) { background: var(--button-destructive-background-pressed); }
+.destructive:disabled { background: var(--button-destructive-disabled-background); color: var(--button-destructive-disabled-text); }
 
 /* Inverse: the deep emerald button that sits on a brand (emerald) surface */
-.inverse { background: var(--interactive-button-inverse-brand-background); color: var(--interactive-button-inverse-brand-text); }
-@media (hover: hover) { .inverse:hover:not(:disabled) { background: var(--interactive-button-inverse-brand-background-hover); } }
-.inverse:active:not(:disabled) { background: var(--interactive-button-inverse-brand-background-pressed); }
-.inverse:disabled { background: var(--interactive-button-inverse-brand-disabled-background); color: var(--interactive-button-inverse-brand-disabled-foreground); }
+.inverse { background: var(--button-inverse-background); color: var(--button-inverse-text); }
+@media (hover: hover) { .inverse:hover:not(:disabled) { background: var(--button-inverse-background-hover); } }
+.inverse:active:not(:disabled) { background: var(--button-inverse-background-pressed); }
+.inverse:disabled { background: var(--button-inverse-disabled-background); color: var(--button-inverse-disabled-text); }
 
 /* Neutral: the dark grey button */
-.neutral { background: var(--interactive-button-inverse-neutral-background); color: var(--interactive-button-inverse-neutral-text); }
-@media (hover: hover) { .neutral:hover:not(:disabled) { background: var(--interactive-button-inverse-neutral-background-hover); } }
-.neutral:active:not(:disabled) { background: var(--interactive-button-inverse-neutral-background-pressed); }
-.neutral:disabled { background: var(--interactive-button-inverse-neutral-disabled-background); color: var(--interactive-button-inverse-neutral-disabled-foreground); }
+.neutral { background: var(--button-neutral-background); color: var(--button-neutral-text); }
+@media (hover: hover) { .neutral:hover:not(:disabled) { background: var(--button-neutral-background-hover); } }
+.neutral:active:not(:disabled) { background: var(--button-neutral-background-pressed); }
+.neutral:disabled { background: var(--button-neutral-disabled-background); color: var(--button-neutral-disabled-text); }
 
 /* Tertiary: outlined (1.5px on Regular, 2px on Large), used on accent surfaces */
-.tertiary { background: var(--interactive-button-tertiary-background); color: var(--interactive-button-tertiary-text); box-shadow: inset 0 0 0 1.5px var(--interactive-button-tertiary-border); }
-.tertiary.large { box-shadow: inset 0 0 0 2px var(--interactive-button-tertiary-border); }
-@media (hover: hover) { .tertiary:hover:not(:disabled) { background: var(--interactive-button-tertiary-background-hover); } }
-.tertiary:active:not(:disabled) { background: var(--interactive-button-tertiary-background-pressed); }
-.tertiary:disabled { background: var(--interactive-button-tertiary-disabled-background); color: var(--interactive-button-tertiary-disabled-foreground); box-shadow: inset 0 0 0 1.5px var(--interactive-button-tertiary-disabled-foreground); }
+.tertiary { background: var(--button-tertiary-background); color: var(--button-tertiary-text); box-shadow: inset 0 0 0 1.5px var(--button-tertiary-border); }
+.tertiary.large { box-shadow: inset 0 0 0 2px var(--button-tertiary-border); }
+@media (hover: hover) { .tertiary:hover:not(:disabled) { background: var(--button-tertiary-background-hover); } }
+.tertiary:active:not(:disabled) { background: var(--button-tertiary-background-pressed); }
+.tertiary:disabled { background: var(--button-tertiary-disabled-background); color: var(--button-tertiary-disabled-text); box-shadow: inset 0 0 0 1.5px var(--button-tertiary-disabled-text); }
 
-.ghost { background: var(--interactive-button-ghost-background); color: var(--interactive-button-ghost-text); }
-@media (hover: hover) { .ghost:hover:not(:disabled) { background: var(--interactive-button-ghost-background-hover); } }
-.ghost:active:not(:disabled) { background: var(--interactive-button-ghost-background-pressed); }
-.ghost:disabled { background: var(--interactive-button-ghost-disabled-background); color: var(--interactive-button-ghost-disabled-foreground); }
+.ghost { background: var(--button-ghost-background); color: var(--button-ghost-text); }
+@media (hover: hover) { .ghost:hover:not(:disabled) { background: var(--button-ghost-background-hover); } }
+.ghost:active:not(:disabled) { background: var(--button-ghost-background-pressed); }
+.ghost:disabled { background: var(--button-ghost-disabled-background); color: var(--button-ghost-disabled-text); }
 
 .button:disabled { cursor: default; }
 .block { width: 100%; }
@@ -68,28 +68,28 @@
 .iconSmall { width: var(--size-control-sm); height: var(--size-control-sm); }
 .iconSmall::after { inset: calc((var(--size-control-sm) - var(--size-tap)) / 2); }
 .iconButton:active:not(:disabled) { transform: scale(0.92); transition: background var(--motion-fast), transform var(--motion-press); }
-.icon-secondary { background: var(--on-light-surface-secondary); color: var(--on-light-icon-primary); } /* Figma Icon button Secondary: neutral grey */
-@media (hover: hover) { .icon-secondary:hover:not(:disabled) { box-shadow: inset 0 0 0 100vmax var(--interactive-unselected-ghost-background-hover); } }
-.icon-secondary:active:not(:disabled) { box-shadow: inset 0 0 0 100vmax var(--interactive-unselected-ghost-background-pressed); }
-.icon-ghost { background: var(--interactive-button-ghost-background); color: var(--interactive-button-ghost-icon); }
-@media (hover: hover) { .icon-ghost:hover:not(:disabled) { background: var(--interactive-button-ghost-background-hover); } }
-.icon-ghost:active:not(:disabled) { background: var(--interactive-button-ghost-background-pressed); }
-.icon-on-brand { background: var(--on-mid-surface-sunken); color: var(--on-mid-icon-primary); }
+.icon-secondary { background: var(--surface-secondary); color: var(--icon-primary); } /* Figma Icon button Secondary: neutral grey */
+@media (hover: hover) { .icon-secondary:hover:not(:disabled) { box-shadow: inset 0 0 0 100vmax var(--control-unselected-ghost-background-hover); } }
+.icon-secondary:active:not(:disabled) { box-shadow: inset 0 0 0 100vmax var(--control-unselected-ghost-background-pressed); }
+.icon-ghost { background: var(--button-ghost-background); color: var(--button-ghost-icon); }
+@media (hover: hover) { .icon-ghost:hover:not(:disabled) { background: var(--button-ghost-background-hover); } }
+.icon-ghost:active:not(:disabled) { background: var(--button-ghost-background-pressed); }
+.icon-on-feature { background: var(--feature-surface-sunken); color: var(--feature-icon); }
 /* Figma Icon button Primary: emerald, for the one main action in a row (Send a comment) */
-.icon-primary { background: var(--interactive-button-primary-background); color: var(--interactive-button-primary-icon); }
-@media (hover: hover) { .icon-primary:hover:not(:disabled) { background: var(--interactive-button-primary-background-hover); } }
-.icon-primary:active:not(:disabled) { background: var(--interactive-button-primary-background-pressed); }
-@media (hover: hover) { .icon-on-brand:hover:not(:disabled) { background: var(--interactive-button-ghost-background-pressed); } }
-.iconButton:disabled { cursor: default; color: var(--interactive-button-ghost-disabled-foreground); }
-.icon-primary:disabled { background: var(--interactive-button-primary-disabled-background); color: var(--interactive-button-primary-disabled-foreground); }
+.icon-primary { background: var(--button-primary-background); color: var(--button-primary-icon); }
+@media (hover: hover) { .icon-primary:hover:not(:disabled) { background: var(--button-primary-background-hover); } }
+.icon-primary:active:not(:disabled) { background: var(--button-primary-background-pressed); }
+@media (hover: hover) { .icon-on-feature:hover:not(:disabled) { background: var(--button-ghost-background-pressed); } }
+.iconButton:disabled { cursor: default; color: var(--button-ghost-disabled-text); }
+.icon-primary:disabled { background: var(--button-primary-disabled-background); color: var(--button-primary-disabled-text); }
 
 /* Each variant's icons use its own icon token (Figma: …/icon), separate from the label colour. */
-.primary .glyph { color: var(--interactive-button-primary-icon); }
-.destructive .glyph { color: var(--interactive-button-destructive-icon); }
-.inverse .glyph { color: var(--interactive-button-inverse-brand-icon); }
-.neutral .glyph { color: var(--interactive-button-inverse-neutral-icon); }
-.tertiary .glyph { color: var(--interactive-button-tertiary-icon); }
-.ghost .glyph { color: var(--interactive-button-ghost-icon); }
+.primary .glyph { color: var(--button-primary-icon); }
+.destructive .glyph { color: var(--button-destructive-icon); }
+.inverse .glyph { color: var(--button-inverse-icon); }
+.neutral .glyph { color: var(--button-neutral-icon); }
+.tertiary .glyph { color: var(--button-tertiary-icon); }
+.ghost .glyph { color: var(--button-ghost-icon); }
 .button:disabled .glyph { color: inherit; }
 
 /* Loading: a ring in the label colour that turns (Reduce Motion: it stays still) */

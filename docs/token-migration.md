@@ -1,6 +1,6 @@
 # Token migration (library v2, A1)
 
-**Status: approved by the owner on 14 Nov 2026, with the answers below.** The tables show the approved names. The original questions are kept under "Decisions" for the record.
+**Status: approved by the owner on 14 Nov 2026, with the answers below. A2 and A3 are built.** The tables show the approved names. The original questions are kept under "Decisions" for the record.
 
 This is the record of every token's old name and new name for `docs/changes/rove-change-library-v2.md` (A2–A7). It was made on 14 Nov 2026 from Main (`185d1fa`) and the Figma file `cXoK1GzmzgqY0cmcgJw66W`.
 

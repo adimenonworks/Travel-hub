@@ -12,21 +12,19 @@ function Section({ title, footer, children }: { title: string; footer?: ReactNod
 
 // Colour by surface: same groups and names as the Figma "Color" collection. Every set has the same token names
 // (accents leave out status), so each one is shown on its own surface.
-const SET_TOKENS = ["surface-primary", "surface-secondary", "surface-brand", "surface-sunken", "text-primary", "text-secondary", "text-brand-yellow", "text-brand-orange", "text-brand-green", "text-brand-pink", "link-default", "link-hover", "link-pressed", "icon-primary", "icon-secondary", "icon-brand", "border-subtle", "border-bold", "border-focus", "border-brand", "divider-default", "illustration-primary", "illustration-secondary", "illustration-accent", "illustration-accent-bold", "illustration-accent-subtle", "illustration-warm", "illustration-warm-bold", "illustration-border", "status-success", "status-success-subtle", "status-warning", "status-warning-subtle", "status-error", "status-error-subtle"];
-const surfaceSets: { name: string; title: string; note: string }[] = [
-  { name: 'on-light', title: 'On light', note: 'White and light grey: the canvas, cards and sheets.' },
-  { name: 'on-mid', title: 'On mid', note: 'Bright emerald: the Hero card frame and accent cards.' },
-  { name: 'on-dark', title: 'On dark', note: 'Deep emerald: the Hero card panel.' },
-];
-// On accent: one set shared by every accent surface (they share one tone), so only the surface changes.
-const ACCENTS = ['yellow', 'orange', 'green', 'pink'];
 const PALETTES = ['emerald', 'green', 'orange', 'red', 'yellow', 'pink', 'sky', 'violet', 'neutral'];
 const STEPS = [0, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000];
-const ACCENT_TOKENS = ["surface-sunken", "text-primary", "text-secondary", "text-brand-yellow", "text-brand-orange", "text-brand-green", "text-brand-pink", "link-default", "link-hover", "link-pressed", "icon-primary", "icon-secondary", "icon-brand-yellow", "icon-brand-orange", "icon-brand-green", "icon-brand-pink", "border-subtle", "border-bold", "border-focus", "border-brand", "divider-default", "illustration-primary", "illustration-secondary", "illustration-accent", "illustration-accent-bold", "illustration-accent-subtle", "illustration-warm", "illustration-warm-bold", "illustration-border"];
-const colorGroups: { title: string; tokens: string[] }[] = [
-  { title: 'Interactive / button (hover lighter, pressed darker)', tokens: ['--interactive-button-primary-background', '--interactive-button-primary-background-hover', '--interactive-button-primary-background-pressed', '--interactive-button-ghost-background-hover', '--interactive-button-ghost-background-pressed', '--interactive-button-inverse-neutral-background', '--interactive-button-inverse-brand-background', '--interactive-button-tertiary-background', '--interactive-button-destructive-background', '--interactive-button-destructive-background-hover', '--interactive-button-destructive-background-pressed'] },
-  { title: 'Interactive / selected & unselected', tokens: ['--interactive-selected-primary-background', '--interactive-selected-secondary-background', '--interactive-selected-ghost-border', '--interactive-unselected-ghost-background', '--interactive-unselected-ghost-border', '--interactive-unselected-ghost-text'] },
-  { title: 'Input and overlay', tokens: ['--input-field-background', '--input-field-border', '--input-field-border-selected', '--overlay-scrim', '--overlay-image'] },
+// Figma's Color collection: one set (no surface sets since library v2). Feature tokens are shown on a feature surface.
+const colorGroups: { title: string; tokens: string[]; feature?: boolean }[] = [
+  { title: 'Surface', tokens: ['--surface-primary', '--surface-secondary', '--surface-sunken', '--surface-brand'] },
+  { title: 'Text', tokens: ['--text-primary', '--text-secondary', '--text-brand', '--text-link', '--text-link-hover', '--text-link-pressed'] },
+  { title: 'Icon and border', tokens: ['--icon-primary', '--icon-secondary', '--icon-brand', '--border-subtle', '--border-bold', '--border-focus', '--border-brand', '--border-divider'] },
+  { title: 'Status', tokens: ['--status-success', '--status-success-subtle', '--status-warning', '--status-warning-subtle', '--status-danger', '--status-danger-subtle'] },
+  { title: 'Feature (deep green: the Next card, accent Card, Stat strip, New trip)', feature: true, tokens: ['--feature-surface', '--feature-surface-secondary', '--feature-surface-sunken', '--feature-text', '--feature-text-secondary', '--feature-icon', '--feature-icon-secondary', '--feature-border-subtle', '--feature-divider', '--feature-border-focus', '--feature-status-warning'] },
+  { title: 'Button (hover lighter, pressed darker)', tokens: ['--button-primary-background', '--button-primary-background-hover', '--button-primary-background-pressed', '--button-neutral-background', '--button-inverse-background', '--button-tertiary-border', '--button-ghost-background-hover', '--button-ghost-background-pressed', '--button-destructive-background', '--button-destructive-background-hover', '--button-destructive-background-pressed'] },
+  { title: 'Control (selected and unselected)', tokens: ['--control-selected-background', '--control-selected-text', '--control-selected-ghost-border', '--control-selected-ghost-text', '--control-unselected-background', '--control-unselected-border', '--control-unselected-ghost-border', '--control-unselected-ghost-text'] },
+  { title: 'Input, tag, overlay and map', tokens: ['--input-background', '--input-border', '--input-border-focus', '--input-hint', '--tag-neutral-background', '--tag-category-background', '--overlay-scrim', '--overlay-bar', '--map-pin', '--map-pin-icon'] },
+  { title: 'Illustration', tokens: ['--illustration-primary', '--illustration-secondary', '--illustration-accent', '--illustration-accent-bold', '--illustration-accent-subtle', '--illustration-warm-bold', '--illustration-border'] },
 ];
 
 // One row per Figma text style, at the default iPhone text size.
@@ -84,49 +82,9 @@ export function DesignSystem() {
             </div>
           ))}
         </Section>
-        <Section title="Colour" footer="Semantic tokens from src/design/tokens/semantic.css, organised by the surface they sit on. Switch light/dark mode in Profile → Appearance.">
-          {surfaceSets.map((set) => (
-            <div key={set.name} className={s.surfaceSet} style={{ background: `var(--${set.name}-surface-primary)`, color: `var(--${set.name}-text-primary)` }}>
-              <div className="t-heading-4">{set.title}</div>
-              <p className="t-body-small" style={{ color: `var(--${set.name}-text-secondary)` }}>
-                {set.note} <span style={{ color: `var(--${set.name}-link-default)`, textDecoration: 'underline' }}>A link</span>
-              </p>
-              <div className={s.swatches}>
-                {SET_TOKENS.map((t) => (
-                  <div key={t} className={s.swatch}>
-                    <div className={s.chip} style={{ background: `var(--${set.name}-${t})`, boxShadow: `inset 0 0 0 1px var(--${set.name}-border-subtle)` }} />
-                    <code className={s.code} style={{ color: `var(--${set.name}-text-secondary)` }}>{set.name}-{t}</code>
-                  </div>
-                ))}
-              </div>
-            </div>
-          ))}
-          <Card>
-            <div className="t-heading-4">On accent</div>
-            <p className="t-body-small">Sparingly, for stand-out cards. Every accent shares the tokens on top except brand text and icons, which take the accent's own deep colour (for colour-drenched headings).</p>
-            <div className={s.accents}>
-              {ACCENTS.map((a) => (
-                <div key={a} className={s.surfaceSet} style={{ background: `var(--on-accent-surface-${a})`, color: 'var(--on-accent-text-primary)' }}>
-                  <div className="t-heading-4" style={{ color: `var(--on-accent-text-brand-${a})` }}>{a[0].toUpperCase() + a.slice(1)}</div>
-                  <p className="t-body-small" style={{ color: 'var(--on-accent-text-secondary)' }}>
-                    on-accent-surface-{a} <span style={{ color: 'var(--on-accent-link-default)', textDecoration: 'underline' }}>A link</span>
-                  </p>
-                </div>
-              ))}
-            </div>
-            <div className={s.surfaceSet} style={{ background: 'var(--on-accent-surface-yellow)', color: 'var(--on-accent-text-primary)' }}>
-              <div className={s.swatches}>
-                {ACCENT_TOKENS.map((t) => (
-                  <div key={t} className={s.swatch}>
-                    <div className={s.chip} style={{ background: `var(--on-accent-${t})`, boxShadow: 'inset 0 0 0 1px var(--on-accent-border-subtle)' }} />
-                    <code className={s.code} style={{ color: 'var(--on-accent-text-secondary)' }}>on-accent-{t}</code>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </Card>
+        <Section title="Colour" footer="The Figma Color collection (Light and Dark), from src/design/tokens/semantic.css: one set for every surface, plus feature/* for the deep green. Switch light/dark mode in You → Appearance.">
           {colorGroups.map((g) => (
-            <Card key={g.title}>
+            <Card key={g.title} tone={g.feature ? 'accent' : 'default'}>
               <div className="t-heading-4" style={{ marginBottom: 'var(--space-default-400)' }}>{g.title}</div>
               <div className={s.swatches}>
                 {g.tokens.map((t) => (
@@ -231,10 +189,10 @@ export function DesignSystem() {
             <IconButton icon="send" label="Send (Primary, disabled)" tone="primary" disabled />
             <Select compact aria-label="Compact select (matches a small button)"><option>Organizer</option><option>Member</option></Select>
           </Card>
-          <Card tone="accent" className={s.row}><Button tone="inverse">Inverse</Button><IconButton icon="x" label="Close (On brand)" tone="on-brand" /></Card>
+          <Card tone="accent" className={s.row}><Button tone="inverse">Inverse</Button><IconButton icon="x" label="Close (On feature)" tone="on-feature" /></Card>
         </Section>
 
-        <Section title="Navigation" footer="Tabs switch between sections of a page (each trip uses them). The current tab is darker and underlined in emerald (--interactive-selected-ghost-border).">
+        <Section title="Navigation" footer="Tabs switch between sections of a page (each trip uses them). The current tab is darker and underlined in emerald (--control-selected-ghost-border).">
           <Card>
             <Tabs label="Demo tabs" items={[
               { to: '/design', label: 'Current', active: true },
@@ -329,10 +287,10 @@ export function DesignSystem() {
           </div>
         </Section>
 
-        <Section title="Category icon, event page header and Context menu" footer=".Category icon is the one place an event type's colour lives (Event card, List item, Idea row, Option card and the Page header nest it): Size Small 32 / Regular 40 / Large 48; Tone Secondary (grey Neutral tile, on white), Primary (white, on a grey card), On dark (on the Next card). Page header Title small with Show leading icon and Show subtitle (the time). Context menu: what a long press on your own comment opens (Edit, Delete in red); tap the bubble to see it.">
+        <Section title="Category icon, event page header and Context menu" footer=".Category icon is the one place an event type's colour lives (Event card, List item, Idea row, Option card and the Page header nest it): Size Small 32 / Regular 40 / Large 48; Tone Secondary (grey Neutral tile, on white), Primary (white, on a grey card), On feature (on the Next card). Page header Title small with Show leading icon and Show subtitle (the time). Context menu: what a long press on your own comment opens (Edit, Delete in red); tap the bubble to see it.">
           {/* Figma `.Category icon`: Type × Size × Tone, the rows as on Foundations */}
-          {([['regular', 'secondary'], ['regular', 'primary'], ['regular', 'on-dark'], ['large', 'primary'], ['small', 'primary']] as const).map(([size, tone]) => (
-            <div key={size + tone} className={[s.chipRow, tone === 'on-dark' && 'surface-dark'].filter(Boolean).join(' ')} style={tone === 'primary' ? { background: 'var(--on-light-surface-secondary)', borderRadius: 'var(--radius-600)', padding: 'var(--space-default-300)' } : tone === 'on-dark' ? { background: 'var(--on-dark-surface-brand)', borderRadius: 'var(--radius-600)', padding: 'var(--space-default-300)' } : undefined}>
+          {([['regular', 'secondary'], ['regular', 'primary'], ['regular', 'on-feature'], ['large', 'primary'], ['small', 'primary']] as const).map(([size, tone]) => (
+            <div key={size + tone} className={[s.chipRow, tone === 'on-feature' && 'feature'].filter(Boolean).join(' ')} style={tone === 'primary' ? { background: 'var(--surface-secondary)', borderRadius: 'var(--radius-600)', padding: 'var(--space-default-300)' } : tone === 'on-feature' ? { background: 'var(--feature-surface)', borderRadius: 'var(--radius-600)', padding: 'var(--space-default-300)' } : undefined}>
               {(['neutral', 'travel', 'stays', 'food', 'activities', 'notes'] as const).map((t) => <CategoryIcon key={t} icon={t === 'food' ? 'grape' : 'plane'} type={t} size={size} tone={tone} />)}
             </div>
           ))}

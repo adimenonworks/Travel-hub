@@ -560,7 +560,7 @@ The same text sits on the Figma Foundations page ("Glossary", beside the Compone
 | Property | Means | Values |
 | --- | --- | --- |
 | `Type` | Event type (sets the colour). Only on `.Category icon` (nested in Event card, List item, Idea row, Option card, Page header) and Chip | Neutral · Travel · Stays · Food & drink · Activities · Notes |
-| `Tone` | Colour role, not event type | Default · Accent · Neutral · Success · Warning · Danger. Buttons use their own roles: Primary · Destructive · Inverse · Neutral · Tertiary · Ghost; Icon button: Secondary · Ghost · On brand · Primary; `.Category icon`, by the surface it sits on: Secondary · Primary · On dark |
+| `Tone` | Colour role, not event type | Default · Accent · Neutral · Success · Warning · Danger. Buttons use their own roles: Primary · Destructive · Inverse · Neutral · Tertiary · Ghost; Icon button: Secondary · Ghost · On feature · Primary; `.Category icon`, by the surface it sits on: Secondary · Primary · On feature |
 | `Size` | Size | Small · Regular · Large |
 | `State` | Interaction or status | Default · Pressed · Disabled · Selected · Focus · Filled · Next · Done · Suggested; plus a component's own statuses (Accordion: Collapsed · Expanded; `.Calendar day`: Range · Start · End · Empty; Step progress: Step 1–4) |
 | `Layout` | Structural variant | Per component (Event card: Standard · Journey · Note; Card: Start · Centre; Option card: Plain · Category; Journey card: Journey · Span; Text field: Input · Text area · Dropdown; Avatar: Initials · More; Message: Theirs · Mine; Skeleton: Text · Block · Circle) |
