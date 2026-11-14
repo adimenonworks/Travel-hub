@@ -51,7 +51,7 @@ Rove is a **web app wrapped inside an iPhone app**.
 | **Nominatim** | Turning an address into map coordinates | Free OpenStreetMap service |
 | **OpenStreetMap + Leaflet** [Leaflet is a map library] | Maps on event pages and You | Free map tiles; no Google Maps bill |
 | **ExchangeRate-API** (open endpoint) | Converting prices and budgets | Free daily rates, no key (credited in Settings) |
-| **Figma** | The design system: tokens [named design values: colours, spacing, corner sizes], components, icons; plus the Planning board | Figma is the source of truth for components; code matches it 1:1 |
+| **Figma** | The design system: tokens [named design values: colours, spacing, corner sizes], components, icons; plus the Planning board, a visual copy of `docs/ROADMAP.md` | Figma is the source of truth for components; code matches it 1:1 |
 | **GitHub** | Stores the code; pull requests [a proposed change, reviewed then merged] keep history | Standard; `Main` is the branch the app is built from |
 
 Retired or not used: the website (GitHub Pages) is frozen and only serves invite links; the `readLink` Cloud Function

@@ -6,7 +6,9 @@ Read this first when starting a session. If it disagrees with the code or Figma,
 
 `docs/changes/rove-change-component-library.md` (component library cleanup) is **finished** (13 Nov 2026; caveats in the Check everything results below).
 
-**Now: `docs/changes/rove-change-library-v2.md`** (owner, 14 Nov 2026), written from the 14 Nov Figma and code audit: token restructure, Size names, naming rules, component fixes. Then the transparency setup, then `rove-change-people-and-sharing.md`, then `rove-change-polish-and-library.md`.
+`docs/changes/rove-change-library-v2.md` is **finished** (14 Nov 2026; results below).
+
+**Next: `docs/changes/rove-change-transparency-setup.md`** (14 Nov 2026): the start-up check and the Planning board redrawn from `docs/ROADMAP.md`. The transparency documents themselves (`ROADMAP.md`, `DECISIONS.md`, the split `CLAUDE.md` with `DESIGN-SYSTEM.md`, `APP-SPEC.md`, `FEEL-AND-NATIVE.md`) were merged from the claude.ai chat the same day. Then `rove-change-people-and-sharing.md`, then `rove-change-polish-and-library.md`.
 
 ### Library v2 status (14 Nov 2026)
 
