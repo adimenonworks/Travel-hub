@@ -9,7 +9,7 @@ import { currencyLabel, entryRules, timeDifference, utcOffset } from '../../lib/
 type Spot = { name: string; lat: number; lng: number; countryCode?: string };
 
 /**
- * Figma "Country sheet", opened from the Overview's "Good to know". Emergency: the numbers, tap to call (only countries
+ * Figma "Country sheet", opened from the Overview's "Countries you’re visiting". Emergency: the numbers, tap to call (only countries
  * we're sure of, src/lib/emergency.ts). Before you go: Entry requirements (the destination's official government site,
  * never a third party; else your own government's advice), Local time compared with your home city, and the Currency.
  * `place`: a city in that country on the trip (for the local time); `home`: your home city.
