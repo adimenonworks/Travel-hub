@@ -260,7 +260,7 @@ export function CountryCollection() {
         action={shareable ? { icon: 'user-add', label: owner ? 'Share this collection' : 'People in this collection', onClick: () => { haptic('selection'); setPeople(true); } } : undefined} />
       {mine.length === 0 ? (
         <Card layout="centre" media={<Illustration name="map" size={120} />} title={`Nothing saved in ${title}`} body="Save cafés, bars, stays and sights you find online."
-          action={role === 'viewer' ? undefined : <Button icon="plus" onClick={() => { openSave({ mode: 'link' }); navigate('/trips'); }}>Save a place</Button>} />
+          actions={role === 'viewer' ? undefined : <Button icon="plus" onClick={() => { openSave({ mode: 'link' }); navigate('/trips'); }}>Save a place</Button>} />
       ) : (
         <>
           {/* Figma "Map card": the map with every place, the counts, how much you've visited and who it's with */}

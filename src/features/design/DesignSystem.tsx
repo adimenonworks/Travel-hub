@@ -205,7 +205,7 @@ export function DesignSystem() {
           <div className={s.cards}>
             <Card><div className="t-heading-3">Default card</div><p className="t-body-small t-secondary">White on the pale canvas, no shadow.</p></Card>
             <Card tone="accent"><div className="t-heading-3">Brand card</div><p className="t-body-small t-secondary">For the one thing that matters most on a page.</p><div><Button tone="inverse" icon="plus">Inverse button</Button></div></Card>
-            <Card tone="accent" media={<Icon name="globe" size={56}  />} action={<Button tone="inverse">Action</Button>}>
+            <Card tone="accent" media={<Icon name="globe" size={56}  />} actions={<Button tone="inverse">Action</Button>}>
               <div className="t-heading-3">Card with media and action</div><p className="t-body-small">The media sits on the left, the action on the right (below on phones).</p>
             </Card>
             <Card media={<Illustration name="memories" />}><div className="t-heading-4">Card with an illustration</div><p className="t-body-small t-secondary">Illustrations are for empty states and invitations.</p></Card>
@@ -397,7 +397,7 @@ export function DesignSystem() {
               <Button tone="neutral" onClick={() => toast({ size: 'large', icon: 'chat', label: 'Sam on Tram 28 to Alfama: Meet at the stop?', action: { label: 'Open', onClick: () => {} } })}>Large toast (message)</Button>
             </div>
           </Card>
-          <Card><Card layout="centre" media={<Illustration name="ideas" size={120} />} title="Empty state" body="Explains what goes here and how to start." action={<Button tone="neutral" onClick={() => setSheet(true)}>Open a sheet</Button>} /></Card>
+          <Card><Card layout="centre" media={<Illustration name="ideas" size={120} />} title="Empty state" body="Explains what goes here and how to start." actions={<Button tone="neutral" onClick={() => setSheet(true)}>Open a sheet</Button>} /></Card>
         </Section>
       </div>
       <Sheet open={sheet} title="Save to Rove" subtitle="A short task over the current screen" onClose={() => setSheet(false)} onSubmit={() => setSheet(false)} submitLabel="Save">

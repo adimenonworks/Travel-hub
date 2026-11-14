@@ -40,7 +40,7 @@ export function TripPage() {
     return (
       <Content>
         <Card layout="centre" media={<Illustration name="compass" size={120} />} title="Trip not found" body="It may have been deleted, or you're not a member yet. Ask the organizer for an invite link."
-          action={<LinkButton to="/trips" tone="neutral">Back to trips</LinkButton>} />
+          actions={<LinkButton to="/trips" tone="neutral">Back to trips</LinkButton>} />
       </Content>
     );
   return <TripLoaded trip={trip} />;

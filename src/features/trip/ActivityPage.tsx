@@ -73,7 +73,7 @@ export function ActivityPage(ctx: TripCtx) {
     return (
       <>
         <PageHeader title="Event not found" back={{ to: itinerary, label: 'Itinerary' }} />
-        <Card layout="centre" media={<Illustration name="calendar" size={120} />} title="This event was deleted" body="It may have been removed from the itinerary." action={<LinkButton to={itinerary} tone="neutral">Back to itinerary</LinkButton>} />
+        <Card layout="centre" media={<Illustration name="calendar" size={120} />} title="This event was deleted" body="It may have been removed from the itinerary." actions={<LinkButton to={itinerary} tone="neutral">Back to itinerary</LinkButton>} />
       </>
     );
 

@@ -40,7 +40,7 @@ export function Join() {
       <Content>
         <Card>
           <Card layout="centre" media={<Illustration name="ticket" size={120} />} title={expired ? 'This invite has expired' : 'Invite not found'} body={invite?.kind === 'collection' ? 'Ask whoever shared it for a new link.' : 'Ask the trip organizer for a new link.'}
-            action={<LinkButton to="/" tone="neutral">{joinOnly() ? 'Get Rove' : 'Go to my trips'}</LinkButton>} />
+            actions={<LinkButton to="/" tone="neutral">{joinOnly() ? 'Get Rove' : 'Go to my trips'}</LinkButton>} />
         </Card>
       </Content>
     );
@@ -64,10 +64,10 @@ export function Join() {
         {isCollection ? (
           <Card layout="centre" media={<Illustration name="map" size={120} />} title={`Join “${invite.tripName}”`}
             body={invite.role === 'member' ? 'You can see every place, add your own, move them and star them.' : 'You can see every place, star them and open them in Maps.'}
-            action={<Button size="large" onClick={join} disabled={busy}>Join collection</Button>} />
+            actions={<Button size="large" onClick={join} disabled={busy}>Join collection</Button>} />
         ) : (
           <Card layout="centre" media={<Illustration name="suitcase" size={120} />} title={`Join “${invite.tripName}”`} body="You've been invited to plan this trip together."
-            action={<Button size="large" onClick={join} disabled={busy}>Join trip</Button>} />
+            actions={<Button size="large" onClick={join} disabled={busy}>Join trip</Button>} />
         )}
         {error && <p className="t-label-small t-danger" style={{ textAlign: 'center' }}>{error}</p>}
       </Card>
