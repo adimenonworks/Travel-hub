@@ -142,7 +142,7 @@ export function Itinerary(ctx: TripCtx) {
                         <EventCard {...eventCardProps(e, ctx)} amount={amountOf(e)} state={state} favourite={!!(a.placeId && places[a.placeId]?.starredBy?.includes(me.uid))}
                           extras={[
                             ...(state === 'next' ? [
-                              { icon: 'info' as const, label: `Next · ${startsIn(e)}` },
+                              { icon: 'information' as const, label: `Next · ${startsIn(e)}` },
                               ...(a.attendeeIds.length > 0 ? [{ icon: 'people' as const, label: a.attendeeIds.includes(me.uid) && a.attendeeIds.length === 1 ? 'You’re going' : `${a.attendeeIds.length} of ${trip.memberIds.length} going` }] : []),
                             ] : []),
                             ...unreadTag(unreadCount(reads, me.uid, a.id, ctx.comments)),

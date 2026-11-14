@@ -49,7 +49,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
       <div className={s.region} role="status" aria-live="polite">
         {msg && (
           <div key={msg.id} className={[s.toast, msg.size === 'large' ? s.large : s.small, msg.tone === 'danger' && s.error, leaving && s.leaving].filter(Boolean).join(' ')}>
-            {(msg.icon || msg.tone === 'danger') && <Icon name={msg.icon ?? 'info'} size={msg.size === 'large' ? 24 : 16} className={s.icon} />}
+            {(msg.icon || msg.tone === 'danger') && <Icon name={msg.icon ?? 'information'} size={msg.size === 'large' ? 24 : 16} className={s.icon} />}
             <span>{msg.label}</span>
             {msg.action && (
               <button type="button" className={s.action} onClick={() => { msg.action!.onClick(); clear(); setLeaving(true); timers.current.push(window.setTimeout(() => setMsg(null), LEAVE_MS)); }}>

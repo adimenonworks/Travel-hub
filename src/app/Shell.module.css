@@ -7,7 +7,7 @@
 
 
 .main { min-width: 0; padding-top: env(safe-area-inset-top); overflow-x: clip; /* a screen sliding in never makes the page scroll sideways */ }
-/* Room for the Bottom nav (its height, the 8px gap and the home indicator) under every page */
+/* Room for the Bottom navigation (its height, the 8px gap and the home indicator) under every page */
 /* Screen changes (ScreenStack.tsx): both screens move together, like iOS. Transform and opacity only. */
 .screen { position: relative; z-index: 1; }
 .leaving { position: fixed; left: 0; right: 0; z-index: 0; pointer-events: none; }
@@ -19,7 +19,7 @@
 .in-back { animation: driftIn var(--motion-screen); will-change: transform; }
 .in-back::after { content: ''; position: absolute; inset: 0; background: var(--overlay-scrim); opacity: 0; pointer-events: none; animation: dimOut var(--motion-screen); }
 .out-back { z-index: 3; background: var(--surface-primary); box-shadow: var(--shadow-overlay); animation: pushOut var(--motion-screen) forwards; will-change: transform; }
-/* Bottom nav: the old tab fades out over the new one, so there's never a blank frame */
+/* Bottom navigation: the old tab fades out over the new one, so there's never a blank frame */
 .out-tab { z-index: 3; background: var(--surface-primary); animation: fadeOut var(--duration-fade) var(--easing-standard) forwards; will-change: opacity; }
 /* Held on the first frame until the new screen has drawn (ScreenStack), then it runs */
 .paused, .paused::after { animation-play-state: paused !important; }
@@ -34,7 +34,7 @@
   .in-push, .in-back, .out-push, .in-back::after, .out-push::after { animation: none; box-shadow: none; }
   .out-push, .out-back, .out-tab { z-index: 3; background: var(--surface-primary); animation: fadeOut var(--duration-quick) var(--easing-standard) forwards; }
 }
-/* Every page already ends with 96px (space/default/1000), which clears the floating Bottom nav (64 + 16).
+/* Every page already ends with 96px (space/default/1000), which clears the floating Bottom navigation (64 + 16).
    Add the safe area (home indicator), and whatever the bar grows by at larger text sizes. */
 .withNav { padding-bottom: calc(env(safe-area-inset-bottom) + max(0px, var(--size-tab-bar) - var(--size-1050))); }
 .content {

@@ -130,7 +130,7 @@ export function JourneyStop({ title, meta, warning, action }: { title: string; m
           {meta && <span className="t-body-small t-secondary">{meta}</span>}
         </div>
       </div>
-      {(warning || action) && <div className={s.layoverActions}>{warning && <Tag tone="warning" icon="info">{warning}</Tag>}{action}</div>}
+      {(warning || action) && <div className={s.layoverActions}>{warning && <Tag tone="warning" icon="information">{warning}</Tag>}{action}</div>}
     </div>
   );
 }

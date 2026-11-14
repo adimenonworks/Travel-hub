@@ -73,7 +73,7 @@ export function Chip({ selected, icon, flag, onClick, label, type, children }: {
 export type BannerTone = 'warning' | 'success' | 'danger' | 'neutral' | 'accent';
 
 /** Figma "Banner" (called Notification until 13 Nov 2026; Tone Warning / Success / Danger / Neutral / Accent): an info icon, an optional label, and a message on a status colour. */
-export function Banner({ tone = 'neutral', icon = 'info', label, children }: { tone?: BannerTone; icon?: IconName; label?: ReactNode; children: ReactNode }) {
+export function Banner({ tone = 'neutral', icon = 'information', label, children }: { tone?: BannerTone; icon?: IconName; label?: ReactNode; children: ReactNode }) {
   return (
     <div className={[s.note, s[`note-${tone}`]].filter(Boolean).join(' ')} role={tone === 'danger' ? 'alert' : undefined}>
       <Icon name={icon} size={24} />

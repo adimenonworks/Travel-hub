@@ -6,7 +6,7 @@ export { SegmentControl } from './SegmentControl';
 export { Sheet } from './Sheet';
 export { Avatar, AvatarStack, Tag, Chip, Banner, type AvatarSize, type TagTone, type BannerTone } from './Misc';
 export { Skeleton, PageSkeleton } from './Skeleton';
-export { BottomNav, type NavTab } from './BottomNav';
+export { BottomNavigation, type NavTab } from './BottomNavigation';
 export { PageHeader, Tabs, type TabItem } from './Bars';
 export { Illustration, COVER_ILLUSTRATIONS, type IllustrationName } from './Illustration';
 export { HeroCard, DayCard, NowLine, JourneyCard, JourneyLeg, JourneyStop } from './TripCards';

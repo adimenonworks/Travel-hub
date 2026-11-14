@@ -169,7 +169,7 @@
   --space-page-gutter: var(--space-700);   /* page side margin (24) */
   --space-page-section: var(--space-900);  /* gap between sections (40); inside a section, 16 */
   --space-page-top: var(--space-950);      /* space above the page title (48) */
-  --space-page-bottom: var(--space-1000);  /* below every page (96), clearing the Bottom nav */
+  --space-page-bottom: var(--space-1000);  /* below every page (96), clearing the Bottom navigation */
   --radius-100: var(--base-radius-2); --radius-200: var(--base-radius-4); --radius-300: var(--base-radius-8); --radius-400: var(--base-radius-12); --radius-500: var(--base-radius-16);
   --radius-600: var(--base-radius-24); --radius-700: var(--base-radius-32); --radius-900: var(--base-radius-64); --radius-full: var(--base-radius-999);
   /* Size scale (Figma size/*, numbered like space/*): every fixed size without a shared role */
@@ -182,7 +182,7 @@
   --size-control-large: var(--base-size-48);    /* Button Large, Text field */
   --size-avatar-small: var(--base-size-24); --size-avatar-medium: var(--base-size-32); --size-avatar-large: var(--base-size-40);
   --size-category-icon-small: var(--base-size-32); --size-category-icon-medium: var(--base-size-40); --size-category-icon-large: var(--base-size-48);
-  --size-tab-bar: calc(60rem / 17); /* Bottom nav height: Figma size/tab-bar (base/size/60) in rem, so it grows with text size */
+  --size-tab-bar: calc(60rem / 17); /* Bottom navigation height: Figma size/tab-bar (base/size/60) in rem, so it grows with text size */
   --size-content-max: var(--base-size-480);     /* phone width: on a computer the test site shows a centred phone column */
   /* Border widths (Figma border-width/*) */
   --border-width-thin: 1px; --border-width-medium: 1.5px; --border-width-thick: 2px; --border-width-focus: 3px;
@@ -201,7 +201,7 @@
   --shadow-raised: 0 0 40px rgba(14, 15, 12, 0.05), 0 2px 6px rgba(14, 15, 12, 0.04);
   --shadow-overlay: 0 24px 64px rgba(14, 15, 12, 0.24), 0 4px 12px rgba(14, 15, 12, 0.1);
   --blur-overlay: 20px;
-  /* Elevation/Floating bar: the Raised shadow plus the background blur (the Bottom nav) */
+  /* Elevation/Floating bar: the Raised shadow plus the background blur (the Bottom navigation) */
   --elevation-floating-bar: var(--shadow-raised);
 
 }

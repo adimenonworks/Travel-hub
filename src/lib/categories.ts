@@ -42,7 +42,7 @@ const k = (value: EventKind, label: string, icon: IconName, type: EventType, beh
 export const EVENT_KINDS: KindInfo[] = [
   k('flight', 'Flight', 'plane', 'transport', 'journey', 'A flight with its number and times. Add a connection for each leg.'),
   k('train', 'Train', 'train', 'transport', 'journey', 'Trains, from city hops to high-speed and sleepers.'),
-  k('bus', 'Bus or coach', 'bus-alt', 'transport', 'journey', 'Long-distance buses and coaches between towns.'),
+  k('bus', 'Bus or coach', 'coach', 'transport', 'journey', 'Long-distance buses and coaches between towns.'),
   k('ferry', 'Ferry', 'ship', 'transport', 'journey', 'Ferries and boat crossings.'),
   k('taxi', 'Taxi or rideshare', 'taxi', 'transport', 'journey', 'A taxi, Uber or Bolt from where you’re picked up to where you’re going.', false),
   k('transfer', 'Airport transfer', 'shuttle-van', 'transport', 'journey', 'A booked ride to or from the airport.'),
@@ -50,7 +50,7 @@ export const EVENT_KINDS: KindInfo[] = [
   k('driver', 'Private car', 'car-side', 'transport', 'journey', 'Your own car, or a private driver taking you from A to B.'),
   k('bike', 'Bike or scooter hire', 'bike', 'transport', 'place', 'Bikes or scooters to get around for a while.'),
   k('car', 'Car rental', 'car', 'transport', 'span', 'A hire car: shown at pick-up and drop-off.'),
-  k('campervan', 'Campervan', 'rv', 'transport', 'span', 'A campervan or motorhome: shown at pick-up and drop-off.'),
+  k('campervan', 'Campervan', 'campervan', 'transport', 'span', 'A campervan or motorhome: shown at pick-up and drop-off.'),
   k('parking', 'Parking', 'car-garage', 'transport', 'span', 'Airport, hotel or valet parking for your own car: shown at drop-off and pick-up.'),
   k('luggage', 'Luggage storage', 'luggage-cart', 'transport', 'span', 'Lockers or a bag drop: shown when you drop your bags and when you collect them.'),
 

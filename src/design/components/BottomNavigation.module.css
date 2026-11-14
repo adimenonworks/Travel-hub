@@ -1,4 +1,4 @@
-/* Figma "Bottom nav": a frosted pill (overlay/bar + Elevation/Floating bar), 60px tall, floating 18px from the sides and
+/* Figma "Bottom navigation": a frosted pill (overlay/bar + Elevation/Floating bar), 60px tall, floating 18px from the sides and
    24px from the physical bottom edge (like Wise's) of the screen (no safe area added; it sits over the home indicator area, like iOS bars).
    The safe area goes into the page's bottom padding instead (Shell .withNav). */
 .nav {
@@ -16,7 +16,7 @@
   -webkit-backdrop-filter: blur(var(--blur-overlay)); backdrop-filter: blur(var(--blur-overlay));
   touch-action: none; /* the bar's touches are all ours: iOS never takes a drag over to scroll (which dropped the pill) */
 }
-/* Figma ".Nav item": icon over a Label small label */
+/* Figma ".Navigation item": icon over a Label small label */
 .item {
   flex: 1 1 0; min-width: 0; min-height: calc(50rem / 17);
   display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--space-100);

@@ -551,8 +551,11 @@ The same text sits on the Figma Foundations page ("Glossary", beside the Compone
 
 ### Naming rules
 
-- **Sentence case everywhere:** components, frames, properties and values ("Hero card", "Page header", `Show heads-up`).
-- **A "." in front** means a part that is only ever used inside another component, never placed on a screen by itself: `.Tab`, `.Segment`, `.Nav item`, `.Calendar day`, `.Vote button`, `.Category icon`, `.Context menu item`, `.Leg`, `.Stop`. (Message has no "." because it is placed on the Event screen by itself.)
+- **Sentence case everywhere:** components, frames, layers, properties, values, variables and styles ("Hero card", "Page header", `Show heads-up`, "Body small"). Every layer name starts with a capital.
+- **Full names, not abbreviations,** unless a name gets really long: Information, Document, Sign out, Bottom navigation, Coach, Campervan (code keys `information`, `document`, `sign-out`, `coach`, `campervan`). Kept short on purpose: `size/content-max` (matches CSS `max-width`).
+- **Booleans read `Show <thing>`.** When the thing is one component, use its name as written, with its capital: `Show Icon button`, `Show Avatar stack`, `Show Tag`, `Show Button`, `Show Avatar`, `Show Illustration`. Otherwise sentence case: `Show meta`, `Show leading icon`. Icons count as "icon", not a component name. Where a component has several slots of the same component with different jobs (Sheet's save, close and discard; Page header's back), the job names it.
+- **Sizes:** Small / Large; Small / Medium / Large when there are three (code `small` / `medium` / `large`).
+- **A "." in front** means a part that is only ever used inside another component, never placed on a screen by itself: `.Tab`, `.Segment`, `.Navigation item`, `.Calendar day`, `.Vote button`, `.Category icon`, `.Context menu item`, `.Leg`, `.Stop`, `.Stat`. (Message has no "." because it is placed on the Event screen by itself.)
 - In code the same names are written as one word: "Hero card" is `HeroCard`, `.Category icon` is `CategoryIcon`, `Show heads-up` is `headsUp`.
 
 ### Property names (exactly these, nothing else)
@@ -571,7 +574,7 @@ Decisions recorded (13 Nov 2026):
 - Chip's `Category` became `Type`. Chip is the only component besides `.Category icon` that has `Type` (a selected category chip is filled with the colour).
 - Event type lives only in `.Category icon`; Event card, List item, Idea row, Option card and Page header nest it.
 - Avatar's `Kind` became `Layout` (Initials · More), not `Type`: `Type` only ever means the event type.
-- A selected, checked or voted control is `State` = Selected (`.Vote button`, `.Nav item`, `.Tab`, `.Segment`, Day card, Option card, Chip).
+- A selected, checked or voted control is `State` = Selected (`.Vote button`, `.Navigation item`, `.Tab`, `.Segment`, Day card, Option card, Chip).
 - Button's `Variant` became `Tone`.
 - Illustration keeps `Name` for which drawing it is (the one exception, owner 13 Nov 2026): `Type` only ever means the event type, and the drawings don't differ in structure, so `Layout` would mislead. Cover scene merged into Illustration as `Size` Cover.
 
@@ -589,8 +592,8 @@ Decisions recorded (13 Nov 2026):
 ### Component names
 
 Controls: Button · Icon button · Chip · Text field · Segment control (`.Segment`) · `.Vote button` · Step progress · Option card · Calendar (`.Calendar day`)
-Navigation: Page header · Section header · Tab bar (`.Tab`) · Bottom nav (`.Nav item`) · Context menu (`.Context menu item`) · Sheet
-Content & lists: List item · List group · Idea row · Accordion · Tag · `.Category icon` · Stat · Stat strip
+Navigation: Page header · Section header · Tab bar (`.Tab`) · Bottom navigation (`.Navigation item`) · Context menu (`.Context menu item`) · Sheet
+Content & lists: List item · List group · Idea row · Accordion · Tag · `.Category icon` · Stat strip (`.Stat`)
 Cards: Card (empty states too: Layout Centre) · Tile · Hero card · Budget card · Map card
 Trip: Event card · Day card · Now line · Travel connector · Journey card (`.Leg`, `.Stop`)
 People: Avatar · Avatar stack · Profile card · Message

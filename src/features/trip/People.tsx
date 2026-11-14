@@ -92,7 +92,7 @@ export function People({ trip, profiles, canManage, isOwner }: TripCtx) {
 
       {/* Deleting the trip lives in Edit trip (its creator only); here anyone can leave, while someone else is on it */}
       {members.length > 1 && (
-        <Button tone="destructive" icon="signout" onClick={async () => {
+        <Button tone="destructive" icon="sign-out" onClick={async () => {
           if (!confirmAction(isOwner ? `Leave "${trip.name}"? It stays with everyone else.` : `Leave "${trip.name}"?`)) return;
           await store.leaveTrip(trip.id, me.uid);
           navigate('/');

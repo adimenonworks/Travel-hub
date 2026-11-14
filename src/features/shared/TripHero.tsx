@@ -46,7 +46,7 @@ export function TripHero({ trip, cover = true, list }: { trip: Trip; cover?: boo
   const headsUp = flight && tag
     ? { icon: 'plane' as const, tone: 'travel' as const, title: tag.label === 'Check-in open' ? 'Check-in open' : `Flight ${tag.label.toLowerCase()}`, meta: [flight.title, flight.ref].filter(Boolean).join(' · '), to: `${base}/plan/${flight.id}` }
     : phase === 'upcoming' && daysBetween(t, trip.startDate) <= 14 && abroad.length > 0
-      ? { icon: 'doc' as const, title: 'Check the entry requirements', meta: abroad.map(countryName).join(', '), to: base }
+      ? { icon: 'document' as const, title: 'Check the entry requirements', meta: abroad.map(countryName).join(', '), to: base }
       : undefined;
   // Unsplash cover: an organizer's Rove fetches one the first time the trip shows without a photo of its own.
   const me = useMe();
