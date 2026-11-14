@@ -56,6 +56,7 @@
   --button-destructive-background-pressed: var(--base-color-red-200);
   --overlay-bar: color-mix(in srgb, var(--base-color-neutral-50) 85%, transparent);
   --overlay-scrim: color-mix(in srgb, var(--base-color-neutral-1000) 50%, transparent);
+  --overlay-photo: color-mix(in srgb, var(--base-color-neutral-1000) 45%, transparent); /* the gradient at the foot of a cover photo, both modes */
   --button-destructive-text: var(--base-color-red-700);
   --button-destructive-icon: var(--base-color-red-700);
   --button-destructive-disabled-background: color-mix(in srgb, var(--base-color-neutral-1000) 5%, transparent);
@@ -171,6 +172,9 @@
   --space-page-bottom: var(--space-1000);  /* below every page (96), clearing the Bottom nav */
   --radius-100: var(--base-radius-2); --radius-200: var(--base-radius-4); --radius-300: var(--base-radius-8); --radius-400: var(--base-radius-12); --radius-500: var(--base-radius-16);
   --radius-600: var(--base-radius-24); --radius-700: var(--base-radius-32); --radius-900: var(--base-radius-64); --radius-full: var(--base-radius-999);
+  /* Size scale (Figma size/*, numbered like space/*): every fixed size without a shared role */
+  --size-100: var(--base-size-4); --size-200: var(--base-size-8); --size-400: var(--base-size-16); --size-500: var(--base-size-20); --size-600: var(--base-size-24); --size-650: var(--base-size-28); --size-700: var(--base-size-32); --size-750: var(--base-size-36); --size-800: var(--base-size-40); --size-900: var(--base-size-48); --size-1000: var(--base-size-56);
+  --size-1050: var(--base-size-60); --size-1100: var(--base-size-64); --size-1200: var(--base-size-72); --size-1300: var(--base-size-96); --size-1400: var(--base-size-112); --size-1500: var(--base-size-120); --size-1600: var(--base-size-176); --size-1700: var(--base-size-240); --size-1800: var(--base-size-440); --size-1900: var(--base-size-560);
   /* Sizes (Figma size/*): role tokens only where the meaning is shared */
   --size-tap: var(--base-size-44);              /* the smallest tap area */
   --size-icon-small: var(--base-size-16); --size-icon-large: var(--base-size-24);
@@ -255,6 +259,7 @@
     --button-destructive-background-pressed: var(--base-color-red-900);
     --overlay-bar: color-mix(in srgb, var(--base-color-neutral-1000) 85%, transparent);
     --overlay-scrim: color-mix(in srgb, var(--base-color-neutral-1000) 70%, transparent);
+    --overlay-photo: color-mix(in srgb, var(--base-color-neutral-1000) 45%, transparent); /* the gradient at the foot of a cover photo, both modes */
     --button-destructive-text: var(--base-color-red-200);
     --button-destructive-icon: var(--base-color-red-200);
     --button-destructive-disabled-background: color-mix(in srgb, var(--base-color-neutral-0) 5%, transparent);
@@ -411,6 +416,7 @@
   --button-destructive-background-pressed: var(--base-color-red-900);
   --overlay-bar: color-mix(in srgb, var(--base-color-neutral-1000) 85%, transparent);
   --overlay-scrim: color-mix(in srgb, var(--base-color-neutral-1000) 70%, transparent);
+  --overlay-photo: color-mix(in srgb, var(--base-color-neutral-1000) 45%, transparent); /* the gradient at the foot of a cover photo, both modes */
   --button-destructive-text: var(--base-color-red-200);
   --button-destructive-icon: var(--base-color-red-200);
   --button-destructive-disabled-background: color-mix(in srgb, var(--base-color-neutral-0) 5%, transparent);

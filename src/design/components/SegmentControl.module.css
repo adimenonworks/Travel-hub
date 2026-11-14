@@ -6,7 +6,7 @@
   padding: var(--space-200);
   gap: var(--space-200);
   background: transparent;
-  border: 1px solid var(--control-unselected-ghost-border);
+  border: var(--border-width-thin) solid var(--control-unselected-ghost-border);
   border-radius: var(--radius-full); /* Figma: a pill, segments too */
   max-width: 100%;
 }
@@ -16,13 +16,13 @@
    measured on the device) */
 .text { white-space: nowrap; }
 .tight .option { padding-inline: var(--space-300); }
-.noCount .count { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; } /* still read out */
+.noCount .count { position: absolute; width: var(--border-width-thin); height: var(--border-width-thin); overflow: hidden; clip-path: inset(50%); white-space: nowrap; } /* still read out */
 .option { padding-inline: var(--space-300); }
 .option {
-  min-height: 34px;
+  min-height: calc(var(--size-control-small) + 2 * var(--border-width-thin));
   /* Side padding gives way as text grows (16px at the default size, 8px from about 23px text), so labels keep to one line */
   white-space: nowrap; overflow: hidden;
-  padding: var(--space-400) clamp(var(--space-300), calc(54px - 2rem), var(--space-500));
+  padding: var(--space-400) clamp(var(--space-300), calc(var(--size-1000) - var(--space-100) - 2rem), var(--space-500));
   border: 0;
   border-radius: var(--radius-full);
   background: transparent;

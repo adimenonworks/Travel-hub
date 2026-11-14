@@ -15,7 +15,7 @@
    so the day cards and events never show through behind the clock and battery. */
 .sectionNav::before {
   content: ''; position: absolute; left: 0; right: 0; bottom: 100%;
-  height: calc(env(safe-area-inset-top) + 1px); background: inherit; pointer-events: none;
+  height: calc(env(safe-area-inset-top) + var(--border-width-thin)); background: inherit; pointer-events: none;
   visibility: hidden;
 }
 .sectionNav[data-stuck]::before { visibility: visible; }
@@ -76,7 +76,7 @@
 /* Bookings tiles: two columns, 8 apart (one column when text is very large). Tiles in a row stretch to the same
    height; titles keep their size and wrap between words. */
 .tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(calc(130rem / 17), 1fr)); align-items: stretch; gap: var(--space-300); }
-.flagThumb { width: 32px; height: 32px; border-radius: 50%; }
+.flagThumb { width: var(--size-700); height: var(--size-700); border-radius: 50%; }
 /* Event cards and their Travel connectors, 8 apart */
 .eventList { display: flex; flex-direction: column; gap: var(--space-300); }
 

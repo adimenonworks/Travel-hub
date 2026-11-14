@@ -7,7 +7,7 @@
   color: var(--text-primary); transition: background var(--motion-fast);
 }
 .header:active { background: var(--button-ghost-background-pressed); }
-.header:focus-visible { outline: 3px solid var(--border-focus); outline-offset: -3px; border-radius: var(--radius-600); }
+.header:focus-visible { outline: var(--border-width-focus) solid var(--border-focus); outline-offset: calc(-1 * var(--border-width-focus)); border-radius: var(--radius-600); }
 .text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: var(--space-100); }
 .title { font: var(--type-heading-4); }
 .meta { font: var(--type-body-small); color: var(--text-secondary); }

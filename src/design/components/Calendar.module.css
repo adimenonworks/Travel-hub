@@ -4,9 +4,9 @@
 .monthName { font: var(--type-heading-3); letter-spacing: -0.02em; }
 .grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); row-gap: var(--space-0); }
 .weekday { text-align: center; font: var(--type-body-small); color: var(--text-secondary); padding-bottom: var(--space-200); }
-.cell { position: relative; min-height: 40px; display: grid; place-items: center; }
+.cell { position: relative; min-height: var(--size-800); display: grid; place-items: center; }
 .day { border: 0; background: none; padding: 0; font: var(--type-body); color: var(--text-primary); cursor: pointer; font-variant-numeric: tabular-nums; }
-.day > span { position: relative; z-index: 1; display: grid; place-items: center; width: 36px; height: 36px; border-radius: var(--radius-full); transition: transform var(--motion-release); }
+.day > span { position: relative; z-index: 1; display: grid; place-items: center; width: var(--size-750); height: var(--size-750); border-radius: var(--radius-full); transition: transform var(--motion-release); }
 .day:active > span { transform: scale(0.94); transition: transform var(--motion-press); }
 .day:disabled { color: var(--button-ghost-disabled-text); cursor: default; }
 .day-range { background: var(--surface-brand); color: var(--text-brand); }

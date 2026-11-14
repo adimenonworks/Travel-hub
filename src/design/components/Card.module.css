@@ -1,7 +1,7 @@
 /* Figma "Card": the grey container (on-light/surface/secondary), no border, 24px corners */
 .card {
   background: var(--surface-secondary);
-  border: 1px solid transparent;
+  border: var(--border-width-thin) solid transparent;
   border-radius: var(--radius-600);
   padding: var(--space-600);
   color: var(--text-primary);

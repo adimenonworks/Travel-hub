@@ -8,7 +8,7 @@
   min-height: var(--size-control-large);
   padding: 0 var(--space-600);
   background: var(--input-background);
-  border: 1px solid var(--input-border);
+  border: var(--border-width-thin) solid var(--input-border);
   color: var(--input-value);
   border-radius: var(--radius-full);
   font-size: var(--size-body);
@@ -20,9 +20,9 @@
 .input::placeholder { color: var(--input-placeholder); opacity: 1; }
 .input:hover { background: var(--input-background-hover); }
 /* Focus (Figma State=Focus): 2px border-selected, lighter fill (border + inset shadow keeps layout still) */
-.input:focus { background: var(--input-background-hover); border-color: var(--input-border-focus); box-shadow: inset 0 0 0 1px var(--input-border-focus); }
-textarea.input { min-height: 112px; padding: var(--space-400) var(--space-600); border-radius: var(--radius-600); resize: vertical; line-height: 1.5; }
-input[type='date'].input, input[type='time'].input { line-height: calc(var(--size-control-large) - 2px); }
+.input:focus { background: var(--input-background-hover); border-color: var(--input-border-focus); box-shadow: inset 0 0 0 var(--border-width-thin) var(--input-border-focus); }
+textarea.input { min-height: var(--size-1400); padding: var(--space-400) var(--space-600); border-radius: var(--radius-600); resize: vertical; line-height: 1.5; }
+input[type='date'].input, input[type='time'].input { line-height: calc(var(--size-control-large) - 2 * var(--border-width-thin)); }
 select.input {
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5l5 5 5-5' fill='none' stroke='%23868685' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
@@ -38,6 +38,6 @@ select.compact { min-height: var(--size-tap); padding-left: var(--space-500); pa
 /* Leading icon (Figma Text field "Icon"): 24px, 20 in from the left, the text starts after it with the 12 gap */
 .iconWrap { position: relative; display: block; }
 .leadingIcon { position: absolute; left: var(--space-600); top: 50%; transform: translateY(-50%); color: var(--icon-secondary); pointer-events: none; }
-.withIcon { padding-left: calc(var(--space-600) + 24px + var(--space-400)); }
+.withIcon { padding-left: calc(var(--space-600) + var(--size-icon-large) + var(--space-400)); }
 /* A search input (type=search, e.g. New trip's place search) never shows the browser's own clear button */
 .input::-webkit-search-cancel-button { -webkit-appearance: none; appearance: none; }

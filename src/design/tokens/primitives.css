@@ -19,7 +19,7 @@
   --base-color-neutral-0: #ffffff; --base-color-neutral-50: #fafafa; --base-color-neutral-100: #f4f4f4; --base-color-neutral-200: #e6e6e6; --base-color-neutral-300: #cdcdcd; --base-color-neutral-400: #afafaf; --base-color-neutral-500: #959595; --base-color-neutral-600: #767676; --base-color-neutral-700: #595959; --base-color-neutral-800: #434343; --base-color-neutral-900: #2e2e2e; --base-color-neutral-1000: #1c1c1c;
   --base-space--6: -6px;
   --base-space-0: 0px; --base-space-2: 2px; --base-space-4: 4px; --base-space-6: 6px; --base-space-8: 8px; --base-space-12: 12px; --base-space-16: 16px; --base-space-18: 18px; --base-space-20: 20px; --base-space-24: 24px; --base-space-32: 32px; --base-space-40: 40px; --base-space-48: 48px; --base-space-96: 96px;
-  --base-size-16: 16px; --base-size-24: 24px; --base-size-32: 32px; --base-size-40: 40px; --base-size-44: 44px; --base-size-48: 48px; --base-size-480: 480px;
+  --base-size-4: 4px; --base-size-8: 8px; --base-size-16: 16px; --base-size-20: 20px; --base-size-24: 24px; --base-size-28: 28px; --base-size-32: 32px; --base-size-36: 36px; --base-size-40: 40px; --base-size-44: 44px; --base-size-48: 48px; --base-size-56: 56px; --base-size-60: 60px; --base-size-64: 64px; --base-size-72: 72px; --base-size-96: 96px; --base-size-112: 112px; --base-size-120: 120px; --base-size-176: 176px; --base-size-240: 240px; --base-size-440: 440px; --base-size-480: 480px; --base-size-560: 560px;
   --base-radius-2: 2px; --base-radius-4: 4px; --base-radius-8: 8px; --base-radius-12: 12px; --base-radius-16: 16px; --base-radius-24: 24px; --base-radius-32: 32px; --base-radius-64: 64px; --base-radius-999: 999px;
 
 
