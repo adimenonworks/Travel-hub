@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { confirmAction } from '../../lib/native';
-import { Button, FieldRow, Select, Sheet, TextField, useToast } from '../../design/components';
+import { Button, FieldRow, Dropdown, Sheet, TextField, useToast } from '../../design/components';
 import { store } from '../../data';
 import type { Place, Trip } from '../../data/types';
 import { addDays, today } from '../../lib/dates';
@@ -87,10 +87,10 @@ export function TripForm({ open, trip, onClose, onSaved, onDeleted }: { open: bo
         <TextField label="Start" type="date" value={d.startDate} onChange={(e) => set({ startDate: e.target.value, endDate: d.endDate < e.target.value ? e.target.value : d.endDate })} />
         <TextField label="End" type="date" value={d.endDate} min={d.startDate} onChange={(e) => set({ endDate: e.target.value })} />
       </FieldRow>
-      <Select label="Local currency" value={d.currency} onChange={(e) => set({ currency: e.target.value })}
+      <Dropdown label="Local currency" value={d.currency} onChange={(e) => set({ currency: e.target.value })}
         hint="Prices you add start in this currency.">
         {CURRENCIES.map((c) => <option key={c}>{c}</option>)}
-      </Select>
+      </Dropdown>
       <PriceField label="Budget per person (optional)" hint="A rough total for the trip. Overview shows what’s left after your bookings. Empty: no budget." value={d.budget} onChange={(budget) => set({ budget })} />
       <CoverPhotoField value={d.coverPhoto} position={d.coverPosition}
         onChange={(coverPhoto) => set({ coverPhoto, coverPosition: null })} onMove={(coverPosition) => set({ coverPosition })} />

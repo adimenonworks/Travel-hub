@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState, type ReactNode } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Button, Card, CategoryIcon, Chip, AvatarStack, TextField, Icon, IconButton, Illustration, LinkButton, ListGroup, ListItem, MapCard, PageHeader, PageSection, PageSkeleton, Select, Sheet, useToast, Tile } from '../../design/components';
+import { Button, Card, CategoryIcon, Chip, AvatarStack, TextField, Icon, IconButton, Illustration, LinkButton, ListGroup, ListItem, MapCard, PageHeader, PageSection, PageSkeleton, Dropdown, Sheet, useToast, Tile } from '../../design/components';
 import { hostOf } from '../../lib/format';
 import { store } from '../../data';
 import { personName, useActivitiesFor, useMe, useMyTrips, usePlaces, useProfiles, useShares, useSharedPlaces } from '../../data/hooks';
@@ -162,9 +162,9 @@ export function PlaceSheet({ place, onClose, role = 'owner', cities = [] }: {
           </ListGroup>
         )}
         {fits.length > 1 && !viewer && (
-          <Select label="Add to a trip" value={target?.id} onChange={(e) => setTripId(e.target.value)}>
+          <Dropdown label="Add to a trip" value={target?.id} onChange={(e) => setTripId(e.target.value)}>
             {fits.map((t) => <option key={t.id} value={t.id}>{t.name}</option>)}
-          </Select>
+          </Dropdown>
         )}
       </div>
     </Sheet>

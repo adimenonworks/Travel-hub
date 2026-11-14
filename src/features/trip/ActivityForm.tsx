@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Button, CategoryIcon, Chip, FieldRow, OptionCard, Select, Sheet, TextArea, TextField, useToast } from '../../design/components';
+import { Button, CategoryIcon, Chip, FieldRow, OptionCard, Dropdown, Sheet, TextArea, TextField, useToast } from '../../design/components';
 import { store } from '../../data';
 import { useMe, useRole, useSub } from '../../data/hooks';
 import type { Activity, Category, LinkItem, Place, Trip } from '../../data/types';
@@ -260,9 +260,9 @@ export function ActivityForm({ open, trip, date, activity, draft, onClose, onCre
   // End days (check-out, pick-up, drop-off, collect) are the trip's days only: the itinerary shows nothing outside the trip (owner)
   const afterEnd = days;
   const daySelect = (lbl: string, value: string, onChange: (v: string) => void, list = days) => (
-    <Select label={lbl} value={value} onChange={(e) => onChange(e.target.value)}>
+    <Dropdown label={lbl} value={value} onChange={(e) => onChange(e.target.value)}>
       {list.map((d) => <option key={d} value={d}>{dayWord(d, trip.startDate)} · {formatDay(d)}</option>)}
-    </Select>
+    </Dropdown>
   );
   const time = (lbl: string, key: 'startTime' | 'endTime') => (
     <TextField label={lbl} type="time" value={f[key]} onChange={(e) => set({ [key]: e.target.value } as Partial<Form>)} />
@@ -363,9 +363,9 @@ export function ActivityForm({ open, trip, date, activity, draft, onClose, onCre
                 {time('Time', 'startTime')}
               </FieldRow>
               <FieldRow>
-                <Select label="Arrives" value={f.endDate || f.date} onChange={(e) => set({ endDate: e.target.value })}>
+                <Dropdown label="Arrives" value={f.endDate || f.date} onChange={(e) => set({ endDate: e.target.value })}>
                   {[0, 1, 2].map((n) => { const d = addDays(f.date, n); return <option key={d} value={d}>{n === 0 ? 'Same day' : `+${n} · ${formatDay(d)}`}</option>; })}
-                </Select>
+                </Dropdown>
                 {time('Time', 'endTime')}
               </FieldRow>
               <FieldRow>

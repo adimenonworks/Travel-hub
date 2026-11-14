@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Avatar, Button, Card, IconButton, Select, LinkButton, ListGroup, ListItem, PageHeader, PageSection, ProfileCard as FigmaProfileCard, SegmentControl, Sheet, StatStrip, TextField, useToast } from '../../design/components';
+import { Avatar, Button, Card, IconButton, Dropdown, LinkButton, ListGroup, ListItem, PageHeader, PageSection, ProfileCard as FigmaProfileCard, SegmentControl, Sheet, StatStrip, TextField, useToast } from '../../design/components';
 import { store } from '../../data';
 import { useMe, useMyTrips, usePlaces, useProfile } from '../../data/hooks';
 import { countryName } from '../../lib/countries';
@@ -130,9 +130,9 @@ export function ProfilePage() {
       </Sheet>
 
       <Sheet open={open === 'currency'} title="Currency" subtitle="Idea prices show in their own currency, with a conversion to this one." onClose={() => setOpen(null)}>
-        <Select label="Your currency" value={home} onChange={(e) => save({ currency: e.target.value }, 'Currency saved')}>
+        <Dropdown label="Your currency" value={home} onChange={(e) => save({ currency: e.target.value }, 'Currency saved')}>
           {[...new Set([home, ...CURRENCIES])].map((c) => <option key={c} value={c}>{c}</option>)}
-        </Select>
+        </Dropdown>
         <p className="t-body-small t-secondary"><a href="https://www.exchangerate-api.com" target="_blank" rel="noreferrer">Rates by Exchange Rate API</a>. Updated once a day; conversions are a guide.</p>
       </Sheet>
 

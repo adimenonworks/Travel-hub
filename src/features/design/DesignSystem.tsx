@@ -1,5 +1,5 @@
 import { useState, type CSSProperties } from 'react';
-import { Avatar, AvatarStack, Message, Tag, Chip, Banner, Button, Card, FieldRow, HeroCard, Icon, IconButton, LinkButton, PageHeader, PageSection, SegmentControl, Select, Sheet, Tabs, TextArea, TextField, NowLine, Illustration, type IllustrationName, COVER_ILLUSTRATIONS, ICON_NAMES, useToast, BottomNavigation, Skeleton, Logo, ListItem, ListGroup, SectionHeader, EventCard, TravelConnector, IdeaRow, Tile, StatStrip, ProfileCard, OptionCard, BudgetCard, StepProgress, DayCard, CountryModal, CategoryIcon, ContextMenu, Accordion, Calendar, JourneyCard, JourneyLeg, JourneyStop, MapCard } from '../../design/components';
+import { Avatar, AvatarStack, Message, Tag, Chip, Banner, Button, Card, FieldRow, HeroCard, Icon, IconButton, LinkButton, PageHeader, PageSection, SegmentControl, Dropdown, Sheet, Tabs, TextArea, TextField, NowLine, Illustration, type IllustrationName, COVER_ILLUSTRATIONS, ICON_NAMES, useToast, BottomNavigation, Skeleton, Logo, ListItem, ListGroup, SectionHeader, EventCard, TravelConnector, IdeaRow, Tile, StatStrip, ProfileCard, OptionCard, BudgetCard, StepProgress, DayCard, CountryModal, CategoryIcon, ContextMenu, Accordion, Calendar, JourneyCard, JourneyLeg, JourneyStop, MapCard } from '../../design/components';
 import { flagUrl } from '../../lib/countries';
 import { EVENT_TYPES, TYPE_TONE } from '../../lib/categories';
 import type { ReactNode } from 'react';
@@ -186,7 +186,7 @@ export function DesignSystem() {
             <IconButton icon="pencil" label="Edit (Secondary)" tone="secondary" />
             <IconButton icon="send" label="Send (Primary)" tone="primary" />
             <IconButton icon="send" label="Send (Primary, disabled)" tone="primary" disabled />
-            <Select compact aria-label="Compact select (matches a small button)"><option>Organizer</option><option>Member</option></Select>
+            <Dropdown compact aria-label="Compact select (matches a small button)"><option>Organizer</option><option>Member</option></Dropdown>
           </Card>
           <Card tone="accent" className={s.row}><Button tone="inverse">Inverse</Button><IconButton icon="x" label="Close (On feature)" tone="on-feature" /></Card>
         </Section>
@@ -369,7 +369,7 @@ export function DesignSystem() {
           <Card className={s.stack}>
             <FieldRow>
               <TextField label="Text field" placeholder="Placeholder" />
-              <Select label="Select"><option>One</option><option>Two</option></Select>
+              <Dropdown label="Dropdown"><option>One</option><option>Two</option></Dropdown>
             </FieldRow>
             <FieldRow>
               <TextField label="Date" type="date" />

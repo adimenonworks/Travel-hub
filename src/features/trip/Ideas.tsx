@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { SlideSwap } from '../shared/SlideSwap';
 import { useSearchParams } from 'react-router-dom';
-import { Button, IdeaRow, LinkButton, ListGroup, ListItem, PageSection, SectionHeader, SegmentControl, Select, Sheet, TextArea, TextField, useToast, Card, Illustration } from '../../design/components';
+import { Button, IdeaRow, LinkButton, ListGroup, ListItem, PageSection, SectionHeader, SegmentControl, Dropdown, Sheet, TextArea, TextField, useToast, Card, Illustration } from '../../design/components';
 import { store } from '../../data';
 import { personName, useMe, usePlaces, usePlacesById } from '../../data/hooks';
 import type { Category, Idea, LinkItem, SavedPlace } from '../../data/types';
@@ -239,11 +239,11 @@ function IdeaForm({ open, tripId, currency, idea, onClose }: { open: boolean; tr
     <Sheet open={open} mode={idea ? 'edit' : 'default'} title={idea ? 'Edit idea' : 'New idea'} onClose={onClose} onSubmit={submit} submitLabel={idea ? 'Save' : 'Add'} submitDisabled={!f.title.trim()}
       secondary={idea ? <Button tone="destructive" size="large" onClick={remove}>Delete</Button> : undefined}>
       <TextField label="Idea" placeholder="Dinner at Taberna da Rua das Flores" value={f.title} onChange={(e) => set({ title: e.target.value })} />
-      <Select label="Type" value={eventKind(f.category)} onChange={(e) => set({ category: e.target.value as Category })}>
+      <Dropdown label="Type" value={eventKind(f.category)} onChange={(e) => set({ category: e.target.value as Category })}>
         {EVENT_TYPES.filter((t) => t.value !== 'free' && t.value !== 'notes').map((t) => (
           <optgroup key={t.value} label={t.label}>{t.kinds.map((c) => <option key={c.value} value={c.value}>{c.label}</option>)}</optgroup>
         ))}
-      </Select>
+      </Dropdown>
       {!isEveryday(f.category) && <PriceField value={f.price} onChange={(price) => set({ price })} />}
       <TextArea label="Why it's great" value={f.notes} onChange={(e) => set({ notes: e.target.value })} />
       <LinkEditor links={f.links} onChange={(links) => set({ links })} />
