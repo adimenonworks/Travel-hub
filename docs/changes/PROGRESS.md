@@ -8,7 +8,24 @@ Read this first when starting a session. If it disagrees with the code or Figma,
 
 `docs/changes/rove-change-library-v2.md` is **finished** (14 Nov 2026; results below).
 
-**Next: `docs/changes/rove-change-transparency-setup.md`** (14 Nov 2026): the start-up check and the Planning board redrawn from `docs/ROADMAP.md`. The transparency documents themselves (`ROADMAP.md`, `DECISIONS.md`, the split `CLAUDE.md` with `DESIGN-SYSTEM.md`, `APP-SPEC.md`, `FEEL-AND-NATIVE.md`) were merged from the claude.ai chat the same day. Then `rove-change-people-and-sharing.md`, then `rove-change-polish-and-library.md` (which now also has G8: Dropdown's size and Text area's height, the two Figma mismatches library v2 left).
+`docs/changes/rove-change-transparency-setup.md` is **finished** (14 Nov 2026; results below).
+
+**Next: `docs/changes/rove-change-people-and-sharing.md`**, then `rove-change-polish-and-library.md` (which also has G8: Dropdown's size and Text area's height, the two Figma mismatches library v2 left).
+
+### Transparency setup status (14 Nov 2026)
+
+- **1, documents hold together** (pull request 147). Read `CLAUDE.md`, `DECISIONS.md`, `ROADMAP.md`, `DESIGN-SYSTEM.md`, `APP-SPEC.md`, `FEEL-AND-NATIVE.md` and this file, and checked them against the code. Fixed: DECISIONS said every session starts by pulling (it checks and asks); DESIGN-SYSTEM said screens aren't redrawn (the eight core screens are); APP-SPEC's New trip flow skipped its budget step, called the country picker "Where should it go?" (it's "Choose a country"), and counted 43 categories (`EVENT_KINDS` has 46, also in ROADMAP); ROADMAP said places can be saved from a search (only Share → Rove or a link); FEEL-AND-NATIVE's Home description was stale; the "Set up Rove's small server" Next card was done (`/cover` answers with Unsplash photos), so it went. README rewritten where stale (roles, design system, manual deploy) and points to ROADMAP and DECISIONS; PR template has the docs line. No judgement calls came up.
+- **2, start-up check** (pull request 148): `.claude/settings.json` + `.claude/hooks/session-start.sh`. Tested in throwaway clones: hook output right in all four cases; real sessions run for "behind" and "offline" (both said the right thing); the app's safety check blocked starting test sessions for "up to date" and "uncommitted change", so those two were checked by the hook's output only.
+- **3, Planning board** (`466:553`, page Planning): rebuilt from `ROADMAP.md`: seven columns Now · Next · Later · Needs a design first · Blue sky · Decided not to build · Built (2 · 4 · 13 · 11 · 9 · 16 · 16 = 71 cards). Columns are a Section header instance (column name, item count) and a description; cards are Card instances (Tone Default, Layout Start, Title and Body; Now, Next and Later bodies end with "How we'd build it"). Frames bind `surface/*`, `border/subtle`, `border-width/thin`, `space/*` and `radius/900`; every text uses a text style and a `text/*` variable (checked by script: none unbound). New title "Rove roadmap" and the "don't edit here" intro with the redraw date. Guides panels rebuilt from the current `HOW-ROVE-IS-BUILT.md`, `DEPENDENCIES-AND-RISKS.md` and `SECURITY.md` the same way (they had no variables or styles before). Screenshot: `docs/changes/images/planning-board.png`. The old board's columns were bound to `map/pin` by mistake (from library v2's rebinding); gone with it.
+- Found while redrawing: `DEPENDENCIES-AND-RISKS.md` said the rules have no text limits; they have had them since 10 Nov. Fixed.
+
+### Check everything results (transparency setup, 14 Nov 2026)
+
+- ✅ All seven documents read; contradictions reported and the clear ones fixed; no judgement calls to ask.
+- ✅ `README.md` current, pointing to `ROADMAP.md` and `DECISIONS.md`; PR template line added.
+- ⚠️ Start-up hook committed; it never changes files (it only fetches); tested in the four cases. Real sessions for "behind" and "offline" only; the other two were blocked by the app's safety check, so they were checked by the hook's own output.
+- ✅ Planning board redrawn from `ROADMAP.md` (seven columns, right counts, "don't edit here" intro, components and variables only); Guides panels current; screenshot in the pull request.
+- ✅ `PROGRESS.md` updated.
 
 ### Library v2 status (14 Nov 2026)
 
