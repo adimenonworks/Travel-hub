@@ -88,5 +88,5 @@ The owner's rule (10 Nov 2026): **components must always match exactly; screens 
 ## Before pushing
 
 1. `npm run build` (type-checks and builds).
-2. Exercise the change in demo mode with Playwright (pre-installed, `require('playwright')`). Check 320, 375, 390 and 430px widths, light and dark mode, and large text (html font-size 23px and 33px).
+2. Exercise the change in demo mode with Playwright (pre-installed, `require('playwright')`). Check 320, 375, 390 and 430px widths, light and dark mode, and large text (html font-size 23px and 33px). **Compare screenshots by script, not by eye** (owner, 14 Nov 2026): take the before and after shots, compare them with a pixel-diff script, and only open (view) the ones that differ, plus any the owner needs to see. Looking at images costs far more than comparing them.
 3. If rules changed: `cd tests/rules && npm install && npm test` (needs Java; the Firestore emulator downloads on first run).
