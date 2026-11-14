@@ -65,7 +65,12 @@ Read this first when starting a session. If it disagrees with the code or Figma,
   - Every kind's row re-flowed: most used first (instances placed directly in designs, not counting ones nested inside other components), then A to Z; 96px between sets, wrapping inside the 4,946px dividers; Text field, Text area and Dropdown stacked together. Checked by script: nothing overlaps, in the section or on the page. Section now 5,266 × 9,856.
   - Screenshot: `docs/changes/images/library-v2-components.png`.
 
-**Next: Part D (code tidy-ups: delete what the mapping marks deleted, /#/design shows the new collections and names).** Then E and the Check everything list.
+- **Part D, tidy-ups:**
+  - Deleted tokens: every name the mapping marks "deleted" is gone from the code (checked by search, 26 old prefixes, 0 hits). Still unused in code but kept, because Figma has them and components there use most of them: `control/selected-ghost/background`, `control/selected/icon`, `control/unselected-ghost/icon`, `tag/*/icon`, `radius/900`, `size/avatar-small`, `size/avatar-large`, `easing/settle`.
+  - /#/design: Typography specs corrected (they were wrong, e.g. Heading 1 is Poppins Black 125%) and Link small added; "Spacing & shape" is now **Layout** (space, page spaces, every radius, role sizes, the size scale, border widths); **Motion** lists the durations (in ms) and easings from `motion.css` plus the `--motion-*` shorthands; the Colour section was updated in A3.
+  - Figma Foundations, Semantics doc (`35:1720`): Button, Control, Input, Tag, Category and Map groups added to the Light and Dark boards (110 swatches each, linked to their variables), `overlay/photo` added, and every swatch's "→ base" line regenerated from the live variables (13 in Light and 15 in Dark were out of date).
+
+**Next: Part E (update everything that names tokens or components; remove CLAUDE.md's stale lines).** Then the Check everything list.
 
 **Noticed for later:** the Foundations section "Spacing & radius" (`35:2217`) documents names from long ago (`--space-xxs`, `--radius-button`, "Regular (744–1067px)"). Rebuild it in A4 with the new Layout names.
 

@@ -28,29 +28,41 @@ const colorGroups: { title: string; tokens: string[]; feature?: boolean }[] = [
 
 // One row per Figma text style, at the default iPhone text size.
 const typeStyles = [
-  ['t-display', 'Display', '48 · Poppins Black · 100%'],
+  ['t-display', 'Display', '48 · Poppins Black · 125%'],
   ['t-display-small', 'Display small', '32 · Poppins Black · 100%'],
-  ['t-heading-1', 'Heading 1', '28 · Manrope Bold · 100%'],
-  ['t-heading-2', 'Heading 2', '20 · Semibold · 100%'],
-  ['t-heading-3', 'Heading 3', '18 · Semibold · 100%'],
-  ['t-heading-4', 'Heading 4', '18 · Bold · 100%'],
-  ['t-body', 'Body', '14 · Regular · 150%'],
-  ['t-body-small', 'Body small', '12 · Regular · 150%'],
-  ['t-label', 'Label', '14 · Medium · 150%'],
-  ['t-label-small', 'Label small', '12 · Medium · 150%'],
-  ['t-link', 'Link', '14 · Medium'],
+  ['t-heading-1', 'Heading 1', '28 · Poppins Black · 125%'],
+  ['t-heading-2', 'Heading 2', '20 · Poppins Bold · 125%'],
+  ['t-heading-3', 'Heading 3', '16 · Manrope Semibold · 100%'],
+  ['t-heading-4', 'Heading 4', '16 · Manrope Bold · 100%'],
+  ['t-body', 'Body', '14 · Manrope Regular · 150%'],
+  ['t-body-small', 'Body small', '12 · Manrope Regular · 150%'],
+  ['t-label', 'Label', '14 · Manrope Medium · 150%'],
+  ['t-label-small', 'Label small', '12 · Manrope Medium · 150%'],
+  ['t-link', 'Link', '14 · Manrope Medium · 100%'],
+  ['t-link-small', 'Link small', '12 · Manrope Medium · 100%'],
 ];
 
-const spaces = ['--space-200', '--space-300', '--space-400', '--space-500', '--space-600', '--space-700', '--space-800', '--space-950', '--space-1000'];
-const radii = ['--radius-500', '--radius-600', '--radius-700', '--radius-full'];
-const controlSizes = ['--size-control-small', '--size-tap', '--size-control-large'];
+// The Figma Layout collection (one mode, "Value").
+const spaces = ['--space-100', '--space-200', '--space-250', '--space-300', '--space-400', '--space-450', '--space-500', '--space-600', '--space-700', '--space-800', '--space-900', '--space-950', '--space-1000'];
+const pageSpaces = ['--space-page-gutter', '--space-page-section', '--space-page-top', '--space-page-bottom'];
+const radii = ['--radius-100', '--radius-200', '--radius-300', '--radius-400', '--radius-500', '--radius-600', '--radius-700', '--radius-900', '--radius-full'];
+const roleSizes = ['--size-icon-small', '--size-icon-large', '--size-avatar-small', '--size-avatar-medium', '--size-avatar-large', '--size-control-small', '--size-category-icon-medium', '--size-tap', '--size-control-large', '--size-category-icon-large', '--size-tab-bar'];
+const sizeScale = [100, 200, 400, 500, 600, 650, 700, 750, 800, 900, 1000, 1050, 1100, 1200, 1300, 1400, 1500, 1600, 1700, 1800, 1900].map((n) => `--size-${n}`);
+const borderWidths = ['--border-width-thin', '--border-width-medium', '--border-width-thick', '--border-width-focus'];
+// The Figma Motion collection (motion.css); the --motion-* shorthands are code only, built from it.
+const durations = ['stagger', 'quick', 'fade', 'settle', 'regular', 'gentle', 'fluid', 'celebrate', 'sheet', 'spin', 'shimmer'].map((n) => `--duration-${n}`);
+const easings = ['standard', 'spring', 'fluid', 'exit', 'bounce', 'settle', 'keyboard', 'linear'].map((n) => `--easing-${n}`);
+/** Browsers report durations in seconds (".15s"); Figma and motion.css use ms. */
+const toMs = (v: string) => { const x = v.trim(); return x.endsWith('ms') ? x : `${Math.round(parseFloat(x) * 1000)}ms`; };
 const motions: [string, string][] = [
   ['--motion-fast', 'Colour and background changes (hover, press colours)'],
-  ['--motion-fluid', 'Things that move: the tab underline, the segmented pill, day cards pushing and expanding'],
-  ['--motion-press', 'A button or option pressing in (scales to 96%)'],
+  ['--motion-press', 'A button or option pressing in'],
   ['--motion-release', 'Springing back out, with a small overshoot'],
-  ['--motion-sheet', 'Sheets gliding up (or popping in on wider screens)'],
-  ['--motion-sheet-out', 'Sheets sliding away on Cancel, Save or close: quicker, speeding up as they leave'],
+  ['--motion-fluid', 'Things that move: the tab underline, the segment pill, day cards pushing and expanding'],
+  ['--motion-screen', 'A screen sliding in, like an iPhone push'],
+  ['--motion-sheet', 'Sheets and toasts gliding up'],
+  ['--motion-sheet-out', 'Sheets sliding away: quicker, speeding up as they leave'],
+  ['--motion-keyboard', 'Riding up with the keyboard, on its own curve'],
 ];
 const spotNames: IllustrationName[] = ['memories', 'ideas', 'calendar', 'map', 'ticket', 'suitcase', 'compass', 'globe', 'friends'];
 const icons = ICON_NAMES;
@@ -97,7 +109,7 @@ export function DesignSystem() {
           ))}
         </Section>
 
-        <Section title="Typography" footer="Same names as the Figma text styles. Poppins Black for display titles and big numbers; Manrope for everything else. Headings are one line (100% line height). Sizes follow the iPhone text setting (shown here at the default).">
+        <Section title="Typography" footer="The Figma Typography collection and text styles: Poppins Black / Bold for display titles, Heading 1, Heading 2 and big numbers (125% line height so wrapped titles never touch); Manrope for everything else. Sizes follow the iPhone text setting (shown here at the default).">
           <Card className={s.stack}>
             {typeStyles.map(([cls, name, spec]) => (
               <div key={cls} className={s.typeRow}>
@@ -108,28 +120,48 @@ export function DesignSystem() {
           </Card>
         </Section>
 
-        <Section title="Spacing & shape" footer="Named like Figma: space/inline-* inside components, space/page-* between sections. Controls are pills; cards have 24px corners. Minimum tap target 44×44.">
+        <Section title="Layout" footer="The Figma Layout collection: space/* (16 inside a section), space/page/* (24 side margins, 40 between sections, 96 below every page), radius/* (pills are radius/full), role sizes, the numbered size scale size/{step} for every other fixed size, and border-width/*. Every component value comes from one of these (or calc() of them). Minimum tap target 44×44.">
           <Card className={s.stack}>
-            {spaces.map((t) => (
+            <div className="t-heading-4">Space</div>
+            {[...spaces, ...pageSpaces].map((t) => (
               <div key={t} className={s.spaceRow}>
                 <code className={s.code}>{t}</code>
                 <div className={s.spaceBar} style={{ width: `var(${t})` }} />
               </div>
             ))}
+            <div className="t-heading-4">Corner radius</div>
             <div className={s.radii}>
               {radii.map((r) => <div key={r} className={s.radius} style={{ borderRadius: `var(${r})` } as CSSProperties}><code className={s.code}>{r.replace('--radius-', '')}</code></div>)}
             </div>
-            {controlSizes.map((t) => (
+            <div className="t-heading-4">Role sizes</div>
+            {roleSizes.map((t) => (
               <div key={t} className={s.spaceRow}>
                 <code className={s.code}>{t}</code>
                 <div className={s.spaceBar} style={{ width: `var(${t})`, height: `var(${t})` }} />
               </div>
             ))}
+            <div className={s.spaceRow}><code className={s.code}>--size-content-max</code><span className="t-body-small t-secondary">480 (the phone column on a computer)</span></div>
+            <div className="t-heading-4">Size scale</div>
+            {sizeScale.map((t) => (
+              <div key={t} className={s.spaceRow}>
+                <code className={s.code}>{t}</code>
+                <div className={s.spaceBar} style={{ width: `min(var(${t}), 100%)` }} />
+              </div>
+            ))}
+            <div className="t-heading-4">Border width</div>
+            {borderWidths.map((t) => (
+              <div key={t} className={s.spaceRow}>
+                <code className={s.code}>{t}</code>
+                <div style={{ height: 'var(--size-600)', borderRadius: 'var(--radius-300)', border: `var(${t}) solid var(--border-bold)` }} />
+              </div>
+            ))}
           </Card>
         </Section>
 
-        <Section title="Motion" footer="Tokens in semantic.css. Tap the tabs or the segmented control on this page to see --motion-fluid. With “reduce motion” on, changes are instant.">
+        <Section title="Motion" footer="The Figma Motion collection (src/design/tokens/motion.css): durations in ms and easing curves. The --motion-* shorthands are code only, built from them. Tap the tabs or the segment control on this page to see --motion-fluid. With Reduce Motion on, movement becomes a short fade.">
           <Card className={s.stack}>
+            {durations.map((t) => <div key={t} className={s.typeRow}><code className={s.code}>{t}</code><span className="t-body-small t-secondary">{toMs(getComputedStyle(document.documentElement).getPropertyValue(t))}</span></div>)}
+            {easings.map((t) => <div key={t} className={s.typeRow}><code className={s.code}>{t}</code><span className="t-body-small t-secondary">{getComputedStyle(document.documentElement).getPropertyValue(t).trim()}</span></div>)}
             {motions.map(([t, use]) => (
               <div key={t} className={s.typeRow}><code className={s.code}>{t}</code><span className="t-body-small t-secondary">{use}</span></div>
             ))}
