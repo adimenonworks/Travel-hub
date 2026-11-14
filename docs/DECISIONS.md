@@ -14,6 +14,11 @@
 
 ## 14 Nov 2026
 
+### Travelling and Following: built (people and sharing, item 2, first part)
+- **Decision:** Add people opens a sheet with two Option cards, Travelling and Following (each with its one line), then Share link makes a link carrying that role and opens the share sheet ("Join us on <trip> in Rove", or "Follow <trip> in Rove" for a Following link). The join page says what a follower gets. People is one list with a role dropdown on each row (List item "Show Button", a Ghost Button) that opens the Context menu: Travelling, Following (the current one ticked) and Remove from trip, or Leave trip on your own row. Followers see roles as plain text and leave with a button at the end. Changing a role confirms with a Toast with Undo.
+- **Settled while building:** there's always at least one traveller: the last one can't make themselves Following (a Toast says to make someone else Travelling first), since only travellers can change anything. The rules check the role against the link: a Following link can only make you a follower; links from older app versions carry no role and still mean travelling.
+- **Split:** item 2's Undo-on-everything and per-event change history come next as their own pull request; "only people in an event edit it" and "Just me / Remove for everyone" need item 3's who's in, so they're built with item 3.
+
 ### One trip, everyone equal: built (people and sharing, item 1)
 - **Decision:** no owner anywhere. Two roles, **Travelling** (`traveller`) and **Following** (`follower`). Any traveller edits the trip, adds people, changes roles, removes someone and deletes the trip; anyone can leave. Who started the trip is kept as `createdBy`, a record only.
 - **Details settled while building:** deleting goes to Recently deleted for everyone, and any traveller restores it or (after 30 days) clears it for good; the rules only allow deleting for good from Recently deleted. The last traveller leaving deletes the trip into Recently deleted, and they stay on it so they can restore it. Deleting your account leaves every trip; a trip with no other traveller is deleted. Older trips are migrated by the first traveller who opens them (owner, editor, member → traveller; viewer → follower; `ownerId` → `createdBy`), since there's no server; until then the app and the rules read the old names the same way.

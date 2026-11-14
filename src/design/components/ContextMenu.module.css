@@ -2,7 +2,9 @@
 .dim { position: fixed; inset: 0; z-index: 70; background: var(--overlay-scrim); opacity: 0.35; animation: dimIn var(--motion-fast); }
 .lifted { position: relative; z-index: 71; animation: lift var(--motion-release); }
 .menu {
-  position: absolute; top: calc(100% + var(--space-200)); z-index: 72; min-width: calc(240rem / 17);
+  position: absolute; top: calc(100% + var(--space-200)); z-index: 72;
+  /* 240 wide, growing with text, but never wider than the screen minus its side margins (largest text sizes) */
+  min-width: min(calc(240rem / 17), calc(100vw - var(--space-page-gutter) * 2)); max-width: calc(100vw - var(--space-page-gutter) * 2);
   display: flex; flex-direction: column; overflow: hidden; border-radius: var(--radius-500);
   background: var(--surface-primary); box-shadow: var(--shadow-overlay); animation: pop var(--motion-release);
 }

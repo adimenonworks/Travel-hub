@@ -83,7 +83,8 @@ export interface Store {
   createCollectionInvite(share: CollectionShare, role: CollectionRole, label: string): Promise<string>;
   /** The owner changes someone's role, or removes them (role null); anyone can remove themselves (leave). */
   setShareRole(share: CollectionShare, uid: string, role: CollectionRole | null): Promise<void>;
-  createInvite(trip: Trip): Promise<string>;
+  /** A link to join the trip as a traveller or a follower (the link carries the role). */
+  createInvite(trip: Trip, role: Role): Promise<string>;
   getInvite(code: string): Promise<Invite | null>;
   redeemInvite(invite: Invite): Promise<void>;
 }

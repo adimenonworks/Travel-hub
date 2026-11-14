@@ -77,6 +77,14 @@ await t('follower cannot make an invite', assertFails(setDoc(doc(C, 'invites/fba
 await t('follower cannot make themselves a traveller', assertFails(updateDoc(doc(C, 'trips/t1'), { 'roles.carol': 'traveller' })));
 await t('follower cannot bin the trip', assertFails(updateDoc(doc(C, 'trips/t1'), { deletedAt: 1, deletedBy: 'carol' })));
 
+// Links carry the role: a Following link makes you a follower, and you can't pick Travelling instead
+await t('a traveller makes a Following link', assertSucceeds(setDoc(doc(B, 'invites/follow'), { tripId: 't1', tripName: 'Lisbon', role: 'follower', createdBy: 'bob', expiresAt: Timestamp.fromMillis(Date.now() + 1e9) })));
+await t('cannot make a link with an unknown role', assertFails(setDoc(doc(B, 'invites/boss'), { tripId: 't1', tripName: 'Lisbon', role: 'owner', createdBy: 'bob', expiresAt: Timestamp.fromMillis(Date.now() + 1e9) })));
+await t('a Following link cannot make you a traveller', assertFails(updateDoc(doc(db('fay'), 'trips/t1'), { memberIds: arrayUnion('fay'), 'roles.fay': 'traveller', joinedVia: 'follow' })));
+await t('nor an old member', assertFails(updateDoc(doc(db('fay'), 'trips/t1'), { memberIds: arrayUnion('fay'), 'roles.fay': 'member', joinedVia: 'follow' })));
+await t('fay joins with a Following link as a follower', assertSucceeds(updateDoc(doc(db('fay'), 'trips/t1'), { memberIds: arrayUnion('fay'), 'roles.fay': 'follower', joinedVia: 'follow' })));
+await t('a follower from a link cannot edit the trip', assertFails(updateDoc(doc(db('fay'), 'trips/t1'), { name: 'x' })));
+await t('a link with no role still lets an older app join as member', assertSucceeds(updateDoc(doc(db('gus'), 'trips/t1'), { memberIds: arrayUnion('gus'), 'roles.gus': 'member', joinedVia: 'good' })));
 await env.withSecurityRulesDisabled(async (c) => setDoc(doc(c.firestore(), 'invites/old'), { tripId: 't1', tripName: 'x', createdBy: 'alice', expiresAt: Timestamp.fromMillis(Date.now() - 1000) }));
 await t('expired invite rejected', assertFails(updateDoc(doc(db('dan'), 'trips/t1'), { memberIds: arrayUnion('dan'), 'roles.dan': 'traveller', joinedVia: 'old' })));
 

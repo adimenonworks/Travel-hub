@@ -101,7 +101,7 @@ export function NewTrip({ open, onClose, onOpenTrip }: { open: boolean; onClose:
     // The trip as stored (createInvite needs the whole record): read it once from its listener.
     const trip = await new Promise<Trip | null>((resolve) => { const off = store.watchTrip(id, (t) => { resolve(t); setTimeout(() => off(), 0); }, () => resolve(null)); });
     if (!trip) return;
-    const code = await store.createInvite(trip);
+    const code = await store.createInvite(trip, 'traveller');
     const url = `${isNativeApp ? PUBLIC_SITE : location.origin + location.pathname}#/join/${code}`;
     if (await shareLink({ title: `Join ${name}`, text: `Join us on ${name} in Rove`, url })) return;
     try { await navigator.clipboard.writeText(url); toast({ icon: 'copy', label: 'Link to join copied' }); } catch { /* shown nowhere else; the People tab has it */ }

@@ -28,11 +28,12 @@ export function ListItem({ title, meta, trailing, action, icon, media, size = 'l
   title: ReactNode; meta?: ReactNode; trailing?: ReactNode; icon?: IconName; media?: ReactNode; size?: 'large' | 'small'; round?: boolean;
   /** The nested `.Category icon`'s Type: the icon tile in an event type's colour (a place or an event). */
   type?: CategoryTone;
-  /** Figma "Show action": a small Ghost Icon button at the end, e.g. Copy for a booking reference. Not inside a pressable row. */
+  /** Figma "Show Icon button" (a small Ghost Icon button, e.g. Copy for a booking reference) or "Show Button" (a small
+   *  Ghost Button, e.g. People's role dropdown) at the end. Not inside a pressable row. */
   action?: ReactNode;
 }) {
   return (
-    <Pressable {...press} role="listitem" className={[s.item, size === 'small' && s.compact].filter(Boolean).join(' ')}>
+    <Pressable {...press} role="listitem" className={[s.item, size === 'small' && s.compact, action && s.hasAction].filter(Boolean).join(' ')}>
       {media ? <Thumb media={media} round={round} /> : icon && <CategoryIcon icon={icon} type={type} size={size === 'small' ? 'small' : 'large'} tone="primary" />}
       <span className={s.itemText}>
         <span className={s.itemTitle}>{title}</span>
