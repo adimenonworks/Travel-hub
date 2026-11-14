@@ -1,5 +1,5 @@
 import { useState, type CSSProperties } from 'react';
-import { Avatar, AvatarStack, Tag, Chip, Banner, Button, Card, FieldRow, HeroCard, Icon, IconButton, LinkButton, PageHeader, PageSection, SegmentControl, Select, Sheet, Tabs, TextArea, TextField, NowLine, Illustration, type IllustrationName, COVER_ILLUSTRATIONS, ICON_NAMES, useToast, BottomNavigation, Skeleton, Logo, ListItem, ListGroup, SectionHeader, EventCard, TravelConnector, IdeaRow, Tile, StatStrip, ProfileCard, OptionCard, BudgetCard, StepProgress, DayCard, CountryModal, CategoryIcon, ContextMenu, Accordion, Calendar, JourneyCard, JourneyLeg, JourneyStop, MapCard } from '../../design/components';
+import { Avatar, AvatarStack, Message, Tag, Chip, Banner, Button, Card, FieldRow, HeroCard, Icon, IconButton, LinkButton, PageHeader, PageSection, SegmentControl, Select, Sheet, Tabs, TextArea, TextField, NowLine, Illustration, type IllustrationName, COVER_ILLUSTRATIONS, ICON_NAMES, useToast, BottomNavigation, Skeleton, Logo, ListItem, ListGroup, SectionHeader, EventCard, TravelConnector, IdeaRow, Tile, StatStrip, ProfileCard, OptionCard, BudgetCard, StepProgress, DayCard, CountryModal, CategoryIcon, ContextMenu, Accordion, Calendar, JourneyCard, JourneyLeg, JourneyStop, MapCard } from '../../design/components';
 import { flagUrl } from '../../lib/countries';
 import { EVENT_TYPES, TYPE_TONE } from '../../lib/categories';
 import type { ReactNode } from 'react';
@@ -378,6 +378,15 @@ export function DesignSystem() {
             <TextArea label="Text area" placeholder="Notes" />
             <SegmentControl label="Demo" value={seg} onChange={setSeg} options={[{ value: 'a', label: 'First' }, { value: 'b', label: 'Second' }, { value: 'c', label: 'Third' }]} />
           </Card>
+        </Section>
+
+        <Section title="Message" footer="Figma Message: Layout Theirs (white, on the grey comments section, Avatar slot on the left) / Mine (deep green, feature/*), Show meta (theirs: who and when; mine: when), Show Avatar, Show edited. A run from one person stacks them: meta on the first, avatar beside the last. Press and hold your own to Edit or Delete (on an event page).">
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-100)', padding: 'var(--space-500)', borderRadius: 'var(--radius-600)', background: 'var(--surface-secondary)' }}>
+            <Message layout="theirs" meta="Sam · 2h">Love this place, the bifanas are great</Message>
+            <Message layout="theirs" edited avatar={<Avatar name="Sam Lee" size="medium" />}>Shall we book for Friday?</Message>
+            <Message layout="mine" meta="now">Yes, booked for 8</Message>
+            <Message layout="mine" edited>See you there</Message>
+          </div>
         </Section>
 
         <Section title="Feedback & identity">

@@ -18,3 +18,4 @@ export { ContextMenu, type ContextMenuItem } from './ContextMenu';
 export { Accordion } from './Accordion';
 export { MapCard } from './MapCard';
 export { Logo } from './Logo';
+export { Message } from './Message';

@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { haptic } from '../../lib/native';
-import { Avatar, ContextMenu, IconButton, Banner, useToast } from '../../design/components';
+import { Avatar, ContextMenu, IconButton, Banner, Message, useToast } from '../../design/components';
 import { store } from '../../data';
 import { personName, useMe } from '../../data/hooks';
 import type { Comment, Profile } from '../../data/types';
@@ -98,32 +98,24 @@ export function Comments({ tripId, targetId, comments, profiles }: { tripId: str
             const name = personName(profiles, first.authorId);
             const when = timeAgo(first.createdAt);
             return (
-              <li key={first.id} className={`${s.message} ${mine ? s.mine : s.theirs}`}>
-                <span className={s.messageMeta}>{mine ? when : `${name.split(' ')[0]} · ${when}`}</span>
-                {stack.map((c, i) => {
-                  const lastOne = i === stack.length - 1;
-                  const bubble = (
-                    <p className={s.bubble} {...(mine ? {
+              <li key={first.id} className={s.stack}>
+                {stack.map((c, i) => (
+                  <Message key={c.id} layout={mine ? 'mine' : 'theirs'} edited={!!c.editedAt}
+                    meta={i === 0 ? (mine ? when : `${name.split(' ')[0]} · ${when}`) : undefined}
+                    avatar={!mine && i === stack.length - 1 ? <Avatar name={name} photo={profiles[c.authorId]?.photo} seed={c.authorId} size="medium" /> : undefined}
+                    bubbleProps={mine ? {
                       onPointerDown: pressStart(c), onPointerMove: pressMove, onPointerUp: pressEnd, onPointerCancel: pressEnd, onPointerLeave: pressEnd,
                       onContextMenu: (e: React.MouseEvent) => { e.preventDefault(); setMenu(c.id); },
                       tabIndex: 0, role: 'button', 'aria-haspopup': 'menu' as const, 'aria-label': `${c.text}. Press and hold for Edit and Delete`,
                       onKeyDown: (e: React.KeyboardEvent) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setMenu(c.id); } },
-                    } : {})}>{c.text}</p>
-                  );
-                  return (
-                    <div key={c.id} className={s.messageRow}>
-                      {!mine && (lastOne ? <Avatar name={name} photo={profiles[c.authorId]?.photo} seed={c.authorId} size="medium" /> : <span className={s.avatarSpace} aria-hidden="true" />)}
-                      {c.editedAt && mine && <span className={s.edited}>Edited</span>}
-                      {menu === c.id
-                        ? <ContextMenu label="Message" align="end" onClose={() => setMenu(null)} items={[
-                            { label: 'Edit', icon: 'pencil', onClick: () => edit(c) },
-                            { label: 'Delete', icon: 'trash', tone: 'danger', onClick: () => remove(c) },
-                          ]}>{bubble}</ContextMenu>
-                        : bubble}
-                      {c.editedAt && !mine && <span className={s.edited}>Edited</span>}
-                    </div>
-                  );
-                })}
+                    } : undefined}
+                    wrapBubble={menu === c.id ? (bubble) => (
+                      <ContextMenu label="Message" align="end" onClose={() => setMenu(null)} items={[
+                        { label: 'Edit', icon: 'pencil', onClick: () => edit(c) },
+                        { label: 'Delete', icon: 'trash', tone: 'danger', onClick: () => remove(c) },
+                      ]}>{bubble}</ContextMenu>
+                    ) : undefined}>{c.text}</Message>
+                ))}
               </li>
             );
           })}
